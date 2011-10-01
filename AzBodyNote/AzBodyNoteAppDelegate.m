@@ -8,7 +8,7 @@
 
 #import "AzBodyNoteAppDelegate.h"
 
-#import "RootViewController.h"
+#import "E2recordTVC.h"
 
 @implementation AzBodyNoteAppDelegate
 
@@ -75,7 +75,7 @@
 
 - (void)awakeFromNib
 {
-    RootViewController *rootViewController = (RootViewController *)[self.navigationController topViewController];
+    E2recordTVC *rootViewController = (E2recordTVC *)[self.navigationController topViewController];
     rootViewController.managedObjectContext = self.managedObjectContext;
 }
 

@@ -1,18 +1,18 @@
 //
-//  RootViewController.m
+//  E2recordTVC.m
 //  AzBodyNote
 //
 //  Created by 松山 和正 on 11/10/01.
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "RootViewController.h"
+#import "E2recordTVC.h"
 
-@interface RootViewController ()
+@interface E2recordTVC ()
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 @end
 
-@implementation RootViewController
+@implementation E2recordTVC
 
 @synthesize fetchedResultsController = __fetchedResultsController;
 @synthesize managedObjectContext = __managedObjectContext;
