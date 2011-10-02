@@ -1,14 +1,14 @@
 //
 //  AzBodyNoteAppDelegate.m
-//  AzBodyNote
+//	AzBodyNote
 //
-//  Created by 松山 和正 on 11/10/01.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Created by Sum Positive on 2011/10/01.
+//  Copyright 2011 Sum Positive@Azukid.com. All rights reserved.
 //
 
 #import "AzBodyNoteAppDelegate.h"
 
-#import "E2recordTVC.h"
+#import "E2listTVC.h"
 
 @implementation AzBodyNoteAppDelegate
 
@@ -16,13 +16,15 @@
 @synthesize managedObjectContext = __managedObjectContext;
 @synthesize managedObjectModel = __managedObjectModel;
 @synthesize persistentStoreCoordinator = __persistentStoreCoordinator;
-@synthesize navigationController = _navigationController;
+//@synthesize navigationController = _navigationController;
+@synthesize tabBarController = _tabBarController;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 	// Override point for customization after application launch.
 	// Add the navigation controller's view to the window and display.
-	self.window.rootViewController = self.navigationController;
+
+	self.window.rootViewController = self.tabBarController;
 	[self.window makeKeyAndVisible];
     return YES;
 }
@@ -69,14 +71,14 @@
 	[__managedObjectContext release];
 	[__managedObjectModel release];
 	[__persistentStoreCoordinator release];
-	[_navigationController release];
+	[_tabBarController release];
     [super dealloc];
 }
 
 - (void)awakeFromNib
 {
-    E2recordTVC *rootViewController = (E2recordTVC *)[self.navigationController topViewController];
-    rootViewController.managedObjectContext = self.managedObjectContext;
+    //E2listTVC *rootViewController = (E2listTVC *)[self.navigationController topViewController];
+    //rootViewController.managedObjectContext = self.managedObjectContext;
 }
 
 - (void)saveContext

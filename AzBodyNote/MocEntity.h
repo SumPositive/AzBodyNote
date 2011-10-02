@@ -1,8 +1,9 @@
 //
 //  MocEntity.h
+//	AzBodyNote
 //
 //  Created by Sum Positive on 2011/10/01.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Copyright 2011 Sum Positive@Azukid.com. All rights reserved.
 //
 #import <Foundation/Foundation.h>
 

@@ -1,9 +1,9 @@
 //
 //  AzBodyNoteAppDelegate.h
-//  AzBodyNote
+//	AzBodyNote
 //
-//  Created by 松山 和正 on 11/10/01.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Created by Sum Positive on 2011/10/01.
+//  Copyright 2011 Sum Positive. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -19,6 +19,7 @@
 - (void)saveContext;
 - (NSURL *)applicationDocumentsDirectory;
 
-@property (nonatomic, retain) IBOutlet UINavigationController *navigationController;
+//@property (nonatomic, retain) IBOutlet UINavigationController *navigationController;
+@property (nonatomic, retain) IBOutlet UITabBarController *tabBarController;
 
 @end
