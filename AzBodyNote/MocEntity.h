@@ -14,8 +14,8 @@
 @interface E1body : NSManagedObject {
 }
 @property (nonatomic, retain) NSDate			*birthday;	// NSDateは、UTC(+0000)協定時刻で記録 ⇒ 表示でタイムゾーン変換する
-@property (nonatomic, retain) NSNumber   *markBpLower_mmHg;
-@property (nonatomic, retain) NSNumber   *markBpUpper_mmHg;
+@property (nonatomic, retain) NSNumber   *markBpHi_mmHg;
+@property (nonatomic, retain) NSNumber   *markBpLo_mmHg;
 @property (nonatomic, retain) NSNumber   *markWaist_cm;
 @property (nonatomic, retain) NSNumber   *markWeight_g;
 @property (nonatomic, retain) NSString		*name;
@@ -26,8 +26,8 @@
 //---------------------------------------------------------------------------------------E2
 @interface E2record : NSManagedObject {
 }
-@property (nonatomic, retain) NSNumber   *bpLower_mmHg;
-@property (nonatomic, retain) NSNumber   *bpUpper_mmHg;
+@property (nonatomic, retain) NSNumber   *bpHi_mmHg;
+@property (nonatomic, retain) NSNumber   *bpLo_mmHg;
 @property (nonatomic, retain) NSString		*caution;
 @property (nonatomic, retain) NSString		*condition;
 @property (nonatomic, retain) NSDate			*datetime;	// NSDateは、UTC(+0000)協定時刻で記録 

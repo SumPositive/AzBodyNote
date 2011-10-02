@@ -7,7 +7,7 @@
 //
 
 #import "AzBodyNoteAppDelegate.h"
-
+#import "MocFunctions.h"
 #import "E2listTVC.h"
 
 @implementation AzBodyNoteAppDelegate
@@ -24,6 +24,8 @@
 	// Override point for customization after application launch.
 	// Add the navigation controller's view to the window and display.
 
+	[MocFunctions setMoc:self.managedObjectContext];
+	
 	self.window.rootViewController = self.tabBarController;
 	[self.window makeKeyAndVisible];
     return YES;

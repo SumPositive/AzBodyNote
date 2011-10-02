@@ -10,7 +10,7 @@
 
 #import <CoreData/CoreData.h>
 
-@interface E2recordTVC : UITableViewController <NSFetchedResultsControllerDelegate>
+@interface E2listTVC : UITableViewController <NSFetchedResultsControllerDelegate>
 
 @property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;

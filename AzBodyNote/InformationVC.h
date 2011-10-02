@@ -1,9 +1,9 @@
 //
 //  InformationVC.h
-//  AzSplitIt-Xc4.1
+//	AzBodyNote
 //
-//  Created by 松山 和正 on 11/09/25.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Created by Sum Positive on 2011/10/01.
+//  Copyright 2011 Sum Positive@Azukid.com. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

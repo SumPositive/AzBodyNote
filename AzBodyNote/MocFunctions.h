@@ -1,13 +1,13 @@
 //
-//  EntityRelation.h
-//  AzCredit
+//  MocFunctions.h
+//	AzBodyNote
 //
-//  Created by 松山 和正 on 10/03/15.
-//  Copyright 2010 __MyCompanyName__. All rights reserved.
+//  Created by Sum Positive on 2011/10/01.
+//  Copyright 2011 Sum Positive@Azukid.com. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
-
+#import "MocEntity.h"
 
 @interface MocFunctions : NSObject {
 }
@@ -26,31 +26,7 @@
 			  where:(NSPredicate *)predicate
 			   sort:(NSArray *)arSort;
 
-+ (void)allReset;
++ (void)e2delete:(E2record *)e2node;
 
-+ (E0root *)e0root;
-
-+ (NSInteger)yearMMDDpaymentE1card:(E1card *)Pe1card  forUseDate:(NSDate*)PtUse;
-+ (void)e1delete:(E1card *)e1obj;
-+ (void)e1update:(E1card *)e1obj;
-
-+ (E2invoice *)e2invoice:(E1card *)e1card inYearMMDD:(NSInteger)iYearMMDD;
-+ (void)e2e7update:(E2invoice *)e2;
-+ (void)e2delete:(E2invoice *)e2obj;
-+ (void)e2paid:(E2invoice *)e2obj inE6payNextMonth:(BOOL)bE6payNextMonth;
-+ (void)e7paid:(E7payment *)e7obj inE6payNextMonth:(BOOL)bE6payNextMonth;
-+ (void)e7e2clean;
-
-+ (E3record *)replicateE3record:(E3record *)e3source;
-+ (void)e3check:(BOOL)bCheckOn inE3obj:(E3record *)e3obj inAlert:(BOOL)bAlert;
-+ (void)e3delete:(E3record *)e3obj;
-//+ (BOOL)e3record:(E3record*)e3rec makeE6change:(int)iChange;
-+ (BOOL)e3record:(E3record*)e3rec makeE6change:(int)iChange  withFirstYMD:(NSInteger)firstYMD;
-+ (BOOL)e3saved:(E3record *)e3node;  //inFirstYearMMDD:(NSInteger)iFirstYearMMDD;
-
-+ (void)e6check:(BOOL)bCheckOn inE6obj:(E6part *)e6obj inAlert:(BOOL)bAlert;
-+ (void)e6payNextMonth:(E6part *)e6obj;
-
-+ (void)bugFix113;		//[1.1.3.0]
 
 @end

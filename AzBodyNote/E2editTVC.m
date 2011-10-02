@@ -6,13 +6,20 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
+#import "Global.h"
+#import "MocEntity.h"
+#import "MocFunctions.h"
 #import "E2editTVC.h"
+#import "E2editCellValue.h"
 
 @implementation E2editTVC
+@synthesize Re2edit;
+@synthesize ownerE2editTVC;
+
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
-    self = [super initWithStyle:style];
+    self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
         // Custom initialization
     }
@@ -27,6 +34,47 @@
     // Release any cached data, images, etc that aren't in use.
 }
 
+
+#pragma mark - IBAction
+
+- (IBAction)ibBuValue:(UIButton *)button
+{
+	NSLog(@"ibBuValue");
+}
+
+- (IBAction)ibSrValueChange:(UISlider *)slider
+{
+	NSLog(@"ibSrValueChange");
+}
+
+- (IBAction)actionCellValueTouch:(UIButton *)button
+{
+	NSLog(@"actionCellValueTouch .tag=%d", button.tag);
+}
+- (IBAction)actionCellSliderChange:(UISlider *)slider
+{
+	NSLog(@"actionCellSliderChange .tag=%d", slider.tag);
+}
+
+- (void)actionClear
+{
+	assert(mIsAddNew);
+	assert(Re2edit);
+	
+	Re2edit.datetime = [NSDate date];
+	Re2edit.bpHi_mmHg = nil;
+	Re2edit.bpLo_mmHg = nil;
+	Re2edit.pulse_bpm = nil;
+	
+	[self.tableView reloadData];
+}
+
+- (void)actionSave
+{
+	
+}
+
+
 #pragma mark - View lifecycle
 
 - (void)viewDidLoad
@@ -36,8 +84,29 @@
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
  
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+	if (Re2edit) {
+		// Edit mode.
+		mIsAddNew = NO;
+		// [Cancel]ボタンを左側に追加する  Navi標準の戻るボタンでは actionCancel 処理ができないため
+		self.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc]
+												  initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+												  target:self action:@selector(actionCancel)] autorelease];
+	} else {
+		// AddNew mode.
+		mIsAddNew = YES;
+		Re2edit = [MocFunctions insertAutoEntity:@"E2record"]; // autorelese
+		// [Clear]ボタンを左側に追加する  Navi標準の戻るボタンでは cancelClose:処理ができないため
+		self.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc]
+												  initWithTitle:NSLocalizedString(@"Clear",nil) style:UIBarButtonItemStyleBordered 
+												  target:self action:@selector(actionClear)] autorelease];
+	}
+
+	// SAVEボタンを右側に追加する
+	self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc]
+											   initWithBarButtonSystemItem:UIBarButtonSystemItemSave
+											   target:self action:@selector(actionSave)] autorelease];
+	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
+	
 }
 
 - (void)viewDidUnload
@@ -50,6 +119,8 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+	
+	[self.tableView reloadData];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -70,37 +141,116 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+	return (interfaceOrientation == UIInterfaceOrientationPortrait); // タテ正面のみ
 }
 
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-#warning Potentially incomplete method implementation.
-    // Return the number of sections.
-    return 0;
+{	// Return the number of sections.
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{	// Return the number of rows in the section.
+    return 4;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-#warning Incomplete method implementation.
-    // Return the number of rows in the section.
-    return 0;
+	if (indexPath.row==0) {
+		return 50; // DateTime
+	} else {
+		return 80; // CellValue
+	}
+    return 44; // Default
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"Cell";
-    
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
-    }
-    
-    // Configure the cell...
-    
-    return cell;
+    assert(indexPath.section==0);
+	static NSString *CellIDate = @"CellDate";
+	static NSString *CellIValue = @"E2editCellValue";
+
+    if (indexPath.row==0) {
+		UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIDate];
+		if (cell == nil) {
+			cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue2 reuseIdentifier:CellIDate] autorelease];
+			cell.textLabel.textAlignment = UITextAlignmentCenter;
+			cell.textLabel.font = [UIFont systemFontOfSize:18];
+			cell.detailTextLabel.textAlignment = UITextAlignmentCenter;
+			cell.detailTextLabel.font = [UIFont systemFontOfSize:20];
+		}
+		cell.textLabel.text = NSLocalizedString(@"DateTime",nil);
+		
+		NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
+		// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
+		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+		[fmt setCalendar:calendar];
+		[calendar release];
+		//[df setLocale:[NSLocale systemLocale]];これがあると曜日が表示されない。
+		[fmt setDateFormat:@"yyyy-M-d EE HH:mm"];
+		if (mIsAddNew OR Re2edit.datetime==nil) {
+			Re2edit.datetime = [NSDate date];
+		}
+		cell.detailTextLabel.text = [fmt stringFromDate:Re2edit.datetime];
+		[fmt release];
+		return cell;
+	}
+	else {
+		E2editCellValue *cell = (E2editCellValue*)[tableView dequeueReusableCellWithIdentifier:CellIValue];
+		if (cell == nil) {
+			//cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIValue] autorelease];
+			UINib *nib = [UINib nibWithNibName:CellIValue   bundle:nil];
+			//NSArray *array = [nib instantiateWithOwner:s  options:nil];
+			//cell = (E2editCellValue*)[array objectAtIndex:0];
+			[nib instantiateWithOwner:self options:nil];
+			cell = self.ownerE2editTVC;
+			
+			//cell = [[[E2editCellValue alloc] init] autorelease];
+			//--------------------------------------------------------------------------Name
+			//mCellName = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, 173, 35)];
+			//mCellName.font = [UIFont	systemFontSize:
+			//[cell.contentView addSubview:mCellName], [mCellName release];
+		}
+		switch (indexPath.row) {
+			case 1:
+				cell.ibLbName.text = NSLocalizedString(@"BpHi Name",nil);
+				cell.ibLbUnit.text = @"mmHg";
+				cell.ibBuValue.tag = 1;
+				cell.ibSrValue.tag = 1;
+				if (Re2edit.bpHi_mmHg) {
+					cell.ibLbValue.text = [NSString stringWithFormat:@"%d", [Re2edit.bpHi_mmHg integerValue]];
+				} else {
+					cell.ibLbValue.text = NSLocalizedString(@"None",nil);
+				}
+				break;
+			case 2:
+				cell.ibLbName.text = NSLocalizedString(@"BpLo Name",nil);
+				cell.ibLbUnit.text = @"mmHg";
+				cell.ibBuValue.tag = 2;
+				cell.ibSrValue.tag = 2;
+				if (Re2edit.bpLo_mmHg) {
+					cell.ibLbValue.text = [NSString stringWithFormat:@"%d", [Re2edit.bpLo_mmHg integerValue]];
+				} else {
+					cell.ibLbValue.text = NSLocalizedString(@"None",nil);
+				}
+				break;
+			case 3:
+				cell.ibLbName.text = NSLocalizedString(@"Pulse rate",nil);
+				cell.ibLbUnit.text = NSLocalizedString(@"Pulse unit",nil);
+				cell.ibBuValue.tag = 3;
+				cell.ibSrValue.tag = 3;
+				if (Re2edit.pulse_bpm) {
+					cell.ibLbValue.text = [NSString stringWithFormat:@"%d", [Re2edit.pulse_bpm integerValue]];
+				} else {
+					cell.ibLbValue.text = NSLocalizedString(@"None",nil);
+				}
+				break;
+		}
+		return cell;
+	}
+	return nil;
 }
 
 /*

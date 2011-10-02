@@ -3,7 +3,7 @@
 //  AzBodyNote
 //
 //  Created by Sum Positive on 11/10/02.
-//  Copyright 2011 SumPositive@Azukid.com. All rights reserved.
+//  Copyright 2011 SumPositive. All rights reserved.
 //
 
 #import "SettingTVC.h"

@@ -1,9 +1,9 @@
 //
 //  Global.h
-//  AzSplitIt
+//	AzBodyNote
 //
-//  Created by 松山 和正 on 09/22/03.
-//  Copyright __MyCompanyName__ 2009. All rights reserved.
+//  Created by Sum Positive on 2011/10/01.
+//  Copyright 2011 Sum Positive. All rights reserved.
 //
 
 //#define NO_AD	// AppStore画面撮影用に「広告なし」にするため
@@ -22,7 +22,7 @@
 #endif
 
 
-#define GD_PRODUCTNAME	@"AzSplitIt"  // IMPORTANT PRODUCT NAME  和名「わりかん」
+#define GD_PRODUCTNAME	@"AzBodyNote"  // IMPORTANT PRODUCT NAME  和名「カラダ日記」
 													//↑↑変更禁止！！Keychainの'ServiceName'に使っているので読み出せなくなる。
 //#define GD_KEY_LOGINPASS  @"AzCreditLoginPass"  //←変更禁止！！Keychainの'Username'に使っているので読み出せなくなる。
 
@@ -46,3 +46,6 @@
 #define GD_UseSplit1									@"GD_UseSplit1"
 #define GD_UseSplit2									@"GD_UseSplit2"
 
+
+//----------------------------------------------- Global.m グローバル関数
+void alertBox( NSString *zTitle, NSString *zMsg, NSString *zButton );

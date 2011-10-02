@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------------------E1 
 @implementation E1body
 @dynamic birthday;
-@dynamic markBpLower_mmHg;
-@dynamic markBpUpper_mmHg;
+@dynamic markBpHi_mmHg;
+@dynamic markBpLo_mmHg;
 @dynamic markWaist_cm;
 @dynamic markWeight_g;
 @dynamic name;
@@ -23,8 +23,8 @@
 
 //---------------------------------------------------------------------------------------E2 
 @implementation E2record
-@dynamic bpLower_mmHg;
-@dynamic bpUpper_mmHg;
+@dynamic bpHi_mmHg;
+@dynamic bpLo_mmHg;
 @dynamic caution;
 @dynamic condition;
 @dynamic datetime;

@@ -75,7 +75,7 @@
 				<bool key="IBUIHorizontal">NO</bool>
 				<object class="IBUINavigationController" key="IBUISelectedViewController" id="119481761">
 					<object class="IBUITabBarItem" key="IBUITabBarItem" id="568234485">
-						<string key="IBUITitle">Add</string>
+						<string key="IBUITitle">追加</string>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 					</object>
 					<reference key="IBUIParentViewController" ref="960107244"/>
@@ -99,7 +99,7 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="IBUIViewController" id="463072002">
 							<object class="IBUINavigationItem" key="IBUINavigationItem" id="439021745">
-								<string key="IBUITitle">Root View Controller</string>
+								<string key="IBUITitle">新しい測定</string>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 							</object>
 							<reference key="IBUIParentViewController" ref="119481761"/>
@@ -116,9 +116,9 @@
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<reference ref="119481761"/>
 					<object class="IBUINavigationController" id="701001926">
-						<string key="IBUITitle">List</string>
+						<string key="IBUITitle">一覧</string>
 						<object class="IBUITabBarItem" key="IBUITabBarItem" id="347533568">
-							<string key="IBUITitle">List</string>
+							<string key="IBUITitle">リスト</string>
 							<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						</object>
 						<reference key="IBUIParentViewController" ref="960107244"/>
@@ -142,6 +142,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBUIViewController" id="619226028">
 								<object class="IBUINavigationItem" key="IBUINavigationItem" id="394667715">
+									<string key="IBUITitle">カラダ日記</string>
 									<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 								</object>
 								<reference key="IBUIParentViewController" ref="701001926"/>
@@ -158,7 +159,7 @@
 					</object>
 					<object class="IBUIViewController" id="558004432">
 						<object class="IBUITabBarItem" key="IBUITabBarItem" id="769386869">
-							<string key="IBUITitle">Graph</string>
+							<string key="IBUITitle">グラフ</string>
 							<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						</object>
 						<reference key="IBUIParentViewController" ref="960107244"/>
@@ -171,7 +172,7 @@
 					</object>
 					<object class="IBUIViewController" id="578615771">
 						<object class="IBUITabBarItem" key="IBUITabBarItem" id="268164658">
-							<string key="IBUITitle">Setting</string>
+							<string key="IBUITitle">設定</string>
 							<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						</object>
 						<reference key="IBUIParentViewController" ref="960107244"/>

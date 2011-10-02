@@ -1,13 +1,13 @@
 //
 //  E2recordCell.h
-//  AzBodyNote
+//	AzBodyNote
 //
-//  Created by 松山 和正 on 11/10/01.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Created by Sum Positive on 2011/10/01.
+//  Copyright 2011 Sum Positive@Azukid.com. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 
-@interface E2recordCell : UITableViewCell
+@interface E2listCell : UITableViewCell
 
 @end

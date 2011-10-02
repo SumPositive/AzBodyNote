@@ -2,8 +2,8 @@
 <model name="" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="562" systemVersion="10K549" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="E1body">
         <attribute name="birthday" optional="YES" attributeType="Date"/>
-        <attribute name="markBpLower_mmHg" optional="YES" attributeType="Integer 16" minValueString="20" maxValueString="200"/>
-        <attribute name="markBpUpper_mmHg" optional="YES" attributeType="Integer 16" minValueString="30" maxValueString="300"/>
+        <attribute name="markBpHi_mmHg" optional="YES" attributeType="Integer 16" minValueString="30" maxValueString="300"/>
+        <attribute name="markBpLo_mmHg" optional="YES" attributeType="Integer 16" minValueString="20" maxValueString="200"/>
         <attribute name="markWaist_cm" optional="YES" attributeType="Integer 16" minValueString="30" maxValueString="500"/>
         <attribute name="markWeight_g" optional="YES" attributeType="Integer 32" minValueString="1" maxValueString="300000"/>
         <attribute name="name" optional="YES" attributeType="String"/>
@@ -11,8 +11,8 @@
         <relationship name="e2records" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="E2record" inverseName="e1body" inverseEntity="E2record"/>
     </entity>
     <entity name="E2record">
-        <attribute name="bpLower_mmHg" optional="YES" attributeType="Integer 16" minValueString="20" maxValueString="200"/>
-        <attribute name="bpUpper_mmHg" optional="YES" attributeType="Integer 16" minValueString="30" maxValueString="300"/>
+        <attribute name="bpHi_mmHg" optional="YES" attributeType="Integer 16" minValueString="30" maxValueString="300"/>
+        <attribute name="bpLo_mmHg" optional="YES" attributeType="Integer 16" minValueString="20" maxValueString="200"/>
         <attribute name="caution" optional="YES" attributeType="Boolean" defaultValueString="NO"/>
         <attribute name="condition" optional="YES" attributeType="String"/>
         <attribute name="datetime" optional="YES" attributeType="Date" indexed="YES"/>

@@ -1,8 +1,9 @@
 //
 //  CalcView.h
+//	AzBodyNote
 //
-//  Created by 松山 和正 on 10/01/04.
-//  Copyright 2010 __MyCompanyName__. All rights reserved.
+//  Created by Sum Positive on 2011/10/01.
+//  Copyright 2011 Sum Positive@Azukid.com. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
