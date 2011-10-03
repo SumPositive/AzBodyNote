@@ -37,6 +37,7 @@
 
 #pragma mark - IBAction
 
+/*
 - (IBAction)ibBuValue:(UIButton *)button
 {
 	NSLog(@"ibBuValue");
@@ -55,6 +56,7 @@
 {
 	NSLog(@"actionCellSliderChange .tag=%d", slider.tag);
 }
+*/
 
 - (void)actionClear
 {
@@ -219,33 +221,33 @@
 				cell.ibLbUnit.text = @"mmHg";
 				cell.ibBuValue.tag = 1;
 				cell.ibSrValue.tag = 1;
-				if (Re2edit.bpHi_mmHg) {
-					cell.ibLbValue.text = [NSString stringWithFormat:@"%d", [Re2edit.bpHi_mmHg integerValue]];
-				} else {
-					cell.ibLbValue.text = NSLocalizedString(@"None",nil);
-				}
+				cell.RnValue = Re2edit.bpHi_mmHg; // NSNumber
+				cell.mValueMin = 30;
+				cell.mValueMax = 300;
+				cell.mValueRate = 1;
+				cell.mValueStep = 1;
 				break;
 			case 2:
 				cell.ibLbName.text = NSLocalizedString(@"BpLo Name",nil);
 				cell.ibLbUnit.text = @"mmHg";
 				cell.ibBuValue.tag = 2;
 				cell.ibSrValue.tag = 2;
-				if (Re2edit.bpLo_mmHg) {
-					cell.ibLbValue.text = [NSString stringWithFormat:@"%d", [Re2edit.bpLo_mmHg integerValue]];
-				} else {
-					cell.ibLbValue.text = NSLocalizedString(@"None",nil);
-				}
+				cell.RnValue = Re2edit.bpLo_mmHg; // NSNumber
+				cell.mValueMin = 20;
+				cell.mValueMax = 200;
+				cell.mValueRate = 1;
+				cell.mValueStep = 1;
 				break;
 			case 3:
 				cell.ibLbName.text = NSLocalizedString(@"Pulse rate",nil);
 				cell.ibLbUnit.text = NSLocalizedString(@"Pulse unit",nil);
 				cell.ibBuValue.tag = 3;
 				cell.ibSrValue.tag = 3;
-				if (Re2edit.pulse_bpm) {
-					cell.ibLbValue.text = [NSString stringWithFormat:@"%d", [Re2edit.pulse_bpm integerValue]];
-				} else {
-					cell.ibLbValue.text = NSLocalizedString(@"None",nil);
-				}
+				cell.RnValue = Re2edit.pulse_bpm; // NSNumber
+				cell.mValueMin = 10;
+				cell.mValueMax = 200;
+				cell.mValueRate = 1;
+				cell.mValueStep = 1;
 				break;
 		}
 		return cell;

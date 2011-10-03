@@ -24,7 +24,7 @@
 @property (nonatomic, retain) E2record		*Re2edit;
 @property (nonatomic, assign) IBOutlet E2editCellValue *ownerE2editTVC;  // E2editCellValue と E2editTVC をFile's Ownerリンクするため
 
-- (IBAction)actionCellValueTouch:(UIButton *)button;
-- (IBAction)actionCellSliderChange:(UISlider *)slider;
+//- (IBAction)actionCellValueTouch:(UIButton *)button;
+//- (IBAction)actionCellSliderChange:(UISlider *)slider;
 
 @end
