@@ -23,6 +23,11 @@ static NSManagedObjectContext *scMoc = nil;
 	scMoc = moc;
 }	
 
++ (NSManagedObjectContext*)getMoc
+{
+	return scMoc;
+}
+
 + (id)insertAutoEntity:(NSString *)zEntityName	// autorelease
 {
 	assert(scMoc);

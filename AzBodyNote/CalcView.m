@@ -488,7 +488,7 @@ int levelOperator( NSString *zOpe )  // 演算子の優先順位
 	mTarget = target;
 	mActionSelector = action;
 
-	mRectShow = CGRectMake(0, 0, 320, 460);  // self.frame;
+	mRectShow = CGRectMake(0, 0, 320, VIEW_HIGHT);  // self.frame;
 	mRectHide = mRectShow;
 	mRectHide.origin.y = mRectHide.size.height; // 下部に隠す為
 
@@ -510,7 +510,7 @@ int levelOperator( NSString *zOpe )  // 演算子の優先順位
 
 	//------------------------------------------
 	assert(mSubView==nil);
-	mSubView = [[UIView alloc] initWithFrame:CGRectMake(0, 460-250, 320, 250)]; // 縦横固定にする
+	mSubView = [[UIView alloc] initWithFrame:CGRectMake(0, VIEW_HIGHT-250, 320, 250)]; // 縦横固定にする
 	[self addSubview:mSubView], [mSubView release];
 	mSubView.backgroundColor = [UIColor blackColor];
 	mSubView.userInteractionEnabled = YES;

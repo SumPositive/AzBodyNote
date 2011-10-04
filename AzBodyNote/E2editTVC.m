@@ -34,6 +34,14 @@
     // Release any cached data, images, etc that aren't in use.
 }
 
+#pragma mark - delegate
+
+- (void)editUpdate
+{
+	self.navigationItem.rightBarButtonItem.enabled = YES; // 変更あればYESにする
+}
+
+
 
 #pragma mark - IBAction
 
@@ -62,6 +70,8 @@
 {
 	assert(mIsAddNew);
 	assert(Re2edit);
+	//appDelegate.mIsUpdate = NO;
+	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
 	
 	Re2edit.datetime = [NSDate date];
 	Re2edit.bpHi_mmHg = nil;
@@ -73,7 +83,32 @@
 
 - (void)actionSave
 {
-	
+	[MocFunctions commit];
+
+	//appDelegate.mIsUpdate = NO;
+	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
+
+	if (mIsAddNew) {
+		// AddNew mode
+		//alertBox(NSLocalizedString(@"AddNew Save",nil) , nil, NSLocalizedString(@"Roger",nil));
+		//[Re2edit release], 
+		Re2edit = [MocFunctions insertAutoEntity:@"E2record"];
+		[self actionClear];
+		[self.tableView reloadData];
+		// List画面に切り替えて、追加行を一時ハイライトする
+		self.navigationController.tabBarController.selectedIndex = 1; // List画面へ
+	} else {
+		// Edit mode
+		[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
+	}
+}
+
+- (void)actionCancel
+{
+	assert(mIsAddNew==NO);
+	// Edit mode ONLY
+	[MocFunctions rollBack];
+	[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
 }
 
 
@@ -82,10 +117,12 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
+	//appDelegate = (AzBodyNoteAppDelegate *)[[UIApplication sharedApplication] delegate];
+	//appDelegate.mIsUpdate = NO;
+	
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
- 
+	
 	if (Re2edit) {
 		// Edit mode.
 		mIsAddNew = NO;
@@ -97,6 +134,7 @@
 		// AddNew mode.
 		mIsAddNew = YES;
 		Re2edit = [MocFunctions insertAutoEntity:@"E2record"]; // autorelese
+		
 		// [Clear]ボタンを左側に追加する  Navi標準の戻るボタンでは cancelClose:処理ができないため
 		self.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc]
 												  initWithTitle:NSLocalizedString(@"Clear",nil) style:UIBarButtonItemStyleBordered 
@@ -122,7 +160,7 @@
 {
     [super viewWillAppear:animated];
 	
-	[self.tableView reloadData];
+	//[self.tableView reloadData];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -145,6 +183,13 @@
     // Return YES for supported orientations
 	return (interfaceOrientation == UIInterfaceOrientationPortrait); // タテ正面のみ
 }
+
+- (void)dealloc
+{
+	[Re2edit release], Re2edit = nil;
+	[super dealloc];
+}
+
 
 #pragma mark - Table view data source
 
@@ -208,12 +253,9 @@
 			//cell = (E2editCellValue*)[array objectAtIndex:0];
 			[nib instantiateWithOwner:self options:nil];
 			cell = self.ownerE2editTVC;
-			
-			//cell = [[[E2editCellValue alloc] init] autorelease];
-			//--------------------------------------------------------------------------Name
-			//mCellName = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, 173, 35)];
-			//mCellName.font = [UIFont	systemFontSize:
-			//[cell.contentView addSubview:mCellName], [mCellName release];
+			// 
+			cell.delegate = self;
+			cell.viewParent = self.navigationController.view;  // CalcをaddSubviewするため
 		}
 		switch (indexPath.row) {
 			case 1:
@@ -221,10 +263,12 @@
 				cell.ibLbUnit.text = @"mmHg";
 				cell.ibBuValue.tag = 1;
 				cell.ibSrValue.tag = 1;
-				cell.RnValue = Re2edit.bpHi_mmHg; // NSNumber
+				//cell.RnValue = Re2edit.bpHi_mmHg; // NSNumber
+				cell.Re2record = Re2edit;
+				cell.RzKey = @"bpHi_mmHg";
 				cell.mValueMin = 30;
 				cell.mValueMax = 300;
-				cell.mValueRate = 1;
+				cell.mValueDec = 0;
 				cell.mValueStep = 1;
 				break;
 			case 2:
@@ -232,10 +276,12 @@
 				cell.ibLbUnit.text = @"mmHg";
 				cell.ibBuValue.tag = 2;
 				cell.ibSrValue.tag = 2;
-				cell.RnValue = Re2edit.bpLo_mmHg; // NSNumber
+				//cell.RnValue = Re2edit.bpLo_mmHg; // NSNumber
+				cell.Re2record = Re2edit;
+				cell.RzKey = @"bpLo_mmHg";
 				cell.mValueMin = 20;
 				cell.mValueMax = 200;
-				cell.mValueRate = 1;
+				cell.mValueDec = 0;
 				cell.mValueStep = 1;
 				break;
 			case 3:
@@ -243,13 +289,16 @@
 				cell.ibLbUnit.text = NSLocalizedString(@"Pulse unit",nil);
 				cell.ibBuValue.tag = 3;
 				cell.ibSrValue.tag = 3;
-				cell.RnValue = Re2edit.pulse_bpm; // NSNumber
+				//cell.RnValue = Re2edit.pulse_bpm; // NSNumber
+				cell.Re2record = Re2edit;
+				cell.RzKey = @"pulse_bpm";
 				cell.mValueMin = 10;
 				cell.mValueMax = 200;
-				cell.mValueRate = 1;
+				cell.mValueDec = 0;
 				cell.mValueStep = 1;
 				break;
 		}
+		[cell drawRect:cell.frame]; // コンテンツ描画
 		return cell;
 	}
 	return nil;

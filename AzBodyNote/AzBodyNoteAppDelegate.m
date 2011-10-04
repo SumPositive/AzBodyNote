@@ -18,6 +18,8 @@
 @synthesize persistentStoreCoordinator = __persistentStoreCoordinator;
 //@synthesize navigationController = _navigationController;
 @synthesize tabBarController = _tabBarController;
+//@synthesize mIsUpdate;
+
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {

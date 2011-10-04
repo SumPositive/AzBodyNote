@@ -1,12 +1,16 @@
 //
-//  E2recordTVC.m
+//  E2listTVC.m
 //	AzBodyNote
 //
 //  Created by Sum Positive on 2011/10/01.
-//  Copyright 2011 Sum Positive@Azukid.com. All rights reserved.
+//  Copyright 2011 Sum Positive. All rights reserved.
 //
 
+#import "Global.h"
+#import "MocEntity.h"
+#import "MocFunctions.h"
 #import "E2listTVC.h"
+
 
 @interface E2listTVC ()
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
@@ -21,11 +25,13 @@
 {
 	[super viewDidLoad];
 	// Set up the edit and add buttons.
-	self.navigationItem.leftBarButtonItem = self.editButtonItem;
+	//self.navigationItem.leftBarButtonItem = self.editButtonItem;
 
-	UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject)];
-	self.navigationItem.rightBarButtonItem = addButton;
-	[addButton release];
+	//UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject)];
+	//self.navigationItem.rightBarButtonItem = addButton;
+	//[addButton release];
+	
+	self.managedObjectContext = [MocFunctions getMoc];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -208,7 +214,7 @@
     [fetchRequest setFetchBatchSize:20];
     
     // Edit the sort key as appropriate.
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"datetime" ascending:NO];
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"datetime" ascending:YES];
     NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sortDescriptor, nil];
     
     [fetchRequest setSortDescriptors:sortDescriptors];

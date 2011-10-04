@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "MocEntity.h"
+//#import "AzBodyNoteAppDelegate.h"
 
 @class E2editCellValue;
 
@@ -18,7 +19,8 @@
 	E2record		*Re2edit;		// =nil:AddNew
 	
 @private
-	BOOL	mIsAddNew;
+	//AzBodyNoteAppDelegate	*appDelegate;
+	BOOL					mIsAddNew;
 }
 
 @property (nonatomic, retain) E2record		*Re2edit;
@@ -26,5 +28,9 @@
 
 //- (IBAction)actionCellValueTouch:(UIButton *)button;
 //- (IBAction)actionCellSliderChange:(UISlider *)slider;
+
+// <delegate>
+- (void)editUpdate;
+
 
 @end
