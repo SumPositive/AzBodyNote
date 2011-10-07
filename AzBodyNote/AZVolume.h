@@ -10,7 +10,12 @@
 
 @interface AZVolume : UIView	<UIScrollViewDelegate>
 {
-
+	id							delegate;
+	NSInteger			mVolumeMin;
+	NSInteger			mVolumeMax;
+	NSInteger			mVolumeStep;
+	NSInteger			mVolume;
+	
 @private
 	UIScrollView			*mScrollView;
 	
@@ -18,8 +23,15 @@
 	NSInteger			mCenterViewIndex;			// index of mViewList
 	NSInteger			mLeftViewIndex;		// index of mViewList
 	NSInteger			mRightViewIndex;	// index of mViewList
-	//BOOL circulated_;
+	CGFloat				mCenterOffset;
+	BOOL					mIsMoved;
 }
+
+@property (nonatomic, assign) id							delegate;
+@property (nonatomic, assign) NSInteger			mVolume;
+@property (nonatomic, assign) NSInteger			mVolumeMin;
+@property (nonatomic, assign) NSInteger			mVolumeMax;
+@property (nonatomic, assign) NSInteger			mVolumeStep;
 
 //@property (nonatomic, retain) NSArray* viewList;
 //@property (nonatomic, retain) NSArray* imageList;
@@ -27,5 +39,8 @@
 
 - (id)initWithFrame:(CGRect)frame;
 - (void)setPoint:(CGPoint)point;
+
+// AZVolumeDelegate
+- (void)volumeChanged:(NSInteger)volume;
 
 @end

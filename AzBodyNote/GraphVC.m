@@ -46,10 +46,19 @@
 
 	if (!mVolume) {
 		mVolume = [[AZVolume alloc] initWithFrame:CGRectMake(0, 100, 320, 30)];
+		mVolume.mVolume = 0;
+		mVolume.mVolumeMin = -1000;
+		mVolume.mVolumeMax = 1000;
+		mVolume.mVolumeStep = 1;
+		mVolume.delegate = self;
 		[self.view addSubview:mVolume];
 	}
 }
 
+- (void)volumeChanged:(NSInteger)volume
+{
+	ibLbVolume.text = [NSString stringWithFormat:@"%ld", volume];
+}
 
 - (void)viewDidUnload
 {

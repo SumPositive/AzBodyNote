@@ -12,6 +12,13 @@
 
 @interface GraphVC : UIViewController
 {
-	AZVolume		*mVolume;
+	IBOutlet UILabel		*ibLbVolume;
+	
+	AZVolume				*mVolume;
 }
+
+// AZVolumeDelegate
+- (void)volumeChanged:(NSInteger)volume;
+
+
 @end

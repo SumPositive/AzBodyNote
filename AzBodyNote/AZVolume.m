@@ -8,19 +8,14 @@
 
 #import "AZVolume.h"
 
+#define PAGE_WIDTH		(40 * 100)		// 1タイル幅=40 * 20=タイリング数
+#define PAGES				200				// 2の倍数
+
 
 @implementation AZVolume
+@synthesize delegate;
+@synthesize mVolume, mVolumeMin, mVolumeMax, mVolumeStep;
 
-/*
-- (id)initWithFrame:(CGRect)frame
-{
-    self = [super initWithFrame:frame];
-    if (self) {
-        // Initialization code
-    }
-    return self;
-}
-*/
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -43,18 +38,16 @@
 		frame.origin.x = 10;	// self内の座標
 		frame.origin.y = 0;
 		frame.size.width -= 20;
-		float fW = frame.size.width * 200;
 		mScrollView = [[UIScrollView alloc] initWithFrame:frame];
-		mScrollView.contentSize = CGSizeMake(fW, frame.size.height);
-		mScrollView.contentOffset = CGPointMake(fW/2.0, 0);
+		mScrollView.contentSize = CGSizeMake(PAGE_WIDTH * PAGES, frame.size.height);
+		mScrollView.contentOffset = CGPointMake(PAGE_WIDTH * (PAGES/2), 0); // Center
 	} else {
 		frame.origin.x = 0;	// self内の座標
 		frame.origin.y = 10;
 		frame.size.height -= 20;
-		float fH = frame.size.height * 200;
 		mScrollView = [[UIScrollView alloc] initWithFrame:frame];
-		mScrollView.contentSize = CGSizeMake(frame.size.width, fH);
-		mScrollView.contentOffset = CGPointMake(0, fH/2.0);
+		mScrollView.contentSize = CGSizeMake(frame.size.width, PAGE_WIDTH * PAGES);
+		mScrollView.contentOffset = CGPointMake(0, PAGE_WIDTH * (PAGES/2)); // Center
 	}
 	mScrollView.delegate = self;
 	mScrollView.showsVerticalScrollIndicator = NO;
@@ -67,23 +60,28 @@
 	
 
 	NSMutableArray* array = [NSMutableArray array];
-	CGRect rcImg = CGRectMake(-40*10, 0, 40*10, 30); // (0)page
-	//[imgTile drawAsPatternInRect:rcImg];
+	CGRect rcImg = CGRectMake(PAGE_WIDTH * (PAGES/2 - 1), 10, PAGE_WIDTH, 30); // (0)page
+	
+	UIColor *patternColor = [UIColor colorWithPatternImage:imgTile];
 	
 	for (int i=0; i < 3; i++) {
 		UIImageView* iv = [[UIImageView alloc] initWithFrame:rcImg];
 		iv.contentMode = UIViewContentModeTopLeft;
-		[iv setImage:imgTile];
+		//[iv setImage:imgTile];
+		//[imgTile drawAsPatternInRect:rcImg];
+		iv.backgroundColor = patternColor;
 		[array addObject:iv];
-		rcImg.origin.x += 40*10;
+		rcImg.origin.x += PAGE_WIDTH;
 		[mScrollView addSubview:iv];
 	}
-	mViewList = array;
+	mViewList = [[NSArray alloc] initWithArray:array];
 	mLeftViewIndex = 0;		// (0)page
 	mCenterViewIndex = 1;	// (1)page
 	mRightViewIndex = 2;		// (2)page
-	mScrollView.contentOffset = CGPointMake(rcImg.size.width/2 - mScrollView.frame.size.width/2, 0); // Center
-
+	mCenterOffset = PAGE_WIDTH * (PAGES/2);
+	mScrollView.contentOffset = CGPointMake(mCenterOffset, 0); // Center (1)page
+	mIsMoved = NO;
+	
     return self;
 }
 
@@ -114,38 +112,54 @@ typedef enum {
 
 - (void)scrollWithDirection:(ScrollDirection)scrollDirection
 {
+	if (mIsMoved) return;
+	mIsMoved = YES;
+
 	NSInteger incremental = 0;
 	NSInteger index = 0;
 	//NSInteger imageIndex = 0;
 	
 	if (scrollDirection == kScrollDirectionLeft) {
-		incremental = (-1);
+		incremental = (-2);
 		index = mRightViewIndex;
 		mRightViewIndex = mCenterViewIndex;
 		mCenterViewIndex = mLeftViewIndex;
 		mLeftViewIndex = index;
 	} else if (scrollDirection == kScrollDirectionRight) {
-		incremental = 1;
+		incremental = 2;
 		index = mLeftViewIndex;
 		mLeftViewIndex = mCenterViewIndex;
 		mCenterViewIndex = mRightViewIndex;
 		mRightViewIndex = index;
+	} else {
+		assert(NO);
+		return;
 	}
 	
 	// change position
-	UIImageView* view = [mViewList objectAtIndex:index];
-	CGRect frame = view.frame;
-	frame.origin.x += 40*10 * incremental;
-	view.frame = frame;
+	//NSLog(@"mViewList=%@", mViewList);
+	assert(index < [mViewList count]);
+	UIImageView* iv = [mViewList objectAtIndex:index];
+	CGRect frame = iv.frame;
+	frame.origin.x += (PAGE_WIDTH * incremental);
+	iv.frame = frame;
+	
+	iv = [mViewList objectAtIndex:mCenterViewIndex];
+	mCenterOffset = iv.frame.origin.x;
+
+	mIsMoved = NO;
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-	CGFloat position = scrollView.contentOffset.x / 40*10;
-	CGFloat delta = position - (CGFloat)mCenterViewIndex;
+	if ([delegate respondsToSelector:@selector(volumeChanged:)]) {
+		[delegate volumeChanged:mVolume];
+	}
 	
-	if (fabs(delta) >= 1.0f) {
-		if (delta > 0) {
+	if (mIsMoved) return;
+	CGFloat delta = (scrollView.contentOffset.x - mCenterOffset);
+	if ((PAGE_WIDTH/2) <= fabs(delta)) {  // 半ページ以上スクロールしたとき
+		if (0 < delta) {
 			[self scrollWithDirection:kScrollDirectionRight];
 		} else {
 			[self scrollWithDirection:kScrollDirectionLeft];			
