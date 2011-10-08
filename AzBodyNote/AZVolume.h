@@ -10,37 +10,34 @@
 
 @interface AZVolume : UIView	<UIScrollViewDelegate>
 {
-	id							delegate;
-	NSInteger			mVolumeMin;
-	NSInteger			mVolumeMax;
-	NSInteger			mVolumeStep;
-	NSInteger			mVolume;
-	
 @private
 	UIScrollView			*mScrollView;
-	
-	NSArray				*mViewList;
-	NSInteger			mCenterViewIndex;			// index of mViewList
-	NSInteger			mLeftViewIndex;		// index of mViewList
-	NSInteger			mRightViewIndex;	// index of mViewList
-	CGFloat				mCenterOffset;
+	id							mDelegate;
+	CGFloat				mScrollMin;
+	CGFloat				mScrollMax;
+	CGFloat				mScrollValue;
+
+	//NSArray				*mViewList;
+	//NSInteger			mIndexCenter;			// index of mViewList
+	//NSInteger			mIndexLeft;		// index of mViewList
+	//NSInteger			mIndexRight;	// index of mViewList
 	BOOL					mIsMoved;
+	UIImageView		*mIvLeft;
+	UIImageView		*mIvCenter;
+	UIImageView		*mIvRight;
 }
 
-@property (nonatomic, assign) id							delegate;
-@property (nonatomic, assign) NSInteger			mVolume;
-@property (nonatomic, assign) NSInteger			mVolumeMin;
-@property (nonatomic, assign) NSInteger			mVolumeMax;
-@property (nonatomic, assign) NSInteger			mVolumeStep;
+//@property (nonatomic, assign) id							delegate;
+//@property (nonatomic, assign) NSInteger			value;
+//@property (nonatomic, assign) NSInteger			vmin;
+//@property (nonatomic, assign) NSInteger			vmax;
+//@property (nonatomic, assign) NSInteger			vstep;
 
-//@property (nonatomic, retain) NSArray* viewList;
-//@property (nonatomic, retain) NSArray* imageList;
-//@property (nonatomic, readonly, getter=isCirculated) BOOL circulated;
-
-- (id)initWithFrame:(CGRect)frame;
-- (void)setPoint:(CGPoint)point;
-
-// AZVolumeDelegate
-- (void)volumeChanged:(NSInteger)volume;
+- (id)initWithFrame:(CGRect)frame 
+				delegate:(id)delegate 
+				value:(NSInteger)value		// 初期値
+				min:(NSInteger)vmin			// 最小値
+				max:(NSInteger)vmax		// 最大値
+				step:(NSInteger)vstep;		// 増減値
 
 @end

@@ -45,12 +45,7 @@
     [super viewDidLoad];
 
 	if (!mVolume) {
-		mVolume = [[AZVolume alloc] initWithFrame:CGRectMake(0, 100, 320, 30)];
-		mVolume.mVolume = 0;
-		mVolume.mVolumeMin = -1000;
-		mVolume.mVolumeMax = 1000;
-		mVolume.mVolumeStep = 1;
-		mVolume.delegate = self;
+		mVolume = [[AZVolume alloc] initWithFrame:CGRectMake(10, 100, 200, 44) delegate:self value:88 min:20 max:200 step:1];
 		[self.view addSubview:mVolume];
 	}
 }
