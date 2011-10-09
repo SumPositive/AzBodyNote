@@ -40,4 +40,12 @@
 				max:(NSInteger)vmax		// 最大値
 				step:(NSInteger)vstep;		// 増減値
 
+- (void)setValue:(NSInteger)value;
+
 @end
+
+@protocol AZVolumeDelegate<NSObject>
+- (void)volumeChanged:(id)sender  value:(NSInteger)value;
+- (void)volumeDone:(id)sender  value:(NSInteger)value;
+@end
+

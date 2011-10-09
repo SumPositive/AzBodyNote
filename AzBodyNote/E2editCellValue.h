@@ -8,8 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "MocEntity.h"
+#import "AZVolume.h"
 
-@interface E2editCellValue : UITableViewCell
+@interface E2editCellValue : UITableViewCell <AZVolumeDelegate>
 {
 	id						delegate;
 	UIView				*viewParent;  // ここへCalcをaddSubviewする
@@ -24,12 +25,19 @@
 @private
 	NSInteger		mSliderBase;
 	NSInteger		mValue;
+	AZVolume		*mVolume;
+	BOOL				mIsOS5;
+	UIStepper			*mStepper;
+	UIButton			*mBuDown;
+	UIButton			*mBuUp;
 }
 
 @property (nonatomic, retain) IBOutlet UILabel			*ibLbName;
+@property (nonatomic, retain) IBOutlet UILabel			*ibLbDetail;
 @property (nonatomic, retain) IBOutlet UILabel			*ibLbValue;
 @property (nonatomic, retain) IBOutlet UILabel			*ibLbUnit;
-@property (nonatomic, retain) IBOutlet UISlider			*ibSrValue;		//.tagセットするため
+//@property (nonatomic, retain) IBOutlet UISlider			*ibSrValue;		//.tagセットするため
+//@property (nonatomic, retain) IBOutlet UIStepper		*ibStepValue;
 @property (nonatomic, retain) IBOutlet UIButton			*ibBuValue;		//.tagセットするため
 
 @property (nonatomic, assign) id						delegate;

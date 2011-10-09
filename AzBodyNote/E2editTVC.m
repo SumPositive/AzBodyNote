@@ -206,9 +206,9 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	if (indexPath.row==0) {
-		return 50; // DateTime
+		return 44; // DateTime
 	} else {
-		return 80; // CellValue
+		return 88; // CellValue
 	}
     return 44; // Default
 }
@@ -222,13 +222,14 @@
     if (indexPath.row==0) {
 		UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIDate];
 		if (cell == nil) {
-			cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue2 reuseIdentifier:CellIDate] autorelease];
-			cell.textLabel.textAlignment = UITextAlignmentCenter;
-			cell.textLabel.font = [UIFont systemFontOfSize:18];
-			cell.detailTextLabel.textAlignment = UITextAlignmentCenter;
-			cell.detailTextLabel.font = [UIFont systemFontOfSize:20];
+			cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIDate] autorelease];
+			cell.textLabel.textAlignment = UITextAlignmentLeft;
+			cell.textLabel.font = [UIFont systemFontOfSize:20];
+			//cell.detailTextLabel.textAlignment = UITextAlignmentLeft;
+			//cell.detailTextLabel.font = [UIFont systemFontOfSize:20];
+			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;	// > ディスクロージャマーク
 		}
-		cell.textLabel.text = NSLocalizedString(@"DateTime",nil);
+		//cell.textLabel.text = NSLocalizedString(@"DateTime",nil);
 		
 		NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
 		// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
@@ -240,7 +241,9 @@
 		if (mIsAddNew OR Re2edit.datetime==nil) {
 			Re2edit.datetime = [NSDate date];
 		}
-		cell.detailTextLabel.text = [fmt stringFromDate:Re2edit.datetime];
+		//cell.detailTextLabel.text = [fmt stringFromDate:Re2edit.datetime];
+		cell.textLabel.text = [NSString stringWithFormat:@"%@   %@", NSLocalizedString(@"DateTime",nil), 
+							   [fmt stringFromDate:Re2edit.datetime]];
 		[fmt release];
 		return cell;
 	}
@@ -256,13 +259,17 @@
 			// 
 			cell.delegate = self;
 			cell.viewParent = self.navigationController.view;  // CalcをaddSubviewするため
+			// 選択禁止
+			cell.accessoryType = UITableViewCellAccessoryNone;
+			cell.selectionStyle = UITableViewCellSelectionStyleNone; // 選択時ハイライトなし
 		}
 		switch (indexPath.row) {
 			case 1:
 				cell.ibLbName.text = NSLocalizedString(@"BpHi Name",nil);
+				cell.ibLbDetail.text = NSLocalizedString(@"BpHi Detail",nil);
 				cell.ibLbUnit.text = @"mmHg";
 				cell.ibBuValue.tag = 1;
-				cell.ibSrValue.tag = 1;
+				//cell.ibSrValue.tag = 1;
 				//cell.RnValue = Re2edit.bpHi_mmHg; // NSNumber
 				cell.Re2record = Re2edit;
 				cell.RzKey = @"bpHi_mmHg";
@@ -273,9 +280,10 @@
 				break;
 			case 2:
 				cell.ibLbName.text = NSLocalizedString(@"BpLo Name",nil);
+				cell.ibLbDetail.text = NSLocalizedString(@"BpLo Detail",nil);
 				cell.ibLbUnit.text = @"mmHg";
 				cell.ibBuValue.tag = 2;
-				cell.ibSrValue.tag = 2;
+				//cell.ibSrValue.tag = 2;
 				//cell.RnValue = Re2edit.bpLo_mmHg; // NSNumber
 				cell.Re2record = Re2edit;
 				cell.RzKey = @"bpLo_mmHg";
@@ -285,10 +293,11 @@
 				cell.mValueStep = 1;
 				break;
 			case 3:
-				cell.ibLbName.text = NSLocalizedString(@"Pulse rate",nil);
+				cell.ibLbName.text = NSLocalizedString(@"Pulse Name",nil);
+				cell.ibLbDetail.text = NSLocalizedString(@"Pulse Detail",nil);
 				cell.ibLbUnit.text = NSLocalizedString(@"Pulse unit",nil);
 				cell.ibBuValue.tag = 3;
-				cell.ibSrValue.tag = 3;
+				//cell.ibSrValue.tag = 3;
 				//cell.RnValue = Re2edit.pulse_bpm; // NSNumber
 				cell.Re2record = Re2edit;
 				cell.RzKey = @"pulse_bpm";
@@ -347,6 +356,8 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+	[tableView deselectRowAtIndexPath:indexPath animated:YES];	// 選択状態を解除する
+	
     // Navigation logic may go here. Create and push another view controller.
     /*
      <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:@"<#Nib name#>" bundle:nil];

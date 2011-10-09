@@ -10,7 +10,7 @@
 #import "AZVolume.h"
 
 
-@interface GraphVC : UIViewController
+@interface GraphVC : UIViewController <AZVolumeDelegate>
 {
 	IBOutlet UILabel		*ibLbVolume;
 	
@@ -18,7 +18,7 @@
 }
 
 // AZVolumeDelegate
-- (void)volumeChanged:(NSInteger)volume;
+//- (void)volumeChanged:(NSInteger)volume;
 
 
 @end

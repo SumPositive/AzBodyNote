@@ -15,10 +15,12 @@
 #define BLOCK				800.0		//=(ImgW * 10 * 2)	// 10=タイリング数  2=2の倍数にするため
 #define STEP					22.0
 
-
+/*
 @interface NSObject (AZVolumeDelegate)
-- (void)volumeChanged:(NSInteger)value;
+- (void)volumeChanged:(id)sender  value:(NSInteger)value;
+- (void)volumeDone:(id)sender  value:(NSInteger)value;
 @end
+*/
 
 @implementation AZVolume
 
@@ -35,7 +37,7 @@
 	assert(value <= vmax);
 	assert(1 <= vstep);
 	
-	UIImage *imgTile = [UIImage imageNamed:@"AZVolumeH40x30"];	// ヨコ型
+	UIImage *imgTile = [UIImage imageNamed:@"AZVolumeTile"];	// H30 x W10の倍数
 	if (imgTile==nil) return nil;
 	UIColor *patternColor = [UIColor colorWithPatternImage:imgTile];
 	
@@ -48,16 +50,14 @@
 	mScrollMax = (CGFloat)vmax * STEP;
 	mScrollValue = (CGFloat)value * STEP;
 
-	// 背景画像
-	//frame.size.height = FrameH; // 高さ固定
-	
 	// ScrollView
-	frame.origin.x = 10;	// self内の座標
-	frame.origin.y = (FrameH - ImgH)/2;
-	frame.size.width -= 20;
-	frame.size.height = ImgH;
-	mScrollView = [[UIScrollView alloc] initWithFrame:frame];
-	mScrollView.contentSize = CGSizeMake( mScrollMax - mScrollMin + frame.size.width, ImgH );
+	CGRect rcScroll = frame;
+	rcScroll.origin.x = 10;	// self内の座標
+	rcScroll.origin.y = (FrameH - ImgH)/2;
+	rcScroll.size.width -= (rcScroll.origin.x * 2);
+	rcScroll.size.height = ImgH;
+	mScrollView = [[UIScrollView alloc] initWithFrame:rcScroll];
+	mScrollView.contentSize = CGSizeMake( mScrollMax - mScrollMin + rcScroll.size.width, ImgH );
 	mScrollView.contentOffset = CGPointMake( mScrollValue - mScrollMin, 0);
 
 	mScrollView.delegate = self;
@@ -66,10 +66,22 @@
 	mScrollView.pagingEnabled = NO;
 	mScrollView.scrollsToTop = NO;
 	mScrollView.bounces = NO;
-	mScrollView.backgroundColor = [UIColor lightGrayColor];
+	//mScrollView.backgroundColor = [UIColor whiteColor];
 	[self addSubview:mScrollView];
-
-
+	
+	// 背景画像
+	UIImage *imgBack = [UIImage imageNamed:@"AZVolumeBack"];	// H44 x W320
+	if (imgBack) {
+		UIImageView *iv = [[UIImageView alloc] initWithImage:imgBack];
+		CGRect rcBack = frame;
+		rcBack.origin.x = 0;
+		rcBack.origin.y = 0;
+		iv.frame = rcBack;
+		iv.contentMode = UIViewContentModeScaleToFill;
+		iv.contentStretch = CGRectMake(0.5, 0,  0, 0);
+		[self	addSubview:iv];
+	}
+	
 	NSInteger iNo = floor( (mScrollValue - mScrollMin) / BLOCK );  // 小数以下切り捨て
 	//array[0] Left
 	CGRect rcImg = CGRectMake( (iNo - 1) * BLOCK, 0, BLOCK, ImgH);
@@ -101,6 +113,12 @@
     return self;
 }
 
+- (void)setValue:(NSInteger)value
+{
+	mScrollValue = (CGFloat)value * STEP;
+	mScrollView.contentOffset = CGPointMake( mScrollValue - mScrollMin, 0);
+}
+
 
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.
@@ -113,7 +131,7 @@
 #pragma mark - <UIScrollViewDelegate>
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
-{
+{	// スクロール中
 	if (mIsMoved) return;
 	mIsMoved = YES;
 
@@ -128,11 +146,11 @@
 	}
 	sBase = scrollView.contentOffset.x;
 
-	NSLog(@".x=%.1f  Left.x=%.1f  Center.x=%.1f  Right.x=%.1f", scrollView.contentOffset.x, mIvLeft.frame.origin.x, mIvCenter.frame.origin.x, mIvRight.frame.origin.x);
+	//NSLog(@".x=%.1f  Left.x=%.1f  Center.x=%.1f  Right.x=%.1f", scrollView.contentOffset.x, mIvLeft.frame.origin.x, mIvCenter.frame.origin.x, mIvRight.frame.origin.x);
 	// valueChange
 	NSInteger ii = floor( (mScrollMin + scrollView.contentOffset.x) / STEP );
-	if ([mDelegate respondsToSelector:@selector(volumeChanged:)]) {
-		[mDelegate volumeChanged:ii];
+	if ([mDelegate respondsToSelector:@selector(volumeChanged:value:)]) {
+		[mDelegate volumeChanged:self  value:ii];
 	}
 
 	if ( scrollView.contentOffset.x < mIvCenter.frame.origin.x ) {
@@ -163,5 +181,22 @@
 	mIsMoved = NO;
 }
 
+- (void)scrollDone:(UIScrollView *)scrollView
+{	// Original
+	NSInteger ii = floor( (mScrollMin + scrollView.contentOffset.x) / STEP );
+	if ([mDelegate respondsToSelector:@selector(volumeDone:value:)]) {
+		[mDelegate volumeDone:self  value:ii];
+	}
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{	// ドラッグ終了 ＜＜＜スクロールを止めてから、指を離したときに呼ばれる
+	[self scrollDone:scrollView];
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{	// スクロール・ビューの動きが減速終了 ＜＜＜スクロール中に指を離して、自然に止まったときに呼ばれる
+	[self scrollDone:scrollView];
+}
 
 @end

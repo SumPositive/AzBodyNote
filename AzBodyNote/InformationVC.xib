@@ -76,13 +76,11 @@
 						<float key="IBUIMinimumFontSize">10</float>
 						<int key="IBUITextAlignment">1</int>
 						<object class="IBUIFontDescription" key="IBUIFontDescription">
-							<string key="name">HiraMaruPro-W4</string>
-							<string key="family">Hiragino Maru Gothic Pro</string>
-							<int key="traits">0</int>
+							<int key="type">2</int>
 							<double key="pointSize">40</double>
 						</object>
 						<object class="NSFont" key="IBUIFont">
-							<string key="NSName">Helvetica</string>
+							<string key="NSName">Helvetica-Bold</string>
 							<double key="NSSize">40</double>
 							<int key="NSfFlags">16</int>
 						</object>
@@ -106,14 +104,12 @@
 						<float key="IBUIMinimumFontSize">10</float>
 						<int key="IBUITextAlignment">1</int>
 						<object class="IBUIFontDescription" key="IBUIFontDescription">
-							<string key="name">Monaco</string>
-							<string key="family">Monaco</string>
-							<int key="traits">0</int>
-							<double key="pointSize">14</double>
+							<int key="type">1</int>
+							<double key="pointSize">16</double>
 						</object>
-						<object class="NSFont" key="IBUIFont" id="311384734">
+						<object class="NSFont" key="IBUIFont">
 							<string key="NSName">Helvetica</string>
-							<double key="NSSize">14</double>
+							<double key="NSSize">16</double>
 							<int key="NSfFlags">16</int>
 						</object>
 					</object>
@@ -140,12 +136,14 @@ aXRpdmXigKhBbGwgUmlnaHRzIFJlc2VydmVkLgo</string>
 						<int key="IBUITextAlignment">1</int>
 						<int key="IBUILineBreakMode">1</int>
 						<object class="IBUIFontDescription" key="IBUIFontDescription">
-							<string key="name">Osaka</string>
-							<string key="family">Osaka</string>
-							<int key="traits">0</int>
+							<int key="type">1</int>
 							<double key="pointSize">14</double>
 						</object>
-						<reference key="IBUIFont" ref="311384734"/>
+						<object class="NSFont" key="IBUIFont">
+							<string key="NSName">Helvetica</string>
+							<double key="NSSize">14</double>
+							<int key="NSfFlags">16</int>
+						</object>
 					</object>
 					<object class="IBUILabel" id="534004765">
 						<reference key="NSNextResponder" ref="191373211"/>
@@ -167,10 +165,8 @@ aXRpdmXigKhBbGwgUmlnaHRzIFJlc2VydmVkLgo</string>
 						<float key="IBUIMinimumFontSize">10</float>
 						<int key="IBUINumberOfLines">6</int>
 						<int key="IBUILineBreakMode">1</int>
-						<object class="IBUIFontDescription" key="IBUIFontDescription">
-							<string key="name">Monaco</string>
-							<string key="family">Monaco</string>
-							<int key="traits">0</int>
+						<object class="IBUIFontDescription" key="IBUIFontDescription" id="1028600826">
+							<int key="type">1</int>
 							<double key="pointSize">12</double>
 						</object>
 						<object class="NSFont" key="IBUIFont" id="483458342">
@@ -208,12 +204,7 @@ qJjlhaXjgZfjgarjgYTjgafjgY/jgaDjgZXjgYTjgII</string>
 						<float key="IBUIMinimumFontSize">10</float>
 						<int key="IBUINumberOfLines">9</int>
 						<int key="IBUILineBreakMode">0</int>
-						<object class="IBUIFontDescription" key="IBUIFontDescription" id="586044475">
-							<string key="name">Osaka</string>
-							<string key="family">Osaka</string>
-							<int key="traits">0</int>
-							<double key="pointSize">12</double>
-						</object>
+						<reference key="IBUIFontDescription" ref="1028600826"/>
 						<reference key="IBUIFont" ref="483458342"/>
 					</object>
 					<object class="IBUIButton" id="960448353">
@@ -238,7 +229,7 @@ qJjlhaXjgZfjgarjgYTjgafjgY/jgaDjgZXjgYTjgII</string>
 							<int key="NSColorSpace">3</int>
 							<bytes key="NSWhite">MC41AA</bytes>
 						</object>
-						<reference key="IBUIFontDescription" ref="586044475"/>
+						<reference key="IBUIFontDescription" ref="1028600826"/>
 						<reference key="IBUIFont" ref="483458342"/>
 					</object>
 					<object class="IBUIButton" id="925994006">
@@ -260,13 +251,11 @@ qJjlhaXjgZfjgarjgYTjgafjgY/jgaDjgZXjgYTjgII</string>
 							<bytes key="NSRGB">MC4xOTYwNzg0MzQ2IDAuMzA5ODAzOTMyOSAwLjUyMTU2ODY1NgA</bytes>
 						</object>
 						<reference key="IBUINormalTitleShadowColor" ref="5811636"/>
-						<object class="IBUIFontDescription" key="IBUIFontDescription">
-							<string key="name">HiraMaruPro-W4</string>
-							<string key="family">Hiragino Maru Gothic Pro</string>
-							<int key="traits">0</int>
+						<object class="IBUIFontDescription" key="IBUIFontDescription" id="583368138">
+							<int key="type">1</int>
 							<double key="pointSize">15</double>
 						</object>
-						<object class="NSFont" key="IBUIFont">
+						<object class="NSFont" key="IBUIFont" id="854850664">
 							<string key="NSName">Helvetica</string>
 							<double key="NSSize">15</double>
 							<int key="NSfFlags">16</int>
@@ -278,7 +267,6 @@ qJjlhaXjgZfjgarjgYTjgafjgY/jgaDjgZXjgYTjgII</string>
 						<string key="NSFrame">{{20, 410}, {280, 30}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						<int key="IBUIContentHorizontalAlignment">0</int>
@@ -291,17 +279,8 @@ qJjlhaXjgZfjgarjgYTjgafjgY/jgaDjgZXjgYTjgII</string>
 							<bytes key="NSRGB">MC4xOTYwNzg0MzE0IDAuMzA5ODAzOTIxNiAwLjUyMTU2ODYyNzUAA</bytes>
 						</object>
 						<reference key="IBUINormalTitleShadowColor" ref="5811636"/>
-						<object class="IBUIFontDescription" key="IBUIFontDescription">
-							<string key="name">Helvetica-Bold</string>
-							<string key="family">Helvetica</string>
-							<int key="traits">2</int>
-							<double key="pointSize">15</double>
-						</object>
-						<object class="NSFont" key="IBUIFont">
-							<string key="NSName">Helvetica-Bold</string>
-							<double key="NSSize">15</double>
-							<int key="NSfFlags">16</int>
-						</object>
+						<reference key="IBUIFontDescription" ref="583368138"/>
+						<reference key="IBUIFont" ref="854850664"/>
 					</object>
 				</object>
 				<string key="NSFrame">{{0, 20}, {320, 460}}</string>

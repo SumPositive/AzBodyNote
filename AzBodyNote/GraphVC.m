@@ -45,14 +45,22 @@
     [super viewDidLoad];
 
 	if (!mVolume) {
-		mVolume = [[AZVolume alloc] initWithFrame:CGRectMake(10, 100, 200, 44) delegate:self value:88 min:20 max:200 step:1];
+		mVolume = [[AZVolume alloc] initWithFrame:CGRectMake(20, 100, 200, 44) delegate:self value:88 min:20 max:200 step:1];
 		[self.view addSubview:mVolume];
+		mVolume.backgroundColor = [UIColor greenColor]; //self.view.backgroundColor;
 	}
 }
 
-- (void)volumeChanged:(NSInteger)volume
+- (void)volumeChanged:(id)sender value:(NSInteger)value
 {
-	ibLbVolume.text = [NSString stringWithFormat:@"%ld", volume];
+	ibLbVolume.text = [NSString stringWithFormat:@"%ld", value];
+	//ibLbVolume.backgroundColor = [UIColor yellowColor];
+}
+
+- (void)volumeDone:(id)sender value:(NSInteger)value
+{
+	ibLbVolume.text = [NSString stringWithFormat:@"%ld", value];
+	//ibLbVolume.backgroundColor = [UIColor blueColor];
 }
 
 - (void)viewDidUnload
