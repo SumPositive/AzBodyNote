@@ -142,12 +142,16 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 				}
 		} break;
 			
-		case 6: // +/-
+	/*	case 6: // +/-
 			if ([mLbFormula.text hasPrefix:@"-"]) {
 				mLbFormula.text = [mLbFormula.text substringFromIndex:1];
 			} else {
 				mLbFormula.text = [NSString stringWithFormat:@"-(%@)", mLbFormula.text];
 			}
+			break;　*/
+		case 6:	// [Cancel] AzBodyNote
+			[self hide];
+			return;
 			break;
 			
 		case 9: // [Done]
@@ -590,7 +594,11 @@ int levelOperator( NSString *zOpe )  // 演算子の優先順位
 					[bu setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
 					break;
 				
-				case  2: bu.tag=6; [bu setTitle:@"+/-" forState:UIControlStateNormal]; break;
+				case  2: bu.tag=6; [bu setTitle:NSLocalizedString(@"Cancel",nil) forState:UIControlStateNormal]; 	// AzBodyNote
+					bu.titleLabel.font = [UIFont systemFontOfSize:14]; 
+					[bu setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+					break;
+
 				case  3: bu.tag=1; [bu setTitle:@"00" forState:UIControlStateNormal]; break;
 				
 					

@@ -7,17 +7,17 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "AZVolume.h"
+#import "AZDial.h"
 
 
-@interface GraphVC : UIViewController <AZVolumeDelegate>
+@interface GraphVC : UIViewController <AZDialDelegate>
 {
 	IBOutlet UILabel		*ibLbVolume;
 	
-	AZVolume				*mVolume;
+	AZDial						*mDial;
 }
 
-// AZVolumeDelegate
+// AZDialDelegate
 //- (void)volumeChanged:(NSInteger)volume;
 
 

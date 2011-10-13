@@ -32,6 +32,12 @@
 	//[addButton release];
 	
 	self.managedObjectContext = [MocFunctions getMoc];
+
+	// TableView
+	//self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone; // セル区切り線なし
+	//self.tableView.separatorColor = [UIColor blackColor];
+	UIImage *imgTile = [UIImage imageNamed:@"Tx-WoodWhite320"];
+	self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 }
 
 - (void)viewWillAppear:(BOOL)animated

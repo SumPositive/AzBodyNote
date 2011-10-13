@@ -7,20 +7,23 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <iAd/iAd.h>
 #import "MocEntity.h"
 //#import "AzBodyNoteAppDelegate.h"
 
 @class E2editCellValue;
 
-@interface E2editTVC : UITableViewController
+@interface E2editTVC : UITableViewController <ADBannerViewDelegate>
 {
-	IBOutlet UITableView				*ibTvMain;
+	//IBOutlet UITableView				*ibTvMain;  = self.tableView を使用。
+	IBOutlet ADBannerView			*ibADBanner;
 	
 	E2record		*Re2edit;		// =nil:AddNew
 	
 @private
 	//AzBodyNoteAppDelegate	*appDelegate;
 	BOOL					mIsAddNew;
+	float						mADBannerY;	//iAd表示位置のY座標
 }
 
 @property (nonatomic, retain) E2record		*Re2edit;

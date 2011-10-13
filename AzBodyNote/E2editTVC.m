@@ -146,7 +146,19 @@
 											   initWithBarButtonSystemItem:UIBarButtonSystemItemSave
 											   target:self action:@selector(actionSave)] autorelease];
 	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
+
+	// TableView
+	self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone; // セル区切り線なし
+	//self.tableView.separatorColor = [UIColor blackColor];
+	//self.tableView.backgroundColor = [UIColor colorWithRed:151.0/256 green:80.0/256 blue:77.0/256 alpha:0.7];
+	UIImage *imgTile = [UIImage imageNamed:@"Tx-WoodWhite320"];
+	self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 	
+	// iAd
+	mADBannerY = ibADBanner.frame.origin.y;
+	CGRect rc = ibADBanner.frame;
+	rc.origin.y = self.view.frame.size.height + 50; // 下へ隠す
+	ibADBanner.frame = rc;
 }
 
 - (void)viewDidUnload
@@ -207,7 +219,7 @@
 {
 	if (indexPath.row==0) {
 		return 44; // DateTime
-	} else {
+	} else if (indexPath.row <= 3) {
 		return 88; // CellValue
 	}
     return 44; // Default
@@ -228,6 +240,9 @@
 			//cell.detailTextLabel.textAlignment = UITextAlignmentLeft;
 			//cell.detailTextLabel.font = [UIFont systemFontOfSize:20];
 			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;	// > ディスクロージャマーク
+			cell.textLabel.textColor = [UIColor blackColor];
+			cell.textLabel.backgroundColor = [UIColor clearColor];
+			cell.contentView.backgroundColor = [UIColor clearColor];
 		}
 		//cell.textLabel.text = NSLocalizedString(@"DateTime",nil);
 		
@@ -268,7 +283,7 @@
 				cell.ibLbName.text = NSLocalizedString(@"BpHi Name",nil);
 				cell.ibLbDetail.text = NSLocalizedString(@"BpHi Detail",nil);
 				cell.ibLbUnit.text = @"mmHg";
-				cell.ibBuValue.tag = 1;
+				//cell.ibBuValue.tag = 1;
 				//cell.ibSrValue.tag = 1;
 				//cell.RnValue = Re2edit.bpHi_mmHg; // NSNumber
 				cell.Re2record = Re2edit;
@@ -282,7 +297,7 @@
 				cell.ibLbName.text = NSLocalizedString(@"BpLo Name",nil);
 				cell.ibLbDetail.text = NSLocalizedString(@"BpLo Detail",nil);
 				cell.ibLbUnit.text = @"mmHg";
-				cell.ibBuValue.tag = 2;
+				//cell.ibBuValue.tag = 2;
 				//cell.ibSrValue.tag = 2;
 				//cell.RnValue = Re2edit.bpLo_mmHg; // NSNumber
 				cell.Re2record = Re2edit;
@@ -296,7 +311,7 @@
 				cell.ibLbName.text = NSLocalizedString(@"Pulse Name",nil);
 				cell.ibLbDetail.text = NSLocalizedString(@"Pulse Detail",nil);
 				cell.ibLbUnit.text = NSLocalizedString(@"Pulse unit",nil);
-				cell.ibBuValue.tag = 3;
+				//cell.ibBuValue.tag = 3;
 				//cell.ibSrValue.tag = 3;
 				//cell.RnValue = Re2edit.pulse_bpm; // NSNumber
 				cell.Re2record = Re2edit;
@@ -366,6 +381,51 @@
      [self.navigationController pushViewController:detailViewController animated:YES];
      [detailViewController release];
      */
+}
+
+
+#pragma mark - iAd
+
+// iAd delegate  取得できたときに呼ばれる　⇒　表示する
+- (void)bannerViewDidLoadAd:(ADBannerView *)banner
+{	// iAd 広告あり
+	// アニメ開始位置
+	
+	// アニメ準備
+	[UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; // slow at end
+	[UIView setAnimationDuration:1.2];
+	// アニメ終了位置
+	CGRect rc = banner.frame;
+	rc.origin.y = mADBannerY;		// 表示位置
+	banner.frame = rc;
+	banner.alpha = 1;
+	// アニメ開始
+	[UIView commitAnimations];
+}
+
+// iAd delegate  取得できなかったときに呼ばれる　⇒　非表示にする
+- (void)bannerView:(ADBannerView *)banner didFailToReceiveAdWithError:(NSError *)error
+{	// iAd 広告なし
+	// アニメ開始位置
+	
+	// アニメ準備
+	[UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationCurve:UIViewAnimationCurveEaseIn]; // slow at beginning
+	[UIView setAnimationDuration:1.2];
+	// アニメ終了位置
+	CGRect rc = banner.frame;
+	rc.origin.y = self.view.frame.size.height + 50;	// 下へ隠す
+	banner.frame = rc;
+	banner.alpha = 0;
+	// アニメ開始
+	[UIView commitAnimations];
+}
+
+// iAd delegate
+- (BOOL)bannerViewActionShouldBegin:(ADBannerView *)banner willLeaveApplication:(BOOL)willLeave
+{	// 広告表示前にする処理があれば記述
+	return YES;
 }
 
 @end

@@ -14,7 +14,7 @@
 #import "CalcView.h"
 
 @implementation E2editCellValue
-@synthesize ibLbName, ibLbDetail, ibLbValue, ibLbUnit, ibBuValue;
+@synthesize ibLbName, ibLbDetail, ibLbValue, ibLbUnit;
 @synthesize delegate, viewParent;
 @synthesize Re2record, RzKey, mValueMin, mValueMax, mValueDec, mValueStep;
 
@@ -69,6 +69,8 @@
 	mValue = [self integerFromDecimal:decAnswer digits:mValueDec];
 	if (mValue < mValueMin) mValue = mValueMin;  // min
 	else if (mValueMax < mValue) mValue = mValueMax; // max
+
+	[mDial setValue:mValue  animated:YES];
 	[self refreshValue];
 
 	if ([[Re2record valueForKey:RzKey] integerValue] != mValue) {
@@ -95,92 +97,20 @@
 	[calc release];
 }
 
-- (void)mStepperChange:(UIStepper *)sender
+- (IBAction)ibBuNone:(UIButton *)button
 {
-	mValue = (NSInteger)sender.value;
-	
-	ibLbValue.text = [NSString stringWithFormat:@"%ld", mValue];
-	[mVolume setValue:mValue];
+	NSLog(@"ibBuNone");
+	mValue = (-1); // None
+	//[mDial setValue:mValue  animated:YES];
+	[self refreshValue];
 	
 	if ([[Re2record valueForKey:RzKey] integerValue] != mValue) {
 		[Re2record setValue:[NSNumber numberWithInteger:mValue] forKey:RzKey];
-		
 		if ([delegate respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
 			[delegate editUpdate];
 		}
 	}
 }
-
-- (void)mBuDownTouch:(UIButton*)sender
-{
-	if (mValue <= mValueMin) return;
-
-	mValue--;
-	
-	ibLbValue.text = [NSString stringWithFormat:@"%ld", mValue];
-	[mVolume setValue:mValue];
-	
-	if ([[Re2record valueForKey:RzKey] integerValue] != mValue) {
-		[Re2record setValue:[NSNumber numberWithInteger:mValue] forKey:RzKey];
-		
-		if ([delegate respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
-			[delegate editUpdate];
-		}
-	}
-}
-
-- (void)mBuUpTouch:(UIButton*)sender
-{
-	if (mValueMax <= mValue) return;
-	
-	mValue++;
-	
-	ibLbValue.text = [NSString stringWithFormat:@"%ld", mValue];
-	[mVolume setValue:mValue];
-	
-	if ([[Re2record valueForKey:RzKey] integerValue] != mValue) {
-		[Re2record setValue:[NSNumber numberWithInteger:mValue] forKey:RzKey];
-		
-		if ([delegate respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
-			[delegate editUpdate];
-		}
-	}
-}
-
-/*
-- (IBAction)ibSrValueChange:(UISlider *)slider
-{
-	//NSLog(@"ibSrValueChange .tag=%d", slider.tag);
-	NSInteger iSlider = (NSInteger)(slider.value);
-	//NSInteger iVal = [RnValue integerValue];
-	if (mSliderBase < 0) {	// TouchDownは、Changeの後に通るため、このような処理にした。TouchUpにて(-1)にしている。
-		mSliderBase = mValue;
-	}
-	if (mValue != mSliderBase + iSlider) {
-		mValue = mSliderBase + iSlider;
-		if (mValue < mValueMin) mValue = mValueMin;  // min
-		else if (mValueMax < mValue) mValue = mValueMax; // max
-		//NG//RnValue = [NSNumber numberWithInteger:iVal];
-		[self refreshValue];
-	}
-}
-
-- (IBAction)ibSrValueTouchUp:(UISlider *)slider
-{	// Inside & Outside
-	NSLog(@"ibSrValueTouchUp");
-	slider.value = 0; // 中央に戻す
-	mSliderBase = (-1);
-	//RnValue = [NSNumber numberWithInteger:mValue];
-	if ([[Re2record valueForKey:RzKey] integerValue] != mValue) {
-		//AzBodyNoteAppDelegate *appDelegate = (AzBodyNoteAppDelegate *)[[UIApplication sharedApplication] delegate];
-		//appDelegate.mIsUpdate = YES; // 変更あり
-		[Re2record setValue:[NSNumber numberWithInteger:mValue] forKey:RzKey];
-		
-		if ([delegate respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
-			[delegate editUpdate];
-		}
-	}
-}*/
 
 
 - (void)drawRect:(CGRect)rect
@@ -200,68 +130,34 @@
 		val = (mValueMax - mValueMin) / 2;  //＜＜＜　前回値をセットする
 	}
 
-	mIsOS5 = ([[[UIDevice currentDevice] systemVersion] compare:@"5.0"] != NSOrderedAscending);  // !<  (>=) "5.0"
 	
-	if (mIsOS5) {	//iOS5 以上
-		if (!mStepper) {
-			mStepper = [[UIStepper alloc] initWithFrame:CGRectMake(10, 52, 0, 0)];
-			[mStepper addTarget:self action:@selector(mStepperChange:) forControlEvents:UIControlEventValueChanged];
-			[self addSubview:mStepper];
-			mStepper.minimumValue = mValueMin;
-			mStepper.maximumValue = mValueMax;
-			mStepper.stepValue = 1.0;
-			mStepper.value = val;
-		}
-		mBuDown = nil;
-		mBuUp = nil;
-	} else {
-		if (!mBuUp) {
-			mBuUp = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-			[mBuUp addTarget:self action:@selector(mBuUpTouch:) forControlEvents:UIControlEventTouchUpInside];
-			mBuUp.frame = CGRectMake(10+44+5, 51, 44, 30);
-			[self addSubview:mBuUp];
-			mBuUp.titleLabel.text = @"+";
-		}
-		if (!mBuDown) {
-			mBuDown = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-			[mBuDown addTarget:self action:@selector(mBuDownTouch:) forControlEvents:UIControlEventTouchUpInside];
-			mBuDown.frame = CGRectMake(10, 51, 44, 30);
-			[self addSubview:mBuDown];
-			mBuDown.titleLabel.text = @"-";
-		}
-		mStepper = nil;
-	}
-	
-	// AZVolume
-	if (!mVolume) {
-		mVolume = [[AZVolume alloc] initWithFrame:CGRectMake(115, 44, 200, 44) delegate:self
-											value:val  min:mValueMin  max:mValueMax  step:1];
-		[self addSubview:mVolume];
-		mVolume.backgroundColor = self.backgroundColor;
+	// AZDial
+	if (!mDial) {
+		mDial = [[AZDial alloc] initWithFrame:CGRectMake(10, 44, 300, 44)
+									 delegate: self
+											value: val
+										  min: mValueMin
+										  max: mValueMax
+										 step: 1
+									stepper: YES ];
+		[self addSubview:mDial];
+		mDial.backgroundColor = [UIColor clearColor]; //self.backgroundColor;
 	}
 	
 	[self refreshValue];
 }
 
-// <AZVolumeDelegate>
+// <AZDialDelegate>
 - (void)volumeChanged:(id)sender value:(NSInteger)value
 {	// Volumeが変位したとき
 	ibLbValue.text = [NSString stringWithFormat:@"%ld", value];
-	//ibLbValue.backgroundColor = [UIColor yellowColor];
-	if (mStepper) {	//iOS5 以上
-		mStepper.value = value;
-	}
 }
 
 - (void)volumeDone:(id)sender value:(NSInteger)value
 {	// Volume変位が停止したとき
 	ibLbValue.text = [NSString stringWithFormat:@"%ld", value];
-	//ibLbValue.backgroundColor = [UIColor greenColor];
 
 	mValue = value;
-	if (mStepper) {	//iOS5 以上
-		mStepper.value = value;
-	}
 	
 	if ([[Re2record valueForKey:RzKey] integerValue] != mValue) {
 		[Re2record setValue:[NSNumber numberWithInteger:mValue] forKey:RzKey];
@@ -278,17 +174,5 @@
 	[Re2record release], Re2record = nil;
 	[super dealloc];
 }
-
-/*
- - (IBAction)ibBuValue:(UIButton *)button
- {
- NSLog(@"E2editCellValue -- ibBuValue");
- }
- 
- - (IBAction)ibSrValueChange:(UISlider *)slider
- {
- NSLog(@"E2editCellValue -- ibSrValueChange");
- }
- */
 
 @end

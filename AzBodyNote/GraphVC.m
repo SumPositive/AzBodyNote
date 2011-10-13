@@ -17,7 +17,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-		mVolume = nil;
+		mDial = nil;
     }
     return self;
 }
@@ -44,10 +44,11 @@
 {
     [super viewDidLoad];
 
-	if (!mVolume) {
-		mVolume = [[AZVolume alloc] initWithFrame:CGRectMake(20, 100, 200, 44) delegate:self value:88 min:20 max:200 step:1];
-		[self.view addSubview:mVolume];
-		mVolume.backgroundColor = [UIColor greenColor]; //self.view.backgroundColor;
+	if (!mDial) {
+		mDial = [[AZDial alloc] initWithFrame:CGRectMake(20, 100, 200, 44) 
+									   delegate:self value:50 min:0 max:300 step:1 stepper:YES];
+		[self.view addSubview:mDial];
+		mDial.backgroundColor = [UIColor greenColor]; //self.view.backgroundColor;
 	}
 }
 
