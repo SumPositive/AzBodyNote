@@ -28,8 +28,8 @@
 
 	[MocFunctions setMoc:self.managedObjectContext];
 	
-	self.window.rootViewController = self.tabBarController;
-	[self.window makeKeyAndVisible];
+	//self.window.rootViewController = self.tabBarController;
+	//[self.window makeKeyAndVisible];
     return YES;
 }
 

@@ -99,7 +99,7 @@
 								<string key="NSFrame">{{20, 30}, {173, 14}}</string>
 								<reference key="NSSuperview" ref="770759319"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="417433488"/>
+								<reference key="NSNextKeyView" ref="255512301"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
 								<int key="IBUIContentMode">7</int>
@@ -125,7 +125,7 @@
 							<object class="IBUIButton" id="417433488">
 								<reference key="NSNextResponder" ref="770759319"/>
 								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{200, 13}, {110, 30}}</string>
+								<string key="NSFrame">{{200, 13}, {114, 30}}</string>
 								<reference key="NSSuperview" ref="770759319"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="590521778"/>
@@ -159,10 +159,10 @@
 							<object class="IBUIButton" id="255512301">
 								<reference key="NSNextResponder" ref="770759319"/>
 								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{168, 16}, {25, 25}}</string>
+								<string key="NSFrame">{{171, 15}, {25, 25}}</string>
 								<reference key="NSSuperview" ref="770759319"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="198025435"/>
+								<reference key="NSNextKeyView" ref="417433488"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<float key="IBUIAlpha">0.30000001192092896</float>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
@@ -170,11 +170,11 @@
 								<int key="IBUIContentVerticalAlignment">0</int>
 								<int key="IBUIButtonType">1</int>
 								<string key="IBUITitleShadowOffset">{2, 2}</string>
-								<string key="IBUINormalTitle">x</string>
+								<string key="IBUINormalTitle">×</string>
 								<reference key="IBUIHighlightedTitleColor" ref="456877674"/>
 								<object class="NSColor" key="IBUINormalTitleColor">
-									<int key="NSColorSpace">1</int>
-									<bytes key="NSRGB">MC41OTIxNTY4NjI3IDAuMzEzNzI1NDkwMiAwLjMwMTk2MDc4NDMgMC43NQA</bytes>
+									<int key="NSColorSpace">3</int>
+									<bytes key="NSWhite">MC4zMzMzMzMzMzMzAA</bytes>
 								</object>
 								<reference key="IBUINormalTitleShadowColor" ref="456877674"/>
 								<object class="IBUIFontDescription" key="IBUIFontDescription">
@@ -193,7 +193,7 @@
 								<string key="NSFrame">{{202, 10}, {65, 35}}</string>
 								<reference key="NSSuperview" ref="770759319"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="255512301"/>
+								<reference key="NSNextKeyView" ref="198025435"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
 								<int key="IBUIContentMode">7</int>
@@ -271,7 +271,6 @@
 				<reference key="NSNextKeyView" ref="770759319"/>
 				<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 				<reference key="IBUIContentView" ref="770759319"/>
-				<string key="IBUIReuseIdentifier">E2editCellValue</string>
 			</object>
 		</object>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
@@ -279,43 +278,11 @@
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchOutletConnection" key="connection">
-						<string key="label">ownerE2editTVC</string>
+						<string key="label">ownerCellDial</string>
 						<reference key="source" ref="372490531"/>
 						<reference key="destination" ref="969560439"/>
 					</object>
-					<int key="connectionID">46</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBCocoaTouchOutletConnection" key="connection">
-						<string key="label">ibLbName</string>
-						<reference key="source" ref="969560439"/>
-						<reference key="destination" ref="499446402"/>
-					</object>
-					<int key="connectionID">34</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBCocoaTouchOutletConnection" key="connection">
-						<string key="label">ibLbUnit</string>
-						<reference key="source" ref="969560439"/>
-						<reference key="destination" ref="198025435"/>
-					</object>
-					<int key="connectionID">35</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBCocoaTouchOutletConnection" key="connection">
-						<string key="label">ibLbValue</string>
-						<reference key="source" ref="969560439"/>
-						<reference key="destination" ref="590521778"/>
-					</object>
-					<int key="connectionID">36</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBCocoaTouchOutletConnection" key="connection">
-						<string key="label">ibBuValue</string>
-						<reference key="source" ref="969560439"/>
-						<reference key="destination" ref="417433488"/>
-					</object>
-					<int key="connectionID">44</int>
+					<int key="connectionID">79</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchOutletConnection" key="connection">
@@ -323,7 +290,31 @@
 						<reference key="source" ref="969560439"/>
 						<reference key="destination" ref="898812116"/>
 					</object>
-					<int key="connectionID">54</int>
+					<int key="connectionID">73</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">ibLbName</string>
+						<reference key="source" ref="969560439"/>
+						<reference key="destination" ref="499446402"/>
+					</object>
+					<int key="connectionID">74</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">ibLbUnit</string>
+						<reference key="source" ref="969560439"/>
+						<reference key="destination" ref="198025435"/>
+					</object>
+					<int key="connectionID">75</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">ibLbValue</string>
+						<reference key="source" ref="969560439"/>
+						<reference key="destination" ref="590521778"/>
+					</object>
+					<int key="connectionID">76</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
@@ -332,7 +323,7 @@
 						<reference key="destination" ref="969560439"/>
 						<int key="IBEventType">7</int>
 					</object>
-					<int key="connectionID">63</int>
+					<int key="connectionID">78</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
@@ -341,7 +332,7 @@
 						<reference key="destination" ref="969560439"/>
 						<int key="IBEventType">7</int>
 					</object>
-					<int key="connectionID">62</int>
+					<int key="connectionID">77</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -380,7 +371,7 @@
 							<reference ref="255512301"/>
 						</object>
 						<reference key="parent" ref="0"/>
-						<string key="objectName">2edit Cell Value - E2editCellValue</string>
+						<string key="objectName">E2editCellDial</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">10</int>
@@ -445,7 +436,7 @@
 					<string>UIResponder</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-					<string>E2editCellValue</string>
+					<string>E2editCellDial</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -468,13 +459,13 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">63</int>
+			<int key="maxID">79</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="IBPartialClassDescription">
-					<string key="className">E2editCellValue</string>
+					<string key="className">E2editCellDial</string>
 					<string key="superclassName">UITableViewCell</string>
 					<object class="NSMutableDictionary" key="outlets">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -524,7 +515,47 @@
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/E2editCellValue.h</string>
+						<string key="minorKey">./Classes/E2editCellDial.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">E2editCellNote</string>
+					<string key="superclassName">UITableViewCell</string>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>ibTfNote1</string>
+							<string>ibTfNote2</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>UITextField</string>
+							<string>UITextField</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>ibTfNote1</string>
+							<string>ibTfNote2</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ibTfNote1</string>
+								<string key="candidateClassName">UITextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ibTfNote2</string>
+								<string key="candidateClassName">UITextField</string>
+							</object>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/E2editCellNote.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -534,31 +565,31 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>ibADBanner</string>
-							<string>ownerE2editTVC</string>
+							<string>ownerCellDial</string>
+							<string>ownerCellNote</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>ADBannerView</string>
-							<string>E2editCellValue</string>
+							<string>E2editCellDial</string>
+							<string>E2editCellNote</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>ibADBanner</string>
-							<string>ownerE2editTVC</string>
+							<string>ownerCellDial</string>
+							<string>ownerCellNote</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBToOneOutletInfo">
-								<string key="name">ibADBanner</string>
-								<string key="candidateClassName">ADBannerView</string>
+								<string key="name">ownerCellDial</string>
+								<string key="candidateClassName">E2editCellDial</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">ownerE2editTVC</string>
-								<string key="candidateClassName">E2editCellValue</string>
+								<string key="name">ownerCellNote</string>
+								<string key="candidateClassName">E2editCellNote</string>
 							</object>
 						</object>
 					</object>

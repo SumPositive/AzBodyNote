@@ -38,28 +38,33 @@
 			if (!mStepBuUp) {
 				mStepBuUp = [UIButton buttonWithType:UIButtonTypeCustom];
 				[self addSubview:mStepBuUp];
-				[mStepBuUp addTarget:self action:@selector(actionStepBuUpTouch:) forControlEvents:UIControlEventTouchUpInside];
+				[mStepBuUp addTarget:self action:@selector(actionStepBuUpTouch:) 
+					forControlEvents:UIControlEventTouchDown];
 				[mStepBuUp setImage:[UIImage imageNamed:@"AZDialStepperPlus"] forState:UIControlStateNormal];
+				[mStepBuUp setImage:[UIImage imageNamed:@"AZDialStepperPlusDown"] forState:UIControlStateHighlighted];
 				CGRect rc = self.bounds;
 				rc.origin.x = 47;
-				rc.origin.y = 6;
+				rc.origin.y = 7;
 				rc.size.width = 47;
-				rc.size.height = 31;
+				rc.size.height = 30;
 				mStepBuUp.frame = rc;		//[+]右側
 			}
 			if (!mStepBuDown) {
 				mStepBuDown = [UIButton buttonWithType:UIButtonTypeCustom];
 				[self addSubview:mStepBuDown];
-				[mStepBuDown addTarget:self action:@selector(actionStepBuDownTouch:) forControlEvents:UIControlEventTouchUpInside];
+				[mStepBuDown addTarget:self action:@selector(actionStepBuDownTouch:) 
+					  forControlEvents:UIControlEventTouchDown];
 				[mStepBuDown setImage:[UIImage imageNamed:@"AZDialStepperMinus"] forState:UIControlStateNormal];
+				[mStepBuDown setImage:[UIImage imageNamed:@"AZDialStepperMinusDown"] forState:UIControlStateHighlighted];
 				CGRect rc = self.bounds;
-				rc.origin.y = 6;
+				rc.origin.x = 0;
+				rc.origin.y = 7;
 				rc.size.width = 47;
-				rc.size.height = 31;
+				rc.size.height = 30;
 				mStepBuDown.frame = rc;		//[-]左側
 			}
 		}
-		//初期値セットは、setValue: から scrollReset:　が呼び出される。
+		//初期値セットは、setDial: から scrollReset:　が呼び出される。
 	} else {
 		if (mStepper) {
 			[mStepper removeFromSuperview];
@@ -91,8 +96,8 @@
 		mScrollView.frame = rcScroll;
 	} else {
 		mScrollView = [[UIScrollView alloc] initWithFrame:rcScroll];
-		//setValue:にて// mScrollView.contentSize = CGSizeMake( mScrollMax + rcScroll.size.width, ImgH );
-		//setValue:にて// mScrollView.contentOffset = CGPointMake( mScrollMax - mScrollValue, 0);
+		//setDial:にて// mScrollView.contentSize = CGSizeMake( mScrollMax + rcScroll.size.width, ImgH );
+		//setDial:にて// mScrollView.contentOffset = CGPointMake( mScrollMax - mScrollValue, 0);
 		mScrollView.delegate = self;
 		mScrollView.showsVerticalScrollIndicator = NO;
 		mScrollView.showsHorizontalScrollIndicator = NO;
@@ -129,20 +134,20 @@
 
 - (id)initWithFrame:(CGRect)frame 
 		   delegate:(id)delegate 
-			  value:(NSInteger)value			// 初期値
-			   min:(NSInteger)vmin			// 最小値
-			   max:(NSInteger)vmax			// 最大値
-			   step:(NSInteger)vstep		// 増減値
+			  dial:(NSInteger)dial			// 初期値
+			   min:(NSInteger)min			// 最小値
+			   max:(NSInteger)max		// 最大値
+			   step:(NSInteger)step		// 増減値
 			stepper:(BOOL)stepper;
 {
 	assert(delegate);
-	assert(vmin < vmax);
+	assert(min < max);
 	//assert(vmin <= value);
 	//assert(value <= vmax);
-	if (value < vmin) value = vmin;
-	else if (vmax < value) value = vmax;
+	if (dial < min) dial = min;
+	else if (max < dial) dial = max;
 	//assert(1 <= vstep);
-	if (vstep < 1) vstep =1;
+	if (step < 1) step =1;
 	
 	UIImage *imgTile = [UIImage imageNamed:@"AZDialTile"];	// H30 x W10の倍数
 	if (imgTile==nil) return nil;
@@ -152,13 +157,13 @@
     if (self==nil) return nil;
 	
 	// Initialization
-	//mIsMoved = YES;	// =YES:setValue:等の初期値セット中 ⇒ delegate呼び出ししない。
+	//mIsMoved = YES;	// =YES:setDial:等の初期値セット中 ⇒ delegate呼び出ししない。
 	mDelegate = delegate;
-	mVmin = vmin;
-	mVmax = vmax;
-	mVstep = vstep;
+	mDialMin = min;
+	mDialMax = max;
+	mDialStep = step;
 	mStepperMag = 1.0;
-	//mValue は、mScrollView生成後、setValue:によりセットしている。
+	//mValue は、mScrollView生成後、setDial:によりセットしている。
 	mIsOS5 = ([[[UIDevice currentDevice] systemVersion] compare:@"5.0"] != NSOrderedAscending);  // !<  (>=) "5.0"
 
 	[self makeView:stepper];
@@ -181,7 +186,7 @@
 	[mScrollView addSubview:mIvRight];
 	
 	// mValue, mScrollView 座標系をセット
-	[self setValue:value  animated:NO];	//---> scrollReset:にてmScrollViewやBLOCK再配置処理
+	[self setDial:dial  animated:NO];	//---> scrollReset:にてmScrollViewやBLOCK再配置処理
 	
 	//mIsMoved = NO;
     return self;
@@ -199,31 +204,29 @@
 
 - (void)scrollReset
 {	// mScrollView 座標系セット
-	//mIsMoved = YES;	// =YES:setValue:等の初期値セット中 ⇒ delegate呼び出ししない。
-	//mScrollView.delegate = nil;
 	
-	NSLog(@"-- scrollReset -- mValue=%d  mVmin=%d  mVmax=%d  :: mScrollMax=%.1f  mScrollOfs=%.1f",
-		  mValue, mVmin, mVmax, mScrollMax, mScrollOfs);
+	//NSLog(@"-- scrollReset -- mValue=%d  mVmin=%d  mVmax=%d  :: mScrollMax=%.1f  mScrollOfs=%.1f",
+	//	  mValue, mVmin, mVmax, mScrollMax, mScrollOfs);
 
-	CGFloat ff = (CGFloat)(mVmax - mVmin) / mVstep * PITCH;
+	CGFloat ff = (CGFloat)(mDialMax - mDialMin) / mDialStep * PITCH;
 	if (mScrollMax != ff) {
 		mScrollMax = ff;
 		mScrollView.contentSize = CGSizeMake( mScrollMax + mScrollView.frame.size.width, ImgH );	//  +PITCH が無いと原点0に戻らなくなる。
-		NSLog(@"                       -- CHANGE - mScrollMax=%.1lf  mVstep=%d  STEP=%d", mScrollMax, mVstep, (int)PITCH);
+		//NSLog(@"                       -- CHANGE - mScrollMax=%.1lf  mVstep=%d  STEP=%d", mScrollMax, mVstep, (int)PITCH);
 	}
 
-	ff = mScrollMax - (CGFloat)((mValue - mVmin) / mVstep * PITCH);	  // 右側が原点になるため
+	ff = mScrollMax - (CGFloat)((mDial - mDialMin) / mDialStep * PITCH);	  // 右側が原点になるため
 	if (mScrollOfs != ff) {
 		mScrollOfs = ff;
 		mScrollView.contentOffset = CGPointMake( mScrollOfs, 0);
-		NSLog(@"                       -- CHANGE - mScrollMax=%.1lf  mScrollOfs=%.1lf  STEP=%d", mScrollMax, mScrollOfs, (int)PITCH);
+		//NSLog(@"                       -- CHANGE - mScrollMax=%.1lf  mScrollOfs=%.1lf  STEP=%d", mScrollMax, mScrollOfs, (int)PITCH);
 	}
 	
 	if ( ( 0 < mIvLeft.frame.origin.x && mScrollOfs < mIvCenter.frame.origin.x - PITCH*3)
 		|| ( mIvRight.frame.origin.x + BLOCK < mScrollMax && mIvRight.frame.origin.x + PITCH*3 < mScrollOfs) ) 
 	{	// mIvCenterの範囲外が指定された場合、再配置する
 		NSInteger iNo = floor( (mScrollOfs) / BLOCK );  // Center No.  小数以下切り捨て
-		NSLog(@"                       -- mIvCenter1 - X=%.1lf  Wid=%.1lf  iNo=%d", mIvCenter.frame.origin.x, mIvCenter.frame.origin.x + BLOCK, iNo);
+		//NSLog(@"                       -- mIvCenter1 - X=%.1lf  Wid=%.1lf  iNo=%d", mIvCenter.frame.origin.x, mIvCenter.frame.origin.x + BLOCK, iNo);
 		CGRect rc = mIvLeft.frame;
 		//Left
 		rc.origin.x =  (iNo - 1) * BLOCK;
@@ -231,7 +234,7 @@
 		//Center
 		rc.origin.x += BLOCK;
 		mIvCenter.frame = rc;
-		NSLog(@"                       -- mIvCenter2 - X=%.1lf  Wid=%.1lf", mIvCenter.frame.origin.x, mIvCenter.frame.origin.x + BLOCK);
+		//NSLog(@"                       -- mIvCenter2 - X=%.1lf  Wid=%.1lf", mIvCenter.frame.origin.x, mIvCenter.frame.origin.x + BLOCK);
 		//Right
 		rc.origin.x += BLOCK;
 		mIvRight.frame = rc;
@@ -242,28 +245,28 @@
 
 	if (mIsOS5) {
 		if (!mStepper) return;
-		mStepper.minimumValue = mVmin;
-		mStepper.maximumValue = mVmax;
-		mStepper.stepValue = mVstep * mStepperMag;
-		mStepper.value = mValue;
+		mStepper.minimumValue = mDialMin;
+		mStepper.maximumValue = mDialMax;
+		mStepper.stepValue = mDialStep * mStepperMag;
+		mStepper.value = mDial;
 	} else {
 		if (!mStepBuUp || !mStepBuDown) return;
-		mStepBuUp.enabled = (mValue < mVmax);
-		mStepBuDown.enabled = (mVmin < mValue);
+		mStepBuUp.enabled = (mDial < mDialMax);
+		mStepBuDown.enabled = (mDialMin < mDial);
 	}
 }
 
-- (NSInteger)getValue
+- (NSInteger)getDial
 {
-	return mValue;
+	return mDial;
 }
 
-- (void)setValue:(NSInteger)value  animated:(BOOL)animated
+- (void)setDial:(NSInteger)dial  animated:(BOOL)animated
 {
-	if (value < mVmin) value = mVmin;
-	else if (mVmax < value) value = mVmax;
+	if (dial < mDialMin) dial = mDialMin;
+	else if (mDialMax < dial) dial = mDialMax;
 	// SET
-	mValue = value;
+	mDial = dial;
 	
 	if (animated) {
 		// アニメ準備
@@ -281,25 +284,25 @@
 
 - (void)setStep:(NSInteger)vstep
 {
-	if (vstep < 1) mVstep =1;
-	else mVstep = vstep;
+	if (vstep < 1) mDialStep =1;
+	else mDialStep = vstep;
 	[self scrollReset];
 }
 
 - (void)setMin:(NSInteger)vmin
 {
-	if (mValue < vmin) mValue = vmin;
+	if (mDial < vmin) mDial = vmin;
 	// SET
-	mVmin = vmin;
+	mDialMin = vmin;
 	// mScrollView 座標系セット
 	[self scrollReset];
 }
 
 - (void)setMax:(NSInteger)vmax
 {
-	if (vmax < mValue) mValue = vmax;
+	if (vmax < mDial) mDial = vmax;
 	// SET
-	mVmax = vmax;
+	mDialMax = vmax;
 	// mScrollView 座標系セット
 	[self scrollReset];
 }
@@ -326,30 +329,30 @@
 
 - (void)actionStepperChange:(UIStepper *)sender
 {
-	[self	setValue:(NSInteger)sender.value animated:YES];
+	[self	setDial:(NSInteger)sender.value animated:YES];
 
-	if ([mDelegate respondsToSelector:@selector(volumeDone:value:)]) {
-		[mDelegate volumeDone:self  value:mValue];
+	if ([mDelegate respondsToSelector:@selector(volumeDone:dial:)]) {
+		[mDelegate volumeDone:self  dial:mDial];
 	}
 }
 
 - (void)actionStepBuUpTouch:(UIButton*)sender
 {
-	NSInteger ii = mValue + (mVstep * mStepperMag);
-	if (mVmax < ii) ii = mVmax;
-	[self	setValue:ii  animated:YES];
-	if ([mDelegate respondsToSelector:@selector(volumeDone:value:)]) {
-		[mDelegate volumeDone:self  value:mValue];
+	NSInteger ii = mDial + (mDialStep * mStepperMag);
+	if (mDialMax < ii) ii = mDialMax;
+	[self	setDial:ii  animated:YES];
+	if ([mDelegate respondsToSelector:@selector(volumeDone:dial:)]) {
+		[mDelegate volumeDone:self  dial:mDial];
 	}
 }
 
 - (void)actionStepBuDownTouch:(UIButton*)sender
 {
-	NSInteger ii = mValue - (mVstep * mStepperMag);
-	if (ii < mVmin) ii = mVmin;
-	[self	setValue:ii  animated:YES];
-	if ([mDelegate respondsToSelector:@selector(volumeDone:value:)]) {
-		[mDelegate volumeDone:self  value:mValue];
+	NSInteger ii = mDial - (mDialStep * mStepperMag);
+	if (ii < mDialMin) ii = mDialMin;
+	[self	setDial:ii  animated:YES];
+	if ([mDelegate respondsToSelector:@selector(volumeDone:dial:)]) {
+		[mDelegate volumeDone:self  dial:mDial];
 	}
 }
 
@@ -368,7 +371,6 @@
 	}
 	CGFloat delta = scrollView.contentOffset.x - sBase;	// 変位量
 	if ( fabs(delta) < PITCH/2 ) {
-		//mIsMoved = NO;
 		return;
 	}
 	sBase = scrollView.contentOffset.x;
@@ -377,10 +379,9 @@
 	//													mIvLeft.frame.origin.x, mIvCenter.frame.origin.x, mIvRight.frame.origin.x);
 	
 	// valueChange
-	//NSInteger ii = floor( (mScrollMax - scrollView.contentOffset.x) / PITCH ) * mVstep;
-	mValue = mVmin + floor( (mScrollMax - scrollView.contentOffset.x) / PITCH ) * mVstep;
-	if ([mDelegate respondsToSelector:@selector(volumeChanged:value:)]) {
-		[mDelegate volumeChanged:self  value:mValue];	// 変化、決定ではない
+	mDial = mDialMin + floor( (mScrollMax - scrollView.contentOffset.x) / PITCH ) * mDialStep;
+	if ([mDelegate respondsToSelector:@selector(volumeChanged:dial:)]) {
+		[mDelegate volumeChanged:self  dial:mDial];	// 変化、決定ではない
 	}
 
 	if ( scrollView.contentOffset.x < mIvCenter.frame.origin.x - PITCH*3 ) {
@@ -389,8 +390,8 @@
 			UIImageView *iv = mIvRight;
 			mIvRight = mIvCenter;
 			mIvCenter = mIvLeft;
-			NSLog(@"                       -L- mIvCenter - X=%.1lf  Wid=%.1lf  <<< X=%.1f", 
-				  mIvCenter.frame.origin.x, mIvCenter.frame.origin.x + BLOCK, scrollView.contentOffset.x);
+			//NSLog(@"                       -L- mIvCenter - X=%.1lf  Wid=%.1lf  <<< X=%.1f", 
+			//	  mIvCenter.frame.origin.x, mIvCenter.frame.origin.x + BLOCK, scrollView.contentOffset.x);
 			mIvLeft = iv;
 			CGRect frame = mIvLeft.frame;
 			frame.origin.x -= (BLOCK * 3);
@@ -403,15 +404,14 @@
 			UIImageView *iv = mIvLeft;
 			mIvLeft = mIvCenter;
 			mIvCenter = mIvRight;
-			NSLog(@"                       -R- mIvCenter - X=%.1lf  Wid=%.1lf  <<< X=%.1f", 
-				  mIvCenter.frame.origin.x, mIvCenter.frame.origin.x + BLOCK, scrollView.contentOffset.x);
+			//NSLog(@"                       -R- mIvCenter - X=%.1lf  Wid=%.1lf  <<< X=%.1f", 
+			//	  mIvCenter.frame.origin.x, mIvCenter.frame.origin.x + BLOCK, scrollView.contentOffset.x);
 			mIvRight = iv;
 			CGRect frame = mIvRight.frame;
 			frame.origin.x += (BLOCK * 3);
 			mIvRight.frame = frame;
 		}
 	}
-	//mIsMoved = NO;
 }
 
 - (void)scrollDone:(UIScrollView *)scrollView
@@ -420,12 +420,12 @@
 	//NG//NSInteger ii = floor( (mScrollMax - scrollView.contentOffset.x) / PITCH ) * mVstep;
 	//NG//ここで、改めて位置から求めると、指を離した瞬間に動いて変化する場合がある。
 	//OK//そのため、scrollViewDidScroll:にて表示されている mValue に決定することにした。
-	if ([mDelegate respondsToSelector:@selector(volumeDone:value:)]) {
-		[mDelegate volumeDone:self  value:mValue];	// 決定
+	if ([mDelegate respondsToSelector:@selector(volumeDone:dial:)]) {
+		[mDelegate volumeDone:self  dial:mDial];	// 決定
 	}
 	
-	NSInteger iStep = mVstep * mStepperMag;
-	[self setValue:((mValue / iStep) * iStep)  animated:NO];	// ステッパーのステップに補正する
+	NSInteger iStep = mDialStep * mStepperMag;
+	[self setDial:((mDial / iStep) * iStep)  animated:NO];	// ステッパーのステップに補正する
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate

@@ -1,5 +1,5 @@
 //
-//  E2editCellValue.m
+//  E2editCellDial.m
 //  AzBodyNote
 //
 //  Created by Sum Positive on 11/10/02.
@@ -10,19 +10,21 @@
 #import "AzBodyNoteAppDelegate.h"
 #import "MocEntity.h"
 #import "E2editTVC.h"
-#import "E2editCellValue.h"
+#import "E2editCellDial.h"
 #import "CalcView.h"
 
-@implementation E2editCellValue
+@implementation E2editCellDial
 @synthesize ibLbName, ibLbDetail, ibLbValue, ibLbUnit;
 @synthesize delegate, viewParent;
-@synthesize Re2record, RzKey, mValueMin, mValueMax, mValueDec, mValueStep;
+@synthesize Re2record, RzKey, mValueMin, mValueMax, mValueDec, mValueStep, mValuePrev;
 
 
 - (void)refreshValue
 {
 	if (mValue < 0) {
-		ibLbValue.text = NSLocalizedString(@"None",nil);
+		//ibLbValue.text = NSLocalizedString(@"None",nil);
+		ibLbValue.text = [NSString stringWithFormat:@"%d", mValuePrev];
+		ibLbValue.textColor = [UIColor brownColor];
 	} else {
 		if (mValueDec<=0) {
 			ibLbValue.text = [NSString stringWithFormat:@"%d", mValue];
@@ -36,8 +38,8 @@
 				ibLbValue.text = [NSString stringWithFormat:@"%ld.%ld", iInt, iDec];
 			}
 		}
+		ibLbValue.textColor = [UIColor blackColor];
 	}
-	//
 }
 
 
@@ -70,7 +72,7 @@
 	if (mValue < mValueMin) mValue = mValueMin;  // min
 	else if (mValueMax < mValue) mValue = mValueMax; // max
 
-	[mDial setValue:mValue  animated:YES];
+	[mDial setDial:mValue  animated:YES];
 	[self refreshValue];
 
 	if ([[Re2record valueForKey:RzKey] integerValue] != mValue) {
@@ -100,8 +102,8 @@
 - (IBAction)ibBuNone:(UIButton *)button
 {
 	NSLog(@"ibBuNone");
+	[mDial setDial:mValuePrev  animated:YES];
 	mValue = (-1); // None
-	//[mDial setValue:mValue  animated:YES];
 	[self refreshValue];
 	
 	if ([[Re2record valueForKey:RzKey] integerValue] != mValue) {
@@ -117,25 +119,31 @@
 {
 	assert(Re2record);
 	assert(RzKey);
-	NSNumber *num = [Re2record valueForKey:RzKey ];
+	NSNumber *num = [Re2record valueForKey:RzKey];
 	if (num) {
 		mValue = [num integerValue];
 	} else {
-		//mValue = (-1); // None
-		mValue = (mValueMax - mValueMin) / 2;  //＜＜＜　前回値をセットする
+		mValue = (-1); // None
+	}
+
+	if (mValuePrev<mValueMin || mValueMax<mValuePrev) {
+		mValuePrev = (mValueMax - mValueMin) / 2; //平均値
 	}
 	
 	NSInteger val = mValue;
 	if (val < mValueMin || mValueMax < val) {
-		val = (mValueMax - mValueMin) / 2;  //＜＜＜　前回値をセットする
+		val = mValuePrev;  //＜＜＜　前回値をセットする
 	}
 
 	
 	// AZDial
-	if (!mDial) {
+	if (mDial) {
+		[mDial setDial:val animated:YES];
+	} else {
+		// 新規生成
 		mDial = [[AZDial alloc] initWithFrame:CGRectMake(10, 44, 300, 44)
 									 delegate: self
-											value: val
+										 dial: val
 										  min: mValueMin
 										  max: mValueMax
 										 step: 1
@@ -148,16 +156,16 @@
 }
 
 // <AZDialDelegate>
-- (void)volumeChanged:(id)sender value:(NSInteger)value
+- (void)volumeChanged:(id)sender dial:(NSInteger)dial
 {	// Volumeが変位したとき
-	ibLbValue.text = [NSString stringWithFormat:@"%ld", value];
+	mValue = dial;
+	[self refreshValue];
 }
 
-- (void)volumeDone:(id)sender value:(NSInteger)value
+- (void)volumeDone:(id)sender dial:(NSInteger)dial
 {	// Volume変位が停止したとき
-	ibLbValue.text = [NSString stringWithFormat:@"%ld", value];
-
-	mValue = value;
+	mValue = dial;
+	[self refreshValue];
 	
 	if ([[Re2record valueForKey:RzKey] integerValue] != mValue) {
 		[Re2record setValue:[NSNumber numberWithInteger:mValue] forKey:RzKey];

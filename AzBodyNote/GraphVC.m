@@ -46,21 +46,21 @@
 
 	if (!mDial) {
 		mDial = [[AZDial alloc] initWithFrame:CGRectMake(20, 100, 200, 44) 
-									   delegate:self value:50 min:0 max:300 step:1 stepper:YES];
+									 delegate:self dial:50 min:0 max:300 step:1 stepper:YES];
 		[self.view addSubview:mDial];
 		mDial.backgroundColor = [UIColor greenColor]; //self.view.backgroundColor;
 	}
 }
 
-- (void)volumeChanged:(id)sender value:(NSInteger)value
+- (void)volumeChanged:(id)sender dial:(NSInteger)dial
 {
-	ibLbVolume.text = [NSString stringWithFormat:@"%ld", value];
+	ibLbVolume.text = [NSString stringWithFormat:@"%ld", dial];
 	//ibLbVolume.backgroundColor = [UIColor yellowColor];
 }
 
-- (void)volumeDone:(id)sender value:(NSInteger)value
+- (void)volumeDone:(id)sender dial:(NSInteger)dial
 {
-	ibLbVolume.text = [NSString stringWithFormat:@"%ld", value];
+	ibLbVolume.text = [NSString stringWithFormat:@"%ld", dial];
 	//ibLbVolume.backgroundColor = [UIColor blueColor];
 }
 

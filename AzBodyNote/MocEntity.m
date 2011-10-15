@@ -11,31 +11,31 @@
 
 //---------------------------------------------------------------------------------------E1 
 @implementation E1body
-@dynamic birthday;
-@dynamic markBpHi_mmHg;
-@dynamic markBpLo_mmHg;
-@dynamic markWaist_cm;
-@dynamic markWeight_g;
-@dynamic name;
-@dynamic note;
+@dynamic dBirthday;
+@dynamic nMkBpHi_mmHg;
+@dynamic nMkBpLo_mmHg;
+@dynamic nMkWaist_cm;
+@dynamic nMkWeight_g;
+@dynamic sName;
+@dynamic sNote;
 @dynamic e2records;
 @end
 
 //---------------------------------------------------------------------------------------E2 
 @implementation E2record
-@dynamic bpHi_mmHg;
-@dynamic bpLo_mmHg;
-@dynamic caution;
-@dynamic condition;
-@dynamic datetime;
-@dynamic equipment;
-@dynamic meal_cal;
-@dynamic meal_photo;
-@dynamic note;
-@dynamic pulse_bpm;
-@dynamic temp_10c;
-@dynamic waist_cm;
-@dynamic weight_g;
+@dynamic bCaution;
+@dynamic dateTime;
+@dynamic nBpHi_mmHg;
+@dynamic nBpLo_mmHg;
+@dynamic nMeal_cal;
+@dynamic nPulse_bpm;
+@dynamic nTemp_10c;
+@dynamic nWaist_cm;
+@dynamic nWeight_g;
+@dynamic sEquipment;
+@dynamic sNote1;
+@dynamic sNote2;
+@dynamic yMeal_photo;
 @dynamic e1body;
 @end
 
