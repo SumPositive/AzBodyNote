@@ -21,24 +21,30 @@
 
 - (void)refreshValue
 {
-	if (mValue < 0) {
-		//ibLbValue.text = NSLocalizedString(@"None",nil);
-		ibLbValue.text = [NSString stringWithFormat:@"%d", mValuePrev];
+	NSInteger  val = mValue;
+	if (val < 0) {
+		val = mValuePrev;
 		ibLbValue.textColor = [UIColor brownColor];
 	} else {
-		if (mValueDec<=0) {
-			ibLbValue.text = [NSString stringWithFormat:@"%d", mValue];
-		} else {
-			NSInteger iPow = (NSInteger)pow(10, mValueDec); //= 10 ^ mValueDec;
-			NSInteger iInt = mValue / iPow;
-			NSInteger iDec = mValue - iInt * iPow;
-			if (iDec<=0) {
-				ibLbValue.text = [NSString stringWithFormat:@"%ld", iInt];
-			} else {
-				ibLbValue.text = [NSString stringWithFormat:@"%ld.%ld", iInt, iDec];
-			}
-		}
 		ibLbValue.textColor = [UIColor blackColor];
+	}
+
+	if (mValueDec<=0) {
+		ibLbValue.text = [NSString stringWithFormat:@"%d", val];
+	} else {
+		NSInteger iPow = (NSInteger)pow(10, mValueDec); //= 10 ^ mValueDec;
+		NSInteger iInt = val / iPow;
+		NSInteger iDec = val - iInt * iPow;
+		if (iDec<=0) {
+			//ibLbValue.text = [NSString stringWithFormat:@"%ld", iInt];
+			switch (mValueDec) {
+				case 1: ibLbValue.text =  [NSString stringWithFormat:@"%ld.0", iInt]; break;
+				case 2: ibLbValue.text =  [NSString stringWithFormat:@"%ld.00", iInt]; break;
+				default: ibLbValue.text =  [NSString stringWithFormat:@"%ld", iInt]; break;
+			}
+		} else {
+			ibLbValue.text = [NSString stringWithFormat:@"%ld.%ld", iInt, iDec];
+		}
 	}
 }
 

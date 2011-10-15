@@ -4,7 +4,6 @@
         <attribute name="dBirthday" optional="YES" attributeType="Date"/>
         <attribute name="nMkBpHi_mmHg" optional="YES" attributeType="Integer 16" maxValueString="300"/>
         <attribute name="nMkBpLo_mmHg" optional="YES" attributeType="Integer 16" maxValueString="200"/>
-        <attribute name="nMkWaist_cm" optional="YES" attributeType="Integer 16" maxValueString="500"/>
         <attribute name="nMkWeight_g" optional="YES" attributeType="Integer 32" maxValueString="300000"/>
         <attribute name="sName" optional="YES" attributeType="String"/>
         <attribute name="sNote" optional="YES" attributeType="String"/>
@@ -15,19 +14,16 @@
         <attribute name="dateTime" optional="YES" attributeType="Date" indexed="YES"/>
         <attribute name="nBpHi_mmHg" optional="YES" attributeType="Integer 16" maxValueString="300"/>
         <attribute name="nBpLo_mmHg" optional="YES" attributeType="Integer 16" maxValueString="200"/>
-        <attribute name="nMeal_cal" optional="YES" attributeType="Integer 32" maxValueString="9000000"/>
         <attribute name="nPulse_bpm" optional="YES" attributeType="Integer 16" maxValueString="200"/>
         <attribute name="nTemp_10c" optional="YES" attributeType="Integer 16" maxValueString="450"/>
-        <attribute name="nWaist_cm" optional="YES" attributeType="Integer 16" maxValueString="500"/>
         <attribute name="nWeight_g" optional="YES" attributeType="Integer 32" maxValueString="300000"/>
         <attribute name="sEquipment" optional="YES" attributeType="String"/>
         <attribute name="sNote1" optional="YES" attributeType="String"/>
         <attribute name="sNote2" optional="YES" attributeType="String"/>
-        <attribute name="yMeal_photo" optional="YES" attributeType="Binary"/>
         <relationship name="e1body" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="E1body" inverseName="e2records" inverseEntity="E1body"/>
     </entity>
     <elements>
-        <element name="E1body" positionX="-92" positionY="231" width="128" height="165"/>
-        <element name="E2record" positionX="117" positionY="195" width="128" height="255"/>
+        <element name="E1body" positionX="-92" positionY="231" width="128" height="150"/>
+        <element name="E2record" positionX="117" positionY="195" width="128" height="210"/>
     </elements>
 </model>

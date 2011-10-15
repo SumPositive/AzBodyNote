@@ -17,9 +17,10 @@
 @end
 
 @implementation E2listTVC
-
 @synthesize fetchedResultsController = __fetchedResultsController;
 @synthesize managedObjectContext = __managedObjectContext;
+@synthesize ownerCell;
+
 
 - (void)viewDidLoad
 {
@@ -83,12 +84,16 @@
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"Cell";
-    
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
-    }
+	static NSString *Cid = @"E2listCell";  //== Class名
+	E2listCell *cell = (E2listCell*)[tableView dequeueReusableCellWithIdentifier:Cid];
+	if (cell == nil) {
+		UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
+		[nib instantiateWithOwner:self options:nil];
+		cell = self.ownerCell;
+		// 選択
+		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+		//cell.selectionStyle = UITableViewCellSelectionStyleNone; // 選択時ハイライトなし
+	}
 
 	// Configure the cell.
 	[self configureCell:cell atIndexPath:indexPath];
@@ -167,10 +172,39 @@
     [super dealloc];
 }
 
-- (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath
+- (NSString *)strValue:(NSInteger)val dec:(NSInteger)dec
+{
+	if (val <= 0) return nil;
+	
+	if (dec<=0) {
+		return [NSString stringWithFormat:@"%d", val];
+	} else {
+		NSInteger iPow = (NSInteger)pow(10, dec); //= 10 ^ mValueDec;
+		NSInteger iInt = val / iPow;
+		NSInteger iDec = val - iInt * iPow;
+		if (iDec<=0) {
+			switch (dec) {
+				case 1: return [NSString stringWithFormat:@"%ld.0", iInt]; break;
+				case 2: return [NSString stringWithFormat:@"%ld.00", iInt]; break;
+				default:return [NSString stringWithFormat:@"%ld", iInt]; break;
+			}
+		} else {
+			return [NSString stringWithFormat:@"%ld.%ld", iInt, iDec];
+		}
+	}
+}
+
+- (void)configureCell:(E2listCell *)cell atIndexPath:(NSIndexPath *)indexPath
 {
     NSManagedObject *managedObject = [self.fetchedResultsController objectAtIndexPath:indexPath];
-    cell.textLabel.text = [[managedObject valueForKey:@"dateTime"] description];
+    //cell.textLabel.text = [[managedObject valueForKey: E2_dateTime] description];
+	
+	cell.ibLbBpHi.text = [self strValue:[[managedObject valueForKey: E2_nBpHi_mmHg] integerValue] dec:0];
+	cell.ibLbBpLo.text = [self strValue:[[managedObject valueForKey: E2_nBpLo_mmHg] integerValue] dec:0];
+	cell.ibLbPuls.text = [self strValue:[[managedObject valueForKey: E2_nPulse_bpm] integerValue] dec:0];
+	cell.ibLbWeight.text = [self strValue:[[managedObject valueForKey: E2_nWeight_g] integerValue] dec:1];
+	cell.ibLbTemp.text = [self strValue:[[managedObject valueForKey: E2_nTemp_10c] integerValue] dec:1];
+	
 }
 
 - (void)insertNewObject
@@ -182,7 +216,7 @@
     
     // If appropriate, configure the new managed object.
     // Normally you should use accessor methods, but using KVC here avoids the need to add a custom class to the template.
-    [newManagedObject setValue:[NSDate date] forKey:@"dateTime"];
+    [newManagedObject setValue:[NSDate date] forKey:E2_dateTime];
     
     // Save the context.
     NSError *error = nil;
@@ -220,7 +254,7 @@
     [fetchRequest setFetchBatchSize:20];
     
     // Edit the sort key as appropriate.
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"dateTime" ascending:YES];
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:YES];
     NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sortDescriptor, nil];
     
     [fetchRequest setSortDescriptors:sortDescriptors];

@@ -9,6 +9,8 @@
 #import "E2listCell.h"
 
 @implementation E2listCell
+@synthesize ibLbBpHi, ibLbBpLo, ibLbDate, ibLbPuls, ibLbWeight, ibLbTemp;
+
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {

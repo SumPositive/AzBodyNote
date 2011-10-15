@@ -14,7 +14,6 @@
 @dynamic dBirthday;
 @dynamic nMkBpHi_mmHg;
 @dynamic nMkBpLo_mmHg;
-@dynamic nMkWaist_cm;
 @dynamic nMkWeight_g;
 @dynamic sName;
 @dynamic sNote;
@@ -27,15 +26,12 @@
 @dynamic dateTime;
 @dynamic nBpHi_mmHg;
 @dynamic nBpLo_mmHg;
-@dynamic nMeal_cal;
 @dynamic nPulse_bpm;
 @dynamic nTemp_10c;
-@dynamic nWaist_cm;
 @dynamic nWeight_g;
 @dynamic sEquipment;
 @dynamic sNote1;
 @dynamic sNote2;
-@dynamic yMeal_photo;
 @dynamic e1body;
 @end
 

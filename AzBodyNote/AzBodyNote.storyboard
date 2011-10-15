@@ -48,7 +48,7 @@
                                 <rect key="frame" x="20" y="26" width="57" height="57"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             </imageView>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="体調日記" textAlignment="center" lineBreakMode="tailTruncation" minimumFontSize="10" id="UFo-kD-nCB" userLabel="Lb Title">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="血圧日記" textAlignment="center" lineBreakMode="tailTruncation" minimumFontSize="10" id="UFo-kD-nCB" userLabel="Lb Title">
                                 <rect key="frame" x="101" y="15" width="199" height="72"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="40"/>
@@ -64,8 +64,7 @@
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Limited simple app
 BodyNote
-(C)2011 Azukid Creator Sum Positive All Rights Reserved.
-" textAlignment="center" lineBreakMode="characterWrap" numberOfLines="6" adjustsFontSizeToFit="NO" minimumFontSize="10" id="znk-2Y-YR7" userLabel="Lb Copyright">
+(C)2011 Azukid Creator Sum Positive All Rights Reserved. " textAlignment="center" lineBreakMode="characterWrap" numberOfLines="6" adjustsFontSizeToFit="NO" minimumFontSize="10" id="znk-2Y-YR7" userLabel="Lb Copyright">
                                 <rect key="frame" x="101" y="114" width="199" height="91"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
@@ -79,8 +78,7 @@ BodyNote
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" autoresizesSubviews="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="【ご利用上の合意】作者やAzukid関係者は、このアプリにより発生した損害についていかなる責任も負いません。 これに合意してご利用ください。 
-【セキュリティ警告】このアプリは、情報を暗号化しません。機密情報は記入しないでください。" lineBreakMode="wordWrap" numberOfLines="9" baselineAdjustment="none" adjustsFontSizeToFit="NO" minimumFontSize="10" id="gQ3-CY-0EL" userLabel="Lb Disclaimer">
+                            <label autoresizesSubviews="NO" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="【ご利用上の合意】作者やAzukid関係者は、このアプリにより発生した損害についていかなる責任も負いません。 これに合意してご利用ください。  【セキュリティ警告】このアプリは、情報を暗号化しません。機密情報は記入しないでください。" lineBreakMode="wordWrap" numberOfLines="9" baselineAdjustment="none" adjustsFontSizeToFit="NO" minimumFontSize="10" id="gQ3-CY-0EL" userLabel="Lb Disclaimer">
                                 <rect key="frame" x="20" y="287" width="280" height="115"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
@@ -157,7 +155,65 @@ BodyNote
                             <outlet property="delegate" destination="BBT-Jw-Cgz" id="so1-IG-sGu"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="Nus-pI-pdt"/>
+                    <navigationItem key="navigationItem" id="Nus-pI-pdt">
+                        <nil key="title"/>
+                        <view key="titleView" contentMode="scaleToFill" id="wBl-Ni-Pla">
+                            <rect key="frame" x="5" y="6" width="310" height="33"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <subviews>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="時刻" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="pAe-bA-3EX">
+                                    <rect key="frame" x="28" y="16" width="42" height="16"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="日" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="596-DV-iiT">
+                                    <rect key="frame" x="10" y="16" width="23" height="16"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="最高" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="Pyg-hM-X4T">
+                                    <rect key="frame" x="74" y="16" width="42" height="16"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="最低" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="vUo-sG-OdT">
+                                    <rect key="frame" x="115" y="16" width="42" height="16"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="脈拍" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="i19-iy-5nm">
+                                    <rect key="frame" x="152" y="16" width="42" height="16"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="体重" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="Cs4-fg-BPI">
+                                    <rect key="frame" x="201" y="16" width="42" height="16"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="体温" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="JnW-Tl-omj">
+                                    <rect key="frame" x="245" y="16" width="42" height="16"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                            </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        </view>
+                    </navigationItem>
                     <connections>
                         <segue destination="g6r-81-43n" kind="push" id="Kog-vI-bby"/>
                     </connections>
@@ -178,7 +234,9 @@ BodyNote
                             <outlet property="delegate" destination="g6r-81-43n" id="8gm-9C-ENO"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="RhY-bD-qTL"/>
+                    <navigationItem key="navigationItem" title="Modify" id="RhY-bD-qTL">
+                        <barButtonItem key="backBarButtonItem" title="Back" id="vUe-Jd-6cY"/>
+                    </navigationItem>
                     <connections>
                         <segue destination="eqh-ww-GB4" kind="push" id="Hxw-xN-Owl"/>
                     </connections>
@@ -202,7 +260,7 @@ BodyNote
                                 </date>
                                 <locale key="locale" localeIdentifier="ja"/>
                                 <timeZone key="timeZone" name="America/Los_Angeles">
-                                    <mutableData key="data">
+                                    <data key="data">
 VFppZgAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAAAAAAAC5AAAABAAAABCepkign7sVkKCGKqChmveQ
 y4kaoNIj9HDSYSYQ1v50INiArZDa/tGg28CQENzes6DdqayQ3r6VoN+JjpDgnneg4WlwkOJ+WaDjSVKQ
 5F47oOUpNJDmR1gg5xJREOgnOiDo8jMQ6gccIOrSFRDr5v4g7LH3EO3G4CDukdkQ76/8oPBxuxDxj96g
@@ -220,7 +278,7 @@ f5gqkAABAAECAwEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEA
 AQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEA
 AQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEA
 AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
-</mutableData>
+</data>
                                 </timeZone>
                             </datePicker>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Pgt-aF-SzA">
@@ -245,7 +303,9 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Title" id="8gW-mO-ja9"/>
+                    <navigationItem key="navigationItem" title="Date Time" id="8gW-mO-ja9">
+                        <barButtonItem key="backBarButtonItem" title="Back" id="vWJ-xU-5pU"/>
+                    </navigationItem>
                 </viewController>
             </objects>
             <point key="canvasLocation" x="1528" y="-398"/>
@@ -294,8 +354,8 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         <image name="Tx-WoodWhite320x44.png" width="320" height="44"/>
     </resources>
     <classes>
-        <class className="E2editCellValue" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2editCellValue.h"/>
+        <class className="E2editCellDial" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2editCellDial.h"/>
             <relationships>
                 <relationship kind="outlet" name="ibLbDetail" candidateClass="UILabel"/>
                 <relationship kind="outlet" name="ibLbName" candidateClass="UILabel"/>
@@ -303,15 +363,36 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                 <relationship kind="outlet" name="ibLbValue" candidateClass="UILabel"/>
             </relationships>
         </class>
+        <class className="E2editCellNote" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2editCellNote.h"/>
+            <relationships>
+                <relationship kind="outlet" name="ibTfNote1" candidateClass="UITextField"/>
+                <relationship kind="outlet" name="ibTfNote2" candidateClass="UITextField"/>
+            </relationships>
+        </class>
         <class className="E2editTVC" superclassName="UITableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/E2editTVC.h"/>
             <relationships>
-                <relationship kind="outlet" name="ibADBanner" candidateClass="ADBannerView"/>
-                <relationship kind="outlet" name="ownerE2editTVC" candidateClass="E2editCellValue"/>
+                <relationship kind="outlet" name="ownerCellDial" candidateClass="E2editCellDial"/>
+                <relationship kind="outlet" name="ownerCellNote" candidateClass="E2editCellNote"/>
+            </relationships>
+        </class>
+        <class className="E2listCell" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2listCell.h"/>
+            <relationships>
+                <relationship kind="outlet" name="ibLbBpHi" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbBpLo" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbDate" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbPuls" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbTemp" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbWeight" candidateClass="UILabel"/>
             </relationships>
         </class>
         <class className="E2listTVC" superclassName="UITableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/E2listTVC.h"/>
+            <relationships>
+                <relationship kind="outlet" name="ownerCell" candidateClass="E2listCell"/>
+            </relationships>
         </class>
         <class className="GraphVC" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/GraphVC.h"/>
@@ -335,6 +416,6 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="nDM-Jt-DLq"/>
+        <segue reference="Kog-vI-bby"/>
     </inferredMetricsTieBreakers>
 </document>

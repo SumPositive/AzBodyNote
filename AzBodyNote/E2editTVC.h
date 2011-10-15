@@ -18,10 +18,15 @@
 	E2record		*Re2edit;		// =nil:AddNew
 	
 @private
-	E2record		*Re2prev;	// 直前のレコード
 	BOOL			mIsAddNew;
 	ADBannerView	*mADBanner;
 	float						mADBannerY;	//iAd表示位置のY座標
+	
+	NSInteger	mPrevBpHi;
+	NSInteger	mPrevBpLo;
+	NSInteger	mPrevPuls;
+	NSInteger	mPrevWeight;
+	NSInteger	mPrevTemp;
 }
 
 @property (nonatomic, retain) E2record		*Re2edit;

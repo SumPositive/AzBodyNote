@@ -70,23 +70,66 @@
 - (void)setE2recordPrev
 {
 	assert(Re2edit);
+	E2record	*e2prev;	// 直前のレコード
 	// Sort条件
-	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:@"datetime" ascending:NO];
+	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
 	NSArray *sortDesc = [[NSArray alloc] initWithObjects:sort1,nil]; // 日付降順：Limit抽出に使用
 	[sort1 release];
+	
 	// 直前のレコードを取得
 	NSDate *dateNow = Re2edit.dateTime;	 // 現在編集中の日付
 	if (dateNow==nil) dateNow = [NSDate date];
-	NSArray *arFetch = [MocFunctions select:@"E2record" 
-									  limit:1
-									 offset:0
-									  where:[NSPredicate predicateWithFormat:@"dateTime < %@", dateNow]
+	
+	// E2_nBpHi_mmHg
+	NSArray *arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
+									  where:[NSPredicate predicateWithFormat: E2_nBpHi_mmHg @" > 0 AND " E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 	if ([arFetch count]==1) {
-		Re2prev = [arFetch objectAtIndex:0];
-		NSLog(@"Re2prev.nBpHi_mmHg=%d", [Re2prev.nBpHi_mmHg integerValue]);
+		e2prev = [arFetch objectAtIndex:0];
+		NSLog(@"Re2prev.nBpHi_mmHg=%d", [e2prev.nBpHi_mmHg integerValue]);
+		mPrevBpHi = [e2prev.nBpHi_mmHg integerValue];
 	} else {
-		Re2prev = nil;
+		mPrevBpHi = 130;
+	}
+	// E2_nBpLo_mmHg
+	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
+									  where:[NSPredicate predicateWithFormat: E2_nBpLo_mmHg @" > 0 AND " E2_dateTime @" < %@", dateNow]
+									   sort:sortDesc]; // 日付降順の先頭から1件抽出
+	if ([arFetch count]==1) {
+		e2prev = [arFetch objectAtIndex:0];
+		mPrevBpLo = [e2prev.nBpLo_mmHg integerValue];
+	} else {
+		mPrevBpLo = 80;
+	}
+	// E2_nPulse_bpm
+	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
+									  where:[NSPredicate predicateWithFormat: E2_nPulse_bpm @" > 0 AND " E2_dateTime @" < %@", dateNow]
+									   sort:sortDesc]; // 日付降順の先頭から1件抽出
+	if ([arFetch count]==1) {
+		e2prev = [arFetch objectAtIndex:0];
+		mPrevPuls = [e2prev.nPulse_bpm integerValue];
+	} else {
+		mPrevPuls = 70;
+	}
+	// E2_nWeight_g
+	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
+									  where:[NSPredicate predicateWithFormat: E2_nWeight_g @" > 0 AND " E2_dateTime @" < %@", dateNow]
+									   sort:sortDesc]; // 日付降順の先頭から1件抽出
+	if ([arFetch count]==1) {
+		e2prev = [arFetch objectAtIndex:0];
+		mPrevWeight = [e2prev.nWeight_g integerValue];
+	} else {
+		mPrevWeight = 700;
+	}
+	// E2_nTemp_10c
+	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
+									  where:[NSPredicate predicateWithFormat: E2_nTemp_10c @" > 0 AND " E2_dateTime @" < %@", dateNow]
+									   sort:sortDesc]; // 日付降順の先頭から1件抽出
+	if ([arFetch count]==1) {
+		e2prev = [arFetch objectAtIndex:0];
+		mPrevTemp= [e2prev.nTemp_10c integerValue];
+	} else {
+		mPrevTemp = 370;
 	}
 }
 
@@ -98,9 +141,13 @@
 	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
 	
 	Re2edit.dateTime = [NSDate date];
+	Re2edit.sNote1 = nil;
+	Re2edit.sNote2 = nil;
 	Re2edit.nBpHi_mmHg = nil;
 	Re2edit.nBpLo_mmHg = nil;
 	Re2edit.nPulse_bpm = nil;
+	Re2edit.nWeight_g = nil;
+	Re2edit.nTemp_10c = nil;
 	
 	[self setE2recordPrev];
 	[self.tableView reloadData];
@@ -149,7 +196,8 @@
     // self.clearsSelectionOnViewWillAppear = NO;
 	
 	if (Re2edit) {
-		// Edit mode.
+		// Modify mode.
+		self.title = NSLocalizedString(@"Modify",nil);
 		mIsAddNew = NO;
 		// [Cancel]ボタンを左側に追加する  Navi標準の戻るボタンでは actionCancel 処理ができないため
 		self.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc]
@@ -157,6 +205,7 @@
 												  target:self action:@selector(actionCancel)] autorelease];
 	} else {
 		// AddNew mode.
+		self.title = NSLocalizedString(@"AddNew",nil);
 		mIsAddNew = YES;
 		Re2edit = [MocFunctions insertAutoEntity:@"E2record"]; // autorelese
 		// [Clear]ボタンを左側に追加する  Navi標準の戻るボタンでは cancelClose:処理ができないため
@@ -180,7 +229,14 @@
 	self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 	
 	// iAd
-	mADBannerY = mADBanner.frame.origin.y;
+	if (mADBanner==nil) {
+		mADBanner = [[ADBannerView alloc] init];
+		mADBanner.delegate = self;
+		mADBanner.currentContentSizeIdentifier = ADBannerContentSizeIdentifierPortrait;
+		[self.parentViewController.view addSubview:mADBanner];
+		mADBannerY = self.tabBarController.tabBar.frame.origin.y - mADBanner.frame.size.height;	// 表示位置
+		NSLog(@"mADBannerY=%.1f", mADBannerY);
+	}
 	CGRect rc = mADBanner.frame;
 	rc.origin.y = self.view.frame.size.height + 50; // 下へ隠す
 	mADBanner.frame = rc;
@@ -191,6 +247,11 @@
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
+	if (mADBanner) {
+		[mADBanner cancelBannerViewAction];
+		mADBanner.delegate = nil;
+		mADBanner = nil;
+	}
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -237,25 +298,23 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {	// Return the number of rows in the section.
-    return 5;
+    return 7 + 1;  // +1:末尾の余白セル
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	if (indexPath.row==0) {
 		return 44; // DateTime
-	} else if (indexPath.row <= 4) {
-		return 88; // CellValue
 	}
-    return 44; // Default
+    return 88; // Default
 }
 
 - (UITableViewCell *)cellDate:(UITableView *)tableView
 {
-	static NSString *CellDate = @"CellDate";
-	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellDate];
+	static NSString *Cid = @"CellDate";
+	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
 	if (cell == nil) {
-		cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellDate] autorelease];
+		cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:Cid] autorelease];
 		cell.textLabel.textAlignment = UITextAlignmentLeft;
 		cell.textLabel.font = [UIFont systemFontOfSize:20];
 		//cell.detailTextLabel.textAlignment = UITextAlignmentLeft;
@@ -286,10 +345,10 @@
 
 - (E2editCellDial *)cellDial:(UITableView *)tableView
 {
-	static NSString *CellDial = @"E2editCellDial";  //== Class名
-	E2editCellDial *cell = (E2editCellDial*)[tableView dequeueReusableCellWithIdentifier:CellDial];
+	static NSString *Cid = @"E2editCellDial";  //== Class名
+	E2editCellDial *cell = (E2editCellDial*)[tableView dequeueReusableCellWithIdentifier:Cid];
 	if (cell == nil) {
-		UINib *nib = [UINib nibWithNibName:CellDial   bundle:nil];
+		UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
 		[nib instantiateWithOwner:self options:nil];
 		cell = self.ownerCellDial;
 		// 
@@ -304,10 +363,10 @@
 
 - (E2editCellNote *)cellNote:(UITableView *)tableView
 {
-	static NSString *CellNote = @"E2editCellNote";  //== Class名
-	E2editCellNote *cell = (E2editCellNote*)[tableView dequeueReusableCellWithIdentifier:CellNote];
+	static NSString *Cid = @"E2editCellNote";  //== Class名
+	E2editCellNote *cell = (E2editCellNote*)[tableView dequeueReusableCellWithIdentifier:Cid];
 	if (cell == nil) {
-		UINib *nib = [UINib nibWithNibName:CellNote   bundle:nil];
+		UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
 		[nib instantiateWithOwner:self options:nil];
 		cell = self.ownerCellNote;
 		// 
@@ -315,6 +374,17 @@
 		// 選択禁止
 		cell.accessoryType = UITableViewCellAccessoryNone;
 		cell.selectionStyle = UITableViewCellSelectionStyleNone; // 選択時ハイライトなし
+	}
+	return cell;
+}
+
+- (UITableViewCell *)cellBlank:(UITableView *)tableView
+{	// 余白セル
+	static NSString *Cid = @"CellBlank";
+	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
+	if (cell == nil) {
+		cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:Cid] autorelease];
+		cell.accessoryType = UITableViewCellAccessoryNone;
 	}
 	return cell;
 }
@@ -344,12 +414,12 @@
 			cell.ibLbDetail.text = NSLocalizedString(@"BpHi Detail",nil);
 			cell.ibLbUnit.text = @"mmHg";
 			cell.Re2record = Re2edit;
-			cell.RzKey = @"nBpHi_mmHg";
+			cell.RzKey = E2_nBpHi_mmHg;
 			cell.mValueMin = 30;
 			cell.mValueMax = 300;
 			cell.mValueDec = 0;
 			cell.mValueStep = 1;
-			cell.mValuePrev = [Re2prev.nBpHi_mmHg integerValue];
+			cell.mValuePrev = mPrevBpHi;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
 		}	break;
@@ -360,12 +430,12 @@
 			cell.ibLbDetail.text = NSLocalizedString(@"BpLo Detail",nil);
 			cell.ibLbUnit.text = @"mmHg";
 			cell.Re2record = Re2edit;
-			cell.RzKey = @"nBpLo_mmHg";
+			cell.RzKey = E2_nBpLo_mmHg;
 			cell.mValueMin = 20;
 			cell.mValueMax = 200;
 			cell.mValueDec = 0;
 			cell.mValueStep = 1;
-			cell.mValuePrev = [Re2prev.nBpLo_mmHg integerValue];
+			cell.mValuePrev = mPrevBpLo;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
 		}	break;
@@ -376,17 +446,49 @@
 			cell.ibLbDetail.text = NSLocalizedString(@"Pulse Detail",nil);
 			cell.ibLbUnit.text = NSLocalizedString(@"Pulse unit",nil);
 			cell.Re2record = Re2edit;
-			cell.RzKey = @"nPulse_bpm";
+			cell.RzKey = E2_nPulse_bpm;
 			cell.mValueMin = 10;
-			cell.mValueMax = 200;
+			cell.mValueMax = 170;
 			cell.mValueDec = 0;
 			cell.mValueStep = 1;
-			cell.mValuePrev = [Re2prev.nPulse_bpm integerValue];
+			cell.mValuePrev = mPrevPuls;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
 		}	break;
-	}
-	return nil;
+
+		case 5: {
+			E2editCellDial *cell = [self cellDial:tableView];
+			cell.ibLbName.text = NSLocalizedString(@"Weight Name",nil);
+			cell.ibLbDetail.text = NSLocalizedString(@"Weight Detail",nil);
+			cell.ibLbUnit.text = @"Kg";
+			cell.Re2record = Re2edit;
+			cell.RzKey = E2_nWeight_g;
+			cell.mValueMin = 0;
+			cell.mValueMax = 140000;
+			cell.mValueDec = 1;
+			cell.mValueStep = 100;
+			cell.mValuePrev = mPrevWeight;
+			[cell drawRect:cell.frame]; // コンテンツ描画
+			return cell;
+		}	break;
+			
+		case 6: {
+			E2editCellDial *cell = [self cellDial:tableView];
+			cell.ibLbName.text = NSLocalizedString(@"Temp Name",nil);
+			cell.ibLbDetail.text = NSLocalizedString(@"Temp Detail",nil);
+			cell.ibLbUnit.text = @"℃";
+			cell.Re2record = Re2edit;
+			cell.RzKey = E2_nTemp_10c;
+			cell.mValueMin = 310;
+			cell.mValueMax = 429;
+			cell.mValueDec = 1;
+			cell.mValueStep = 1;
+			cell.mValuePrev = mPrevTemp;
+			[cell drawRect:cell.frame]; // コンテンツ描画
+			return cell;
+		}	break;
+}
+	return [self cellBlank:tableView];
 }
 
 
@@ -451,6 +553,7 @@
 // iAd delegate  取得できたときに呼ばれる　⇒　表示する
 - (void)bannerViewDidLoadAd:(ADBannerView *)banner
 {	// iAd 広告あり
+	NSLog(@"iAd - bannerViewDidLoadAd");
 	// アニメ開始位置
 	
 	// アニメ準備
@@ -469,6 +572,7 @@
 // iAd delegate  取得できなかったときに呼ばれる　⇒　非表示にする
 - (void)bannerView:(ADBannerView *)banner didFailToReceiveAdWithError:(NSError *)error
 {	// iAd 広告なし
+	NSLog(@"iAd - didFailToReceiveAdWithError");
 	// アニメ開始位置
 	
 	// アニメ準備
