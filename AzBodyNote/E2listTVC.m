@@ -10,17 +10,20 @@
 #import "MocEntity.h"
 #import "MocFunctions.h"
 #import "E2listTVC.h"
+#import "E2editTVC.h"
 
 
 @interface E2listTVC ()
-- (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
+- (void)configureCell:(E2listCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 @end
 
 @implementation E2listTVC
 @synthesize fetchedResultsController = __fetchedResultsController;
 @synthesize managedObjectContext = __managedObjectContext;
-@synthesize ownerCell;
+//@synthesize ownerCell;
 
+
+#pragma mark - View lifecycle
 
 - (void)viewDidLoad
 {
@@ -31,6 +34,17 @@
 	//UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject)];
 	//self.navigationItem.rightBarButtonItem = addButton;
 	//[addButton release];
+	
+/*	// TableCell表示で使う日付フォーマッタを定義する
+	assert(mDateFormatter==nil);
+	mDateFormatter = [[NSDateFormatter alloc] init];
+	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+	[mDateFormatter setCalendar:calendar];
+	[calendar release];
+	//[df setLocale:[NSLocale systemLocale]];これがあると曜日が表示されない。
+	[mDateFormatter setDateFormat:@"dd  HH:mm"];
+*/
 	
 	self.managedObjectContext = [MocFunctions getMoc];
 
@@ -69,6 +83,33 @@
 }
  */
 
+- (void)didReceiveMemoryWarning
+{
+    // Releases the view if it doesn't have a superview.
+    [super didReceiveMemoryWarning];
+    
+    // Relinquish ownership any cached data, images, etc that aren't in use.
+}
+
+- (void)viewDidUnload
+{
+    [super viewDidUnload];
+	
+    // Relinquish ownership of anything that can be recreated in viewDidLoad or on demand.
+    // For example: self.myOutlet = nil;
+	//[mDateFormatter release], mDateFormatter = nil;
+}
+
+- (void)dealloc
+{
+	[__fetchedResultsController release];
+	[__managedObjectContext release];
+    [super dealloc];
+}
+
+
+#pragma mark - <UITableViewDelegate>
+
 // Customize the number of sections in the table view.
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -81,6 +122,19 @@
 	return [sectionInfo numberOfObjects];
 }
 
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{	// セクション ヘッダ
+	NSInteger iYearMM = [[[[self.fetchedResultsController sections] objectAtIndex:section] name] integerValue];
+	NSInteger iYear = iYearMM / 100;
+	
+	//NSLog(@"(2) currentLocale NSLocaleLanguageCode : %@",[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode]);
+	if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) { // 「書式」で変わる。　「言語」でない
+		return [NSString stringWithFormat:@"%d年 %d月", iYear, iYearMM - (iYear * 100)]; 
+	} else {
+		return [NSString stringWithFormat:@"%d / %d", iYearMM - (iYear * 100), iYear]; 
+	}
+}
+
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -89,9 +143,9 @@
 	if (cell == nil) {
 		UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
 		[nib instantiateWithOwner:self options:nil];
-		cell = self.ownerCell;
+		//cell = self.ownerCell;
 		// 選択
-		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+		//cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 		//cell.selectionStyle = UITableViewCellSelectionStyleNone; // 選択時ハイライトなし
 	}
 
@@ -140,71 +194,61 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    /*
-    <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:@"<#Nib name#>" bundle:nil];
-    // ...
-    // Pass the selected object to the new view controller.
-    [self.navigationController pushViewController:detailViewController animated:YES];
-    [detailViewController release];
-	*/
+	[tableView deselectRowAtIndexPath:indexPath animated:YES];	// 選択状態を解除する
+
+	/* Storyboard導入により、prepareForSegue:が「先に」呼び出される。
+	E2editTVC *editVc = [[E2editTVC alloc] init];
+	editVc.Re2edit = [self.fetchedResultsController objectAtIndexPath:indexPath];
+    [self.navigationController pushViewController:editVc animated:YES];
+    [editVc release];
+	 */
+	//[mIndexPathEdit release], mIndexPathEdit = [indexPath copy];
 }
 
-- (void)didReceiveMemoryWarning
-{
-    // Releases the view if it doesn't have a superview.
-    [super didReceiveMemoryWarning];
-    
-    // Relinquish ownership any cached data, images, etc that aren't in use.
-}
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{	// 画面遷移のとき、didSelectRowAtIndexPath:よりも先に呼び出される
+	NSLog(@"prepareForSegue: segue=%@", segue);
+	NSLog(@"prepareForSegue: sender=%@", sender);
+	if ([[segue identifier] isEqualToString:@"pushE2edit"])
+	{
+		E2listCell *cell = sender;
+		// [segue destinationViewController] is read-only, so in order to
+		// write to that view controller you'll have to locally instantiate
+		// it here:
+		//ViewController *upcomingViewController = [segue destinationViewController];
 
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
+		E2editTVC *editVc = [segue destinationViewController];
+		editVc.Re2edit = cell.Re2node;  //[self.fetchedResultsController objectAtIndexPath:mIndexPathEdit];
 
-    // Relinquish ownership of anything that can be recreated in viewDidLoad or on demand.
-    // For example: self.myOutlet = nil;
-}
-
-- (void)dealloc
-{
-	[__fetchedResultsController release];
-	[__managedObjectContext release];
-    [super dealloc];
-}
-
-- (NSString *)strValue:(NSInteger)val dec:(NSInteger)dec
-{
-	if (val <= 0) return nil;
-	
-	if (dec<=0) {
-		return [NSString stringWithFormat:@"%d", val];
-	} else {
-		NSInteger iPow = (NSInteger)pow(10, dec); //= 10 ^ mValueDec;
-		NSInteger iInt = val / iPow;
-		NSInteger iDec = val - iInt * iPow;
-		if (iDec<=0) {
-			switch (dec) {
-				case 1: return [NSString stringWithFormat:@"%ld.0", iInt]; break;
-				case 2: return [NSString stringWithFormat:@"%ld.00", iInt]; break;
-				default:return [NSString stringWithFormat:@"%ld", iInt]; break;
-			}
-		} else {
-			return [NSString stringWithFormat:@"%ld.%ld", iInt, iDec];
-		}
+		// You now have a solid reference to the upcoming / destination view
+		// controller. Example use: Allocate and initialize some property of
+		// the destination view controller before you reach it and inject a
+		// reference to the current view controller into the upcoming one:
+		//upcomingViewController.someProperty = [[SomePropertyClass alloc] initWithString:@"Whatever!"];
+		//upcomingViewController.initialViewController = [segue sourceViewController];
+		// Or, equivalent, but more straightforward:
+		//upcomingViewController.initialViewController = self;
 	}
 }
 
+
+						 
 - (void)configureCell:(E2listCell *)cell atIndexPath:(NSIndexPath *)indexPath
 {
-    NSManagedObject *managedObject = [self.fetchedResultsController objectAtIndexPath:indexPath];
+	//NSManagedObject *managedObject = [self.fetchedResultsController objectAtIndexPath:indexPath];
     //cell.textLabel.text = [[managedObject valueForKey: E2_dateTime] description];
-	
-	cell.ibLbBpHi.text = [self strValue:[[managedObject valueForKey: E2_nBpHi_mmHg] integerValue] dec:0];
-	cell.ibLbBpLo.text = [self strValue:[[managedObject valueForKey: E2_nBpLo_mmHg] integerValue] dec:0];
-	cell.ibLbPuls.text = [self strValue:[[managedObject valueForKey: E2_nPulse_bpm] integerValue] dec:0];
-	cell.ibLbWeight.text = [self strValue:[[managedObject valueForKey: E2_nWeight_g] integerValue] dec:1];
-	cell.ibLbTemp.text = [self strValue:[[managedObject valueForKey: E2_nTemp_10c] integerValue] dec:1];
-	
+
+	E2record *e2 = [self.fetchedResultsController objectAtIndexPath:indexPath];
+
+	cell.Re2node = e2;
+	/*
+	cell.ibLbDate.text = [mDateFormatter stringFromDate:e2.dateTime];
+	cell.ibLbBpHi.text = [self strValue:[e2.nBpHi_mmHg integerValue] dec:0]; 
+	cell.ibLbBpLo.text = [self strValue:[e2.nBpLo_mmHg integerValue] dec:0];
+	cell.ibLbPuls.text = [self strValue:[e2.nPulse_bpm integerValue] dec:0];
+	cell.ibLbWeight.text = [self strValue:[e2.nWeight_g integerValue] dec:1];
+	cell.ibLbTemp.text = [self strValue:[e2.nTemp_10c integerValue] dec:1];
+	 */
 }
 
 - (void)insertNewObject
@@ -232,10 +276,11 @@
     }
 }
 
+
 #pragma mark - Fetched results controller
 
 - (NSFetchedResultsController *)fetchedResultsController
-{
+{	// データ抽出コントローラを生成する
     if (__fetchedResultsController != nil)
     {
         return __fetchedResultsController;
@@ -246,30 +291,43 @@
     */
     // Create the fetch request for the entity.
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+
+	// エンティティ指定
     // Edit the entity name as appropriate.
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"E2record" inManagedObjectContext:self.managedObjectContext];
     [fetchRequest setEntity:entity];
     
     // Set the batch size to a suitable number.
-    [fetchRequest setFetchBatchSize:20];
+	//[fetchRequest setFetchBatchSize:20];
+	[fetchRequest setFetchLimit:50];
+	[fetchRequest setFetchOffset:0];
+
+	// where
+	[fetchRequest setPredicate:[NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"]]; // 未保存を除外する
     
+	// ソート条件指定
     // Edit the sort key as appropriate.
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:YES];
-    NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sortDescriptor, nil];
-    
+    NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_nYearMM ascending:YES];		// セクション指定のため
+    NSSortDescriptor *sort2 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:YES];	
+    NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sort1, sort2, nil];
+    [sort2 release];
+    [sort1 release];
     [fetchRequest setSortDescriptors:sortDescriptors];
+    [sortDescriptors release];
     
     // Edit the section name key path and cache name if appropriate.
     // nil for section name key path means "no sections".
-    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:self.managedObjectContext sectionNameKeyPath:nil cacheName:@"Root"];
+    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
+																								managedObjectContext:self.managedObjectContext 
+																								  sectionNameKeyPath:E2_nYearMM	// セクション指定のため
+																										   cacheName:@"Root"];
     aFetchedResultsController.delegate = self;
     self.fetchedResultsController = aFetchedResultsController;
     
     [aFetchedResultsController release];
     [fetchRequest release];
-    [sortDescriptor release];
-    [sortDescriptors release];
 
+	// データ抽出する
 	NSError *error = nil;
 	if (![self.fetchedResultsController performFetch:&error])
         {
@@ -285,7 +343,7 @@
     return __fetchedResultsController;
 }    
 
-#pragma mark - Fetched results controller delegate
+#pragma mark - <Fetched results controller delegate>
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller
 {
@@ -325,7 +383,7 @@
             break;
             
         case NSFetchedResultsChangeUpdate:
-            [self configureCell:[tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
+            [self configureCell:(E2listCell *)[tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
             break;
             
         case NSFetchedResultsChangeMove:

@@ -15,7 +15,7 @@
 
 @implementation E2editTVC
 @synthesize Re2edit;
-@synthesize ownerCellDial, ownerCellNote;
+//@synthesize ownerCellDial, ownerCellNote;
 
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -155,6 +155,14 @@
 
 - (void)actionSave
 {
+	// データ整合処理
+	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+	NSDateComponents* comp = [calendar components:NSYearCalendarUnit | NSMonthCalendarUnit
+										 fromDate:Re2edit.dateTime];
+	Re2edit.nYearMM = [NSNumber numberWithInteger:([comp year] * 100 + [comp month])];
+	
+	// Save & Commit
 	[MocFunctions commit];
 
 	//appDelegate.mIsUpdate = NO;
@@ -199,16 +207,17 @@
 		// Modify mode.
 		self.title = NSLocalizedString(@"Modify",nil);
 		mIsAddNew = NO;
+		/* [<Back]ボタンの方が解りやすい。 修正あるのにBackしたときはアラート表示してからRollback処理する。
 		// [Cancel]ボタンを左側に追加する  Navi標準の戻るボタンでは actionCancel 処理ができないため
 		self.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc]
 												  initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
-												  target:self action:@selector(actionCancel)] autorelease];
+												  target:self action:@selector(actionCancel)] autorelease];*/
 	} else {
 		// AddNew mode.
 		self.title = NSLocalizedString(@"AddNew",nil);
 		mIsAddNew = YES;
 		Re2edit = [MocFunctions insertAutoEntity:@"E2record"]; // autorelese
-		// [Clear]ボタンを左側に追加する  Navi標準の戻るボタンでは cancelClose:処理ができないため
+		// [Clear]ボタンを左側に追加する
 		self.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc]
 												  initWithTitle:NSLocalizedString(@"Clear",nil) style:UIBarButtonItemStyleBordered 
 												  target:self action:@selector(actionClear)] autorelease];
@@ -350,7 +359,7 @@
 	if (cell == nil) {
 		UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
 		[nib instantiateWithOwner:self options:nil];
-		cell = self.ownerCellDial;
+		//cell = self.ownerCellDial;
 		// 
 		cell.delegate = self;
 		cell.viewParent = self.navigationController.view;  // CalcをaddSubviewするため
@@ -368,7 +377,7 @@
 	if (cell == nil) {
 		UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
 		[nib instantiateWithOwner:self options:nil];
-		cell = self.ownerCellNote;
+		//cell = self.ownerCellNote;
 		// 
 		cell.delegate = self;
 		// 選択禁止

@@ -7,20 +7,19 @@
         <attribute name="nMkWeight_g" optional="YES" attributeType="Integer 32" maxValueString="300000"/>
         <attribute name="sName" optional="YES" attributeType="String"/>
         <attribute name="sNote" optional="YES" attributeType="String"/>
-        <relationship name="e2records" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="E2record" inverseName="e1body" inverseEntity="E2record"/>
     </entity>
     <entity name="E2record">
         <attribute name="bCaution" optional="YES" attributeType="Boolean" defaultValueString="NO"/>
-        <attribute name="dateTime" optional="YES" attributeType="Date" indexed="YES"/>
+        <attribute name="dateTime" attributeType="Date" indexed="YES"/>
         <attribute name="nBpHi_mmHg" optional="YES" attributeType="Integer 16" maxValueString="300"/>
         <attribute name="nBpLo_mmHg" optional="YES" attributeType="Integer 16" maxValueString="200"/>
         <attribute name="nPulse_bpm" optional="YES" attributeType="Integer 16" maxValueString="200"/>
         <attribute name="nTemp_10c" optional="YES" attributeType="Integer 16" maxValueString="450"/>
         <attribute name="nWeight_g" optional="YES" attributeType="Integer 32" maxValueString="300000"/>
+        <attribute name="nYearMM" attributeType="Integer 32" minValueString="200000" maxValueString="299912" indexed="YES" syncable="YES"/>
         <attribute name="sEquipment" optional="YES" attributeType="String"/>
         <attribute name="sNote1" optional="YES" attributeType="String"/>
         <attribute name="sNote2" optional="YES" attributeType="String"/>
-        <relationship name="e1body" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="E1body" inverseName="e2records" inverseEntity="E1body"/>
     </entity>
     <elements>
         <element name="E1body" positionX="-92" positionY="231" width="128" height="150"/>

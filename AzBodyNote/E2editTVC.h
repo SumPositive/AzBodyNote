@@ -30,8 +30,8 @@
 }
 
 @property (nonatomic, retain) E2record		*Re2edit;
-@property (nonatomic, assign) IBOutlet E2editCellDial *ownerCellDial;  // E2editCellDial と E2editTVC をFile's Ownerリンクするため
-@property (nonatomic, assign) IBOutlet E2editCellNote *ownerCellNote;  // E2editCellNote と E2editTVC をFile's Ownerリンクするため
+//@property (nonatomic, assign) IBOutlet E2editCellDial *ownerCellDial;  // E2editCellDial と E2editTVC をFile's Ownerリンクするため
+//@property (nonatomic, assign) IBOutlet E2editCellNote *ownerCellNote;  // E2editCellNote と E2editTVC をFile's Ownerリンクするため
 
 // <delegate>
 - (void)editUpdate;
