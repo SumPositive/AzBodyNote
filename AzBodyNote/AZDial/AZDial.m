@@ -262,12 +262,13 @@
 }
 
 - (void)setDial:(NSInteger)dial  animated:(BOOL)animated
-{
+{	// これで変位したときは、delegate< dialChanged: dialDone: > を呼び出さない。
 	if (dial < mDialMin) dial = mDialMin;
 	else if (mDialMax < dial) dial = mDialMax;
 	// SET
 	mDial = dial;
-	
+
+	mIsSetting = YES; // delegate< dialChanged: dialDone: > を呼び出さない。
 	if (animated) {
 		// アニメ準備
 		[UIView beginAnimations:nil context:NULL];
@@ -280,13 +281,16 @@
 	} else {
 		[self scrollReset];	// mScrollView 座標系セット
 	}
+	mIsSetting = NO;
 }
 
 - (void)setStep:(NSInteger)vstep
 {
 	if (vstep < 1) mDialStep =1;
 	else mDialStep = vstep;
+	mIsSetting = YES; // delegate< dialChanged: dialDone: > を呼び出さない。
 	[self scrollReset];
+	mIsSetting = NO;
 }
 
 - (void)setMin:(NSInteger)vmin
@@ -295,7 +299,9 @@
 	// SET
 	mDialMin = vmin;
 	// mScrollView 座標系セット
+	mIsSetting = YES; // delegate< dialChanged: dialDone: > を呼び出さない。
 	[self scrollReset];
+	mIsSetting = NO;
 }
 
 - (void)setMax:(NSInteger)vmax
@@ -304,13 +310,17 @@
 	// SET
 	mDialMax = vmax;
 	// mScrollView 座標系セット
+	mIsSetting = YES; // delegate< dialChanged: dialDone: > を呼び出さない。
 	[self scrollReset];
+	mIsSetting = NO;
 }
 
 - (void)setStepperMagnification:(CGFloat)vmagnif
 {	// ステッパーは刻みを、mVstep * vmagnif にする
 	mStepperMag = vmagnif;
+	mIsSetting = YES; // delegate< dialChanged: dialDone: > を呼び出さない。
 	[self scrollReset];
+	mIsSetting = NO;
 }
 
 - (void)setStepperShow:(BOOL)bShow
@@ -331,8 +341,8 @@
 {
 	[self	setDial:(NSInteger)sender.value animated:YES];
 
-	if ([mDelegate respondsToSelector:@selector(volumeDone:dial:)]) {
-		[mDelegate volumeDone:self  dial:mDial];
+	if ([mDelegate respondsToSelector:@selector(dialDone:dial:)]) {
+		[mDelegate dialDone:self  dial:mDial];
 	}
 }
 
@@ -341,8 +351,8 @@
 	NSInteger ii = mDial + (mDialStep * mStepperMag);
 	if (mDialMax < ii) ii = mDialMax;
 	[self	setDial:ii  animated:YES];
-	if ([mDelegate respondsToSelector:@selector(volumeDone:dial:)]) {
-		[mDelegate volumeDone:self  dial:mDial];
+	if ([mDelegate respondsToSelector:@selector(dialDone:dial:)]) {
+		[mDelegate dialDone:self  dial:mDial];
 	}
 }
 
@@ -351,8 +361,8 @@
 	NSInteger ii = mDial - (mDialStep * mStepperMag);
 	if (ii < mDialMin) ii = mDialMin;
 	[self	setDial:ii  animated:YES];
-	if ([mDelegate respondsToSelector:@selector(volumeDone:dial:)]) {
-		[mDelegate volumeDone:self  dial:mDial];
+	if ([mDelegate respondsToSelector:@selector(dialDone:dial:)]) {
+		[mDelegate dialDone:self  dial:mDial];
 	}
 }
 
@@ -362,9 +372,6 @@
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {	// スクロール中
-	//if (mIsMoved) return;
-	//mIsMoved = YES;
-
 	static CGFloat sBase = (-1);
 	if (sBase < 0) {
 		sBase = scrollView.contentOffset.x;
@@ -377,11 +384,14 @@
 
 	//NSLog(@".x=%.1f  Left.x=%.1f  Center.x=%.1f  Right.x=%.1f", scrollView.contentOffset.x, 
 	//													mIvLeft.frame.origin.x, mIvCenter.frame.origin.x, mIvRight.frame.origin.x);
-	
+
 	// valueChange
 	mDial = mDialMin + floor( (mScrollMax - scrollView.contentOffset.x) / PITCH ) * mDialStep;
-	if ([mDelegate respondsToSelector:@selector(volumeChanged:dial:)]) {
-		[mDelegate volumeChanged:self  dial:mDial];	// 変化、決定ではない
+
+	if (mIsSetting==NO) {
+		if ([mDelegate respondsToSelector:@selector(dialChanged:dial:)]) {
+			[mDelegate dialChanged:self  dial:mDial];	// 変化、決定ではない
+		}
 	}
 
 	if ( scrollView.contentOffset.x < mIvCenter.frame.origin.x - PITCH*3 ) {
@@ -416,12 +426,12 @@
 
 - (void)scrollDone:(UIScrollView *)scrollView
 {	// Original
-	//if (mIsMoved) return;
-	//NG//NSInteger ii = floor( (mScrollMax - scrollView.contentOffset.x) / PITCH ) * mVstep;
 	//NG//ここで、改めて位置から求めると、指を離した瞬間に動いて変化する場合がある。
 	//OK//そのため、scrollViewDidScroll:にて表示されている mValue に決定することにした。
-	if ([mDelegate respondsToSelector:@selector(volumeDone:dial:)]) {
-		[mDelegate volumeDone:self  dial:mDial];	// 決定
+	if (mIsSetting==NO) {
+		if ([mDelegate respondsToSelector:@selector(dialDone:dial:)]) {
+			[mDelegate dialDone:self  dial:mDial];	// 決定
+		}
 	}
 	
 	NSInteger iStep = mDialStep * mStepperMag;

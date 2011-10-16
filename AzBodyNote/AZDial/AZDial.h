@@ -30,6 +30,7 @@
 	
 	// Stepper button
 	BOOL					mIsOS5;			//=YES: iOS5以上
+	BOOL					mIsSetting;		//=YES: set中につき < dialChanged: dialDone: > を呼び出さない。ループ防止のため
 	UIStepper				*mStepper;		// iOS5以上
 	UIButton				*mStepBuUp;		// iOS5未満
 	UIButton				*mStepBuDown;	// iOS5未満
@@ -56,7 +57,7 @@
 
 
 @protocol AZDialDelegate <NSObject>
-- (void)volumeChanged:(id)sender  dial:(NSInteger)dial;
-- (void)volumeDone:(id)sender  dial:(NSInteger)dial;
+- (void)dialChanged:(id)sender  dial:(NSInteger)dial;
+- (void)dialDone:(id)sender  dial:(NSInteger)dial;
 @end
 
