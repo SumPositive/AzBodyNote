@@ -7,19 +7,19 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <iAd/iAd.h>
+//#import <iAd/iAd.h>
 #import "MocEntity.h"
 #import "E2editCellDial.h"
 #import "E2editCellNote.h"
 
 
-@interface E2editTVC : UITableViewController <ADBannerViewDelegate>
+@interface E2editTVC : UITableViewController //<ADBannerViewDelegate>
 {
 	E2record		*Re2edit;		// =nil:AddNew
 	
 @private
 	BOOL			mIsAddNew;
-	ADBannerView	*mADBanner;
+	//ADBannerView	*mADBanner;
 	float						mADBannerY;	//iAd表示位置のY座標
 	
 	NSInteger	mPrevBpHi;
@@ -27,11 +27,12 @@
 	NSInteger	mPrevPuls;
 	NSInteger	mPrevWeight;
 	NSInteger	mPrevTemp;
+	UIButton		*mBuDelete;		// Edit時のみ使用
 }
 
 @property (nonatomic, retain) E2record		*Re2edit;
-//@property (nonatomic, assign) IBOutlet E2editCellDial *ownerCellDial;  // E2editCellDial と E2editTVC をFile's Ownerリンクするため
 //@property (nonatomic, assign) IBOutlet E2editCellNote *ownerCellNote;  // E2editCellNote と E2editTVC をFile's Ownerリンクするため
+//@property (nonatomic, assign) IBOutlet E2editCellDial *ownerCellDial;  // E2editCellDial と E2editTVC をFile's Ownerリンクするため
 
 // <delegate>
 - (void)editUpdate;

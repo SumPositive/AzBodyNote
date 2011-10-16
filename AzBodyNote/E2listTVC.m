@@ -51,7 +51,7 @@
 	// TableView
 	//self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone; // セル区切り線なし
 	//self.tableView.separatorColor = [UIColor blackColor];
-	UIImage *imgTile = [UIImage imageNamed:@"Tx-WoodWhite320"];
+	UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
 	self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 }
 

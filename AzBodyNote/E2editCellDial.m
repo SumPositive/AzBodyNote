@@ -14,8 +14,8 @@
 #import "CalcView.h"
 
 @implementation E2editCellDial
-@synthesize ibLbName, ibLbDetail, ibLbValue, ibLbUnit;
-@synthesize delegate, viewParent;
+@synthesize ibLbName, ibLbDetail, ibLbUnit;  // ibLbValue
+@synthesize  delegate, viewParent;
 @synthesize Re2record, RzKey, mValueMin, mValueMax, mValueDec, mValueStep, mValuePrev;
 
 
@@ -147,7 +147,7 @@
 		[mDial setDial:val animated:YES];
 	} else {
 		// 新規生成
-		mDial = [[AZDial alloc] initWithFrame:CGRectMake(10, 44, 300, 44)
+		mDial = [[AZDial alloc] initWithFrame:CGRectMake(15, 44, 295, 44)
 									 delegate: self
 										 dial: val
 										  min: mValueMin
@@ -162,14 +162,14 @@
 }
 
 // <AZDialDelegate>
-- (void)volumeChanged:(id)sender dial:(NSInteger)dial
-{	// Volumeが変位したとき
+- (void)dialChanged:(id)sender dial:(NSInteger)dial
+{	// dialが変位したとき
 	mValue = dial;
 	[self refreshValue];
 }
 
-- (void)volumeDone:(id)sender dial:(NSInteger)dial
-{	// Volume変位が停止したとき
+- (void)dialDone:(id)sender dial:(NSInteger)dial
+{	// dial変位が停止したとき
 	mValue = dial;
 	[self refreshValue];
 	

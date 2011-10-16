@@ -7,18 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "AZDial.h"
 
 
-@interface GraphVC : UIViewController <AZDialDelegate>
+@interface GraphVC : UIViewController <UIScrollViewDelegate>
 {
-	IBOutlet UILabel		*ibLbVolume;
-	
-	AZDial						*mDial;
+	IBOutlet UIScrollView		*ibScrollView;
 }
-
-// AZDialDelegate
-//- (void)volumeChanged:(NSInteger)volume;
-
 
 @end

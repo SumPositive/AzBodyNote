@@ -14,7 +14,7 @@
 
 @implementation E2editCellNote
 @synthesize delegate, Re2record;
-@synthesize ibTfNote1, ibTfNote2;
+//@synthesize ibTfNote1, ibTfNote2;
 
 
 
@@ -24,9 +24,11 @@
 	//assert(RzKey);
 	ibTfNote1.delegate = self;
 	ibTfNote1.text = Re2record.sNote1;
+	ibTfNote1.placeholder = @"Condition, memo";
 	
 	ibTfNote2.delegate = self;
 	ibTfNote2.text = Re2record.sNote2;
+	ibTfNote2.placeholder = @"Medicine,  memo";
 }
 
 
@@ -34,11 +36,17 @@
 
 - (void)textFieldDidEndEditing:(UITextField *)textField            
 {	// may be called if forced even if shouldEndEditing returns NO (e.g. view removed from window) or endEditing:YES called
-	if (textField==ibTfNote1) {
+	if (textField==ibTfNote1 && ![Re2record.sNote1 isEqualToString:textField.text]) {
 		Re2record.sNote1 = textField.text;
+		if ([delegate respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
+			[delegate editUpdate];  // 変更あり
+		}
 	}
-	else if (textField==ibTfNote2) {
+	else if (textField==ibTfNote2 && ![Re2record.sNote2 isEqualToString:textField.text]) {
 		Re2record.sNote2 = textField.text;
+		if ([delegate respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
+			[delegate editUpdate];  // 変更あり
+		}
 	}
 }
 

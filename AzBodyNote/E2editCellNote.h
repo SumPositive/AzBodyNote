@@ -13,16 +13,17 @@
 {
 	id						delegate;
 	E2record			*Re2record;
-	//NSString			*RzKey;
 	
-@private
+	IBOutlet UITextField		*ibTfNote1;
+	IBOutlet UITextField		*ibTfNote2;
 }
-
-@property (nonatomic, retain) IBOutlet UITextField		*ibTfNote1;
-@property (nonatomic, retain) IBOutlet UITextField		*ibTfNote2;
 
 @property (nonatomic, assign) id						delegate;
 @property (nonatomic, retain) E2record			*Re2record;		// 結果を戻すため
 //@property (nonatomic, retain) NSString			*RzKey;			// 結果を戻すため
+
+//@property (nonatomic, retain) IBOutlet UITextField		*ibTfNote1;
+//@property (nonatomic, retain) IBOutlet UITextField		*ibTfNote2;
+
 
 @end

@@ -212,7 +212,11 @@
 		self.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc]
 												  initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
 												  target:self action:@selector(actionCancel)] autorelease];*/
-	} else {
+		// TableView 背景
+		UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
+		self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
+	}
+	else {
 		// AddNew mode.
 		self.title = NSLocalizedString(@"AddNew",nil);
 		mIsAddNew = YES;
@@ -221,6 +225,9 @@
 		self.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc]
 												  initWithTitle:NSLocalizedString(@"Clear",nil) style:UIBarButtonItemStyleBordered 
 												  target:self action:@selector(actionClear)] autorelease];
+		// TableView 背景
+		UIImage *imgTile = [UIImage imageNamed:@"Tx-LzBeige320"];
+		self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 	}
 	[self setE2recordPrev];
 	
@@ -232,11 +239,8 @@
 
 	// TableView
 	self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone; // セル区切り線なし
-	//self.tableView.separatorColor = [UIColor blackColor];
-	//self.tableView.backgroundColor = [UIColor colorWithRed:151.0/256 green:80.0/256 blue:77.0/256 alpha:0.7];
-	UIImage *imgTile = [UIImage imageNamed:@"Tx-WoodWhite320"];
-	self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 	
+	/*
 	// iAd
 	if (mADBanner==nil) {
 		mADBanner = [[ADBannerView alloc] init];
@@ -249,6 +253,7 @@
 	CGRect rc = mADBanner.frame;
 	rc.origin.y = self.view.frame.size.height + 50; // 下へ隠す
 	mADBanner.frame = rc;
+ */
 }
 
 - (void)viewDidUnload
@@ -256,18 +261,32 @@
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
-	if (mADBanner) {
+/*	if (mADBanner) {
 		[mADBanner cancelBannerViewAction];
 		mADBanner.delegate = nil;
 		mADBanner = nil;
-	}
+	}*/
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
 	
-	//[self.tableView reloadData];
+	// [Delete]ボタンを 余白セルに置く
+	if (!mIsAddNew && !mBuDelete) {
+		mBuDelete = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+		[mBuDelete setTitle:NSLocalizedString(@"Delete",nil) forState:UIControlStateNormal];
+		[mBuDelete setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+		
+		NSIndexPath* indexPath = [NSIndexPath indexPathForRow:7 inSection:0];
+		CGRect rc = [self.tableView rectForRowAtIndexPath:indexPath];
+		rc.size.width /= 2;
+		rc.origin.x = rc.size.width / 2;
+		rc.origin.y += ((rc.size.height - 30) / 2);
+		rc.size.height = 30;
+		mBuDelete.frame = rc;
+		[self.tableView addSubview:mBuDelete];
+	}
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -276,8 +295,14 @@
 }
 
 - (void)viewWillDisappear:(BOOL)animated
-{
+{	// 非表示になる前に呼び出される
     [super viewWillDisappear:animated];
+	
+	if (mIsAddNew) {
+		[MocFunctions rollBack];  // 未保存取り消し
+	} else {
+		[self actionCancel];
+	}
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -307,7 +332,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {	// Return the number of rows in the section.
-    return 7 + 1;  // +1:末尾の余白セル
+	return 7 + 2;  // +2:末尾の余白セル
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -318,12 +343,22 @@
     return 88; // Default
 }
 
+/*
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section 
+{	// セクションフッタを応答
+	if (section==0) {
+		return @"(C)2011 Azukid";
+	}
+	return nil;
+} */
+
 - (UITableViewCell *)cellDate:(UITableView *)tableView
 {
-	static NSString *Cid = @"CellDate";
+	static NSString *Cid = @"E2editCellDate";  //== Class名
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
 	if (cell == nil) {
-		cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:Cid] autorelease];
+		/*
+		 cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:Cid] autorelease];
 		cell.textLabel.textAlignment = UITextAlignmentLeft;
 		cell.textLabel.font = [UIFont systemFontOfSize:20];
 		//cell.detailTextLabel.textAlignment = UITextAlignmentLeft;
@@ -332,9 +367,13 @@
 		cell.textLabel.textColor = [UIColor blackColor];
 		cell.textLabel.backgroundColor = [UIColor clearColor];
 		cell.contentView.backgroundColor = [UIColor clearColor];
+		 */
+		UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
+		[nib instantiateWithOwner:self options:nil];
+		cell = (UITableViewCell*)[tableView dequeueReusableCellWithIdentifier:Cid];
+		assert(cell);
 	}
-	//cell.textLabel.text = NSLocalizedString(@"DateTime",nil);
-	
+
 	NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
 	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
 	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
@@ -352,24 +391,6 @@
 	return cell;
 }
 
-- (E2editCellDial *)cellDial:(UITableView *)tableView
-{
-	static NSString *Cid = @"E2editCellDial";  //== Class名
-	E2editCellDial *cell = (E2editCellDial*)[tableView dequeueReusableCellWithIdentifier:Cid];
-	if (cell == nil) {
-		UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
-		[nib instantiateWithOwner:self options:nil];
-		//cell = self.ownerCellDial;
-		// 
-		cell.delegate = self;
-		cell.viewParent = self.navigationController.view;  // CalcをaddSubviewするため
-		// 選択禁止
-		cell.accessoryType = UITableViewCellAccessoryNone;
-		cell.selectionStyle = UITableViewCellSelectionStyleNone; // 選択時ハイライトなし
-	}
-	return cell;
-}
-
 - (E2editCellNote *)cellNote:(UITableView *)tableView
 {
 	static NSString *Cid = @"E2editCellNote";  //== Class名
@@ -377,13 +398,25 @@
 	if (cell == nil) {
 		UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
 		[nib instantiateWithOwner:self options:nil];
-		//cell = self.ownerCellNote;
-		// 
-		cell.delegate = self;
-		// 選択禁止
-		cell.accessoryType = UITableViewCellAccessoryNone;
-		cell.selectionStyle = UITableViewCellSelectionStyleNone; // 選択時ハイライトなし
+		cell = (E2editCellNote*)[tableView dequeueReusableCellWithIdentifier:Cid];
+		assert(cell);
 	}
+	cell.delegate = self;
+	return cell;
+}
+
+- (E2editCellDial *)cellDial:(UITableView *)tableView
+{
+	static NSString *Cid = @"E2editCellDial";  //== Class名
+	E2editCellDial *cell = (E2editCellDial*)[tableView dequeueReusableCellWithIdentifier:Cid];
+	if (cell == nil) {
+		UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
+		[nib instantiateWithOwner:self options:nil];
+		cell = (E2editCellDial*)[tableView dequeueReusableCellWithIdentifier:Cid];
+		assert(cell);
+	}
+	cell.delegate = self;
+	cell.viewParent = self.navigationController.view;  // CalcをaddSubviewするため
 	return cell;
 }
 
@@ -409,10 +442,7 @@
 			
 		case 1: {
 			E2editCellNote *cell = [self cellNote:tableView];
-			cell.delegate = self;
 			cell.Re2record = Re2edit;
-			cell.ibTfNote1.placeholder = @"Condition, memo";
-			cell.ibTfNote2.placeholder = @"Medicine,  memo";
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
 		}	break;
@@ -557,6 +587,7 @@
 }
 
 
+/*
 #pragma mark - iAd
 
 // iAd delegate  取得できたときに呼ばれる　⇒　表示する
@@ -602,5 +633,6 @@
 {	// 広告表示前にする処理があれば記述
 	return YES;
 }
+*/
 
 @end

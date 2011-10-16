@@ -17,7 +17,6 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-		mDial = nil;
     }
     return self;
 }
@@ -43,25 +42,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+	
+	ibScrollView.contentSize = CGSizeMake(1000.0, 1000.0);
+	ibScrollView.contentOffset = CGPointMake(0, 0);
 
-	if (!mDial) {
-		mDial = [[AZDial alloc] initWithFrame:CGRectMake(20, 100, 200, 44) 
-									 delegate:self dial:50 min:0 max:300 step:1 stepper:YES];
-		[self.view addSubview:mDial];
-		mDial.backgroundColor = [UIColor greenColor]; //self.view.backgroundColor;
-	}
-}
-
-- (void)volumeChanged:(id)sender dial:(NSInteger)dial
-{
-	ibLbVolume.text = [NSString stringWithFormat:@"%ld", dial];
-	//ibLbVolume.backgroundColor = [UIColor yellowColor];
-}
-
-- (void)volumeDone:(id)sender dial:(NSInteger)dial
-{
-	ibLbVolume.text = [NSString stringWithFormat:@"%ld", dial];
-	//ibLbVolume.backgroundColor = [UIColor blueColor];
 }
 
 - (void)viewDidUnload
