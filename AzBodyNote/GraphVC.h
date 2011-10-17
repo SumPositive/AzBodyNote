@@ -12,6 +12,7 @@
 @interface GraphVC : UIViewController <UIScrollViewDelegate>
 {
 	IBOutlet UIScrollView		*ibScrollView;
+	IBOutlet UIView				*ibGraphView;
 }
 
 @end

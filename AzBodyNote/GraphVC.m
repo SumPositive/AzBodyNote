@@ -43,10 +43,14 @@
 {
     [super viewDidLoad];
 	
-	ibScrollView.contentSize = CGSizeMake(1000.0, 1000.0);
-	ibScrollView.contentOffset = CGPointMake(0, 0);
+	CGRect rc = ibScrollView.bounds;
+	rc.size.width *= 3;
+	ibScrollView.contentSize = rc.size;
+	ibGraphView.frame = rc;
 
+	ibScrollView.contentOffset = CGPointMake(0, 0);
 }
+
 
 - (void)viewDidUnload
 {
