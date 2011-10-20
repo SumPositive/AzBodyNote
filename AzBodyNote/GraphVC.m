@@ -14,6 +14,8 @@
 {
 	IBOutlet UIScrollView		*ibScrollView;
 	IBOutlet UIView				*ibGraphView;
+	
+	NSArray *maBpHiY;
 }
 
 
@@ -49,11 +51,14 @@
     [super viewDidLoad];
 	
 	CGRect rc = ibScrollView.bounds;
-	rc.size.width *= 3;
+	rc.size.width *= 10;
 	ibScrollView.contentSize = rc.size;
 	ibGraphView.frame = rc;
 
-	ibScrollView.contentOffset = CGPointMake(0, 0);
+	ibScrollView.contentOffset = CGPointMake(rc.size.width - ibScrollView.frame.size.width, 0);  // 右端（当日）を表示する
+
+	//UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
+	//self.view.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 }
 
 

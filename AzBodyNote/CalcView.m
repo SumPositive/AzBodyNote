@@ -53,7 +53,7 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 	double						mMin;
 	double						mMax;
 	int							mDecimal;		// 小数桁数
-	id								mTarget;
+	__unsafe_unretained id								mTarget;
 	SEL							mActionSelector;
 	
 	//----------------------------------------------viewDidLoadでnil, dealloc時にrelese
