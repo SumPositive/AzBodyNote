@@ -25,7 +25,8 @@
 - (id)pop
 {
     // nil if [self count] == 0
-    id lastObject = [[[self lastObject] retain] autorelease];
+    //id lastObject = [[self lastObject] retain]; autorelease];
+    __strong id lastObject = [self lastObject];
     if (lastObject)
         [self removeLastObject];
     return lastObject;
@@ -44,6 +45,35 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 @end
 
 @implementation CalcView
+{
+	//--------------------------retain
+	NSString					*mTitle;		// [AC]で表示するため
+	NSDecimalNumber	*mAnswer;	// 結果
+	//----------------------------------------------assign
+	double						mMin;
+	double						mMax;
+	int							mDecimal;		// 小数桁数
+	id								mTarget;
+	SEL							mActionSelector;
+	
+	//----------------------------------------------viewDidLoadでnil, dealloc時にrelese
+	UIView				*mSubView;
+	NSDecimalNumberHandler	*mBehaviorDefault;	// 通貨既定の丸め処理
+	NSDecimalNumberHandler	*mBehaviorCalc;		// 計算途中の丸め処理
+	//NSArray								*mKeyButtons;
+	
+	//----------------------------------------------Owner移管につきdealloc時のrelese不要
+	//UILabel				*mLbTitle;
+	UILabel				*mLbAnswer;	// 結果表示
+	UILabel				*mLbFormula;	// 計算式表示
+	
+	//----------------------------------------------assign
+	NSInteger			mRoundingScale;
+	BOOL					mIsShow;
+	int						mFunc;		// (0)Non (-4)+ (-5)- (-6)* (-7)/
+	CGRect				mRectHide;		// 表示定位置
+	CGRect				mRectShow;	// 隠れ位置
+}
 //@synthesize RzTitle;
 //@synthesize RdecNum, RdecMin, RdecMax;
 //@synthesize delegate;
@@ -54,12 +84,14 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 // zFomula を計算し、答えを RdecAnswer に保持しながら mLbAnswer.text に表示する
 - (void)finalAnswer:(NSString *)zFomula
 {
-	[mAnswer release], mAnswer = [self decimalAnswerFomula:zFomula]; // 戻りObjは、retainされている
+	//[mAnswer release], 
+	mAnswer = [self decimalAnswerFomula:zFomula]; // 戻りObjは、retainされている
 	//NSLog(@"**********1 RdecAnswer=%@", RdecAnswer);
 	if (mAnswer) {
 		if (ANSWER_MAX < fabs([mAnswer doubleValue])) {
 			mLbAnswer.text = @"Game Over";
-			[mAnswer release], mAnswer = [[NSDecimalNumber alloc] initWithString:@"0.0"];
+			//[mAnswer release], 
+			mAnswer = [[NSDecimalNumber alloc] initWithString:@"0.0"];
 			// textField.text は、そのままなので計算続行可能。
 			return;
 		}
@@ -70,7 +102,7 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 		[formatter setNegativeFormat:@"-#,##0.####"];
 		// 表示のみ　Rentity更新はしない
 		mLbAnswer.text = [formatter stringFromNumber:mAnswer];
-		[formatter release];
+		//[formatter release];
 	}
 	else {
 		mLbAnswer.text = @"?";
@@ -123,7 +155,8 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 		} break;
 			
 		case 4: { // AC
-			[mAnswer release], mAnswer = nil;
+			//[mAnswer release], 
+			mAnswer = nil;
 			mLbAnswer.text = mTitle;		mLbAnswer.tag = 0; // Title
 			[self formulaHide];
 			mLbFormula.text = @"";
@@ -135,7 +168,7 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 					mLbFormula.text = [mLbFormula.text substringToIndex:iLen-1];
 				} else {
 					//[AC]と同じ
-					[mAnswer release], mAnswer = nil;
+					//[mAnswer release], mAnswer = nil;
 					mLbAnswer.text = mTitle;		mLbAnswer.tag = 0; // Title
 					[self formulaHide];
 					mLbFormula.text = @"";
@@ -193,7 +226,7 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 
 - (void)hide		// 閉じて破棄する
 {
-	[mAnswer release], mAnswer = nil;
+	//[mAnswer release], mAnswer = nil;
 
 	// アニメ準備
 	CGContextRef context = UIGraphicsGetCurrentContext();
@@ -224,8 +257,10 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 	{
 		//AzRETAIN_CHECK(@"save: RdecAnswer", RdecAnswer, 0);
 		// デフォルト丸め処理
-		[mAnswer release], mAnswer = [mAnswer decimalNumberByRoundingAccordingToBehavior:mBehaviorDefault];
+		//[mAnswer release], 
+		mAnswer = [mAnswer decimalNumberByRoundingAccordingToBehavior:mBehaviorDefault];
 		[mTarget performSelector:mActionSelector withObject:[mAnswer copy]];  // 受け取った側でreleaseすること
+		//[mTarget performSelector:mActionSelector withObject:mAnswer];  // 受け取った側でreleaseすること
 	}
 	[self hide];
 }
@@ -259,219 +294,222 @@ int levelOperator( NSString *zOpe )  // 演算子の優先順位
 	
 	NSMutableArray *maStack = [NSMutableArray new];	// - Stack Method
 	NSMutableArray *maRpn = [NSMutableArray new]; // 逆ポーランド記法結果
-	NSDecimalNumber *decAns = nil;
+	__strong NSDecimalNumber *decAns = nil;
 	
 	//-------------------------------------------------localPool BEGIN >>> @finaly release
-	NSAutoreleasePool *autoPool = [[NSAutoreleasePool alloc] init]; //イベント（タッチ）毎の解放では不足(落ちる)なので独自に解放する
-	@try {
-		NSString *zTokn;
-		NSString *zz;
-		
-		NSString *zTemp = [strFomula stringByReplacingOccurrencesOfString:@" " withString:@""]; // [ ]スペース除去
-		NSString *zFlag = nil;
-		if ([zTemp hasPrefix:@"-"] || [zTemp hasPrefix:@"+"]) {		// 先頭が[-]や[+]ならば符号として処理する
-			zFlag = [zTemp substringToIndex:1]; // 先頭の1字
-			zTemp = [zTemp substringFromIndex:1]; // 先頭の1字を除く
-		}
-		// マイナス符号 ⇒ " -"
-		zTemp = [zTemp stringByReplacingOccurrencesOfString:@"×-" withString:@"× s"];  
-		zTemp = [zTemp stringByReplacingOccurrencesOfString:@"÷-" withString:@"÷ s"];
-		zTemp = [zTemp stringByReplacingOccurrencesOfString:@"+-" withString:@"+ s"];
-		zTemp = [zTemp stringByReplacingOccurrencesOfString:@"--" withString:@"- s"];
-		zTemp = [zTemp stringByReplacingOccurrencesOfString:@"(-" withString:@"( s"];
-		// マイナス演算子 ⇒ " - "
-		zTemp = [zTemp stringByReplacingOccurrencesOfString:@")-" withString:@") s "]; 
-		zTemp = [zTemp stringByReplacingOccurrencesOfString:@"-(" withString:@" s ("];
-		// 残った "-" を演算子になるように " s " にする
-		zTemp = [zTemp stringByReplacingOccurrencesOfString:@"-" withString:@" s "];  
-		// "s" を "-" に戻す
-		zTemp = [zTemp stringByReplacingOccurrencesOfString:@"s" withString:@"-"];
-		
-		// [+]を挿入した結果、おかしくなる組み合わせを補正する
-		zTemp = [zTemp stringByReplacingOccurrencesOfString:@"×+" withString:@"×"];
-		zTemp = [zTemp stringByReplacingOccurrencesOfString:@"÷+" withString:@"÷"];
-		zTemp = [zTemp stringByReplacingOccurrencesOfString:@"++" withString:@"+"];
-		// 演算子の両側にスペース挿入
-		zTemp = [zTemp stringByReplacingOccurrencesOfString:@"*" withString:@" * "]; // 前後スペース
-		zTemp = [zTemp stringByReplacingOccurrencesOfString:@"/" withString:@" / "]; // 前後スペース
-		zTemp = [zTemp stringByReplacingOccurrencesOfString:@"×" withString:@" * "]; // 半角文字化
-		zTemp = [zTemp stringByReplacingOccurrencesOfString:@"÷" withString:@" / "]; // 半角文字化
-		zTemp = [zTemp stringByReplacingOccurrencesOfString:@"+" withString:@" + "]; // [-]は演算子ではない
-		zTemp = [zTemp stringByReplacingOccurrencesOfString:@"(" withString:@" ( "];
-		zTemp = [zTemp stringByReplacingOccurrencesOfString:@")" withString:@" ) "];
-		
-		if (zFlag) {
-			zTemp = [zFlag stringByAppendingString:zTemp]; // 先頭に符号を付ける
-		}
-		// スペースで区切られたコンポーネント(部分文字列)を切り出す
-		NSArray *arComp = [zTemp componentsSeparatedByString:@" "];
-		NSLog(@"arComp[]=%@", arComp);
-		
-		NSInteger iCapLeft = 0;
-		NSInteger iCapRight = 0;
-		NSInteger iCntOperator = 0;	// 演算子の数　（関数は除外）
-		NSInteger iCntNumber = 0;	// 数値の数
-		
-		for (int index = 0; index < [arComp count]; index++) 
-		{
-			zTokn = [arComp objectAtIndex:index];
-			//AzLOG(@"arComp[%d]='%@'", index, zTokn);
+	//NSAutoreleasePool *autoPool = [[NSAutoreleasePool alloc] init]; //イベント（タッチ）毎の解放では不足(落ちる)なので独自に解放する
+	@autoreleasepool {
+		@try {
+			NSString *zTokn;
+			NSString *zz;
 			
-			if ([zTokn length] < 1 || [zTokn hasPrefix:@" "]) {
-				// パス
+			NSString *zTemp = [strFomula stringByReplacingOccurrencesOfString:@" " withString:@""]; // [ ]スペース除去
+			NSString *zFlag = nil;
+			if ([zTemp hasPrefix:@"-"] || [zTemp hasPrefix:@"+"]) {		// 先頭が[-]や[+]ならば符号として処理する
+				zFlag = [zTemp substringToIndex:1]; // 先頭の1字
+				zTemp = [zTemp substringFromIndex:1]; // 先頭の1字を除く
 			}
-			else if ([zTokn doubleValue] != 0.0 || [zTokn hasSuffix:@"0"]) {		// 数値ならば
-				iCntNumber++;
-				[maRpn push:zTokn];
+			// マイナス符号 ⇒ " -"
+			zTemp = [zTemp stringByReplacingOccurrencesOfString:@"×-" withString:@"× s"];  
+			zTemp = [zTemp stringByReplacingOccurrencesOfString:@"÷-" withString:@"÷ s"];
+			zTemp = [zTemp stringByReplacingOccurrencesOfString:@"+-" withString:@"+ s"];
+			zTemp = [zTemp stringByReplacingOccurrencesOfString:@"--" withString:@"- s"];
+			zTemp = [zTemp stringByReplacingOccurrencesOfString:@"(-" withString:@"( s"];
+			// マイナス演算子 ⇒ " - "
+			zTemp = [zTemp stringByReplacingOccurrencesOfString:@")-" withString:@") s "]; 
+			zTemp = [zTemp stringByReplacingOccurrencesOfString:@"-(" withString:@" s ("];
+			// 残った "-" を演算子になるように " s " にする
+			zTemp = [zTemp stringByReplacingOccurrencesOfString:@"-" withString:@" s "];  
+			// "s" を "-" に戻す
+			zTemp = [zTemp stringByReplacingOccurrencesOfString:@"s" withString:@"-"];
+			
+			// [+]を挿入した結果、おかしくなる組み合わせを補正する
+			zTemp = [zTemp stringByReplacingOccurrencesOfString:@"×+" withString:@"×"];
+			zTemp = [zTemp stringByReplacingOccurrencesOfString:@"÷+" withString:@"÷"];
+			zTemp = [zTemp stringByReplacingOccurrencesOfString:@"++" withString:@"+"];
+			// 演算子の両側にスペース挿入
+			zTemp = [zTemp stringByReplacingOccurrencesOfString:@"*" withString:@" * "]; // 前後スペース
+			zTemp = [zTemp stringByReplacingOccurrencesOfString:@"/" withString:@" / "]; // 前後スペース
+			zTemp = [zTemp stringByReplacingOccurrencesOfString:@"×" withString:@" * "]; // 半角文字化
+			zTemp = [zTemp stringByReplacingOccurrencesOfString:@"÷" withString:@" / "]; // 半角文字化
+			zTemp = [zTemp stringByReplacingOccurrencesOfString:@"+" withString:@" + "]; // [-]は演算子ではない
+			zTemp = [zTemp stringByReplacingOccurrencesOfString:@"(" withString:@" ( "];
+			zTemp = [zTemp stringByReplacingOccurrencesOfString:@")" withString:@" ) "];
+			
+			if (zFlag) {
+				zTemp = [zFlag stringByAppendingString:zTemp]; // 先頭に符号を付ける
 			}
-			else if ([zTokn isEqualToString:@")"]) {	// "("までスタックから取り出してRPNへ追加、両括弧は破棄する
-				iCapRight++;
-				while ((zz = [maStack pop])) {
-					if ([zz isEqualToString:@"("]) break; // 両カッコは、破棄する
-					[maRpn push:zz];
+			// スペースで区切られたコンポーネント(部分文字列)を切り出す
+			NSArray *arComp = [zTemp componentsSeparatedByString:@" "];
+			NSLog(@"arComp[]=%@", arComp);
+			
+			NSInteger iCapLeft = 0;
+			NSInteger iCapRight = 0;
+			NSInteger iCntOperator = 0;	// 演算子の数　（関数は除外）
+			NSInteger iCntNumber = 0;	// 数値の数
+			
+			for (int index = 0; index < [arComp count]; index++) 
+			{
+				zTokn = [arComp objectAtIndex:index];
+				//AzLOG(@"arComp[%d]='%@'", index, zTokn);
+				
+				if ([zTokn length] < 1 || [zTokn hasPrefix:@" "]) {
+					// パス
 				}
-			}
-			else if ([zTokn isEqualToString:@"("]) {
-				iCapLeft++;
-				[maStack push:zTokn];
-			}
-			else {
-				while (0 < [maStack count]) {
-					//			 スタック最上位の演算子優先順位 ＜ トークンの演算子優先順位
-					if (levelOperator([maStack lastObject]) <= levelOperator(zTokn)) {
-						[maRpn push:[maStack pop]];  // スタックから取り出して、それをRPNへ追加
-					} else {
-						break;
+				else if ([zTokn doubleValue] != 0.0 || [zTokn hasSuffix:@"0"]) {		// 数値ならば
+					iCntNumber++;
+					[maRpn push:zTokn];
+				}
+				else if ([zTokn isEqualToString:@")"]) {	// "("までスタックから取り出してRPNへ追加、両括弧は破棄する
+					iCapRight++;
+					while ((zz = [maStack pop])) {
+						if ([zz isEqualToString:@"("]) break; // 両カッコは、破棄する
+						[maRpn push:zz];
 					}
 				}
-				// スタックが空ならばトークンをスタックへ追加する
-				iCntOperator++;
-				[maStack push:zTokn];
+				else if ([zTokn isEqualToString:@"("]) {
+					iCapLeft++;
+					[maStack push:zTokn];
+				}
+				else {
+					while (0 < [maStack count]) {
+						//			 スタック最上位の演算子優先順位 ＜ トークンの演算子優先順位
+						if (levelOperator([maStack lastObject]) <= levelOperator(zTokn)) {
+							[maRpn push:[maStack pop]];  // スタックから取り出して、それをRPNへ追加
+						} else {
+							break;
+						}
+					}
+					// スタックが空ならばトークンをスタックへ追加する
+					iCntOperator++;
+					[maStack push:zTokn];
+				}
 			}
-		}
-		// スタックに残っているトークンを全て逆ポーランドPUSH
-		while ((zz = [maStack pop])) {
-			[maRpn push:zz];
-		}
-		
-		// 数値と演算子の数チェック
-		if (iCntNumber < iCntOperator + 1) {
-			@throw NSLocalizedString(@"Too many operators", nil); // 演算子が多すぎる
-		}
-		else if (iCntNumber > iCntOperator + 1) {
-			@throw NSLocalizedString(@"Insufficient operator", nil); // 演算子が足らない
-		}
-		// 括弧チェック
-		if (iCapLeft < iCapRight) {
-			@throw NSLocalizedString(@"Closing parenthesis is excessive", nil); // 括弧が閉じ過ぎ
-		}
-		else if (iCapLeft > iCapRight) {
-			@throw NSLocalizedString(@"Unclosed parenthesis", nil); // 括弧が閉じていない
-		}
-		
+			// スタックに残っているトークンを全て逆ポーランドPUSH
+			while ((zz = [maStack pop])) {
+				[maRpn push:zz];
+			}
+			
+			// 数値と演算子の数チェック
+			if (iCntNumber < iCntOperator + 1) {
+				@throw NSLocalizedString(@"Too many operators", nil); // 演算子が多すぎる
+			}
+			else if (iCntNumber > iCntOperator + 1) {
+				@throw NSLocalizedString(@"Insufficient operator", nil); // 演算子が足らない
+			}
+			// 括弧チェック
+			if (iCapLeft < iCapRight) {
+				@throw NSLocalizedString(@"Closing parenthesis is excessive", nil); // 括弧が閉じ過ぎ
+			}
+			else if (iCapLeft > iCapRight) {
+				@throw NSLocalizedString(@"Unclosed parenthesis", nil); // 括弧が閉じていない
+			}
+			
 #ifdef AzDEBUG
-		for (int index = 0; index < [maRpn count]; index++) 
-		{
-			AzLOG(@"maRpn[%d]='%@'", index, [maRpn objectAtIndex:index]);
-		}
+			for (int index = 0; index < [maRpn count]; index++) 
+			{
+				AzLOG(@"maRpn[%d]='%@'", index, [maRpn objectAtIndex:index]);
+			}
 #endif
-		
-		// スタック クリア
-		[maStack removeAllObjects]; //iStackIdx = 0;
-		//-------------------------------------------------------------------------------------
-		// maRpn 逆ポーランド記法を計算する
-		NSDecimalNumber *d1, *d2;
-		
-		// この内部だけの丸め指定
-		NSDecimalNumberHandler *behavior = [[NSDecimalNumberHandler alloc]
-											initWithRoundingMode:NSRoundBankers		// 偶数丸め
-											scale:mRoundingScale + 12	// 丸めた後の桁数
-											raiseOnExactness:YES		// 精度
-											raiseOnOverflow:YES			// オーバーフロー
-											raiseOnUnderflow:YES		// アンダーフロー
-											raiseOnDivideByZero:YES ];	// アンダーフロー
-		[NSDecimalNumber setDefaultBehavior:behavior];	// 計算途中の丸め
-		[behavior release];
-		
-		for (int index = 0; index < [maRpn count]; index++) 
-		{
-			NSString *zTokn = [maRpn objectAtIndex:index];
 			
-			if ([zTokn isEqualToString:@"*"]) {
-				if (2 <= [maStack count]) {
-					d2 = [NSDecimalNumber decimalNumberWithString:[maStack pop]]; // スタックからPOP
-					d1 = [NSDecimalNumber decimalNumberWithString:[maStack pop]]; // スタックからPOP
-					d1 = [d1 decimalNumberByMultiplyingBy:d2]; // d1 * d2
-					[maStack push:[d1 description]];
-				}
-			}
-			else if ([zTokn isEqualToString:@"/"]) {
-				if (2 <= [maStack count]) {
-					d2 = [NSDecimalNumber decimalNumberWithString:[maStack pop]]; // スタックからPOP
-					d1 = [NSDecimalNumber decimalNumberWithString:[maStack pop]]; // スタックからPOP
-					if ([d2 doubleValue] == 0.0) { // 0割
-						@throw NSLocalizedString(@"How do you divide by zero", nil);
-					}
-					d1 = [d1 decimalNumberByDividingBy:d2]; // d1 / d2
-					[maStack push:[d1 description]];
-				}
-			}
-			else if ([zTokn isEqualToString:@"-"]) {
-				if (1 <= [maStack count]) {
-					d2 = [NSDecimalNumber decimalNumberWithString:[maStack pop]]; // スタックからPOP
-					if (1 <= [maStack count]) {
+			// スタック クリア
+			[maStack removeAllObjects]; //iStackIdx = 0;
+			//-------------------------------------------------------------------------------------
+			// maRpn 逆ポーランド記法を計算する
+			NSDecimalNumber *d1, *d2;
+			
+			// この内部だけの丸め指定
+			NSDecimalNumberHandler *behavior = [[NSDecimalNumberHandler alloc]
+												initWithRoundingMode:NSRoundBankers		// 偶数丸め
+												scale:mRoundingScale + 12	// 丸めた後の桁数
+												raiseOnExactness:YES		// 精度
+												raiseOnOverflow:YES			// オーバーフロー
+												raiseOnUnderflow:YES		// アンダーフロー
+												raiseOnDivideByZero:YES ];	// アンダーフロー
+			[NSDecimalNumber setDefaultBehavior:behavior];	// 計算途中の丸め
+			//[behavior release];
+			
+			for (int index = 0; index < [maRpn count]; index++) 
+			{
+				NSString *zTokn = [maRpn objectAtIndex:index];
+				
+				if ([zTokn isEqualToString:@"*"]) {
+					if (2 <= [maStack count]) {
+						d2 = [NSDecimalNumber decimalNumberWithString:[maStack pop]]; // スタックからPOP
 						d1 = [NSDecimalNumber decimalNumberWithString:[maStack pop]]; // スタックからPOP
-					} else {
-						d1 = [NSDecimalNumber zero]; // 0.0;
+						d1 = [d1 decimalNumberByMultiplyingBy:d2]; // d1 * d2
+						[maStack push:[d1 description]];
 					}
-					d1 = [d1 decimalNumberBySubtracting:d2]; // d1 - d2
-					[maStack push:[d1 description]];
+				}
+				else if ([zTokn isEqualToString:@"/"]) {
+					if (2 <= [maStack count]) {
+						d2 = [NSDecimalNumber decimalNumberWithString:[maStack pop]]; // スタックからPOP
+						d1 = [NSDecimalNumber decimalNumberWithString:[maStack pop]]; // スタックからPOP
+						if ([d2 doubleValue] == 0.0) { // 0割
+							@throw NSLocalizedString(@"How do you divide by zero", nil);
+						}
+						d1 = [d1 decimalNumberByDividingBy:d2]; // d1 / d2
+						[maStack push:[d1 description]];
+					}
+				}
+				else if ([zTokn isEqualToString:@"-"]) {
+					if (1 <= [maStack count]) {
+						d2 = [NSDecimalNumber decimalNumberWithString:[maStack pop]]; // スタックからPOP
+						if (1 <= [maStack count]) {
+							d1 = [NSDecimalNumber decimalNumberWithString:[maStack pop]]; // スタックからPOP
+						} else {
+							d1 = [NSDecimalNumber zero]; // 0.0;
+						}
+						d1 = [d1 decimalNumberBySubtracting:d2]; // d1 - d2
+						[maStack push:[d1 description]];
+					}
+				}
+				else if ([zTokn isEqualToString:@"+"]) {
+					if (1 <= [maStack count]) {
+						d2 = [NSDecimalNumber decimalNumberWithString:[maStack pop]]; // スタックからPOP
+						if (1 <= [maStack count]) {
+							d1 = [NSDecimalNumber decimalNumberWithString:[maStack pop]]; // スタックからPOP
+						} else {
+							d1 = [NSDecimalNumber zero]; // 0.0;
+						}
+						d1 = [d1 decimalNumberByAdding:d2]; // d1 + d2
+						[maStack push:[d1 description]];
+					}
+				}
+				else {
+					//[maStack addObject:zTokn];  iStackIdx++; // スタックPUSH
+					[maStack push:zTokn]; // 数値をスタックへPUSH
 				}
 			}
-			else if ([zTokn isEqualToString:@"+"]) {
-				if (1 <= [maStack count]) {
-					d2 = [NSDecimalNumber decimalNumberWithString:[maStack pop]]; // スタックからPOP
-					if (1 <= [maStack count]) {
-						d1 = [NSDecimalNumber decimalNumberWithString:[maStack pop]]; // スタックからPOP
-					} else {
-						d1 = [NSDecimalNumber zero]; // 0.0;
-					}
-					d1 = [d1 decimalNumberByAdding:d2]; // d1 + d2
-					[maStack push:[d1 description]];
-				}
+			
+			// スタックに残った最後が答え
+			if ([maStack count] == 1) {
+				//計算途中精度を通貨小数＋2桁にする
+				decAns = [NSDecimalNumber decimalNumberWithString:[maStack pop]];
+				//NSLog(@"**********1 decAns=%@", decAns);
+				decAns = [decAns decimalNumberByRoundingAccordingToBehavior:mBehaviorCalc]; // 計算結果の丸め処理
+				//NSLog(@"**********2 decAns=%@", decAns);
+				//[decAns retain]; // localPool release されないように retain しておく。
+				//__strong 宣言した。
 			}
 			else {
-				//[maStack addObject:zTokn];  iStackIdx++; // スタックPUSH
-				[maStack push:zTokn]; // 数値をスタックへPUSH
+				@throw @"zRpnCalc:ERROR: [maStack count] != 1";
 			}
 		}
-		
-		// スタックに残った最後が答え
-		if ([maStack count] == 1) {
-			//計算途中精度を通貨小数＋2桁にする
-			decAns = [NSDecimalNumber decimalNumberWithString:[maStack pop]];
-			//NSLog(@"**********1 decAns=%@", decAns);
-			decAns = [decAns decimalNumberByRoundingAccordingToBehavior:mBehaviorCalc]; // 計算結果の丸め処理
-			//NSLog(@"**********2 decAns=%@", decAns);
-			[decAns retain]; // localPool release されないように retain しておく。
+		@catch (NSException * errEx) {
+			NSLog(@"Calc: error %@ : %@\n", [errEx name], [errEx reason]);
+			decAns = nil;
 		}
-		else {
-			@throw @"zRpnCalc:ERROR: [maStack count] != 1";
+		@catch (NSString *errMsg) {
+			NSLog(@"Calc: error=%@", errMsg);
+			decAns = nil;
 		}
-	}
-	@catch (NSException * errEx) {
-		NSLog(@"Calc: error %@ : %@\n", [errEx name], [errEx reason]);
-		decAns = nil;
-	}
-	@catch (NSString *errMsg) {
-		NSLog(@"Calc: error=%@", errMsg);
-		decAns = nil;
-	}
-	@finally {
-		[autoPool release];
-		//-------------------------------------------------localPool END
-		[maRpn release];
-		[maStack release];
+		@finally {
+			//[autoPool release];
+			//-------------------------------------------------localPool END
+			//[maRpn release];
+			//[maStack release];
+		}
 	}
 	return decAns;
 }
@@ -515,7 +553,7 @@ int levelOperator( NSString *zOpe )  // 演算子の優先順位
 	//------------------------------------------
 	assert(mSubView==nil);
 	mSubView = [[UIView alloc] initWithFrame:CGRectMake(0, VIEW_HIGHT-250, 320, 250)]; // 縦横固定にする
-	[self addSubview:mSubView], [mSubView release];
+	[self addSubview:mSubView];//, [mSubView release];
 	mSubView.backgroundColor = [UIColor blackColor];
 	mSubView.userInteractionEnabled = YES;
 	//[self bringSubviewToFront:mSubView];
@@ -537,7 +575,7 @@ int levelOperator( NSString *zOpe )  // 演算子の優先順位
 	mLbAnswer.minimumFontSize = 16;
 	mLbAnswer.adjustsFontSizeToFitWidth = YES;
 	mLbAnswer.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
-	[mSubView addSubview:mLbAnswer], [mLbAnswer release];
+	[mSubView addSubview:mLbAnswer];//, [mLbAnswer release];
 	mLbAnswer.tag = 0;	// (0)title  (1)answer
 	mLbAnswer.text = mTitle;
 	//------------------------------------------
@@ -550,7 +588,7 @@ int levelOperator( NSString *zOpe )  // 演算子の優先順位
 	mLbFormula.minimumFontSize = 10;
 	mLbFormula.adjustsFontSizeToFitWidth = YES;
 	mLbFormula.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
-	[mSubView addSubview:mLbFormula], [mLbFormula release];
+	[mSubView addSubview:mLbFormula];//, [mLbFormula release];
 	mLbFormula.hidden = YES;
 	mLbFormula.text = @"";
 	
@@ -832,7 +870,7 @@ int levelOperator( NSString *zOpe )  // 演算子の優先順位
  - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
  */
 
-
+/*
 #pragma mark  Unload - dealloc
 - (void)dealloc 
 {
@@ -841,7 +879,7 @@ int levelOperator( NSString *zOpe )  // 演算子の優先順位
 	[mTitle release], mTitle = nil;
 	[mAnswer release], mAnswer = nil;
 	[super dealloc];
-}
+}*/
 
 
 #pragma mark - <Touches>

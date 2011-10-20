@@ -11,16 +11,6 @@
 #import <MessageUI/MFMailComposeViewController.h>
 
 @interface InformationVC : UIViewController <MFMailComposeViewControllerDelegate, UIAlertViewDelegate>
-{
-	//IBOutlet UIButton		*ibBuOK;
-	//IBOutlet UIButton		*ibBuGoSupport;
-	//IBOutlet UIButton		*ibBuGoMail;
-	
-	IBOutlet UILabel				*ibLbVersion;
-	
-@private
-	
-}
 
 - (IBAction)ibBuOK:(UIButton *)button;
 - (IBAction)ibBuGoSupport:(UIButton *)button;

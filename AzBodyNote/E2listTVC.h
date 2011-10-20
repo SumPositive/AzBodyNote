@@ -11,12 +11,6 @@
 #import "E2listCell.h"
 
 @interface E2listTVC : UITableViewController <NSFetchedResultsControllerDelegate>
-{
-	
-@private
-	//NSDateFormatter		*mDateFormatter;			// TableCell高速化のため
-	NSIndexPath				*mIndexPathEdit;
-}
 
 @property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;

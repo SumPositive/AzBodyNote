@@ -11,18 +11,8 @@
 
 
 @interface E2listCell : UITableViewCell
-{
-	E2record		*Re2node;
-	
-	IBOutlet UILabel			*ibLbDate;
-	IBOutlet UILabel			*ibLbBpHi;
-	IBOutlet UILabel			*ibLbBpLo;
-	IBOutlet UILabel			*ibLbPuls;
-	IBOutlet UILabel			*ibLbWeight;
-	IBOutlet UILabel			*ibLbTemp;
-}
 
-@property (nonatomic, retain) E2record		*Re2node;
+@property (nonatomic, strong) E2record		*Re2node;
 
 /*
 @property (nonatomic, retain) IBOutlet UILabel			*ibLbDate;

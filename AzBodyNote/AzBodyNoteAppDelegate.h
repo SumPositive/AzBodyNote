@@ -9,11 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface AzBodyNoteAppDelegate : NSObject <UIApplicationDelegate>
-{
-
-@private
-	//BOOL		mIsUpdate;
-}
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain, readonly) NSManagedObjectContext *managedObjectContext;

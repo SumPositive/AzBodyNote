@@ -14,6 +14,20 @@
 #import "E2editCellNote.h"
 
 @implementation E2editTVC
+{
+	E2record		*Re2edit;		// =nil:AddNew
+	
+	BOOL			mIsAddNew;
+	//ADBannerView	*mADBanner;
+	float						mADBannerY;	//iAd表示位置のY座標
+	
+	NSInteger	mPrevBpHi;
+	NSInteger	mPrevBpLo;
+	NSInteger	mPrevPuls;
+	NSInteger	mPrevWeight;
+	NSInteger	mPrevTemp;
+	UIButton		*mBuDelete;		// Edit時のみ使用
+}
 @synthesize Re2edit;
 //@synthesize ownerCellDial, ownerCellNote;
 
@@ -74,7 +88,7 @@
 	// Sort条件
 	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
 	NSArray *sortDesc = [[NSArray alloc] initWithObjects:sort1,nil]; // 日付降順：Limit抽出に使用
-	[sort1 release];
+	//[sort1 release];
 	
 	// 直前のレコードを取得
 	NSDate *dateNow = Re2edit.dateTime;	 // 現在編集中の日付
@@ -222,9 +236,9 @@
 		mIsAddNew = YES;
 		Re2edit = [MocFunctions insertAutoEntity:@"E2record"]; // autorelese
 		// [Clear]ボタンを左側に追加する
-		self.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc]
+		self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
 												  initWithTitle:NSLocalizedString(@"Clear",nil) style:UIBarButtonItemStyleBordered 
-												  target:self action:@selector(actionClear)] autorelease];
+												 target:self action:@selector(actionClear)];// autorelease];
 		// TableView 背景
 		UIImage *imgTile = [UIImage imageNamed:@"Tx-LzBeige320"];
 		self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
@@ -232,9 +246,9 @@
 	[self setE2recordPrev];
 	
 	// SAVEボタンを右側に追加する
-	self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc]
+	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
 											   initWithBarButtonSystemItem:UIBarButtonSystemItemSave
-											   target:self action:@selector(actionSave)] autorelease];
+											  target:self action:@selector(actionSave)];// autorelease];
 	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
 
 	// TableView
@@ -316,11 +330,12 @@
 	return (interfaceOrientation == UIInterfaceOrientationPortrait); // タテ正面のみ
 }
 
+/*
 - (void)dealloc
 {
 	[Re2edit release], Re2edit = nil;
 	[super dealloc];
-}
+}*/
 
 
 #pragma mark - Table view data source
@@ -378,7 +393,7 @@
 	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
 	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 	[fmt setCalendar:calendar];
-	[calendar release];
+	//[calendar release];
 	//[df setLocale:[NSLocale systemLocale]];これがあると曜日が表示されない。
 	[fmt setDateFormat:@"yyyy-M-d EE HH:mm"];
 	if (mIsAddNew OR Re2edit.dateTime==nil) {
@@ -387,7 +402,7 @@
 	//cell.detailTextLabel.text = [fmt stringFromDate:Re2edit.datetime];
 	cell.textLabel.text = [NSString stringWithFormat:@"%@   %@", NSLocalizedString(@"DateTime",nil), 
 						   [fmt stringFromDate:Re2edit.dateTime]];
-	[fmt release];
+	//[fmt release];
 	return cell;
 }
 
@@ -425,7 +440,7 @@
 	static NSString *Cid = @"CellBlank";
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
 	if (cell == nil) {
-		cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:Cid] autorelease];
+		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:Cid];// autorelease];
 		cell.accessoryType = UITableViewCellAccessoryNone;
 	}
 	return cell;

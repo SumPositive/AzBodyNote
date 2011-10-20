@@ -11,15 +11,9 @@
 
 
 @interface EditDateVC : UIViewController
-{
-@private
-	E2record			*Re2node;
-	id						delegate;	
-	NSTimeInterval	MintervalPrev;
-}
 
-@property (nonatomic, retain) E2record			*Re2record;
-@property (nonatomic, assign) id						delegate;
+@property (nonatomic, unsafe_unretained) id						delegate;
+@property (nonatomic, strong) E2record			*Re2record;
 @property (nonatomic, assign) NSInteger	PiMinYearMMDD;
 @property (nonatomic, assign) NSInteger	PiMaxYearMMDD;
 

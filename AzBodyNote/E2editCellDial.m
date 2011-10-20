@@ -14,6 +14,29 @@
 #import "CalcView.h"
 
 @implementation E2editCellDial
+{
+	__unsafe_unretained id						delegate;
+	__unsafe_unretained UIView				*viewParent;  // ここへCalcをaddSubviewする
+	
+	__strong E2record			*Re2record;
+	__strong NSString			*RzKey;
+	
+	NSInteger		mValueMin;
+	NSInteger		mValueMax;
+	NSInteger		mValueDec; // 小数桁数： 0=整数=10^0,  1=0.1=10^-1,  2=0.01=10^-2,  3=0.001=10^-3,
+	NSInteger		mValueStep; //増減単位
+	NSInteger		mValuePrev; // 直前の値（mValue=nil のときに表示する）
+	
+	IBOutlet UILabel			*ibLbName;
+	IBOutlet UILabel			*ibLbDetail;
+	IBOutlet UILabel			*ibLbUnit;
+	IBOutlet UILabel			*ibLbValue;
+	
+	NSInteger		mSliderBase;
+	NSInteger		mValue;
+	AZDial				*mDial;
+}
+
 @synthesize ibLbName, ibLbDetail, ibLbUnit;  // ibLbValue
 @synthesize  delegate, viewParent;
 @synthesize Re2record, RzKey, mValueMin, mValueMax, mValueDec, mValueStep, mValuePrev;
@@ -68,7 +91,7 @@
 		NSDecimalNumber *decExp = [NSDecimalNumber decimalNumberWithMantissa: 1  exponent: digits  isNegative:NO];  //= 1 x 10^digits
 		decLong = [dec decimalNumberByMultiplyingBy: decExp  withBehavior: behavior]; // = dec x (10^digits)
 	}
-	[behavior release];
+	//[behavior release];
 	return (NSInteger)[decLong doubleValue]; // 整数値を返す
 }
 
@@ -102,7 +125,7 @@
 											  target:self	  action:@selector(calcDone:)];
 	[viewParent addSubview:calc];
 	[calc show];
-	[calc release];
+	//[calc release];
 }
 
 - (IBAction)ibBuNone:(UIButton *)button
@@ -182,11 +205,12 @@
 	}
 }
 
+/*
 - (void)dealloc
 {
 	[RzKey release], RzKey = nil;
 	[Re2record release], Re2record = nil;
 	[super dealloc];
-}
+}*/
 
 @end

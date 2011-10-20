@@ -13,7 +13,15 @@
 #import "E2editCellNote.h"
 
 @implementation E2editCellNote
-@synthesize delegate, Re2record;
+{
+	__unsafe_unretained id						delegate;
+	__strong E2record			*Re2record;
+	
+	IBOutlet UITextField		*ibTfNote1;
+	IBOutlet UITextField		*ibTfNote2;
+}
+@synthesize delegate;
+@synthesize Re2record;
 //@synthesize ibTfNote1, ibTfNote2;
 
 
@@ -52,7 +60,7 @@
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string   
 {	// return NO to not change text     テキストが変更される「直前」に呼び出される。これにより入力文字数制限を行っている。
-    NSMutableString *text = [[textField.text mutableCopy] autorelease];
+    NSMutableString *text = [textField.text mutableCopy];// autorelease];
     [text replaceCharactersInRange:range withString:string];
 	// 置き換えた後の長さをチェックする
 	if ([text length] <= 100) {

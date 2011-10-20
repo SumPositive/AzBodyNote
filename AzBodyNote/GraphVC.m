@@ -11,6 +11,11 @@
 
 
 @implementation GraphVC
+{
+	IBOutlet UIScrollView		*ibScrollView;
+	IBOutlet UIView				*ibGraphView;
+}
+
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {

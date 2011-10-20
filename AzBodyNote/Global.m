@@ -17,7 +17,7 @@ void alertBox( NSString *zTitle, NSString *zMsg, NSString *zButton )
 										  cancelButtonTitle:nil
 										  otherButtonTitles:zButton, nil];
 	[alert show];
-	[alert release];
+	//[alert release];
 }
 
 

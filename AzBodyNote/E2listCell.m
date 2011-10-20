@@ -10,6 +10,16 @@
 #import "E2listTVC.h"
 
 @implementation E2listCell
+{
+	__strong E2record		*Re2node;
+	
+	IBOutlet UILabel			*ibLbDate;
+	IBOutlet UILabel			*ibLbBpHi;
+	IBOutlet UILabel			*ibLbBpLo;
+	IBOutlet UILabel			*ibLbPuls;
+	IBOutlet UILabel			*ibLbWeight;
+	IBOutlet UILabel			*ibLbTemp;
+}
 @synthesize Re2node;
 //@synthesize ibLbBpHi, ibLbBpLo, ibLbDate, ibLbPuls, ibLbWeight, ibLbTemp;
 
@@ -60,11 +70,11 @@
 		// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
 		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 		[fm setCalendar:calendar];
-		[calendar release];
+		//[calendar release];
 		//[df setLocale:[NSLocale systemLocale]];これがあると曜日が表示されない。
 		[fm setDateFormat:@"dd  HH:mm"];
 		ibLbDate.text = [fm stringFromDate:Re2node.dateTime];
-		[fm release];
+		//[fm release];
 
 		ibLbBpHi.text = [self strValue:[Re2node.nBpHi_mmHg integerValue] dec:0]; 
 		ibLbBpLo.text = [self strValue:[Re2node.nBpLo_mmHg integerValue] dec:0];

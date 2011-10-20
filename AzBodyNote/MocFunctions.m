@@ -123,7 +123,7 @@ static NSManagedObjectContext *scMoc = nil;
 
 		NSError *error = nil;
 		NSArray *arFetch = [scMoc executeFetchRequest:req error:&error];
-		[req release], req = nil;
+		//[req release], req = nil;
 		if (error) {
 			NSLog(@"select: Error %@, %@", error, [error userInfo]);
 			return nil;
@@ -134,7 +134,7 @@ static NSManagedObjectContext *scMoc = nil;
 		NSLog(@"select @catch:NSException: %@ : %@", [errEx name], [errEx reason]);
 	}
 	@finally {
-		[req release], req = nil;
+		//[req release], req = nil;
 	}
 	return nil;
 }

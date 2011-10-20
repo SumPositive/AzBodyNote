@@ -11,8 +11,7 @@
 
 
 //---------------------------------------------------------------------------------------E1
-@interface E1body : NSManagedObject {
-}
+@interface E1body : NSManagedObject 
 @property (nonatomic, retain) NSDate			*dBirthday;		// NSDateは、UTC(+0000)協定時刻で記録 ⇒ 表示でタイムゾーン変換する
 @property (nonatomic, retain) NSNumber   *nMkBpHi_mmHg;
 @property (nonatomic, retain) NSNumber   *nMkBpLo_mmHg;
@@ -30,8 +29,7 @@
 //#define E1_e2records				@"e2records"
 
 //---------------------------------------------------------------------------------------E2
-@interface E2record : NSManagedObject {
-}
+@interface E2record : NSManagedObject 
 @property (nonatomic, retain) NSString		*bCaution;			// BOOL　YES=注意
 @property (nonatomic, retain) NSDate			*dateTime;			// NSDateは、UTC(+0000)協定時刻で記録 
 @property (nonatomic, retain) NSNumber   *nBpHi_mmHg;

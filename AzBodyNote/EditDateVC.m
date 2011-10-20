@@ -18,7 +18,13 @@
 @end
 
 @implementation EditDateVC
+{
+	__unsafe_unretained id						delegate;	
+	__strong E2record			*Re2node;
+	NSTimeInterval	MintervalPrev;
+}
 @synthesize delegate;
+@synthesize Re2record;
 @synthesize PiMinYearMMDD;
 @synthesize PiMaxYearMMDD;
 
@@ -61,9 +67,9 @@
 	// 前画面に[SAVE]があるから、この[DONE]を無くして戻るだけで更新するように試してみたが、
 	// 右側にある[DONE]ボタンを押して、また右側にある[SAVE]ボタンを押す流れが安全
 	// 左側の[BACK]で戻ると、次に現れる[CANCEL]を押してしまう危険が大きい。
-	self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc]
+	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
 												   initWithBarButtonSystemItem:UIBarButtonSystemItemDone  //[DONE]
-												   target:self action:@selector(done:)] autorelease];
+											  target:self action:@selector(done:)];// autorelease];
 	
 /*	// とりあえず生成、位置はviewDesignにて決定
 	if (Re3edit) {
@@ -168,11 +174,11 @@
 
 
 #pragma mark  View - Unload - dealloc
-
+/*
 - (void)dealloc    // 最後に1回だけ呼び出される（デストラクタ）
 {
 	[super dealloc];
 }
-
+*/
 
 @end

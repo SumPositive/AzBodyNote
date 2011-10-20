@@ -18,6 +18,9 @@
 @end
 
 @implementation E2listTVC
+{
+	NSIndexPath				*mIndexPathEdit;
+}
 @synthesize fetchedResultsController = __fetchedResultsController;
 @synthesize managedObjectContext = __managedObjectContext;
 //@synthesize ownerCell;
@@ -99,14 +102,14 @@
     // For example: self.myOutlet = nil;
 	//[mDateFormatter release], mDateFormatter = nil;
 }
-
+/*
 - (void)dealloc
 {
 	[__fetchedResultsController release];
 	[__managedObjectContext release];
     [super dealloc];
 }
-
+*/
 
 #pragma mark - <UITableViewDelegate>
 
@@ -310,10 +313,10 @@
     NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_nYearMM ascending:YES];		// セクション指定のため
     NSSortDescriptor *sort2 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:YES];	
     NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sort1, sort2, nil];
-    [sort2 release];
-    [sort1 release];
+    //[sort2 release];
+    //[sort1 release];
     [fetchRequest setSortDescriptors:sortDescriptors];
-    [sortDescriptors release];
+    //[sortDescriptors release];
     
     // Edit the section name key path and cache name if appropriate.
     // nil for section name key path means "no sections".
@@ -324,8 +327,8 @@
     aFetchedResultsController.delegate = self;
     self.fetchedResultsController = aFetchedResultsController;
     
-    [aFetchedResultsController release];
-    [fetchRequest release];
+    //[aFetchedResultsController release];
+    //[fetchRequest release];
 
 	// データ抽出する
 	NSError *error = nil;

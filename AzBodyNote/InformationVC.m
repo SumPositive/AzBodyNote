@@ -14,6 +14,14 @@
 #define ALERT_CONTACT			28
 
 @implementation InformationVC
+{
+	//IBOutlet UIButton		*ibBuOK;
+	//IBOutlet UIButton		*ibBuGoSupport;
+	//IBOutlet UIButton		*ibBuGoMail;
+	
+	IBOutlet UILabel				*ibLbVersion;
+}
+
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -71,7 +79,7 @@
 										  otherButtonTitles:@"Go safari＞", nil];
 	alert.tag = ALERT_ToSupportSite;
 	[alert show];
-	[alert autorelease];
+	//[alert autorelease];
 }
 
 - (IBAction)ibBuGoMail:(UIButton *)button
@@ -85,7 +93,7 @@
 											  cancelButtonTitle:nil
 											  otherButtonTitles:@"OK", nil];
 		[alert show];
-		[alert autorelease];
+		//[alert autorelease];
         return;
     }
 	
@@ -96,7 +104,7 @@
 										  otherButtonTitles:@"OK", nil];
 	alert.tag = ALERT_CONTACT;
 	[alert show];
-	[alert autorelease];
+	//[alert autorelease];
 }
 
 
@@ -143,7 +151,7 @@
 			[picker setMessageBody:zBody isHTML:NO];
 			
 			[self presentModalViewController:picker animated:YES];
-			[picker release];
+			//[picker release];
 		}	break;
 	}
 }
@@ -167,7 +175,7 @@
 												  cancelButtonTitle:nil
 												  otherButtonTitles:@"OK", nil];
 			[alert show];
-			[alert autorelease];
+			//[alert autorelease];
 		} break;
         case MFMailComposeResultFailed: {
             //[self setAlert:@"メール送信失敗！":@"メールの送信に失敗しました。ネットワークの設定などを確認して下さい"];
@@ -177,7 +185,7 @@
 												  cancelButtonTitle:nil
 												  otherButtonTitles:@"OK", nil];
 			[alert show];
-			[alert autorelease];
+			//[alert autorelease];
 		} break;
 
         default:

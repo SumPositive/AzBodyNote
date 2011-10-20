@@ -9,33 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface AZDial : UIView	<UIScrollViewDelegate>
-{
-@private
-	UIScrollView			*mScrollView;
-	UIImageView		*mImgBack;
-	id							mDelegate;
-	
-	NSInteger			mDial;
-	NSInteger			mDialMin;
-	NSInteger			mDialMax;
-	NSInteger			mDialStep;
-	
-	//CGFloat				mScrollMin; = 0 固定
-	CGFloat				mScrollMax;		// ScrollView左端から右端までの距離
-	CGFloat				mScrollOfs;		// ScrollView左端からの距離
-
-	UIImageView		*mIvLeft;
-	UIImageView		*mIvCenter;
-	UIImageView		*mIvRight;
-	
-	// Stepper button
-	BOOL					mIsOS5;			//=YES: iOS5以上
-	BOOL					mIsSetting;		//=YES: set中につき < dialChanged: dialDone: > を呼び出さない。ループ防止のため
-	UIStepper				*mStepper;		// iOS5以上
-	UIButton				*mStepBuUp;		// iOS5未満
-	UIButton				*mStepBuDown;	// iOS5未満
-	CGFloat				mStepperMag;	// ステッパーの刻みを mVstep * mStepperMag にする
-}
 
 - (id)initWithFrame:(CGRect)frame 
 				delegate:(id)delegate 
