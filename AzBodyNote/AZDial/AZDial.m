@@ -236,17 +236,19 @@
 	//	  mValue, mVmin, mVmax, mScrollMax, mScrollOfs);
 
 	CGFloat ff = (CGFloat)(mDialMax - mDialMin) / mDialStep * PITCH;
-	if (mScrollMax != ff) {
+	if (mScrollView.contentSize.width != ff + mScrollView.frame.size.width) 
+	{	// + mScrollView.frame.size.width は、Stepper有無でダイアル幅が変わることに対応するため。
 		mScrollMax = ff;
-		mScrollView.contentSize = CGSizeMake( mScrollMax + mScrollView.frame.size.width, ImgH );	//  +PITCH が無いと原点0に戻らなくなる。
-		//NSLog(@"                       -- CHANGE - mScrollMax=%.1lf  mVstep=%d  STEP=%d", mScrollMax, mVstep, (int)PITCH);
+		mScrollView.contentSize = CGSizeMake( ff + mScrollView.frame.size.width, ImgH );
+		//NSLog(@"                       -- CHANGE - mScrollMax=%.1lf  mDialStep=%d  STEP=%d   .width=%f", 
+		//	  mScrollMax, mDialStep, (int)PITCH,  mScrollView.frame.size.width);
 	}
 
 	ff = mScrollMax - (CGFloat)((mDial - mDialMin) / mDialStep * PITCH);	  // 右側が原点になるため
 	if (mScrollOfs != ff) {
 		mScrollOfs = ff;
-		mScrollView.contentOffset = CGPointMake( mScrollOfs, 0);
-		//NSLog(@"                       -- CHANGE - mScrollMax=%.1lf  mScrollOfs=%.1lf  STEP=%d", mScrollMax, mScrollOfs, (int)PITCH);
+		mScrollView.contentOffset = CGPointMake( ff, 0);
+		//NSLog(@"                                          - mScrollMax=%.1lf  mScrollOfs=%.1lf  STEP=%d", mScrollMax, mScrollOfs, (int)PITCH);
 	}
 	
 	if ( ( 0 < mIvLeft.frame.origin.x && mScrollOfs < mIvCenter.frame.origin.x - PITCH*3)
