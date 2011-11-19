@@ -31,6 +31,12 @@
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
+	// listen to our app delegates notification that we might want to refresh our detail view
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+											 selector:@selector(refreshAllViews:) 
+												 name:@"RefreshAllViews" 
+											   object:[[UIApplication sharedApplication] delegate]];
+
 	// Set up the edit and add buttons.
 	//self.navigationItem.leftBarButtonItem = self.editButtonItem;
 
@@ -96,12 +102,11 @@
 
 - (void)viewDidUnload
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [super viewDidUnload];
-	
-    // Relinquish ownership of anything that can be recreated in viewDidLoad or on demand.
-    // For example: self.myOutlet = nil;
 	//[mDateFormatter release], mDateFormatter = nil;
 }
+
 /*
 - (void)dealloc
 {
@@ -110,6 +115,17 @@
     [super dealloc];
 }
 */
+
+
+#pragma mark - iCloud
+- (void)refreshAllViews:(NSNotification*)note 
+{	// iCloud-CoreData に変更があれば呼び出される
+    if (note) {
+		//[self.tableView reloadData];
+		[self viewWillAppear:YES];
+    }
+}
+
 
 #pragma mark - <UITableViewDelegate>
 

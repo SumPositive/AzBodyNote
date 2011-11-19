@@ -169,6 +169,7 @@
 
 - (void)actionSave
 {
+	assert(Re2edit.dateTime);
 	// データ整合処理
 	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
 	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
@@ -211,6 +212,12 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+	// listen to our app delegates notification that we might want to refresh our detail view
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+											 selector:@selector(refreshAllViews:) 
+												 name:@"RefreshAllViews" 
+											   object:[[UIApplication sharedApplication] delegate]];
+
 	//appDelegate = (AzBodyNoteAppDelegate *)[[UIApplication sharedApplication] delegate];
 	//appDelegate.mIsUpdate = NO;
 	
@@ -270,18 +277,6 @@
  */
 }
 
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
-/*	if (mADBanner) {
-		[mADBanner cancelBannerViewAction];
-		mADBanner.delegate = nil;
-		mADBanner = nil;
-	}*/
-}
-
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
@@ -319,15 +314,23 @@
 	}
 }
 
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    // Return YES for supported orientations
+	return (interfaceOrientation == UIInterfaceOrientationPortrait); // タテ正面のみ
+}
+
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    // Return YES for supported orientations
-	return (interfaceOrientation == UIInterfaceOrientationPortrait); // タテ正面のみ
+- (void)viewDidUnload 
+{	// メモリ不足時、裏側にある場合に呼び出されるので、viewDidLoadで生成したObjを解放する。
+	//NSLog(@"--- viewDidUnload ---"); 
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+	[super viewDidUnload];
+	// この後に loadView ⇒ viewDidLoad ⇒ viewWillAppear がコールされる
 }
 
 /*
@@ -336,6 +339,16 @@
 	[Re2edit release], Re2edit = nil;
 	[super dealloc];
 }*/
+
+
+#pragma mark - iCloud
+- (void)refreshAllViews:(NSNotification*)note 
+{	// iCloud-CoreData に変更があれば呼び出される
+    if (note) {
+		//[self.tableView reloadData];
+		[self viewWillAppear:YES];
+    }
+}
 
 
 #pragma mark - Table view data source

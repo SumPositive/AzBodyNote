@@ -13,7 +13,7 @@
 #define ImgH					30
 
 #define BLOCK				800.0		//=(ImgW * 10 * 2)	// 10=タイリング数  2=2の倍数にするため
-#define PITCH					30.0			// スクロール感度　　増減するための最低変位量　＜＜ImgWの約数にするとステッパを使ったとき、ダイアルが動かないように見える。
+#define PITCH					15.0			// スクロール感度　　増減するための最低変位量　＜＜ImgWの約数にするとステッパを使ったとき、ダイアルが動かないように見える。
 														//【注意】 34.0だと[+]右回転に見えるが、36.0にすると左回転に見えてしまう。
 
 @interface AZDial (PrivateMethods)
@@ -219,6 +219,7 @@
     return self;
 }
 
+
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.
 - (void)drawRect:(CGRect)rect
@@ -235,6 +236,8 @@
 	//NSLog(@"-- scrollReset -- mValue=%d  mVmin=%d  mVmax=%d  :: mScrollMax=%.1f  mScrollOfs=%.1f",
 	//	  mValue, mVmin, mVmax, mScrollMax, mScrollOfs);
 
+	//NSLog(@"mDialStep=%d", mDialStep);
+	assert(0<mDialStep);
 	CGFloat ff = (CGFloat)(mDialMax - mDialMin) / mDialStep * PITCH;
 	if (mScrollView.contentSize.width != ff + mScrollView.frame.size.width) 
 	{	// + mScrollView.frame.size.width は、Stepper有無でダイアル幅が変わることに対応するため。
@@ -288,6 +291,12 @@
 - (NSInteger)getDial
 {
 	return mDial;
+}
+
+- (void)setDialFrame:(CGRect)frame	// NEW 回転のため
+{
+	[super setFrame:frame];
+	[self makeView:(mStepper!=nil || mStepBuUp!=nil)];
 }
 
 - (void)setDial:(NSInteger)dial  animated:(BOOL)animated
