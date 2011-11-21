@@ -39,7 +39,7 @@ static NSManagedObjectContext *scMoc = nil;
 
 + (void)deleteEntity:(NSManagedObject *)entity
 {
-	//@synchronized(scMoc)
+	@synchronized(scMoc)
 	{
 		if (entity) {
 			[scMoc deleteObject:entity];	// 即commitされる。つまり、rollbackやcommitの対象外である。 ＜＜そんなことは無い！ roolback可能 save必要
@@ -55,7 +55,7 @@ static NSManagedObjectContext *scMoc = nil;
 + (BOOL)commit
 {
 	assert(scMoc);
-	//@synchronized(scMoc)
+	@synchronized(scMoc)
 	{
 		// SAVE
 		NSError *err = nil;
@@ -75,7 +75,7 @@ static NSManagedObjectContext *scMoc = nil;
 + (void)rollBack
 {
 	assert(scMoc);
-	//@synchronized(scMoc)
+	@synchronized(scMoc)
 	{
 		// ROLLBACK
 		[scMoc rollback]; // 前回のSAVE以降を取り消す

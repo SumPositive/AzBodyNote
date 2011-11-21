@@ -9,16 +9,17 @@
 #import "Global.h"
 #import "AzBodyNoteAppDelegate.h"
 #import "MocFunctions.h"
+#import "E2editTVC.h"
 #import "E2listTVC.h"
 
 @implementation AzBodyNoteAppDelegate
 {
 	
 }
-@synthesize window = _window;
-@synthesize managedObjectContext = __managedObjectContext;
-@synthesize managedObjectModel = __managedObjectModel;
-@synthesize persistentStoreCoordinator = __persistentStoreCoordinator;
+@synthesize window = window_;
+@synthesize managedObjectContext = moc_;
+@synthesize managedObjectModel = moModel_;
+@synthesize persistentStoreCoordinator = persistentStoreCoordinator_;
 //@synthesize navigationController = _navigationController;
 @synthesize tabBarController = _tabBarController;
 //@synthesize mIsUpdate;
@@ -43,16 +44,15 @@
     }
 }
 
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-	// Override point for customization after application launch.
-	// Add the navigation controller's view to the window and display.
+{	// Override point for customization after application launch.
+/*    UITabBarController *tbc = (UITabBarController *)self.window.rootViewController;
+	E2editTVC *e2edit = (E2editTVC *)[tbc.childViewControllers objectAtIndex:0];
+	e2edit.managedObjectContext = self.managedObjectContext;
 
-	[MocFunctions setMoc:self.managedObjectContext];
+	E2listTVC *e2list = (E2listTVC *)[tbc.childViewControllers objectAtIndex:1];
+	e2list.managedObjectContext = self.managedObjectContext;*/
 	
-	//self.window.rootViewController = self.tabBarController;
-	//[self.window makeKeyAndVisible];
     return YES;
 }
 
@@ -143,8 +143,8 @@
  */
 - (NSPersistentStoreCoordinator *)persistentStoreCoordinator
 {
-    if (__persistentStoreCoordinator != nil) {
-        return __persistentStoreCoordinator;
+    if (persistentStoreCoordinator_ != nil) {
+        return persistentStoreCoordinator_;
     }
     
 #ifdef ENABLE_iCloud
@@ -157,7 +157,7 @@
 	// this leverages a behavior in Core Data where you can create NSManagedObjectContext and fetch requests
 	// even if the PSC has no stores.  Fetch requests return empty arrays until the persistent store is added
 	// so it's possible to bring up the UI and then fill in the results later
-    __persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
+    persistentStoreCoordinator_ = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
 	
 	if (IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
 		// do this asynchronously since if this is the first time this particular device is syncing with preexisting
@@ -195,7 +195,7 @@
 			NSLog(@"options=%@", options);
 			
 			// prep the store path and bundle stuff here since NSBundle isn't totally thread safe
-			NSPersistentStoreCoordinator* psc = __persistentStoreCoordinator;
+			NSPersistentStoreCoordinator* psc = persistentStoreCoordinator_;
 			NSError *error = nil;
 			[psc lock];
 			if (![psc addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeUrl options:options error:&error]) 
@@ -221,7 +221,7 @@
 								 nil];
 		
 		NSError *error = nil;
-		if (![__persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType
+		if (![persistentStoreCoordinator_ addPersistentStoreWithType:NSSQLiteStoreType
 														configuration:nil  URL:storeUrl  options:options  error:&error])
 		{
 			NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
@@ -250,7 +250,7 @@
 	}
 #endif
 	
-    return __persistentStoreCoordinator;
+    return persistentStoreCoordinator_;
 }
 
 /**
@@ -259,9 +259,8 @@
  */
 - (NSManagedObjectContext *)managedObjectContext
 {
-    if (__managedObjectContext != nil)
-    {
-        return __managedObjectContext;
+    if (moc_ != nil) {
+        return moc_;
     }
     
     NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
@@ -282,18 +281,18 @@
 			[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy]; // メモリを優先(Def.)
 			//[moc setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy]; // ストアを優先
 			//[moc setMergePolicy:NSOverwriteMergePolicy]; // 上書き
-			__managedObjectContext = moc;
+			moc_ = moc;
         }
 		else {	// iOS5より前
-            __managedObjectContext = [[NSManagedObjectContext alloc] init];
-            [__managedObjectContext setPersistentStoreCoordinator:coordinator];
+            moc_ = [[NSManagedObjectContext alloc] init];
+            [moc_ setPersistentStoreCoordinator:coordinator];
         }		
     }
 #else
 	__managedObjectContext = [[NSManagedObjectContext alloc] init];
 	[__managedObjectContext setPersistentStoreCoordinator:coordinator];
 #endif
-    return __managedObjectContext;
+    return moc_;
 }
 
 /**
@@ -302,18 +301,18 @@
  */
 - (NSManagedObjectModel *)managedObjectModel
 {
-    if (__managedObjectModel != nil) {
-        return __managedObjectModel;
+    if (moModel_ != nil) {
+        return moModel_;
     }
 
 #ifdef ENABLE_iCloud
-	__managedObjectModel = [NSManagedObjectModel mergedModelFromBundles:nil];
+	moModel_ = [NSManagedObjectModel mergedModelFromBundles:nil];
 #else
 	NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"AzBodyNote" withExtension:@"momd"];
 	 __managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];    
 #endif
 
-	return __managedObjectModel;
+	return moModel_;
 }
 
 

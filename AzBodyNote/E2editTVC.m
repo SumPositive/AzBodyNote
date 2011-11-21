@@ -7,47 +7,35 @@
 //
 
 #import "Global.h"
+#import "AzBodyNoteAppDelegate.h"
 #import "MocEntity.h"
-#import "MocFunctions.h"
+//#import "MocFunctions.h"
 #import "E2editTVC.h"
 #import "E2editCellDial.h"
 #import "E2editCellNote.h"
 
 @implementation E2editTVC
 {
-	E2record		*Re2edit;		// =nil:AddNew
+	AzBodyNoteAppDelegate		*appDelegate_;
+	NSManagedObjectContext		*moc_;
+	//E2record		*Re2edit_;		// =nil:AddNew
 	
-	BOOL			mIsAddNew;
+	BOOL			bAddNew_;
 	//ADBannerView	*mADBanner;
-	float						mADBannerY;	//iAd表示位置のY座標
+	float				fADBannerY_;	//iAd表示位置のY座標
 	
-	NSInteger	mPrevBpHi;
-	NSInteger	mPrevBpLo;
-	NSInteger	mPrevPuls;
-	NSInteger	mPrevWeight;
-	NSInteger	mPrevTemp;
-	UIButton		*mBuDelete;		// Edit時のみ使用
+	NSInteger	iPrevBpHi_;
+	NSInteger	iPrevBpLo_;
+	NSInteger	iPrevPuls_;
+	NSInteger	iPrevWeight_;
+	NSInteger	iPrevTemp_;
+	UIButton		*buDelete_;		// Edit時のみ使用
 }
-@synthesize Re2edit;
-//@synthesize ownerCellDial, ownerCellNote;
+@synthesize moE2edit = moE2edit_;
+//@synthesize fetchedResultsController = frc_;
+//@synthesize managedObjectContext = moc_;
 
 
-- (id)initWithStyle:(UITableViewStyle)style
-{
-    self = [super initWithStyle:UITableViewStyleGrouped];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
-
-- (void)didReceiveMemoryWarning
-{
-    // Releases the view if it doesn't have a superview.
-    [super didReceiveMemoryWarning];
-    
-    // Release any cached data, images, etc that aren't in use.
-}
 
 #pragma mark - delegate
 
@@ -81,9 +69,64 @@
 }
 */
 
+
+- (NSArray *)select:(NSString *)zEntity
+			  limit:(NSInteger)iLimit
+			 offset:(NSInteger)iOffset
+			  where:(NSPredicate *)predicate
+			   sort:(NSArray *)arSort 
+{
+	assert(moc_);
+	NSFetchRequest *req = nil;
+	@try {
+		req = [[NSFetchRequest alloc] init];
+		
+		// select
+		NSEntityDescription *entity = [NSEntityDescription entityForName:zEntity 
+												  inManagedObjectContext:moc_];
+		[req setEntity:entity];
+		
+		// limit	抽出件数制限
+		if (0 < iLimit) {
+			[req setFetchLimit:iLimit];
+		}
+		
+		// offset
+		if (iOffset != 0) {
+			[req setFetchOffset:iOffset];
+		}
+		
+		// where
+		if (predicate) {
+			[req setPredicate:predicate];
+		}
+		
+		// order by
+		if (arSort) {
+			[req setSortDescriptors:arSort];
+		}
+		
+		NSError *error = nil;
+		NSArray *arFetch = [moc_ executeFetchRequest:req error:&error];
+		//[req release], req = nil;
+		if (error) {
+			NSLog(@"select: Error %@, %@", error, [error userInfo]);
+			return nil;
+		}
+		return arFetch; // autorelease
+	}
+	@catch (NSException *errEx) {
+		NSLog(@"select @catch:NSException: %@ : %@", [errEx name], [errEx reason]);
+	}
+	@finally {
+		//[req release], req = nil;
+	}
+	return nil;
+}
+
 - (void)setE2recordPrev
 {
-	assert(Re2edit);
+	assert(moE2edit_);
 	E2record	*e2prev;	// 直前のレコード
 	// Sort条件
 	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
@@ -91,77 +134,77 @@
 	//[sort1 release];
 	
 	// 直前のレコードを取得
-	NSDate *dateNow = Re2edit.dateTime;	 // 現在編集中の日付
+	NSDate *dateNow = moE2edit_.dateTime;	 // 現在編集中の日付
 	if (dateNow==nil) dateNow = [NSDate date];
 	
 	// E2_nBpHi_mmHg
-	NSArray *arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
+	NSArray *arFetch = [self select:@"E2record" limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: E2_nBpHi_mmHg @" > 0 AND " E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 	if ([arFetch count]==1) {
 		e2prev = [arFetch objectAtIndex:0];
 		NSLog(@"Re2prev.nBpHi_mmHg=%d", [e2prev.nBpHi_mmHg integerValue]);
-		mPrevBpHi = [e2prev.nBpHi_mmHg integerValue];
+		iPrevBpHi_ = [e2prev.nBpHi_mmHg integerValue];
 	} else {
-		mPrevBpHi = 130;
+		iPrevBpHi_ = 130;
 	}
 	// E2_nBpLo_mmHg
-	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
+	arFetch = [self select:@"E2record" limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: E2_nBpLo_mmHg @" > 0 AND " E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 	if ([arFetch count]==1) {
 		e2prev = [arFetch objectAtIndex:0];
-		mPrevBpLo = [e2prev.nBpLo_mmHg integerValue];
+		iPrevBpLo_ = [e2prev.nBpLo_mmHg integerValue];
 	} else {
-		mPrevBpLo = 80;
+		iPrevBpLo_ = 80;
 	}
 	// E2_nPulse_bpm
-	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
+	arFetch = [self select:@"E2record" limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: E2_nPulse_bpm @" > 0 AND " E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 	if ([arFetch count]==1) {
 		e2prev = [arFetch objectAtIndex:0];
-		mPrevPuls = [e2prev.nPulse_bpm integerValue];
+		iPrevPuls_ = [e2prev.nPulse_bpm integerValue];
 	} else {
-		mPrevPuls = 70;
+		iPrevPuls_ = 70;
 	}
 	// E2_nWeight_g
-	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
+	arFetch = [self select:@"E2record" limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: E2_nWeight_g @" > 0 AND " E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 	if ([arFetch count]==1) {
 		e2prev = [arFetch objectAtIndex:0];
-		mPrevWeight = [e2prev.nWeight_g integerValue];
+		iPrevWeight_ = [e2prev.nWeight_g integerValue];
 	} else {
-		mPrevWeight = 700;
+		iPrevWeight_ = 700;
 	}
 	// E2_nTemp_10c
-	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
+	arFetch = [self select:@"E2record" limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: E2_nTemp_10c @" > 0 AND " E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 	if ([arFetch count]==1) {
 		e2prev = [arFetch objectAtIndex:0];
-		mPrevTemp= [e2prev.nTemp_10c integerValue];
+		iPrevTemp_= [e2prev.nTemp_10c integerValue];
 	} else {
-		mPrevTemp = 370;
+		iPrevTemp_ = 370;
 	}
 }
 
 - (void)actionClear
 {
-	assert(mIsAddNew);
-	assert(Re2edit);
+	assert(bAddNew_);
+	assert(moE2edit_);
 	//appDelegate.mIsUpdate = NO;
 	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
-	
-	Re2edit.dateTime = [NSDate date];
-	Re2edit.sNote1 = nil;
-	Re2edit.sNote2 = nil;
-	Re2edit.nBpHi_mmHg = nil;
-	Re2edit.nBpLo_mmHg = nil;
-	Re2edit.nPulse_bpm = nil;
-	Re2edit.nWeight_g = nil;
-	Re2edit.nTemp_10c = nil;
+
+	moE2edit_.dateTime = [NSDate date];
+	moE2edit_.sNote1 = nil;
+	moE2edit_.sNote2 = nil;
+	moE2edit_.nBpHi_mmHg = nil;
+	moE2edit_.nBpLo_mmHg = nil;
+	moE2edit_.nPulse_bpm = nil;
+	moE2edit_.nWeight_g = nil;
+	moE2edit_.nTemp_10c = nil;
 	
 	[self setE2recordPrev];
 	[self.tableView reloadData];
@@ -169,27 +212,27 @@
 
 - (void)actionSave
 {
-	assert(Re2edit.dateTime);
+	assert(moE2edit_.dateTime);
 	// データ整合処理
 	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
 	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 	NSDateComponents* comp = [calendar components:NSYearCalendarUnit | NSMonthCalendarUnit
-										 fromDate:Re2edit.dateTime];
-	Re2edit.nYearMM = [NSNumber numberWithInteger:([comp year] * 100 + [comp month])];
+										 fromDate:moE2edit_.dateTime];
+	moE2edit_.nYearMM = [NSNumber numberWithInteger:([comp year] * 100 + [comp month])];
 	
 	// Save & Commit
-	[MocFunctions commit];
-
-	//appDelegate.mIsUpdate = NO;
+	//[MocFunctions commit];
+	// SAVE
+	NSError *err = nil;
+	if (![moc_  save:&err]) {
+		NSLog(@"*** MOC commit error ***\n%@\n%@\n***\n", err, [err userInfo]);
+		exit(-1);  // Fail
+	}
+	moE2edit_ = nil;	//autorelease
+	
 	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
 
-	if (mIsAddNew) {
-		// AddNew mode
-		//alertBox(NSLocalizedString(@"AddNew Save",nil) , nil, NSLocalizedString(@"Roger",nil));
-		//[Re2edit release], 
-		Re2edit = [MocFunctions insertAutoEntity:@"E2record"];
-		[self actionClear];
-		[self.tableView reloadData];
+	if (bAddNew_) {
 		// List画面に切り替えて、追加行を一時ハイライトする
 		self.navigationController.tabBarController.selectedIndex = 1; // List画面へ
 	} else {
@@ -200,34 +243,49 @@
 
 - (void)actionCancel
 {
-	assert(mIsAddNew==NO);
+	assert(bAddNew_==NO);
 	// Edit mode ONLY
-	[MocFunctions rollBack];
+	//[MocFunctions rollBack];
+	NSLog(@"--1-- Re2edit_=%@", moE2edit_);
+	[moc_ rollback];
+	NSLog(@"--2-- rollback");
+	NSLog(@"--3-- Re2edit_=%@", moE2edit_);
 	[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
 }
 
 
 #pragma mark - View lifecycle
 
+- (id)initWithStyle:(UITableViewStyle)style
+{
+    self = [super initWithStyle:UITableViewStyleGrouped];
+    if (self) {
+        // Custom initialization
+		appDelegate_ = [[UIApplication sharedApplication] delegate];
+		moc_ = [appDelegate_ managedObjectContext];
+    }
+    return self;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+	appDelegate_ = [[UIApplication sharedApplication] delegate];
+	moc_ = [appDelegate_ managedObjectContext];
+	NSLog(@"E2editTVC: moc_=%@", moc_);
+	assert(moc_);
+	
 	// listen to our app delegates notification that we might want to refresh our detail view
     [[NSNotificationCenter defaultCenter] addObserver:self 
 											 selector:@selector(refreshAllViews:) 
 												 name:@"RefreshAllViews" 
 											   object:[[UIApplication sharedApplication] delegate]];
 
-	//appDelegate = (AzBodyNoteAppDelegate *)[[UIApplication sharedApplication] delegate];
-	//appDelegate.mIsUpdate = NO;
-	
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
-	
-	if (Re2edit) {
+	if (moE2edit_) {
 		// Modify mode.
 		self.title = NSLocalizedString(@"Modify",nil);
-		mIsAddNew = NO;
+		bAddNew_ = NO;
 		/* [<Back]ボタンの方が解りやすい。 修正あるのにBackしたときはアラート表示してからRollback処理する。
 		// [Cancel]ボタンを左側に追加する  Navi標準の戻るボタンでは actionCancel 処理ができないため
 		self.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc]
@@ -240,8 +298,14 @@
 	else {
 		// AddNew mode.
 		self.title = NSLocalizedString(@"AddNew",nil);
-		mIsAddNew = YES;
-		Re2edit = [MocFunctions insertAutoEntity:@"E2record"]; // autorelese
+		bAddNew_ = YES;
+		// moE2edit_ は、viewWillAppear:にて生成する。
+/*		//NG//Re2edit_ = [MocFunctions insertAutoEntity:@"E2record"]; // autorelese
+		//NG//e2edit_ = [NSEntityDescription insertNewObjectForEntityForName:@"E2record" inManagedObjectContext:moc_];
+		// alloc生成する
+		NSEntityDescription *entity = [NSEntityDescription entityForName:@"E2record" inManagedObjectContext:moc_]; //autorelease
+		moE2edit_ = (E2record*)[[NSManagedObject alloc] initWithEntity:entity  insertIntoManagedObjectContext:moc_]; //alloc
+ */
 		// [Clear]ボタンを左側に追加する
 		self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
 												  initWithTitle:NSLocalizedString(@"Clear",nil) style:UIBarButtonItemStyleBordered 
@@ -250,7 +314,6 @@
 		UIImage *imgTile = [UIImage imageNamed:@"Tx-LzBeige320"];
 		self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 	}
-	[self setE2recordPrev];
 	
 	// SAVEボタンを右側に追加する
 	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
@@ -281,34 +344,56 @@
 {
     [super viewWillAppear:animated];
 	
-	// [Delete]ボタンを 余白セルに置く
-	if (!mIsAddNew && !mBuDelete) {
-		mBuDelete = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-		[mBuDelete setTitle:NSLocalizedString(@"Delete",nil) forState:UIControlStateNormal];
-		[mBuDelete setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
-		
-		NSIndexPath* indexPath = [NSIndexPath indexPathForRow:7 inSection:0];
-		CGRect rc = [self.tableView rectForRowAtIndexPath:indexPath];
-		rc.size.width /= 2;
-		rc.origin.x = rc.size.width / 2;
-		rc.origin.y += ((rc.size.height - 30) / 2);
-		rc.size.height = 30;
-		mBuDelete.frame = rc;
-		[self.tableView addSubview:mBuDelete];
+	if (bAddNew_) {
+		if (moE2edit_==nil) {
+			moE2edit_ = [NSEntityDescription insertNewObjectForEntityForName:@"E2record" inManagedObjectContext:moc_];//autorelease
+		}
+		[self actionClear];
+		self.view.alpha = 0; //AddNewのときだけディゾルブ
+	}
+	else {
+		[self setE2recordPrev];
+		if (!buDelete_) { // [Delete]ボタンを 余白セルに置く
+			buDelete_ = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+			[buDelete_ setTitle:NSLocalizedString(@"Delete",nil) forState:UIControlStateNormal];
+			[buDelete_ setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+			
+			NSIndexPath* indexPath = [NSIndexPath indexPathForRow:7 inSection:0];
+			CGRect rc = [self.tableView rectForRowAtIndexPath:indexPath];
+			rc.size.width /= 2;
+			rc.origin.x = rc.size.width / 2;
+			rc.origin.y += ((rc.size.height - 30) / 2);
+			rc.size.height = 30;
+			buDelete_.frame = rc;
+			[self.tableView addSubview:buDelete_];
+		}
 	}
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+	if (bAddNew_) { //AddNewのときだけディゾルブ
+		// アニメ準備
+		CGContextRef context = UIGraphicsGetCurrentContext();
+		[UIView beginAnimations:nil context:context];
+		[UIView setAnimationDuration:1.0];
+		[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
+		// アニメ終了状態
+		self.view.alpha = 1;
+		// アニメ実行
+		[UIView commitAnimations];
+	}
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {	// 非表示になる前に呼び出される
     [super viewWillDisappear:animated];
 	
-	if (mIsAddNew) {
-		[MocFunctions rollBack];  // 未保存取り消し
+	if (bAddNew_) {
+		//[MocFunctions rollBack];  // 未保存取り消し
+		[moc_ rollback];
+		moE2edit_ = nil; //autorelease
 	} else {
 		[self actionCancel];
 	}
@@ -325,6 +410,14 @@
     [super viewDidDisappear:animated];
 }
 
+- (void)didReceiveMemoryWarning
+{
+    // Releases the view if it doesn't have a superview.
+    [super didReceiveMemoryWarning];
+    
+    // Release any cached data, images, etc that aren't in use.
+}
+
 - (void)viewDidUnload 
 {	// メモリ不足時、裏側にある場合に呼び出されるので、viewDidLoadで生成したObjを解放する。
 	//NSLog(@"--- viewDidUnload ---"); 
@@ -336,7 +429,7 @@
 /*
 - (void)dealloc
 {
-	[Re2edit release], Re2edit = nil;
+	[Re2edit_ release], Re2edit_ = nil;
 	[super dealloc];
 }*/
 
@@ -409,12 +502,12 @@
 	//[calendar release];
 	//[df setLocale:[NSLocale systemLocale]];これがあると曜日が表示されない。
 	[fmt setDateFormat:@"yyyy-M-d EE HH:mm"];
-	if (mIsAddNew OR Re2edit.dateTime==nil) {
-		Re2edit.dateTime = [NSDate date];
+	if (bAddNew_ || moE2edit_.dateTime==nil) {
+		moE2edit_.dateTime = [NSDate date];
 	}
-	//cell.detailTextLabel.text = [fmt stringFromDate:Re2edit.datetime];
+	//cell.detailTextLabel.text = [fmt stringFromDate:Re2edit_.datetime];
 	cell.textLabel.text = [NSString stringWithFormat:@"%@   %@", NSLocalizedString(@"DateTime",nil), 
-						   [fmt stringFromDate:Re2edit.dateTime]];
+						   [fmt stringFromDate:moE2edit_.dateTime]];
 	//[fmt release];
 	return cell;
 }
@@ -470,7 +563,7 @@
 			
 		case 1: {
 			E2editCellNote *cell = [self cellNote:tableView];
-			cell.Re2record = Re2edit;
+			cell.Re2record = moE2edit_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
 		}	break;
@@ -480,13 +573,13 @@
 			cell.ibLbName.text = NSLocalizedString(@"BpHi Name",nil);
 			cell.ibLbDetail.text = NSLocalizedString(@"BpHi Detail",nil);
 			cell.ibLbUnit.text = @"mmHg";
-			cell.Re2record = Re2edit;
+			cell.Re2record = moE2edit_;
 			cell.RzKey = E2_nBpHi_mmHg;
 			cell.mValueMin = 30;
 			cell.mValueMax = 300;
 			cell.mValueDec = 0;
 			cell.mValueStep = 1;
-			cell.mValuePrev = mPrevBpHi;
+			cell.mValuePrev = iPrevBpHi_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
 		}	break;
@@ -496,13 +589,13 @@
 			cell.ibLbName.text = NSLocalizedString(@"BpLo Name",nil);
 			cell.ibLbDetail.text = NSLocalizedString(@"BpLo Detail",nil);
 			cell.ibLbUnit.text = @"mmHg";
-			cell.Re2record = Re2edit;
+			cell.Re2record = moE2edit_;
 			cell.RzKey = E2_nBpLo_mmHg;
 			cell.mValueMin = 20;
 			cell.mValueMax = 200;
 			cell.mValueDec = 0;
 			cell.mValueStep = 1;
-			cell.mValuePrev = mPrevBpLo;
+			cell.mValuePrev = iPrevBpLo_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
 		}	break;
@@ -512,13 +605,13 @@
 			cell.ibLbName.text = NSLocalizedString(@"Pulse Name",nil);
 			cell.ibLbDetail.text = NSLocalizedString(@"Pulse Detail",nil);
 			cell.ibLbUnit.text = NSLocalizedString(@"Pulse unit",nil);
-			cell.Re2record = Re2edit;
+			cell.Re2record = moE2edit_;
 			cell.RzKey = E2_nPulse_bpm;
 			cell.mValueMin = 10;
 			cell.mValueMax = 170;
 			cell.mValueDec = 0;
 			cell.mValueStep = 1;
-			cell.mValuePrev = mPrevPuls;
+			cell.mValuePrev = iPrevPuls_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
 		}	break;
@@ -528,13 +621,13 @@
 			cell.ibLbName.text = NSLocalizedString(@"Weight Name",nil);
 			cell.ibLbDetail.text = NSLocalizedString(@"Weight Detail",nil);
 			cell.ibLbUnit.text = @"Kg";
-			cell.Re2record = Re2edit;
+			cell.Re2record = moE2edit_;
 			cell.RzKey = E2_nWeight_g;
 			cell.mValueMin = 0;
 			cell.mValueMax = 140000;
 			cell.mValueDec = 1;
 			cell.mValueStep = 100;
-			cell.mValuePrev = mPrevWeight;
+			cell.mValuePrev = iPrevWeight_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
 		}	break;
@@ -544,13 +637,13 @@
 			cell.ibLbName.text = NSLocalizedString(@"Temp Name",nil);
 			cell.ibLbDetail.text = NSLocalizedString(@"Temp Detail",nil);
 			cell.ibLbUnit.text = @"℃";
-			cell.Re2record = Re2edit;
+			cell.Re2record = moE2edit_;
 			cell.RzKey = E2_nTemp_10c;
 			cell.mValueMin = 310;
 			cell.mValueMax = 429;
 			cell.mValueDec = 1;
 			cell.mValueStep = 1;
-			cell.mValuePrev = mPrevTemp;
+			cell.mValuePrev = iPrevTemp_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
 		}	break;

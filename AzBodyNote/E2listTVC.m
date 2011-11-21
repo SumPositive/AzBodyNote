@@ -7,8 +7,9 @@
 //
 
 #import "Global.h"
+#import "AzBodyNoteAppDelegate.h"
 #import "MocEntity.h"
-#import "MocFunctions.h"
+//#import "MocFunctions.h"
 #import "E2listTVC.h"
 #import "E2editTVC.h"
 
@@ -19,10 +20,12 @@
 
 @implementation E2listTVC
 {
-	NSIndexPath				*mIndexPathEdit;
+	AzBodyNoteAppDelegate		*appDelegate_;
+	NSManagedObjectContext		*moc_;
+	NSIndexPath				*indexPathEdit_;
 }
-@synthesize fetchedResultsController = __fetchedResultsController;
-@synthesize managedObjectContext = __managedObjectContext;
+@synthesize fetchedResultsController = fetchedResultsController_;
+//@synthesize managedObjectContext = moc_;
 //@synthesize ownerCell;
 
 
@@ -31,6 +34,12 @@
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
+
+	appDelegate_ = [[UIApplication sharedApplication] delegate];
+	moc_ = [appDelegate_ managedObjectContext];
+	NSLog(@"E2listTVC: moc_=%@", moc_);
+	assert(moc_);
+
 	// listen to our app delegates notification that we might want to refresh our detail view
     [[NSNotificationCenter defaultCenter] addObserver:self 
 											 selector:@selector(refreshAllViews:) 
@@ -55,7 +64,7 @@
 	[mDateFormatter setDateFormat:@"dd  HH:mm"];
 */
 	
-	self.managedObjectContext = [MocFunctions getMoc];
+	//self.managedObjectContext = [MocFunctions getMoc];
 
 	// TableView
 	//self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone; // セル区切り線なし
@@ -67,13 +76,26 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+	
+	fetchedResultsController_ = nil; //release
+	[self.tableView reloadData];
+	self.view.alpha = 0;
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+	// アニメ準備
+	CGContextRef context = UIGraphicsGetCurrentContext();
+	[UIView beginAnimations:nil context:context];
+	[UIView setAnimationDuration:1.5];
+	[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
+	// アニメ終了状態
+	self.view.alpha = 1;
+	// アニメ実行
+	[UIView commitAnimations];
 }
-
+/*
 - (void)viewWillDisappear:(BOOL)animated
 {
 	[super viewWillDisappear:animated];
@@ -83,6 +105,7 @@
 {
 	[super viewDidDisappear:animated];
 }
+*/
 
 /*
  // Override to allow orientations other than the default portrait orientation.
@@ -187,12 +210,12 @@
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
         // Delete the managed object for the given index path
-        NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
-        [context deleteObject:[self.fetchedResultsController objectAtIndexPath:indexPath]];
+        //NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
+        [moc_ deleteObject:[self.fetchedResultsController objectAtIndexPath:indexPath]];
         
         // Save the context.
         NSError *error = nil;
-        if (![context save:&error])
+        if (![moc_ save:&error])
         {
             /*
              Replace this implementation with code to handle the error appropriately.
@@ -237,7 +260,7 @@
 		//ViewController *upcomingViewController = [segue destinationViewController];
 
 		E2editTVC *editVc = [segue destinationViewController];
-		editVc.Re2edit = cell.Re2node;  //[self.fetchedResultsController objectAtIndexPath:mIndexPathEdit];
+		editVc.moE2edit = cell.Re2node;  //[self.fetchedResultsController objectAtIndexPath:mIndexPathEdit];
 
 		// You now have a solid reference to the upcoming / destination view
 		// controller. Example use: Allocate and initialize some property of
@@ -269,13 +292,13 @@
 	cell.ibLbTemp.text = [self strValue:[e2.nTemp_10c integerValue] dec:1];
 	 */
 }
-
+/*
 - (void)insertNewObject
 {
     // Create a new instance of the entity managed by the fetched results controller.
-    NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
+    //NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
     NSEntityDescription *entity = [[self.fetchedResultsController fetchRequest] entity];
-    NSManagedObject *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
+    NSManagedObject *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:moc_];
     
     // If appropriate, configure the new managed object.
     // Normally you should use accessor methods, but using KVC here avoids the need to add a custom class to the template.
@@ -283,26 +306,21 @@
     
     // Save the context.
     NSError *error = nil;
-    if (![context save:&error])
+    if (![moc_ save:&error])
     {
-        /*
-         Replace this implementation with code to handle the error appropriately.
-         
-         abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. If it is not possible to recover from the error, display an alert panel that instructs the user to quit the application by pressing the Home button.
-         */
         NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
         abort();
     }
-}
+}*/
 
 
 #pragma mark - Fetched results controller
 
 - (NSFetchedResultsController *)fetchedResultsController
 {	// データ抽出コントローラを生成する
-    if (__fetchedResultsController != nil)
+    if (fetchedResultsController_ != nil)
     {
-        return __fetchedResultsController;
+        return fetchedResultsController_;
     }
     
     /*
@@ -313,7 +331,7 @@
 
 	// エンティティ指定
     // Edit the entity name as appropriate.
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"E2record" inManagedObjectContext:self.managedObjectContext];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"E2record" inManagedObjectContext:moc_];
     [fetchRequest setEntity:entity];
     
     // Set the batch size to a suitable number.
@@ -328,7 +346,7 @@
     // Edit the sort key as appropriate.
     NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_nYearMM ascending:YES];		// セクション指定のため
     NSSortDescriptor *sort2 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:YES];	
-    NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sort1, sort2, nil];
+    NSArray *sortDescriptors = [[NSArray alloc] initWithObjects: sort1, sort2, nil];
     //[sort2 release];
     //[sort1 release];
     [fetchRequest setSortDescriptors:sortDescriptors];
@@ -337,7 +355,7 @@
     // Edit the section name key path and cache name if appropriate.
     // nil for section name key path means "no sections".
     NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
-																								managedObjectContext:self.managedObjectContext 
+																								managedObjectContext:moc_ 
 																								  sectionNameKeyPath:E2_nYearMM	// セクション指定のため
 																										   cacheName:@"Root"];
     aFetchedResultsController.delegate = self;
@@ -359,7 +377,7 @@
 	    abort();
 	}
     
-    return __fetchedResultsController;
+    return fetchedResultsController_;
 }    
 
 #pragma mark - <Fetched results controller delegate>
