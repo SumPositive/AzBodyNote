@@ -12,7 +12,7 @@
 
 @interface E2listCell : UITableViewCell
 
-@property (nonatomic, strong) E2record		*Re2node;
+@property (nonatomic, retain) E2record		*moE2node;
 
 /*
 @property (nonatomic, retain) IBOutlet UILabel			*ibLbDate;

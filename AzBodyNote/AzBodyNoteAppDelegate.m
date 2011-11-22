@@ -53,6 +53,8 @@
 	E2listTVC *e2list = (E2listTVC *)[tbc.childViewControllers objectAtIndex:1];
 	e2list.managedObjectContext = self.managedObjectContext;*/
 	
+	// Moc初期化
+	[MocFunctions setMoc:self.managedObjectContext];
     return YES;
 }
 

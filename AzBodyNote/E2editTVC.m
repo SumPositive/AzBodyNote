@@ -9,7 +9,7 @@
 #import "Global.h"
 #import "AzBodyNoteAppDelegate.h"
 #import "MocEntity.h"
-//#import "MocFunctions.h"
+#import "MocFunctions.h"
 #import "E2editTVC.h"
 #import "E2editCellDial.h"
 #import "E2editCellNote.h"
@@ -18,10 +18,8 @@
 {
 	AzBodyNoteAppDelegate		*appDelegate_;
 	NSManagedObjectContext		*moc_;
-	//E2record		*Re2edit_;		// =nil:AddNew
 	
 	BOOL			bAddNew_;
-	//ADBannerView	*mADBanner;
 	float				fADBannerY_;	//iAd表示位置のY座標
 	
 	NSInteger	iPrevBpHi_;
@@ -32,8 +30,6 @@
 	UIButton		*buDelete_;		// Edit時のみ使用
 }
 @synthesize moE2edit = moE2edit_;
-//@synthesize fetchedResultsController = frc_;
-//@synthesize managedObjectContext = moc_;
 
 
 
@@ -70,60 +66,6 @@
 */
 
 
-- (NSArray *)select:(NSString *)zEntity
-			  limit:(NSInteger)iLimit
-			 offset:(NSInteger)iOffset
-			  where:(NSPredicate *)predicate
-			   sort:(NSArray *)arSort 
-{
-	assert(moc_);
-	NSFetchRequest *req = nil;
-	@try {
-		req = [[NSFetchRequest alloc] init];
-		
-		// select
-		NSEntityDescription *entity = [NSEntityDescription entityForName:zEntity 
-												  inManagedObjectContext:moc_];
-		[req setEntity:entity];
-		
-		// limit	抽出件数制限
-		if (0 < iLimit) {
-			[req setFetchLimit:iLimit];
-		}
-		
-		// offset
-		if (iOffset != 0) {
-			[req setFetchOffset:iOffset];
-		}
-		
-		// where
-		if (predicate) {
-			[req setPredicate:predicate];
-		}
-		
-		// order by
-		if (arSort) {
-			[req setSortDescriptors:arSort];
-		}
-		
-		NSError *error = nil;
-		NSArray *arFetch = [moc_ executeFetchRequest:req error:&error];
-		//[req release], req = nil;
-		if (error) {
-			NSLog(@"select: Error %@, %@", error, [error userInfo]);
-			return nil;
-		}
-		return arFetch; // autorelease
-	}
-	@catch (NSException *errEx) {
-		NSLog(@"select @catch:NSException: %@ : %@", [errEx name], [errEx reason]);
-	}
-	@finally {
-		//[req release], req = nil;
-	}
-	return nil;
-}
-
 - (void)setE2recordPrev
 {
 	assert(moE2edit_);
@@ -138,7 +80,7 @@
 	if (dateNow==nil) dateNow = [NSDate date];
 	
 	// E2_nBpHi_mmHg
-	NSArray *arFetch = [self select:@"E2record" limit:1 offset:0
+	NSArray *arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: E2_nBpHi_mmHg @" > 0 AND " E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 	if ([arFetch count]==1) {
@@ -149,7 +91,7 @@
 		iPrevBpHi_ = 130;
 	}
 	// E2_nBpLo_mmHg
-	arFetch = [self select:@"E2record" limit:1 offset:0
+	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: E2_nBpLo_mmHg @" > 0 AND " E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 	if ([arFetch count]==1) {
@@ -159,7 +101,7 @@
 		iPrevBpLo_ = 80;
 	}
 	// E2_nPulse_bpm
-	arFetch = [self select:@"E2record" limit:1 offset:0
+	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: E2_nPulse_bpm @" > 0 AND " E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 	if ([arFetch count]==1) {
@@ -169,7 +111,7 @@
 		iPrevPuls_ = 70;
 	}
 	// E2_nWeight_g
-	arFetch = [self select:@"E2record" limit:1 offset:0
+	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: E2_nWeight_g @" > 0 AND " E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 	if ([arFetch count]==1) {
@@ -179,7 +121,7 @@
 		iPrevWeight_ = 700;
 	}
 	// E2_nTemp_10c
-	arFetch = [self select:@"E2record" limit:1 offset:0
+	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: E2_nTemp_10c @" > 0 AND " E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 	if ([arFetch count]==1) {
@@ -221,13 +163,7 @@
 	moE2edit_.nYearMM = [NSNumber numberWithInteger:([comp year] * 100 + [comp month])];
 	
 	// Save & Commit
-	//[MocFunctions commit];
-	// SAVE
-	NSError *err = nil;
-	if (![moc_  save:&err]) {
-		NSLog(@"*** MOC commit error ***\n%@\n%@\n***\n", err, [err userInfo]);
-		exit(-1);  // Fail
-	}
+	[MocFunctions commit];
 	moE2edit_ = nil;	//autorelease
 	
 	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
@@ -245,11 +181,8 @@
 {
 	assert(bAddNew_==NO);
 	// Edit mode ONLY
-	//[MocFunctions rollBack];
-	NSLog(@"--1-- Re2edit_=%@", moE2edit_);
-	[moc_ rollback];
-	NSLog(@"--2-- rollback");
-	NSLog(@"--3-- Re2edit_=%@", moE2edit_);
+	[MocFunctions rollBack];
+	
 	[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
 }
 
@@ -373,7 +306,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-	if (bAddNew_) { //AddNewのときだけディゾルブ
+	if (self.view.alpha != 1) { //AddNewのときだけディゾルブ
 		// アニメ準備
 		CGContextRef context = UIGraphicsGetCurrentContext();
 		[UIView beginAnimations:nil context:context];
@@ -691,20 +624,13 @@
 }
 */
 
-#pragma mark - Table view delegate
+#pragma mark - <UITableViewDelegate>
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];	// 選択状態を解除する
 	
     // Navigation logic may go here. Create and push another view controller.
-    /*
-     <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:@"<#Nib name#>" bundle:nil];
-     // ...
-     // Pass the selected object to the new view controller.
-     [self.navigationController pushViewController:detailViewController animated:YES];
-     [detailViewController release];
-     */
 }
 
 

@@ -9,7 +9,7 @@
 #import "Global.h"
 #import "AzBodyNoteAppDelegate.h"
 #import "MocEntity.h"
-//#import "MocFunctions.h"
+#import "MocFunctions.h"
 #import "E2listTVC.h"
 #import "E2editTVC.h"
 
@@ -22,11 +22,10 @@
 {
 	AzBodyNoteAppDelegate		*appDelegate_;
 	NSManagedObjectContext		*moc_;
-	NSIndexPath				*indexPathEdit_;
+	NSIndexPath							*indexPathEdit_;
+	BOOL										bEditReturn_;
 }
-@synthesize fetchedResultsController = fetchedResultsController_;
-//@synthesize managedObjectContext = moc_;
-//@synthesize ownerCell;
+@synthesize fetchedResultsController = frc_;
 
 
 #pragma mark - View lifecycle
@@ -39,7 +38,10 @@
 	moc_ = [appDelegate_ managedObjectContext];
 	NSLog(@"E2listTVC: moc_=%@", moc_);
 	assert(moc_);
+	bEditReturn_ = NO;
 
+	//self.tableView.delegate = self;
+	
 	// listen to our app delegates notification that we might want to refresh our detail view
     [[NSNotificationCenter defaultCenter] addObserver:self 
 											 selector:@selector(refreshAllViews:) 
@@ -77,23 +79,40 @@
 {
     [super viewWillAppear:animated];
 	
-	fetchedResultsController_ = nil; //release
-	[self.tableView reloadData];
-	self.view.alpha = 0;
+/*	// データ抽出する
+	NSError *error = nil;
+	if (![self.fetchedResultsController performFetch:&error])
+	{
+	    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+	    abort();
+	}*/
+	
+	if (indexPathEdit_) {
+		NSLog(@"viewWillAppear: indexPathEdit_=%@", indexPathEdit_);
+		NSArray *aPaths = [NSArray arrayWithObject:indexPathEdit_];
+		[self.tableView reloadRowsAtIndexPaths:aPaths withRowAnimation:UITableViewRowAnimationFade];
+	}
+	//[self.tableView reloadData];
+	
+	if (!bEditReturn_) {
+		self.view.alpha = 0;
+	}
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
-    [super viewDidAppear:animated];
-	// アニメ準備
-	CGContextRef context = UIGraphicsGetCurrentContext();
-	[UIView beginAnimations:nil context:context];
-	[UIView setAnimationDuration:1.5];
-	[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
-	// アニメ終了状態
-	self.view.alpha = 1;
-	// アニメ実行
-	[UIView commitAnimations];
+	if (self.view.alpha != 1) {
+		[super viewDidAppear:animated];
+		// アニメ準備
+		CGContextRef context = UIGraphicsGetCurrentContext();
+		[UIView beginAnimations:nil context:context];
+		[UIView setAnimationDuration:1.5];
+		[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
+		// アニメ終了状態
+		self.view.alpha = 1;
+		// アニメ実行
+		[UIView commitAnimations];
+	}
 }
 /*
 - (void)viewWillDisappear:(BOOL)animated
@@ -144,7 +163,6 @@
 - (void)refreshAllViews:(NSNotification*)note 
 {	// iCloud-CoreData に変更があれば呼び出される
     if (note) {
-		//[self.tableView reloadData];
 		[self viewWillAppear:YES];
     }
 }
@@ -217,11 +235,6 @@
         NSError *error = nil;
         if (![moc_ save:&error])
         {
-            /*
-             Replace this implementation with code to handle the error appropriately.
-             
-             abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. If it is not possible to recover from the error, display an alert panel that instructs the user to quit the application by pressing the Home button.
-             */
             NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
             abort();
         }
@@ -237,6 +250,8 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];	// 選択状態を解除する
+	//[indexPathEdit_ release]
+	indexPathEdit_ = [indexPath copy];	// 戻ったときにセルを再描画するため
 
 	/* Storyboard導入により、prepareForSegue:が「先に」呼び出される。
 	E2editTVC *editVc = [[E2editTVC alloc] init];
@@ -244,32 +259,27 @@
     [self.navigationController pushViewController:editVc animated:YES];
     [editVc release];
 	 */
-	//[mIndexPathEdit release], mIndexPathEdit = [indexPath copy];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {	// 画面遷移のとき、didSelectRowAtIndexPath:よりも先に呼び出される
-	NSLog(@"prepareForSegue: segue=%@", segue);
 	NSLog(@"prepareForSegue: sender=%@", sender);
+	NSLog(@"prepareForSegue: segue=%@", segue);
+	NSLog(@"prepareForSegue: [segue identifier]=%@", [segue identifier]);
+	NSLog(@"prepareForSegue: [segue sourceViewController]=%@", [segue sourceViewController]);
+	NSLog(@"prepareForSegue: [segue destinationViewController]=%@", [segue destinationViewController]);
+
 	if ([[segue identifier] isEqualToString:@"pushE2edit"])
 	{
-		E2listCell *cell = sender;
-		// [segue destinationViewController] is read-only, so in order to
-		// write to that view controller you'll have to locally instantiate
-		// it here:
-		//ViewController *upcomingViewController = [segue destinationViewController];
+		// Assume self.view is the table view
+		NSIndexPath *path = [self.tableView indexPathForSelectedRow];//選択中のセル位置
+		NSLog(@"prepareForSegue: path=%@", path);
+		E2record *e2 = [self.fetchedResultsController objectAtIndexPath:path];
+		NSLog(@"prepareForSegue: e2=%@", e2);
 
 		E2editTVC *editVc = [segue destinationViewController];
-		editVc.moE2edit = cell.Re2node;  //[self.fetchedResultsController objectAtIndexPath:mIndexPathEdit];
-
-		// You now have a solid reference to the upcoming / destination view
-		// controller. Example use: Allocate and initialize some property of
-		// the destination view controller before you reach it and inject a
-		// reference to the current view controller into the upcoming one:
-		//upcomingViewController.someProperty = [[SomePropertyClass alloc] initWithString:@"Whatever!"];
-		//upcomingViewController.initialViewController = [segue sourceViewController];
-		// Or, equivalent, but more straightforward:
-		//upcomingViewController.initialViewController = self;
+		editVc.moE2edit = e2;  //[self.fetchedResultsController objectAtIndexPath:mIndexPathEdit];
+		bEditReturn_ = YES;
 	}
 }
 
@@ -277,20 +287,8 @@
 						 
 - (void)configureCell:(E2listCell *)cell atIndexPath:(NSIndexPath *)indexPath
 {
-	//NSManagedObject *managedObject = [self.fetchedResultsController objectAtIndexPath:indexPath];
-    //cell.textLabel.text = [[managedObject valueForKey: E2_dateTime] description];
-
 	E2record *e2 = [self.fetchedResultsController objectAtIndexPath:indexPath];
-
-	cell.Re2node = e2;
-	/*
-	cell.ibLbDate.text = [mDateFormatter stringFromDate:e2.dateTime];
-	cell.ibLbBpHi.text = [self strValue:[e2.nBpHi_mmHg integerValue] dec:0]; 
-	cell.ibLbBpLo.text = [self strValue:[e2.nBpLo_mmHg integerValue] dec:0];
-	cell.ibLbPuls.text = [self strValue:[e2.nPulse_bpm integerValue] dec:0];
-	cell.ibLbWeight.text = [self strValue:[e2.nWeight_g integerValue] dec:1];
-	cell.ibLbTemp.text = [self strValue:[e2.nTemp_10c integerValue] dec:1];
-	 */
+	cell.moE2node = e2;
 }
 /*
 - (void)insertNewObject
@@ -318,9 +316,9 @@
 
 - (NSFetchedResultsController *)fetchedResultsController
 {	// データ抽出コントローラを生成する
-    if (fetchedResultsController_ != nil)
+    if (frc_)
     {
-        return fetchedResultsController_;
+        return frc_;
     }
     
     /*
@@ -336,11 +334,11 @@
     
     // Set the batch size to a suitable number.
 	//[fetchRequest setFetchBatchSize:20];
-	[fetchRequest setFetchLimit:50];
-	[fetchRequest setFetchOffset:0];
+	//[fetchRequest setFetchLimit:50];
+	//[fetchRequest setFetchOffset:0];
 
 	// where
-	[fetchRequest setPredicate:[NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"]]; // 未保存を除外する
+	//[fetchRequest setPredicate:[NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"]]; // 未保存を除外する
     
 	// ソート条件指定
     // Edit the sort key as appropriate.
@@ -354,33 +352,28 @@
     
     // Edit the section name key path and cache name if appropriate.
     // nil for section name key path means "no sections".
-    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
+	NSFetchedResultsController *aFrc = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
 																								managedObjectContext:moc_ 
 																								  sectionNameKeyPath:E2_nYearMM	// セクション指定のため
-																										   cacheName:@"Root"];
-    aFetchedResultsController.delegate = self;
-    self.fetchedResultsController = aFetchedResultsController;
-    
-    //[aFetchedResultsController release];
+																										   cacheName:@"E2listYearMM"];
+    aFrc.delegate = self;
+
+    self.fetchedResultsController = aFrc; //retain
+    //[aFrc release];
     //[fetchRequest release];
 
 	// データ抽出する
 	NSError *error = nil;
-	if (![self.fetchedResultsController performFetch:&error])
-        {
-	    /*
-	     Replace this implementation with code to handle the error appropriately.
-
-	     abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. If it is not possible to recover from the error, display an alert panel that instructs the user to quit the application by pressing the Home button.
-	     */
+	if (![aFrc performFetch:&error])
+	{
 	    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
 	    abort();
 	}
-    
-    return fetchedResultsController_;
+
+    return aFrc;
 }    
 
-#pragma mark - <Fetched results controller delegate>
+#pragma mark - <NSFetchedResultsControllerDelegate>
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller
 {

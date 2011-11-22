@@ -13,11 +13,9 @@
 #import "E2editCellNote.h"
 
 
-@interface E2editTVC : UITableViewController <NSFetchedResultsControllerDelegate> //<ADBannerViewDelegate>
+@interface E2editTVC : UITableViewController <UITableViewDelegate, NSFetchedResultsControllerDelegate> //<ADBannerViewDelegate>
 
 @property (nonatomic, retain) E2record		*moE2edit;		//==nil:AddNew,  !=nil:Edit
-//@property (strong, nonatomic) NSFetchedResultsController *fetchedResultsController;
-//@property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 
 // <delegate>
 - (void)editUpdate;

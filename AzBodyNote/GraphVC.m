@@ -71,18 +71,20 @@
 
 - (void)viewDidAppear:(BOOL)animated
 {
-    [super viewDidAppear:animated];
-	// アニメ準備
-	CGContextRef context = UIGraphicsGetCurrentContext();
-	[UIView beginAnimations:nil context:context];
-	[UIView setAnimationDuration:1.5];
-	[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
-	//[UIView setAnimationDelegate:self];
-	//[UIView setAnimationDidStopSelector:@selector(hide_after_dissmiss)]; //アニメーション終了後に呼び出す＜＜setAnimationDelegate必要
-	// アニメ終了状態
-	self.view.alpha = 1;
-	// アニメ実行
-	[UIView commitAnimations];
+	if (self.view.alpha != 1) {
+		[super viewDidAppear:animated];
+		// アニメ準備
+		CGContextRef context = UIGraphicsGetCurrentContext();
+		[UIView beginAnimations:nil context:context];
+		[UIView setAnimationDuration:1.5];
+		[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
+		//[UIView setAnimationDelegate:self];
+		//[UIView setAnimationDidStopSelector:@selector(hide_after_dissmiss)]; //アニメーション終了後に呼び出す＜＜setAnimationDelegate必要
+		// アニメ終了状態
+		self.view.alpha = 1;
+		// アニメ実行
+		[UIView commitAnimations];
+	}
 }
 
 - (void)viewDidUnload

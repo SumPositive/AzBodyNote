@@ -20,7 +20,7 @@
 	IBOutlet UILabel			*ibLbWeight;
 	IBOutlet UILabel			*ibLbTemp;
 }
-@synthesize Re2node = Re2node_;
+@synthesize moE2node = moE2node_;
 //@synthesize ibLbBpHi, ibLbBpLo, ibLbDate, ibLbPuls, ibLbWeight, ibLbTemp;
 
 
@@ -29,7 +29,7 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         // Initialization code
-		Re2node_ = nil;
+		//moE2node_ = nil;
     }
     return self;
 }
@@ -65,7 +65,7 @@
 
 - (void)drawRect:(CGRect)rect
 {
-	if (Re2node_) {
+	if (moE2node_) {
 		NSDateFormatter *fm = [[NSDateFormatter alloc] init];
 		// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
 		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
@@ -73,14 +73,16 @@
 		//[calendar release];
 		//[df setLocale:[NSLocale systemLocale]];これがあると曜日が表示されない。
 		[fm setDateFormat:@"dd  HH:mm"];
-		ibLbDate.text = [fm stringFromDate:Re2node_.dateTime];
+		ibLbDate.text = [fm stringFromDate:moE2node_.dateTime];
 		//[fm release];
+		
+		//NSLog(@"--- moE2node_.nBpLo_mmHg=%@", moE2node_.nBpLo_mmHg);
 
-		ibLbBpHi.text = [self strValue:[Re2node_.nBpHi_mmHg integerValue] dec:0]; 
-		ibLbBpLo.text = [self strValue:[Re2node_.nBpLo_mmHg integerValue] dec:0];
-		ibLbPuls.text = [self strValue:[Re2node_.nPulse_bpm integerValue] dec:0];
-		ibLbWeight.text = [self strValue:[Re2node_.nWeight_g integerValue] dec:1];
-		ibLbTemp.text = [self strValue:[Re2node_.nTemp_10c integerValue] dec:1];
+		ibLbBpHi.text = [self strValue:[moE2node_.nBpHi_mmHg integerValue] dec:0]; 
+		ibLbBpLo.text = [self strValue:[moE2node_.nBpLo_mmHg integerValue] dec:0];
+		ibLbPuls.text = [self strValue:[moE2node_.nPulse_bpm integerValue] dec:0];
+		ibLbWeight.text = [self strValue:[moE2node_.nWeight_g integerValue] dec:1];
+		ibLbTemp.text = [self strValue:[moE2node_.nTemp_10c integerValue] dec:1];
 	}
 }
 
