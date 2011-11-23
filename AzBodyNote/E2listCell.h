@@ -14,13 +14,6 @@
 
 @property (nonatomic, retain) E2record		*moE2node;
 
-/*
-@property (nonatomic, retain) IBOutlet UILabel			*ibLbDate;
-@property (nonatomic, retain) IBOutlet UILabel			*ibLbBpHi;
-@property (nonatomic, retain) IBOutlet UILabel			*ibLbBpLo;
-@property (nonatomic, retain) IBOutlet UILabel			*ibLbPuls;
-@property (nonatomic, retain) IBOutlet UILabel			*ibLbWeight;
-@property (nonatomic, retain) IBOutlet UILabel			*ibLbTemp;
-*/
+- (void)draw;
 
 @end

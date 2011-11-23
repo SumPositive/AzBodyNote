@@ -164,7 +164,7 @@
 	
 	// Save & Commit
 	[MocFunctions commit];
-	moE2edit_ = nil;	//autorelease
+	//moE2edit_ = nil;	//autorelease
 	
 	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
 

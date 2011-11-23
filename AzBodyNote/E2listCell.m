@@ -19,6 +19,8 @@
 	IBOutlet UILabel			*ibLbPuls;
 	IBOutlet UILabel			*ibLbWeight;
 	IBOutlet UILabel			*ibLbTemp;
+	IBOutlet UILabel			*ibLbNote1;
+	IBOutlet UILabel			*ibLbNote2;
 }
 @synthesize moE2node = moE2node_;
 //@synthesize ibLbBpHi, ibLbBpLo, ibLbDate, ibLbPuls, ibLbWeight, ibLbTemp;
@@ -65,6 +67,11 @@
 
 - (void)drawRect:(CGRect)rect
 {
+	// ここは初期化時にしか通らないので、独自 draw にした。
+}
+
+- (void)draw
+{
 	if (moE2node_) {
 		NSDateFormatter *fm = [[NSDateFormatter alloc] init];
 		// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
@@ -76,13 +83,15 @@
 		ibLbDate.text = [fm stringFromDate:moE2node_.dateTime];
 		//[fm release];
 		
-		//NSLog(@"--- moE2node_.nBpLo_mmHg=%@", moE2node_.nBpLo_mmHg);
+		NSLog(@"--- moE2node_.sNote2=%@", moE2node_.sNote2);
 
 		ibLbBpHi.text = [self strValue:[moE2node_.nBpHi_mmHg integerValue] dec:0]; 
 		ibLbBpLo.text = [self strValue:[moE2node_.nBpLo_mmHg integerValue] dec:0];
 		ibLbPuls.text = [self strValue:[moE2node_.nPulse_bpm integerValue] dec:0];
 		ibLbWeight.text = [self strValue:[moE2node_.nWeight_g integerValue] dec:1];
 		ibLbTemp.text = [self strValue:[moE2node_.nTemp_10c integerValue] dec:1];
+		ibLbNote1.text = moE2node_.sNote1;
+		ibLbNote2.text = moE2node_.sNote2;
 	}
 }
 

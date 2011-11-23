@@ -87,12 +87,11 @@
 	    abort();
 	}*/
 	
-	if (indexPathEdit_) {
+	if (indexPathEdit_ && frc_) {
 		NSLog(@"viewWillAppear: indexPathEdit_=%@", indexPathEdit_);
 		NSArray *aPaths = [NSArray arrayWithObject:indexPathEdit_];
 		[self.tableView reloadRowsAtIndexPaths:aPaths withRowAnimation:UITableViewRowAnimationFade];
 	}
-	//[self.tableView reloadData];
 	
 	if (!bEditReturn_) {
 		self.view.alpha = 0;
@@ -283,13 +282,16 @@
 	}
 }
 
-
 						 
 - (void)configureCell:(E2listCell *)cell atIndexPath:(NSIndexPath *)indexPath
 {
+	//NSLog(@"configureCell: indexPath=%@", indexPath);
 	E2record *e2 = [self.fetchedResultsController objectAtIndexPath:indexPath];
+	//NSLog(@"configureCell: indexPath=%@  moE2node=%@", indexPath, e2);
 	cell.moE2node = e2;
+	[cell draw]; // moE2node を描画する
 }
+
 /*
 - (void)insertNewObject
 {
@@ -355,12 +357,8 @@
 	NSFetchedResultsController *aFrc = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
 																								managedObjectContext:moc_ 
 																								  sectionNameKeyPath:E2_nYearMM	// セクション指定のため
-																										   cacheName:@"E2listYearMM"];
+																										   cacheName:@"E2listDate"];
     aFrc.delegate = self;
-
-    self.fetchedResultsController = aFrc; //retain
-    //[aFrc release];
-    //[fetchRequest release];
 
 	// データ抽出する
 	NSError *error = nil;
@@ -370,8 +368,12 @@
 	    abort();
 	}
 
+    self.fetchedResultsController = aFrc; //retain
+    //[aFrc release];
+    //[fetchRequest release];
     return aFrc;
 }    
+
 
 #pragma mark - <NSFetchedResultsControllerDelegate>
 
@@ -412,9 +414,10 @@
             [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
             break;
             
-        case NSFetchedResultsChangeUpdate:
+		/*非表示状態なので不要。 表示されたときに、viewWillAppear:にて描画処理されるため
+		case NSFetchedResultsChangeUpdate:
             [self configureCell:(E2listCell *)[tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
-            break;
+            break;*/
             
         case NSFetchedResultsChangeMove:
             [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];

@@ -208,42 +208,56 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="30 23:55" textAlignment="right" lineBreakMode="tailTruncation" minimumFontSize="10" id="5ce-yH-bq1">
-                                            <rect key="frame" x="3" y="13" width="78" height="18"/>
+                                            <rect key="frame" x="3" y="5" width="78" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="999" textAlignment="right" lineBreakMode="tailTruncation" minimumFontSize="10" id="yMx-3G-oO1">
-                                            <rect key="frame" x="87" y="11" width="38" height="22"/>
+                                            <rect key="frame" x="85" y="3" width="38" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="999" textAlignment="right" lineBreakMode="tailTruncation" minimumFontSize="10" id="l0K-a8-Z43">
-                                            <rect key="frame" x="128" y="11" width="38" height="22"/>
+                                            <rect key="frame" x="125" y="3" width="38" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="999" textAlignment="right" lineBreakMode="tailTruncation" minimumFontSize="10" id="5cT-9I-8XZ">
-                                            <rect key="frame" x="168" y="12" width="35" height="20"/>
+                                            <rect key="frame" x="166" y="4" width="35" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
+                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Note2" textAlignment="right" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" minimumFontSize="10" id="wBT-jF-cZC">
+                                            <rect key="frame" x="202" y="23" width="94" height="20"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" red="0.59215686270000001" green="0.31372549020000001" blue="0.30196078430000001" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Note1" textAlignment="right" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" minimumFontSize="14" id="zeU-aD-Bh0">
+                                            <rect key="frame" x="86" y="23" width="108" height="20"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" red="0.59215686270000001" green="0.31372549020000001" blue="0.30196078430000001" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="199.9" textAlignment="right" lineBreakMode="tailTruncation" minimumFontSize="10" id="5Cr-zr-Qgw">
-                                            <rect key="frame" x="202" y="12" width="50" height="20"/>
+                                            <rect key="frame" x="202" y="4" width="50" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="36.5" textAlignment="right" lineBreakMode="tailTruncation" minimumFontSize="10" id="ORZ-qp-gXc">
-                                            <rect key="frame" x="254" y="12" width="42" height="20"/>
+                                            <rect key="frame" x="254" y="4" width="42" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -257,6 +271,8 @@
                                     <outlet property="ibLbBpHi" destination="yMx-3G-oO1" id="D1R-Zr-YUb"/>
                                     <outlet property="ibLbBpLo" destination="l0K-a8-Z43" id="m3V-gV-jg1"/>
                                     <outlet property="ibLbDate" destination="5ce-yH-bq1" id="na8-1C-Bpv"/>
+                                    <outlet property="ibLbNote1" destination="zeU-aD-Bh0" id="PDr-UE-LV7"/>
+                                    <outlet property="ibLbNote2" destination="wBT-jF-cZC" id="2ER-Cl-A7S"/>
                                     <outlet property="ibLbPuls" destination="5cT-9I-8XZ" id="hPg-h9-qQe"/>
                                     <outlet property="ibLbTemp" destination="ORZ-qp-gXc" id="Gbf-ep-eiM"/>
                                     <outlet property="ibLbWeight" destination="5Cr-zr-Qgw" id="iWJ-OB-q29"/>
