@@ -14,8 +14,8 @@
         <attribute name="nBpHi_mmHg" optional="YES" attributeType="Integer 16" maxValueString="300"/>
         <attribute name="nBpLo_mmHg" optional="YES" attributeType="Integer 16" maxValueString="200"/>
         <attribute name="nPulse_bpm" optional="YES" attributeType="Integer 16" maxValueString="200"/>
-        <attribute name="nTemp_10c" optional="YES" attributeType="Integer 16" maxValueString="450"/>
-        <attribute name="nWeight_g" optional="YES" attributeType="Integer 32" maxValueString="300000"/>
+        <attribute name="nTemp_10c" optional="YES" attributeType="Integer 16" maxValueString="429"/>
+        <attribute name="nWeight_g" optional="YES" attributeType="Integer 32" maxValueString="200000"/>
         <attribute name="nYearMM" optional="YES" attributeType="Integer 32" maxValueString="299912" syncable="YES"/>
         <attribute name="sEquipment" optional="YES" attributeType="String"/>
         <attribute name="sNote1" optional="YES" attributeType="String"/>

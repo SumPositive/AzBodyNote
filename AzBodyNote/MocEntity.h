@@ -9,7 +9,6 @@
 
 #define AzDataModelVersion			0
 
-
 //---------------------------------------------------------------------------------------E1
 @interface E1body : NSManagedObject 
 @property (nonatomic, retain) NSDate			*dBirthday;		// NSDateは、UTC(+0000)協定時刻で記録 ⇒ 表示でタイムゾーン変換する
@@ -55,5 +54,17 @@
 #define E2_sNote1						@"sNote1"
 #define E2_sNote2						@"sNote2"
 //#define E2_e1body					@"e1body"
+
+#define E2_nBpHi_MIN			30
+#define E2_nBpHi_MAX			300			//.xcdatamodeldの最大値設定と合わせること （最小値は、nil 許可）
+#define E2_nBpLo_MIN			20
+#define E2_nBpLo_MAX			200
+#define E2_nPuls_MIN			10
+#define E2_nPuls_MAX			200
+#define E2_nWeight_MIN		0
+#define E2_nWeight_MAX		200000	//(g)
+#define E2_nTemp_MIN			310
+#define E2_nTemp_MAX		429			//x10(℃)
+
 
 // END

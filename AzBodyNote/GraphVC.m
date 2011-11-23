@@ -15,7 +15,8 @@
 	IBOutlet UIScrollView		*ibScrollView;
 	IBOutlet UIView				*ibGraphView;
 	
-	NSArray *maBpHiY;
+	NSArray *bodyNotes_;
+	
 }
 
 
@@ -66,6 +67,7 @@
 - (void)viewWillAppear:(BOOL)animated 
 {
     [super viewWillAppear:animated];
+	[ibGraphView drawRect:self.view.frame];
 	self.view.alpha = 0;
 }
 

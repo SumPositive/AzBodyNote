@@ -508,8 +508,8 @@
 			cell.ibLbUnit.text = @"mmHg";
 			cell.Re2record = moE2edit_;
 			cell.RzKey = E2_nBpHi_mmHg;
-			cell.mValueMin = 30;
-			cell.mValueMax = 300;
+			cell.mValueMin = E2_nBpHi_MIN;
+			cell.mValueMax = E2_nBpHi_MAX;
 			cell.mValueDec = 0;
 			cell.mValueStep = 1;
 			cell.mValuePrev = iPrevBpHi_;
@@ -524,8 +524,8 @@
 			cell.ibLbUnit.text = @"mmHg";
 			cell.Re2record = moE2edit_;
 			cell.RzKey = E2_nBpLo_mmHg;
-			cell.mValueMin = 20;
-			cell.mValueMax = 200;
+			cell.mValueMin = E2_nBpLo_MIN;
+			cell.mValueMax = E2_nBpLo_MAX;
 			cell.mValueDec = 0;
 			cell.mValueStep = 1;
 			cell.mValuePrev = iPrevBpLo_;
@@ -540,8 +540,8 @@
 			cell.ibLbUnit.text = NSLocalizedString(@"Pulse unit",nil);
 			cell.Re2record = moE2edit_;
 			cell.RzKey = E2_nPulse_bpm;
-			cell.mValueMin = 10;
-			cell.mValueMax = 170;
+			cell.mValueMin = E2_nPuls_MIN;
+			cell.mValueMax = E2_nPuls_MAX;
 			cell.mValueDec = 0;
 			cell.mValueStep = 1;
 			cell.mValuePrev = iPrevPuls_;
@@ -556,8 +556,8 @@
 			cell.ibLbUnit.text = @"Kg";
 			cell.Re2record = moE2edit_;
 			cell.RzKey = E2_nWeight_g;
-			cell.mValueMin = 0;
-			cell.mValueMax = 140000;
+			cell.mValueMin = E2_nWeight_MIN;
+			cell.mValueMax = E2_nWeight_MAX;
 			cell.mValueDec = 1;
 			cell.mValueStep = 100;
 			cell.mValuePrev = iPrevWeight_;
@@ -572,8 +572,8 @@
 			cell.ibLbUnit.text = @"℃";
 			cell.Re2record = moE2edit_;
 			cell.RzKey = E2_nTemp_10c;
-			cell.mValueMin = 310;
-			cell.mValueMax = 429;
+			cell.mValueMin = E2_nTemp_MIN;
+			cell.mValueMax = E2_nTemp_MAX;
 			cell.mValueDec = 1;
 			cell.mValueStep = 1;
 			cell.mValuePrev = iPrevTemp_;

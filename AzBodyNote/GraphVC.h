@@ -11,4 +11,6 @@
 
 @interface GraphVC : UIViewController <UIScrollViewDelegate>
 
+@property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
+
 @end
