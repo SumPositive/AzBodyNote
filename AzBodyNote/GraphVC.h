@@ -8,11 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-#define ViewTAG_BpHi			301
-#define ViewTAG_BpLo			302
-#define ViewTAG_Puls			303
-#define ViewTAG_Weight		304
-#define ViewTAG_Temp		305
+#define RECORD_LIMIT			50	// グラフ表示の最大レコード数　＜＜有料版にて100かつページ移動可能にする予定
+#define RECORD_WIDTH	44.0		// 1レコード分の幅
+#define MARGIN_WIDTH		160.0	// 左右端の余白幅
 
 @interface GraphVC : UIViewController <UIScrollViewDelegate>
 {

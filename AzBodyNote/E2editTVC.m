@@ -28,6 +28,11 @@
 	NSInteger	iPrevWeight_;
 	NSInteger	iPrevTemp_;
 	UIButton		*buDelete_;		// Edit時のみ使用
+
+#ifdef GD_Ad_ENABLED
+	ADBannerView		*iAdBanner_;
+	GADBannerView		*adMobView_;
+#endif
 }
 @synthesize moE2edit = moE2edit_;
 
@@ -257,20 +262,41 @@
 	// TableView
 	self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone; // セル区切り線なし
 	
-	/*
-	// iAd
-	if (mADBanner==nil) {
-		mADBanner = [[ADBannerView alloc] init];
-		mADBanner.delegate = self;
-		mADBanner.currentContentSizeIdentifier = ADBannerContentSizeIdentifierPortrait;
-		[self.parentViewController.view addSubview:mADBanner];
-		mADBannerY = self.tabBarController.tabBar.frame.origin.y - mADBanner.frame.size.height;	// 表示位置
-		NSLog(@"mADBannerY=%.1f", mADBannerY);
+	
+#ifdef GD_Ad_ENABLED
+	//CGRect rcAd = CGRectMake(0, self.view.frame.size.height-self.tabBarController.view.frame.size.height-50, 320, 50);
+	CGRect rcAd = CGRectMake(0, self.view.frame.size.height-28-50, 320, 50);
+	//--------------------------------------------------------------------------------------------------------- AdMob
+	if (adMobView_==nil) {
+		adMobView_ = [[GADBannerView alloc] init];
+		adMobView_.rootViewController = self;
+		adMobView_.adUnitID = AdMobID_BodyNote;
+		GADRequest *request = [GADRequest request];
+		//[request setTesting:YES];
+		// GAD_SIZE_320x50
+		adMobView_.frame = rcAd;
+		adMobView_.alpha = 0;	// 0=非表示　　1=表示
+		adMobView_.tag = 0;		// 0=広告なし　　1=あり　　（iAdを優先表示するために必要）
+		adMobView_.delegate = self;
+		[adMobView_ loadRequest:request];
+		//[self.view addSubview:adMobView_];
+		[self.navigationController.view addSubview:adMobView_];
 	}
-	CGRect rc = mADBanner.frame;
-	rc.origin.y = self.view.frame.size.height + 50; // 下へ隠す
-	mADBanner.frame = rc;
- */
+	
+	//--------------------------------------------------------------------------------------------------------- iAd
+	// iAd
+	if (iAdBanner_==nil) {
+		iAdBanner_ = [[ADBannerView alloc] init];
+		// iOS 4.2 以上限定　＜＜以前のOSでは落ちる！！！
+		iAdBanner_.requiredContentSizeIdentifiers = [NSSet setWithObjects:ADBannerContentSizeIdentifierPortrait, nil];
+		iAdBanner_.currentContentSizeIdentifier = ADBannerContentSizeIdentifierPortrait;
+		iAdBanner_.delegate = self;
+		iAdBanner_.frame = rcAd;
+		iAdBanner_.alpha = 0;
+		//[self.view addSubview:iAdBanner_];
+		[self.navigationController.view addSubview:iAdBanner_];
+	}
+#endif
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -295,7 +321,7 @@
 			CGRect rc = [self.tableView rectForRowAtIndexPath:indexPath];
 			rc.size.width /= 2;
 			rc.origin.x = rc.size.width / 2;
-			rc.origin.y += ((rc.size.height - 30) / 2);
+			rc.origin.y += 10;  //((rc.size.height - 30) / 2);
 			rc.size.height = 30;
 			buDelete_.frame = rc;
 			[self.tableView addSubview:buDelete_];
@@ -310,7 +336,7 @@
 		// アニメ準備
 		CGContextRef context = UIGraphicsGetCurrentContext();
 		[UIView beginAnimations:nil context:context];
-		[UIView setAnimationDuration:1.0];
+		[UIView setAnimationDuration:TABBAR_CHANGE_TIME];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
 		// アニメ終了状態
 		self.view.alpha = 1;
@@ -386,7 +412,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {	// Return the number of rows in the section.
-	return 7 + 2;  // +2:末尾の余白セル
+	return 7 + 1;  // +1:末尾の余白セル
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -634,52 +660,68 @@
 }
 
 
-/*
-#pragma mark - iAd
+#ifdef GD_Ad_ENABLED
+#pragma mark - <ADBannerViewDelegate>
 
-// iAd delegate  取得できたときに呼ばれる　⇒　表示する
+// iAd取得できたときに呼ばれる　⇒　表示する
 - (void)bannerViewDidLoadAd:(ADBannerView *)banner
-{	// iAd 広告あり
-	NSLog(@"iAd - bannerViewDidLoadAd");
-	// アニメ開始位置
+{
+	//if (banner.frame.origin.y < self.view.frame.size.height) return; // 既に表示中
+	if (banner.alpha==1) return; // 既に表示中
+	NSLog(@"iAd - DidReceive");
 	
-	// アニメ準備
 	[UIView beginAnimations:nil context:NULL];
-	[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; // slow at end
-	[UIView setAnimationDuration:1.2];
-	// アニメ終了位置
-	CGRect rc = banner.frame;
-	rc.origin.y = mADBannerY;		// 表示位置
-	banner.frame = rc;
-	banner.alpha = 1;
-	// アニメ開始
+	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+	[UIView setAnimationDuration:2.0];
+	
+	banner.alpha = 1;				// iAd優先
+	adMobView_.alpha = 0;
+	
 	[UIView commitAnimations];
 }
 
-// iAd delegate  取得できなかったときに呼ばれる　⇒　非表示にする
+// iAd取得できなかったときに呼ばれる　⇒　非表示にする
 - (void)bannerView:(ADBannerView *)banner didFailToReceiveAdWithError:(NSError *)error
-{	// iAd 広告なし
-	NSLog(@"iAd - didFailToReceiveAdWithError");
-	// アニメ開始位置
+{
+	//if (self.view.frame.size.height <= banner.frame.origin.y) return; // 既に隠れている
+	if (banner.alpha==0) return; // 既に隠れている
+	NSLog(@"iAd - FailToReceive　Error:%@", [error localizedDescription]);
 	
-	// アニメ準備
 	[UIView beginAnimations:nil context:NULL];
-	[UIView setAnimationCurve:UIViewAnimationCurveEaseIn]; // slow at beginning
-	[UIView setAnimationDuration:1.2];
-	// アニメ終了位置
-	CGRect rc = banner.frame;
-	rc.origin.y = self.view.frame.size.height + 50;	// 下へ隠す
-	banner.frame = rc;
+	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+	[UIView setAnimationDuration:2.0];
+	
 	banner.alpha = 0;
-	// アニメ開始
+	adMobView_.alpha = adMobView_.tag;
+	
 	[UIView commitAnimations];
 }
 
-// iAd delegate
-- (BOOL)bannerViewActionShouldBegin:(ADBannerView *)banner willLeaveApplication:(BOOL)willLeave
-{	// 広告表示前にする処理があれば記述
-	return YES;
+- (void)adViewDidReceiveAd:(GADBannerView *)bannerView 
+{	// AdMob 広告あり
+	adMobView_.tag = 1;
+	if (adMobView_.alpha==1 OR iAdBanner_.alpha==1) return; // 既に非表示 または iAd表示中
+	NSLog(@"AdMob - DidReceive");
+	// iAd非表示ならば、AdMob表示する
+	[UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+	[UIView setAnimationDuration:2.0];
+	adMobView_.alpha = 1;
+	[UIView commitAnimations];
 }
-*/
+
+- (void)adView:(GADBannerView *)bannerView didFailToReceiveAdWithError:(GADRequestError *)error 
+{	// AdMob 広告なし
+	adMobView_.tag = 0;
+	if (adMobView_.alpha==0) return; // 既に非表示
+	NSLog(@"AdMob - FailToReceive　Error:%@", [error localizedDescription]);
+	[UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+	[UIView setAnimationDuration:2.0];
+	adMobView_.alpha = 0;
+	[UIView commitAnimations];
+}
+
+#endif
 
 @end

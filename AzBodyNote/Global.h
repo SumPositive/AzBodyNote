@@ -7,6 +7,10 @@
 //
 
 //#define NO_AD	// AppStore画面撮影用に「広告なし」にするため
+#if !defined(NO_AD)
+#define GD_Ad_ENABLED
+#define AdMobID_BodyNote				@"a14ece23da85f5e";		// 体調日記 パブリッシャー ID
+#endif
 
 #define OR  ||
 
@@ -33,6 +37,8 @@
 #define GD_PRODUCTNAME	@"AzBodyNote"  // IMPORTANT PRODUCT NAME  和名「カラダ日記」
 													//↑↑変更禁止！！Keychainの'ServiceName'に使っているので読み出せなくなる。
 //#define GD_KEY_LOGINPASS  @"AzCreditLoginPass"  //←変更禁止！！Keychainの'Username'に使っているので読み出せなくなる。
+
+#define TABBAR_CHANGE_TIME			1.2		// TabBar切替時のディゾルブ時間(s)
 
 // UserDefault
 #define GD_OptRoundBankers					@"GD_OptRoundBankers"		// 偶数丸め

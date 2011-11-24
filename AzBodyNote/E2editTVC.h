@@ -12,8 +12,17 @@
 #import "E2editCellDial.h"
 #import "E2editCellNote.h"
 
+#ifdef GD_Ad_ENABLED
+#import <iAd/iAd.h>
+#import "GADBannerView.h"
+#endif
 
-@interface E2editTVC : UITableViewController <UITableViewDelegate, NSFetchedResultsControllerDelegate> //<ADBannerViewDelegate>
+
+@interface E2editTVC : UITableViewController <UITableViewDelegate, NSFetchedResultsControllerDelegate
+#ifdef GD_Ad_ENABLED
+	,ADBannerViewDelegate, GADBannerViewDelegate
+#endif
+>
 
 @property (nonatomic, retain) E2record		*moE2edit;		//==nil:AddNew,  !=nil:Edit
 

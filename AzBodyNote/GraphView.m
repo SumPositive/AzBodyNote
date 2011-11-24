@@ -15,18 +15,15 @@
 #import "MocEntity.h"
 #import "MocFunctions.h"
 
-#define GRAPH_MAX		100
-#define W_HOUR		2.0		// 1時間分の横ポイント数
-#define H_GAP			2.0		// グラフの最大および最小の余白ポイント数
-
 
 @implementation GraphView
 {
 	IBOutlet UISegmentedControl	*ibSegType;
 
 	BOOL			bDrowRect_;
-	NSArray		*aE2records_;
 }
+@synthesize RaE2records = aE2records_;
+
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -47,18 +44,17 @@
 			   points:(const CGPoint *)points  
 			   values:(const long *)values		//= month*1000000 + day*10000 + hour*100 + minute
 {
-	assert(count <= GRAPH_MAX);
+	assert(count <= RECORD_LIMIT);
 	//文字列の設定
 	CGContextSetTextDrawingMode (cgc, kCGTextFillStroke);
 	CGContextSelectFont (cgc, "Helvetica", 12.0, kCGEncodingMacRoman);
-	// グラフ ストロークカラー設定(0.0-1.0でRGBAを指定する)
-	CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 1.0);
-	CGContextSetRGBFillColor (cgc, 0, 0, 0, 1.0);
+	CGRect rc;
 	for (int iNo=0; iNo < count; iNo++) 
 	{
 		CGPoint po = points[ iNo ];
 		// 数値
 		long val = values[ iNo ];
+		//NSLog(@"graphDrawDate: [ %d ]=%ld=(%.2f, %.2f)", iNo, val, po.x, po.y);
 		int iMonth = val / 1000000;
 		val -= iMonth * 1000000;
 		int iDay = val / 10000;
@@ -67,12 +63,22 @@
 		val -= iHour * 100;
 		int iMinute = val;
 
+		// 文字列 カラー設定(0.0-1.0でRGBAを指定する)
+		CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 1.0);
+		CGContextSetRGBFillColor (cgc, 0, 0, 0, 1.0);
 		const char *cc;
 		cc = [[NSString stringWithFormat:@"%d/%d", iMonth, iDay] UTF8String];
 		CGContextShowTextAtPoint (cgc, po.x-15, po.y+20, cc, strlen(cc));
 
 		cc = [[NSString stringWithFormat:@"%02d:%02d", iHour, iMinute] UTF8String];
 		CGContextShowTextAtPoint (cgc, po.x-15, po.y+8, cc, strlen(cc));
+
+		// タテ軸　カラー設定
+		CGContextSetRGBFillColor(cgc, 0.9, 0.9, 0.9, 0.3);
+		rc = CGRectMake(po.x-1, 0, 2, po.y+3);
+		CGContextAddRect(cgc, rc);
+		//画面に描画
+		CGContextFillPath(cgc); // パスを塗り潰す
 	}
 	//CGContextStrokePath(cgc);
 	//CGContextFillPath(cgc); // パスを塗り潰す
@@ -82,10 +88,10 @@
 			   count:(int)count
 			  points:(const CGPoint *)points  
 			  values:(const long *)values  
-			valueDec:(int)valueDec
+			valueType:(int)valueType					// 0=Integer  1=Temp(999⇒99.9℃)　　2=Weight(999999g⇒999.99Kg)
 			pointLower:(CGFloat)pointLower		// Y座標の最小値： 数値文字がこれ以下に描画されるならば、上側に表示する
 {
-	assert(count <= GRAPH_MAX);
+	assert(count <= RECORD_LIMIT);
 	// グラフ ストロークカラー設定(0.0-1.0でRGBAを指定する)
 	CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 1.0);
 #ifdef YES
@@ -108,11 +114,11 @@
 		CGContextFillEllipseInRect(cgc, CGRectMake(po.x-1.5, po.y-1.5, 3, 3));	//円Fill
 		// 数値
 		const char *cc;
-		switch (valueDec) {
-			case 2:
-				cc = [[NSString stringWithFormat:@"%0.2f", (float)values[ iNo ] / 100.0] cStringUsingEncoding:NSMacOSRomanStringEncoding];
+		switch (valueType) {
+			case 2:	// Weight(999999g⇒999.99Kg)
+				cc = [[NSString stringWithFormat:@"%0.2f", (float)values[ iNo ] / 1000.0] cStringUsingEncoding:NSMacOSRomanStringEncoding];
 				break;
-			case 1:
+			case 1:	// Temp(999⇒99.9℃)
 				cc = [[NSString stringWithFormat:@"%0.1f", (float)values[ iNo ] / 10.0] cStringUsingEncoding:NSMacOSRomanStringEncoding];
 				break;
 			default:
@@ -130,12 +136,13 @@
 	//CGContextFillPath(cgc); // パスを塗り潰す
 }
 
-#define SEPARATE_HEIGHT	3.0		// 区切り線の高さ
-#define WIDTH_OFFSET			160		// 右端の余白（ラベルや設定ボタンを設置する）
 - (void)graphDraw:(CGContextRef)cgc
 {
 	NSLog(@"graphDraw: frame=(%f, %f)-(%f, %f) ", self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
 	
+	//　全域クリア
+	CGContextSetRGBFillColor (cgc, 1, 1, 1, 1.0);
+	CGContextFillRect(cgc, self.bounds);
 	//ストロークカラーの設定(0.0-1.0でRGBAを指定する)
 	CGContextSetRGBStrokeColor(cgc, 0.0, 0.0, 0.0, 1.0);
 	//ストロークの線幅を設定
@@ -168,8 +175,9 @@
 	rcDate.origin.y = rcBp.origin.y + rcBp.size.height + SEPARATE_HEIGHT;				// Y開始
 	rcDate.size.height = fHeight * 1 / 8 - SEPARATE_HEIGHT;				// 高さ
 	// 区切り線
-	CGContextSetRGBFillColor(cgc, 0.8, 0.8, 0.8, 0.4);
-	rc = CGRectMake(0, 0, self.bounds.size.width - WIDTH_OFFSET + 20, SEPARATE_HEIGHT);
+	//CGContextSetRGBFillColor(cgc, 0.8, 0.8, 0.8, 0.3); // Gray
+	CGContextSetRGBFillColor(cgc, 0.592, 0.313, 0.302, 0.3); //Azukid Color
+	rc = CGRectMake(MARGIN_WIDTH, 0, self.bounds.size.width - MARGIN_WIDTH*2 + 20, SEPARATE_HEIGHT);
 	rc.origin.y = rcWeight.origin.y - SEPARATE_HEIGHT;	CGContextAddRect(cgc, rc);
 	rc.origin.y = rcPuls.origin.y - SEPARATE_HEIGHT;			CGContextAddRect(cgc, rc);
 	rc.origin.y = rcBp.origin.y - SEPARATE_HEIGHT;			CGContextAddRect(cgc, rc);
@@ -179,27 +187,17 @@
 	
 	// 右端の設定領域について
 	rc = ibSegType.frame;
-	rc.origin.x = self.bounds.size.width - WIDTH_OFFSET + 25;
+	rc.origin.x = self.bounds.size.width - MARGIN_WIDTH + 25;
 	ibSegType.frame = rc;
 	
-	
-	// E2record 取得
-	aE2records_ = nil; 
-	// Sort条件
-	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
-	NSArray *sortDesc = [NSArray arrayWithObjects: sort1,nil]; // 日付降順：Limit抽出に使用
-	
-	aE2records_ = [MocFunctions select: @"E2record"
-								 limit: GRAPH_MAX
-								offset: 0
-								 where: nil
-								  sort: sortDesc]; // 最新日付から抽出
-	
+
+	// E2record
 	if ([aE2records_ count] < 1) {
 		aE2records_ = nil;
 		return;
 	}
-	NSLog(@"aE2records_=%@", aE2records_);
+	//NSLog(@"aE2records_=%@", aE2records_);
+	
 	// Min, Max
 	NSInteger iMaxBp = 0;
 	NSInteger iMinBp = 999;
@@ -253,115 +251,137 @@
 	//ストロークの線幅を設定
 	CGContextSetLineWidth(cgc, 0.5);
 
-	CGPoint	pointsArray[GRAPH_MAX+1];
-	long			valuesArray[GRAPH_MAX+1];
+	CGPoint	pointsArray[RECORD_LIMIT+1];
+	long			valuesArray[RECORD_LIMIT+1];
 	int			arrayNo;
 
 	//-------------------------------------------------------------------------------------- Date 描画
 	//システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
 	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 	unsigned unitFlags = NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit;
-	po.x = self.bounds.size.width - WIDTH_OFFSET; // 最新日の描画位置
-	po.y = rcDate.origin.y + H_GAP;
+	po.x = self.bounds.size.width - MARGIN_WIDTH; // 最新日の描画位置
+	po.y = rcDate.origin.y + GRAPH_H_GAP;
 	arrayNo = 0;
-	for (E2record *e2 in aE2records_)
-	{
-		if (e2.dateTime) 
-		{
+	for (E2record *e2 in aE2records_) {
+		if (e2.dateTime) {
 			pointsArray[ arrayNo ] = po;
 			NSDateComponents *comp = [calendar components:unitFlags fromDate:e2.dateTime];
 			valuesArray[ arrayNo ] = comp.month * 1000000 + comp.day * 10000 + comp.hour * 100 + comp.minute;
+			//NSLog(@"valuesArray[ %d ]=%ld", arrayNo, valuesArray[ arrayNo ]);
 			arrayNo++;
 		}
-		po.x -= (W_HOUR * 24);
+		po.x -= RECORD_WIDTH;
 		if (po.x <= 0) break;
 	}
 	[self graphDrawDate:cgc count:arrayNo points:pointsArray values:valuesArray];	
 	
 	//-------------------------------------------------------------------------------------- BpHi グラフ描画
-	fYstep = rcBp.size.height / (iMaxBp - iMinBp + H_GAP*2);  // 1あたりのポイント数
-	po.x = self.bounds.size.width - WIDTH_OFFSET; // 最新日の描画位置
+	fYstep = rcBp.size.height / (iMaxBp - iMinBp + GRAPH_H_GAP*2);  // 1あたりのポイント数
+	po.x = self.bounds.size.width - MARGIN_WIDTH; // 最新日の描画位置
 	arrayNo = 0;
-	for (E2record *e2 in aE2records_)
-	{
+	for (E2record *e2 in aE2records_) {
 		if (e2.nBpHi_mmHg) {
 			ii = [e2.nBpHi_mmHg integerValue];
 			if (E2_nBpHi_MIN<=ii && ii<=E2_nBpHi_MAX) {
-				po.y = rcBp.origin.y + H_GAP + fYstep * (CGFloat)(ii - iMinBp);
+				po.y = rcBp.origin.y + GRAPH_H_GAP + fYstep * (CGFloat)(ii - iMinBp);
 				pointsArray[ arrayNo ] = po;
 				valuesArray[ arrayNo ] = ii;
 				arrayNo++;
 			}
 		}
-		po.x -= (W_HOUR * 24);
+		po.x -= RECORD_WIDTH;
 		if (po.x <= 0) break;
 	}
-	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueDec:0  pointLower:rcBp.origin.y];
+	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueType:0  pointLower:rcBp.origin.y];
 	
 	//-------------------------------------------------------------------------------------- BpLo グラフ描画
 	po.x = self.bounds.size.width - 160;
 	arrayNo = 0;
-	for (E2record *e2 in aE2records_)
-	{
+	for (E2record *e2 in aE2records_) {
 		if (e2.nBpLo_mmHg) {
 			ii = [e2.nBpLo_mmHg integerValue];
 			if (E2_nBpLo_MIN<=ii && ii<=E2_nBpLo_MAX) {
-				po.y = rcBp.origin.y + H_GAP + fYstep * (CGFloat)(ii - iMinBp);
+				po.y = rcBp.origin.y + GRAPH_H_GAP + fYstep * (CGFloat)(ii - iMinBp);
 				pointsArray[ arrayNo ] = po;
 				valuesArray[ arrayNo ] = ii;
 				arrayNo++;
 			}
 		}
-		po.x -= (W_HOUR * 24);
+		po.x -= RECORD_WIDTH;
 		if (po.x <= 0) break;
 	}
-	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueDec:0  pointLower:rcBp.origin.y];
+	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueType:0  pointLower:rcBp.origin.y];
 	
 	//-------------------------------------------------------------------------------------- Puls グラフ描画
-	fYstep = rcPuls.size.height / (iMaxPuls - iMinPuls + H_GAP*2);  // 1あたりのポイント数
+	fYstep = rcPuls.size.height / (iMaxPuls - iMinPuls + GRAPH_H_GAP*2);  // 1あたりのポイント数
 	po.x = self.bounds.size.width - 160;
 	arrayNo = 0;
-	for (E2record *e2 in aE2records_)
-	{
+	for (E2record *e2 in aE2records_) {
 		if (e2.nPulse_bpm) {
 			ii = [e2.nPulse_bpm integerValue];
 			if (E2_nPuls_MIN<=ii && ii<=E2_nPuls_MAX) {
-				po.y = rcPuls.origin.y + H_GAP + fYstep * (CGFloat)(ii - iMinPuls);
+				po.y = rcPuls.origin.y + GRAPH_H_GAP + fYstep * (CGFloat)(ii - iMinPuls);
 				pointsArray[ arrayNo ] = po;
 				valuesArray[ arrayNo ] = ii;
 				arrayNo++;
 			}
 		}
-		po.x -= (W_HOUR * 24);
+		po.x -= RECORD_WIDTH;
 		if (po.x <= 0) break;
 	}
-	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueDec:0  pointLower:rcPuls.origin.y];
+	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueType:0  pointLower:rcPuls.origin.y];
 
-	// Weight グラフ描画
+	//-------------------------------------------------------------------------------------- Weight グラフ描画
+	fYstep = rcWeight.size.height / (iMaxWeight - iMinWeight + GRAPH_H_GAP*2);  // 1あたりのポイント数
+	po.x = self.bounds.size.width - 160;
+	arrayNo = 0;
+	for (E2record *e2 in aE2records_) {
+		if (e2.nWeight_g) {
+			ii = [e2.nWeight_g integerValue];
+			if (E2_nWeight_MIN<=ii && ii<=E2_nWeight_MAX) {
+				po.y = rcWeight.origin.y + GRAPH_H_GAP + fYstep * (CGFloat)(ii - iMinWeight);
+				pointsArray[ arrayNo ] = po;
+				valuesArray[ arrayNo ] = ii;
+				arrayNo++;
+			}
+		}
+		po.x -= RECORD_WIDTH;
+		if (po.x <= 0) break;
+	}
+	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueType:2  pointLower:rcWeight.origin.y];
 
-	// Temp グラフ描画
+	//-------------------------------------------------------------------------------------- Temp グラフ描画
+	fYstep = rcTemp.size.height / (iMaxTemp - iMinTemp + GRAPH_H_GAP*2);  // 1あたりのポイント数
+	po.x = self.bounds.size.width - 160;
+	arrayNo = 0;
+	for (E2record *e2 in aE2records_) {
+		if (e2.nTemp_10c) {
+			ii = [e2.nTemp_10c integerValue];
+			if (E2_nTemp_MIN<=ii && ii<=E2_nTemp_MAX) {
+				po.y = rcTemp.origin.y + GRAPH_H_GAP + fYstep * (CGFloat)(ii - iMinTemp);
+				pointsArray[ arrayNo ] = po;
+				valuesArray[ arrayNo ] = ii;
+				arrayNo++;
+			}
+		}
+		po.x -= RECORD_WIDTH;
+		if (po.x <= 0) break;
+	}
+	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueType:1  pointLower:rcTemp.origin.y];
 
+	//CGContextFlush(cgc);
 }
 
 
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
+// 親側から再描画させたいときには、setNeedsDisplay を使うこと。さもなくば、CGContextRefが正しく取得できない
 - (void)drawRect:(CGRect)rect
 {
-	static CGContextRef cgc = nil;
-	
-	if (bDrowRect_) {	// 初期化時に通さないため
-		//現在のグラフィックスコンテキストを取得
-		if (cgc==nil) {
-			cgc = UIGraphicsGetCurrentContext();
-			// CoreGraphicsの原点が左下なので原点を合わせる
-			CGContextTranslateCTM(cgc, 0, rect.size.height);
-			CGContextScaleCTM(cgc, 1.0, -1.0);
-		}
-		[self graphDraw:cgc];
-		//CGContextRelease(cgc);
-	}
-	bDrowRect_ = YES;
+	CGContextRef cgc = UIGraphicsGetCurrentContext();
+	// CoreGraphicsの原点が左下なので原点を合わせる
+	CGContextTranslateCTM(cgc, 0, rect.size.height);
+	CGContextScaleCTM(cgc, 1.0, -1.0);
+	//
+	[self graphDraw:cgc];
 }
 
 

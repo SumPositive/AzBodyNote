@@ -23,7 +23,11 @@
 	AzBodyNoteAppDelegate		*appDelegate_;
 	NSManagedObjectContext		*moc_;
 	NSIndexPath							*indexPathEdit_;
-	BOOL										bEditReturn_;
+	//BOOL										bEditReturn_;
+
+#ifdef GD_Ad_ENABLED
+	GADBannerView		*adMobView_;
+#endif
 }
 @synthesize fetchedResultsController = frc_;
 
@@ -38,7 +42,7 @@
 	moc_ = [appDelegate_ managedObjectContext];
 	NSLog(@"E2listTVC: moc_=%@", moc_);
 	assert(moc_);
-	bEditReturn_ = NO;
+	//bEditReturn_ = NO;
 
 	//self.tableView.delegate = self;
 	
@@ -93,7 +97,12 @@
 		[self.tableView reloadRowsAtIndexPaths:aPaths withRowAnimation:UITableViewRowAnimationFade];
 	}
 	
-	if (!bEditReturn_) {
+	if (indexPathEdit_) {
+		indexPathEdit_ = nil; // Editモード解除
+	} else { 
+		// 最終行を表示する
+		[self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:[[self.fetchedResultsController sections] count]] 
+							  atScrollPosition:UITableViewScrollPositionMiddle animated:NO];  // 実機検証結果:NO
 		self.view.alpha = 0;
 	}
 }
@@ -105,7 +114,7 @@
 		// アニメ準備
 		CGContextRef context = UIGraphicsGetCurrentContext();
 		[UIView beginAnimations:nil context:context];
-		[UIView setAnimationDuration:1.5];
+		[UIView setAnimationDuration:TABBAR_CHANGE_TIME];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
 		// アニメ終了状態
 		self.view.alpha = 1;
@@ -113,6 +122,7 @@
 		[UIView commitAnimations];
 	}
 }
+
 /*
 - (void)viewWillDisappear:(BOOL)animated
 {
@@ -172,45 +182,91 @@
 // Customize the number of sections in the table view.
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-	return [[self.fetchedResultsController sections] count];
+	return [[self.fetchedResultsController sections] count] + 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-	id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:section];
-	return [sectionInfo numberOfObjects];
+	if (section < [[self.fetchedResultsController sections] count]) {
+		id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:section];
+		return [sectionInfo numberOfObjects];
+	}
+	return 1; // END LINE - AdMob
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {	// セクション ヘッダ
-	NSInteger iYearMM = [[[[self.fetchedResultsController sections] objectAtIndex:section] name] integerValue];
-	NSInteger iYear = iYearMM / 100;
-	
-	//NSLog(@"(2) currentLocale NSLocaleLanguageCode : %@",[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode]);
-	if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) { // 「書式」で変わる。　「言語」でない
-		return [NSString stringWithFormat:@"%d年 %d月", iYear, iYearMM - (iYear * 100)]; 
-	} else {
-		return [NSString stringWithFormat:@"%d / %d", iYearMM - (iYear * 100), iYear]; 
+	if (section < [[self.fetchedResultsController sections] count]) {
+		NSInteger iYearMM = [[[[self.fetchedResultsController sections] objectAtIndex:section] name] integerValue];
+		NSInteger iYear = iYearMM / 100;
+		
+		//NSLog(@"(2) currentLocale NSLocaleLanguageCode : %@",[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode]);
+		if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) { // 「書式」で変わる。　「言語」でない
+			return [NSString stringWithFormat:@"%d年 %d月", iYear, iYearMM - (iYear * 100)]; 
+		} else {
+			return [NSString stringWithFormat:@"%d / %d", iYearMM - (iYear * 100), iYear]; 
+		}
 	}
+	return @"Latest";
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	if (indexPath.section < [[self.fetchedResultsController sections] count]) {
+		return 44; // Default
+	}
+    return 50; // END LINE - AdMob
 }
 
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	static NSString *Cid = @"E2listCell";  //== Class名
-	E2listCell *cell = (E2listCell*)[tableView dequeueReusableCellWithIdentifier:Cid];
-	if (cell == nil) {
-		UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
-		[nib instantiateWithOwner:self options:nil];
-		//cell = self.ownerCell;
-		// 選択
-		//cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-		//cell.selectionStyle = UITableViewCellSelectionStyleNone; // 選択時ハイライトなし
+	if (indexPath.section < [[self.fetchedResultsController sections] count]) 
+	{
+		static NSString *Cid = @"E2listCell";  //== Class名
+		E2listCell *cell = (E2listCell*)[tableView dequeueReusableCellWithIdentifier:Cid];
+		if (cell == nil) {
+			UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
+			[nib instantiateWithOwner:self options:nil];
+			//cell = self.ownerCell;
+			// 選択
+			//cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+			//cell.selectionStyle = UITableViewCellSelectionStyleNone; // 選択時ハイライトなし
+		}
+		// Configure the cell.
+		[self configureCell:cell atIndexPath:indexPath];
+		return cell;
 	}
-
-	// Configure the cell.
-	[self configureCell:cell atIndexPath:indexPath];
-    return cell;
+	else {
+		static NSString *CidEnd = @"E2listEnd";
+		UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CidEnd];
+		if (cell == nil) {
+			cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CidEnd];
+			cell.accessoryType = UITableViewCellAccessoryNone;
+			//cell.textLabel.textAlignment = UITextAlignmentCenter;
+			//cell.textLabel.textColor = [UIColor grayColor];
+			cell.textLabel.text = @"";
+#ifdef GD_Ad_ENABLED
+			//--------------------------------------------------------------------------------------------------------- AdMob
+			if (adMobView_==nil) {
+				adMobView_ = [[GADBannerView alloc] init];
+				adMobView_.rootViewController = self;
+				adMobView_.adUnitID = AdMobID_BodyNote;
+				GADRequest *request = [GADRequest request];
+				//[request setTesting:YES];
+				// GAD_SIZE_320x50
+				adMobView_.frame = cell.contentView.frame;
+				//adMobView_.alpha = 0;	// 0=非表示　　1=表示
+				//adMobView_.tag = 0;		// 0=広告なし　　1=あり　　（iAdを優先表示するために必要）
+				//adMobView_.delegate = self;
+				[adMobView_ loadRequest:request];
+			}
+			[cell.contentView addSubview:adMobView_];
+#endif
+		}
+		return cell;
+	}
+    return nil;
 }
 
 /*
@@ -278,7 +334,7 @@
 
 		E2editTVC *editVc = [segue destinationViewController];
 		editVc.moE2edit = e2;  //[self.fetchedResultsController objectAtIndexPath:mIndexPathEdit];
-		bEditReturn_ = YES;
+		//bEditReturn_ = YES;
 	}
 }
 
@@ -340,7 +396,7 @@
 	//[fetchRequest setFetchOffset:0];
 
 	// where
-	//[fetchRequest setPredicate:[NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"]]; // 未保存を除外する
+	[fetchRequest setPredicate:[NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"]]; // 未保存を除外する
     
 	// ソート条件指定
     // Edit the sort key as appropriate.

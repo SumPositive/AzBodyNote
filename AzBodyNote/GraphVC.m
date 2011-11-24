@@ -8,14 +8,18 @@
 
 #import "Global.h"
 #import "GraphVC.h"
+#import "GraphView.h"
+#import "AzBodyNoteAppDelegate.h"
+#import "MocEntity.h"
+#import "MocFunctions.h"
 
 
 @implementation GraphVC
 {
 	IBOutlet UIScrollView		*ibScrollView;
-	IBOutlet UIView				*ibGraphView;
+	IBOutlet GraphView			*ibGraphView;
 	
-	NSArray *bodyNotes_;
+	NSArray		*aE2records_;
 	
 }
 
@@ -56,25 +60,49 @@
 												 name:@"RefreshAllViews" 
 											   object:[[UIApplication sharedApplication] delegate]];
 	
-	CGRect rc = ibScrollView.bounds;
-	rc.size.width *= 10;
-	ibScrollView.contentSize = rc.size;
-	ibGraphView.frame = rc;
-
-	ibScrollView.contentOffset = CGPointMake(rc.size.width - ibScrollView.frame.size.width, 0);  // 右端（当日）を表示する
-
 	// ibLbBpHi.backgroundColor = self.view.backgroundColor とする。スクロール範囲外になったとき見えなくするため
-	ibLbBpHi.tag = ViewTAG_BpHi;				ibLbBpHi.text = NSLocalizedString(@"BpHi Name",nil);		
-	ibLbBpLo.tag = ViewTAG_BpLo;			ibLbBpLo.text = NSLocalizedString(@"BpLo Name",nil);
-	ibLbPuls.tag = ViewTAG_Puls;				ibLbPuls.text = NSLocalizedString(@"Pulse Name",nil);
-	ibLbWeight.tag = ViewTAG_Weight;	ibLbWeight.text = NSLocalizedString(@"Weight Name",nil);
-	ibLbTemp.tag = ViewTAG_Temp;			ibLbTemp.text = NSLocalizedString(@"Temp Name",nil);
+	ibLbBpHi.text = NSLocalizedString(@"BpHi Name",nil);		
+	ibLbBpLo.text = NSLocalizedString(@"BpLo Name",nil);
+	ibLbPuls.text = NSLocalizedString(@"Pulse Name",nil);
+	ibLbWeight.text = NSLocalizedString(@"Weight Name",nil);
+	ibLbTemp.text = NSLocalizedString(@"Temp Name",nil);
 }
 
 - (void)viewWillAppear:(BOOL)animated 
 {
     [super viewWillAppear:animated];
-	[ibGraphView drawRect:self.view.frame];
+	
+	// E2record 取得
+	aE2records_ = nil; 
+	// Sort条件
+	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
+	NSArray *sortDesc = [NSArray arrayWithObjects: sort1,nil]; // 日付降順：Limit抽出に使用
+	
+	aE2records_ = [MocFunctions select: @"E2record"
+								 limit: RECORD_LIMIT
+								offset: 0
+								 where: [NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"] // 未保存を除外する
+								  sort: sortDesc]; // 最新日付から抽出
+	
+	if ([aE2records_ count] < 1) {
+		aE2records_ = nil;
+		ibGraphView.RaE2records = aE2records_;
+		return;
+	}
+	
+	ibGraphView.RaE2records = aE2records_;
+	
+	// GraphView サイズを決める
+	CGRect rc = ibScrollView.bounds;
+	rc.origin.x = 0;
+	rc.size.width = RECORD_WIDTH * [aE2records_ count] + MARGIN_WIDTH*2;
+	ibScrollView.contentSize = rc.size;
+	ibGraphView.frame = rc;
+	ibScrollView.contentOffset = CGPointMake(rc.size.width - ibScrollView.bounds.size.width, 0);  // 右端（当日）を表示する
+
+	//[ibGraphView drawRect:self.view.frame];  NG//これだと不具合発生する
+	[ibGraphView setNeedsDisplay]; //drawRect:が呼び出される
+	
 	self.view.alpha = 0;
 }
 
@@ -85,7 +113,7 @@
 		// アニメ準備
 		CGContextRef context = UIGraphicsGetCurrentContext();
 		[UIView beginAnimations:nil context:context];
-		[UIView setAnimationDuration:1.5];
+		[UIView setAnimationDuration:TABBAR_CHANGE_TIME];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
 		//[UIView setAnimationDelegate:self];
 		//[UIView setAnimationDidStopSelector:@selector(hide_after_dissmiss)]; //アニメーション終了後に呼び出す＜＜setAnimationDelegate必要

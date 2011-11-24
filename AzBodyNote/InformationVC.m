@@ -51,6 +51,29 @@
 	ibLbVersion.text = [NSString stringWithFormat:@"Version %@", zVersion];
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+	
+	self.view.alpha = 0;
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+	if (self.view.alpha != 1) { //AddNewのときだけディゾルブ
+		// アニメ準備
+		CGContextRef context = UIGraphicsGetCurrentContext();
+		[UIView beginAnimations:nil context:context];
+		[UIView setAnimationDuration:TABBAR_CHANGE_TIME];
+		[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
+		// アニメ終了状態
+		self.view.alpha = 1;
+		// アニメ実行
+		[UIView commitAnimations];
+	}
+}
+
 - (void)viewDidUnload
 {
     [super viewDidUnload];

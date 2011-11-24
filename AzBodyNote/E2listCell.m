@@ -83,7 +83,7 @@
 		ibLbDate.text = [fm stringFromDate:moE2node_.dateTime];
 		//[fm release];
 		
-		NSLog(@"--- moE2node_.sNote2=%@", moE2node_.sNote2);
+		//NSLog(@"--- moE2node_.sNote2=%@", moE2node_.sNote2);
 
 		ibLbBpHi.text = [self strValue:[moE2node_.nBpHi_mmHg integerValue] dec:0]; 
 		ibLbBpLo.text = [self strValue:[moE2node_.nBpLo_mmHg integerValue] dec:0];

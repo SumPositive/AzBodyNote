@@ -21,7 +21,7 @@
                                         <rect key="frame" x="33" y="20" width="249" height="377"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <subviews>
-                                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="Ki5-mH-bkA">
+                                            <segmentedControl hidden="YES" opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="Ki5-mH-bkA">
                                                 <rect key="frame" x="160" y="50" width="100" height="30"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 <segments>
@@ -113,7 +113,7 @@
                                 <rect key="frame" x="20" y="26" width="57" height="57"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             </imageView>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="血圧日記" textAlignment="center" lineBreakMode="tailTruncation" minimumFontSize="10" id="UFo-kD-nCB" userLabel="Lb Title">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="体調日記" textAlignment="center" lineBreakMode="tailTruncation" minimumFontSize="10" id="UFo-kD-nCB" userLabel="Lb Title">
                                 <rect key="frame" x="101" y="15" width="199" height="72"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="40"/>
@@ -127,7 +127,9 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Limited simple app BodyNote (C)2011 Azukid Creator Sum Positive All Rights Reserved. " textAlignment="center" lineBreakMode="characterWrap" numberOfLines="6" adjustsFontSizeToFit="NO" minimumFontSize="10" id="znk-2Y-YR7" userLabel="Lb Copyright">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Limited simple app
+BodyNote
+(C)2011 Azukid Creator Sum Positive All Rights Reserved. " textAlignment="center" lineBreakMode="characterWrap" numberOfLines="6" adjustsFontSizeToFit="NO" minimumFontSize="10" id="znk-2Y-YR7" userLabel="Lb Copyright">
                                 <rect key="frame" x="101" y="114" width="199" height="91"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
@@ -699,7 +701,6 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
             <source key="sourceIdentifier" type="project" relativePath="./Classes/GraphView.h"/>
             <relationships>
                 <relationship kind="action" name="ibSegTypeChange:" candidateClass="UISegmentedControl"/>
-                <relationship kind="outlet" name="ibSegType" candidateClass="UISegmentedControl"/>
             </relationships>
         </class>
         <class className="InformationVC" superclassName="UIViewController">
