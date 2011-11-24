@@ -87,7 +87,7 @@
                         </subviews>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Graph" image="Icon-Drum.png" id="LCl-bO-Aa5"/>
+                    <tabBarItem key="tabBarItem" title="Graph" image="Tab32-Graph.png" id="LCl-bO-Aa5"/>
                     <connections>
                         <outlet property="ibGraphView" destination="EhJ-zG-YVb" id="fE5-IE-AAS"/>
                         <outlet property="ibLbBpHi" destination="f9h-H4-WxH" id="YHj-TJ-idm"/>
@@ -127,9 +127,7 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Limited simple app
-BodyNote
-(C)2011 Azukid Creator Sum Positive All Rights Reserved. " textAlignment="center" lineBreakMode="characterWrap" numberOfLines="6" adjustsFontSizeToFit="NO" minimumFontSize="10" id="znk-2Y-YR7" userLabel="Lb Copyright">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Limited simple app BodyNote (C)2011 Azukid Creator Sum Positive All Rights Reserved. " textAlignment="center" lineBreakMode="characterWrap" numberOfLines="6" adjustsFontSizeToFit="NO" minimumFontSize="10" id="znk-2Y-YR7" userLabel="Lb Copyright">
                                 <rect key="frame" x="101" y="114" width="199" height="91"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
@@ -238,7 +236,7 @@ BodyNote
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hob-kh-rKo" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController definesPresentationContext="YES" modalTransitionStyle="crossDissolve" id="a96-47-bvo" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="List" image="Tx-WoodWhite320x44.png" id="M8A-xp-xZL"/>
+                    <tabBarItem key="tabBarItem" title="List" image="Tab32-List.png" id="M8A-xp-xZL"/>
                     <navigationBar key="navigationBar" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="ee0-I5-CrU">
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -623,7 +621,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="NMd-UZ-Ilp" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController title="Add" definesPresentationContext="YES" modalTransitionStyle="flipHorizontal" id="GAi-aS-64n" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Add" image="Icon32-Setting.png" id="KP8-uq-wlD"/>
+                    <tabBarItem key="tabBarItem" title="Add" image="Tab32-Add.png" id="KP8-uq-wlD"/>
                     <navigationBar key="navigationBar" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="zi7-k3-hfl">
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -657,12 +655,12 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
     </scenes>
     <resources>
         <image name="GraphDrum.png" width="320" height="410"/>
-        <image name="Icon-Drum.png" width="128" height="79"/>
         <image name="Icon32-Information.png" width="32" height="32"/>
-        <image name="Icon32-Setting.png" width="32" height="32"/>
-        <image name="Icon57.png" width="16" height="16"/>
+        <image name="Icon57.png" width="57" height="57"/>
+        <image name="Tab32-Add.png" width="32" height="32"/>
+        <image name="Tab32-Graph.png" width="32" height="32"/>
+        <image name="Tab32-List.png" width="32" height="32"/>
         <image name="Tx-Brown320x88.png" width="320" height="88"/>
-        <image name="Tx-WoodWhite320x44.png" width="16" height="16"/>
     </resources>
     <classes>
         <class className="E2editCellDial" superclassName="UITableViewCell">
@@ -718,6 +716,6 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="I2k-aE-IVK"/>
+        <segue reference="nDM-Jt-DLq"/>
     </inferredMetricsTieBreakers>
 </document>

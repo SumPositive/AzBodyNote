@@ -54,6 +54,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+	self.title = NSLocalizedString(@"TabGraph",nil);
+
 	// listen to our app delegates notification that we might want to refresh our detail view
     [[NSNotificationCenter defaultCenter] addObserver:self 
 											 selector:@selector(refreshAllViews:) 

@@ -235,7 +235,7 @@
 	}
 	else {
 		// AddNew mode.
-		self.title = NSLocalizedString(@"AddNew",nil);
+		self.title = NSLocalizedString(@"TabAdd",nil);
 		bAddNew_ = YES;
 		// moE2edit_ は、viewWillAppear:にて生成する。
 /*		//NG//Re2edit_ = [MocFunctions insertAutoEntity:@"E2record"]; // autorelese
@@ -265,7 +265,7 @@
 	
 #ifdef GD_Ad_ENABLED
 	//CGRect rcAd = CGRectMake(0, self.view.frame.size.height-self.tabBarController.view.frame.size.height-50, 320, 50);
-	CGRect rcAd = CGRectMake(0, self.view.frame.size.height-28-50, 320, 50);
+	CGRect rcAd = CGRectMake(0, self.view.frame.size.height-29-50, 320, 50);
 	//--------------------------------------------------------------------------------------------------------- AdMob
 	if (adMobView_==nil) {
 		adMobView_ = [[GADBannerView alloc] init];

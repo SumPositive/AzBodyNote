@@ -45,6 +45,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+	self.title = NSLocalizedString(@"TabInfo",nil);
+
     // Do any additional setup after loading the view from its nib.
 
 	NSString *zVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];

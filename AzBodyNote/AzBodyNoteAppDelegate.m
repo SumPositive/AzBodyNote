@@ -53,6 +53,13 @@
 	E2listTVC *e2list = (E2listTVC *)[tbc.childViewControllers objectAtIndex:1];
 	e2list.managedObjectContext = self.managedObjectContext;*/
 	
+-----------NG-----
+	NSArray *aTab = self.tabBarController.childViewControllers;
+	[[aTab objectAtIndex:0] setTitle: NSLocalizedString(@"TabAdd",nil)];
+	[[aTab objectAtIndex:1] setTitle: NSLocalizedString(@"TabList",nil)];
+	[[aTab objectAtIndex:2] setTitle: NSLocalizedString(@"TabGraph",nil)];
+	[[aTab objectAtIndex:3] setTitle: NSLocalizedString(@"TabInfo",nil)];
+
 	// Moc初期化
 	[MocFunctions setMoc:self.managedObjectContext];
     return YES;
