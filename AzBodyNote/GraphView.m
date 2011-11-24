@@ -22,13 +22,8 @@
 
 @implementation GraphView
 {
-	//NSArray *maDate;
-	//NSArray *maBpHi;
-	//NSArray *maBpLo;
-	//NSArray *maPuls;
-	//NSArray *maWeight;
-	//NSArray *maTemp;
-	
+	IBOutlet UISegmentedControl	*ibSegType;
+
 	BOOL			bDrowRect_;
 	NSArray		*aE2records_;
 }
@@ -46,6 +41,42 @@
 
 // X軸: 1dot = 1Hour
 // Y軸: 1dot
+
+- (void)graphDrawDate:(CGContextRef)cgc 
+				count:(int)count
+			   points:(const CGPoint *)points  
+			   values:(const long *)values		//= month*1000000 + day*10000 + hour*100 + minute
+{
+	assert(count <= GRAPH_MAX);
+	//文字列の設定
+	CGContextSetTextDrawingMode (cgc, kCGTextFillStroke);
+	CGContextSelectFont (cgc, "Helvetica", 12.0, kCGEncodingMacRoman);
+	// グラフ ストロークカラー設定(0.0-1.0でRGBAを指定する)
+	CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 1.0);
+	CGContextSetRGBFillColor (cgc, 0, 0, 0, 1.0);
+	for (int iNo=0; iNo < count; iNo++) 
+	{
+		CGPoint po = points[ iNo ];
+		// 数値
+		long val = values[ iNo ];
+		int iMonth = val / 1000000;
+		val -= iMonth * 1000000;
+		int iDay = val / 10000;
+		val -= iDay * 10000;
+		int iHour = val / 100;
+		val -= iHour * 100;
+		int iMinute = val;
+
+		const char *cc;
+		cc = [[NSString stringWithFormat:@"%d/%d", iMonth, iDay] UTF8String];
+		CGContextShowTextAtPoint (cgc, po.x-15, po.y+20, cc, strlen(cc));
+
+		cc = [[NSString stringWithFormat:@"%02d:%02d", iHour, iMinute] UTF8String];
+		CGContextShowTextAtPoint (cgc, po.x-15, po.y+8, cc, strlen(cc));
+	}
+	//CGContextStrokePath(cgc);
+	//CGContextFillPath(cgc); // パスを塗り潰す
+}
 
 - (void)graphDrawOne:(CGContextRef)cgc 
 			   count:(int)count
@@ -65,6 +96,9 @@
 #endif
 	CGContextStrokePath(cgc);
 	
+	//文字列の設定
+	CGContextSetTextDrawingMode (cgc, kCGTextFillStroke);
+	CGContextSelectFont (cgc, "Helvetica", 12.0, kCGEncodingMacRoman);
 	// グラフ ストロークカラー設定(0.0-1.0でRGBAを指定する)
 	CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 1.0);
 	CGContextSetRGBFillColor (cgc, 0, 0, 0, 1.0);
@@ -92,9 +126,12 @@
 			CGContextShowTextAtPoint (cgc, po.x-5, po.y-13, cc, strlen(cc));
 		}
 	}
-	CGContextStrokePath(cgc);
+	//CGContextStrokePath(cgc);
+	//CGContextFillPath(cgc); // パスを塗り潰す
 }
 
+#define SEPARATE_HEIGHT	3.0		// 区切り線の高さ
+#define WIDTH_OFFSET			160		// 右端の余白（ラベルや設定ボタンを設置する）
 - (void)graphDraw:(CGContextRef)cgc
 {
 	NSLog(@"graphDraw: frame=(%f, %f)-(%f, %f) ", self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
@@ -103,44 +140,50 @@
 	CGContextSetRGBStrokeColor(cgc, 0.0, 0.0, 0.0, 1.0);
 	//ストロークの線幅を設定
 	CGContextSetLineWidth(cgc, 0.2);
-	
+
+	//--------------------------------------------------------------------------------------- 背景を描く
 	CGFloat fHeight = self.bounds.size.height - 3 - 15;  // 上下の余白を除いた有効な高さ
+	CGRect rc;
 	// Temp領域 (H:1/8)
 	CGRect rcTemp = self.bounds;
-	rcTemp.origin.y = 3.0;													// Y開始
-	rcTemp.size.height = fHeight / 8.0;				// 高さ
-	CGContextSetRGBFillColor(cgc, 0.0, 0.6, 0.6, 1.0);
-	CGContextAddRect(cgc, rcTemp);
-	CGContextFillPath(cgc);
-	
-	// Weight領域 (H:1/4)
+	rcTemp.origin.y = 3.0 + SEPARATE_HEIGHT;	// Y開始
+	rcTemp.size.height = fHeight *  1 / 8 - SEPARATE_HEIGHT;		// 高さ
+	//lb = (UILabel*)[self.superview viewWithTag:ViewTAG_Temp];	// GraphVC:にあるラベルを配置する //NG//固定配置にした。
+	//rc = lb.frame;	rc.origin.y = rcTemp.origin.y + rcTemp.size.height/2;		
+	//lb.frame = rc;
+	// Weight領域 (H:2/8)
 	CGRect rcWeight = self.bounds;
-	rcWeight.origin.y = rcTemp.origin.y + rcTemp.size.height;		// Y開始
-	rcWeight.size.height = fHeight / 4.0;						// 高さ
-	CGContextSetRGBFillColor(cgc, 0.6, 0.0, 0.6, 1.0);
-	CGContextAddRect(cgc, rcWeight);
-	CGContextFillPath(cgc);
-
+	rcWeight.origin.y = rcTemp.origin.y + rcTemp.size.height + SEPARATE_HEIGHT;		// Y開始
+	rcWeight.size.height = fHeight * 2 / 8 - SEPARATE_HEIGHT;		// 高さ
 	// Puls領域  (H:1/8)
 	CGRect rcPuls = self.bounds;
-	rcPuls.origin.y = rcWeight.origin.y + rcWeight.size.height;		// Y開始
-	rcPuls.size.height = fHeight / 8.0;							// 高さ
-	CGContextSetRGBFillColor(cgc, 0.6, 0.6, 0.0, 1.0);
-	CGContextAddRect(cgc, rcPuls);
-	CGContextFillPath(cgc);
-	
-	// BpHi,Lo領域  (H:1/2)
+	rcPuls.origin.y = rcWeight.origin.y + rcWeight.size.height + SEPARATE_HEIGHT;		// Y開始
+	rcPuls.size.height = fHeight * 1 / 8.0 - SEPARATE_HEIGHT;		// 高さ
+	// BpHi,Lo領域  (H:3/8)
 	CGRect rcBp = self.bounds;
-	rcBp.origin.y = rcPuls.origin.y + rcPuls.size.height;				// Y開始
-	rcBp.size.height = fHeight / 2.0;							// 高さ
-	CGContextSetRGBFillColor(cgc, 0.6, 0.6, 0.6, 1.0);
-	CGContextAddRect(cgc, rcBp);
-	CGContextFillPath(cgc);
-
+	rcBp.origin.y = rcPuls.origin.y + rcPuls.size.height + SEPARATE_HEIGHT;				// Y開始
+	rcBp.size.height = fHeight * 3 / 8 - SEPARATE_HEIGHT;				// 高さ
+	// Date領域  (H:1/8)
+	CGRect rcDate = self.bounds;
+	rcDate.origin.y = rcBp.origin.y + rcBp.size.height + SEPARATE_HEIGHT;				// Y開始
+	rcDate.size.height = fHeight * 1 / 8 - SEPARATE_HEIGHT;				// 高さ
+	// 区切り線
+	CGContextSetRGBFillColor(cgc, 0.8, 0.8, 0.8, 0.4);
+	rc = CGRectMake(0, 0, self.bounds.size.width - WIDTH_OFFSET + 20, SEPARATE_HEIGHT);
+	rc.origin.y = rcWeight.origin.y - SEPARATE_HEIGHT;	CGContextAddRect(cgc, rc);
+	rc.origin.y = rcPuls.origin.y - SEPARATE_HEIGHT;			CGContextAddRect(cgc, rc);
+	rc.origin.y = rcBp.origin.y - SEPARATE_HEIGHT;			CGContextAddRect(cgc, rc);
+	rc.origin.y = rcDate.origin.y - SEPARATE_HEIGHT;		CGContextAddRect(cgc, rc);
 	//画面に描画
-	CGContextStrokePath(cgc);
-
-
+	CGContextFillPath(cgc); // パスを塗り潰す
+	
+	// 右端の設定領域について
+	rc = ibSegType.frame;
+	rc.origin.x = self.bounds.size.width - WIDTH_OFFSET + 25;
+	ibSegType.frame = rc;
+	
+	
+	// E2record 取得
 	aE2records_ = nil; 
 	// Sort条件
 	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
@@ -156,7 +199,7 @@
 		aE2records_ = nil;
 		return;
 	}
-	
+	NSLog(@"aE2records_=%@", aE2records_);
 	// Min, Max
 	NSInteger iMaxBp = 0;
 	NSInteger iMinBp = 999;
@@ -209,20 +252,35 @@
 	CGPoint po;
 	//ストロークの線幅を設定
 	CGContextSetLineWidth(cgc, 0.5);
-	//文字列の設定
-	CGContextSetTextDrawingMode (cgc, kCGTextFillStroke);
-	CGContextSelectFont (cgc, "Helvetica", 12.0, kCGEncodingMacRoman);
 
 	CGPoint	pointsArray[GRAPH_MAX+1];
 	long			valuesArray[GRAPH_MAX+1];
 	int			arrayNo;
 
+	//-------------------------------------------------------------------------------------- Date 描画
+	//システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+	unsigned unitFlags = NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit;
+	po.x = self.bounds.size.width - WIDTH_OFFSET; // 最新日の描画位置
+	po.y = rcDate.origin.y + H_GAP;
+	arrayNo = 0;
+	for (E2record *e2 in aE2records_)
+	{
+		if (e2.dateTime) 
+		{
+			pointsArray[ arrayNo ] = po;
+			NSDateComponents *comp = [calendar components:unitFlags fromDate:e2.dateTime];
+			valuesArray[ arrayNo ] = comp.month * 1000000 + comp.day * 10000 + comp.hour * 100 + comp.minute;
+			arrayNo++;
+		}
+		po.x -= (W_HOUR * 24);
+		if (po.x <= 0) break;
+	}
+	[self graphDrawDate:cgc count:arrayNo points:pointsArray values:valuesArray];	
+	
 	//-------------------------------------------------------------------------------------- BpHi グラフ描画
-	// 端点、数値　ストロークカラー設定(0.0-1.0でRGBAを指定する)
-	//CGContextSetRGBStrokeColor(cgc, 1, 1, 0, 1.0);
-	//CGContextSetRGBFillColor (cgc, 1, 1, 0, 1.0);
 	fYstep = rcBp.size.height / (iMaxBp - iMinBp + H_GAP*2);  // 1あたりのポイント数
-	po.x = self.bounds.size.width - 160; // 最新日の描画位置
+	po.x = self.bounds.size.width - WIDTH_OFFSET; // 最新日の描画位置
 	arrayNo = 0;
 	for (E2record *e2 in aE2records_)
 	{
@@ -233,28 +291,12 @@
 				pointsArray[ arrayNo ] = po;
 				valuesArray[ arrayNo ] = ii;
 				arrayNo++;
-				// 端点
-				//CGContextFillEllipseInRect(cgc, CGRectMake(po.x-1.5, po.y-1.5, 3, 3));	//円Fill
-				// 数値
-				//const char *c = [[NSString stringWithFormat:@"%d", ii] UTF8String];
-				//CGContextShowTextAtPoint (cgc, po.x-10, po.y-13, c, sizeof(c)-1);
 			}
 		}
 		po.x -= (W_HOUR * 24);
 		if (po.x <= 0) break;
 	}
 	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueDec:0  pointLower:rcBp.origin.y];
-	//CGContextStrokePath(cgc);
-	// グラフ ストロークカラー設定(0.0-1.0でRGBAを指定する)
-	//CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 1.0);
-	//CGContextSetRGBFillColor (cgc, 0, 0, 0, 1.0);
-#ifdef YES
-	// 折れ線
-	//CGContextAddLines(cgc, pointsArray, pointNo);	
-#else
-	// スプライン曲線
-#endif
-	//CGContextStrokePath(cgc);
 	
 	//-------------------------------------------------------------------------------------- BpLo グラフ描画
 	po.x = self.bounds.size.width - 160;
@@ -306,70 +348,42 @@
 // An empty implementation adversely affects performance during animation.
 - (void)drawRect:(CGRect)rect
 {
+	static CGContextRef cgc = nil;
+	
 	if (bDrowRect_) {	// 初期化時に通さないため
 		//現在のグラフィックスコンテキストを取得
-		CGContextRef cgc = UIGraphicsGetCurrentContext();
-		// CoreGraphicsの原点が左下なので原点を合わせる
-		CGContextTranslateCTM(cgc, 0, rect.size.height);
-		CGContextScaleCTM(cgc, 1.0, -1.0);
-		
+		if (cgc==nil) {
+			cgc = UIGraphicsGetCurrentContext();
+			// CoreGraphicsの原点が左下なので原点を合わせる
+			CGContextTranslateCTM(cgc, 0, rect.size.height);
+			CGContextScaleCTM(cgc, 1.0, -1.0);
+		}
 		[self graphDraw:cgc];
+		//CGContextRelease(cgc);
 	}
 	bDrowRect_ = YES;
 }
 
 
-#ifdef xxxxxxxxxSampleCodexxxxxxxxx
-{
-	//ストロークカラーの設定(0.0-1.0でRGBAを指定する)
-	CGContextSetRGBStrokeColor(cgc, 0.0, 0.0, 0.0, 1.0);
-	//ストロークの線幅を設定
-	CGContextSetLineWidth(cgc, 2.0);
-	//カレントポイントから指定した座標に向けて線を引く
-	CGContextStrokeEllipseInRect(cgc, CGRectMake(0.0, 0.0,100.0,100.0));
-	//パスに円を追加
-	CGContextAddEllipseInRect(cgc, CGRectMake(0.0, 0.0, 600.0, 600.0));
-	//画面に描画
-	CGContextStrokePath(cgc);
-	
-	//
-	CGContextSetRGBStrokeColor(cgc, 1.0, 0.0, 0.0, 1.0);
-	CGPoint lines[] =
-	{
-		CGPointMake(  0.0,   0.0),
-		CGPointMake(70.0, 60.0),
-		CGPointMake(130.0, 100.0),
-		CGPointMake(190.0, 70.0),
-		CGPointMake(250.0, 90.0),
-		CGPointMake(310.0, 50.0)
-	};
-	CGContextAddLines(cgc, lines, (sizeof(lines)/sizeof(lines[0])));
-	//画面に描画
-	CGContextStrokePath(cgc);
-	
+#pragma mark - IBAction
 
-	CGContextSetRGBFillColor(cgc, 1.0, 0.5, 0.0, 1.0);
-    CGContextSetRGBStrokeColor(cgc, 1.0, 0.0, 0.5, 1.0);
-    CGContextSetLineWidth(cgc, 10.0);
-	
-    CGRect r1 = CGRectMake(20.0 , 20.0, 100.0, 100.0);
-    CGContextAddEllipseInRect(cgc,r1);
-    CGContextFillPath(cgc);
-	
-    CGContextMoveToPoint(cgc, 50, 100);
-    CGContextAddLineToPoint(cgc, 150, 100);
-    CGContextAddLineToPoint(cgc, 50, 200);
-    CGContextAddLineToPoint(cgc, 150, 200);
-    CGContextStrokePath(cgc);
-	
-    CGContextMoveToPoint(cgc,50, 250);
-    CGContextAddCurveToPoint(cgc, 
-							 100, 250, 100, 200, 150, 250);
-    CGContextAddCurveToPoint(cgc, 
-							 200, 350, 50, 250, 50, 350);
-    CGContextStrokePath(cgc);
+- (IBAction)ibSegTypeChange:(UISegmentedControl *)seg
+{
+	self.alpha = 0;
+	// アニメ準備
+	CGContextRef context = UIGraphicsGetCurrentContext();
+	[UIView beginAnimations:nil context:context];
+	[UIView setAnimationDuration:2.5];
+	[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
+	//[UIView setAnimationDelegate:self];
+	//[UIView setAnimationDidStopSelector:@selector(hide_after_dissmiss)]; //アニメーション終了後に呼び出す＜＜setAnimationDelegate必要
+	// アニメ終了状態
+	[self drawRect:self.frame];		// タイプを変えて再描画
+	self.alpha = 1;
+	// アニメ実行
+	[UIView commitAnimations];
+
 }
-#endif
 
 @end
 

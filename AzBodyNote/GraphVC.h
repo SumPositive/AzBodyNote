@@ -8,9 +8,19 @@
 
 #import <UIKit/UIKit.h>
 
+#define ViewTAG_BpHi			301
+#define ViewTAG_BpLo			302
+#define ViewTAG_Puls			303
+#define ViewTAG_Weight		304
+#define ViewTAG_Temp		305
 
 @interface GraphVC : UIViewController <UIScrollViewDelegate>
-
-@property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
+{
+	IBOutlet UILabel				*ibLbBpHi;
+	IBOutlet UILabel				*ibLbBpLo;
+	IBOutlet UILabel				*ibLbPuls;
+	IBOutlet UILabel				*ibLbWeight;
+	IBOutlet UILabel				*ibLbTemp;
+}
 
 @end

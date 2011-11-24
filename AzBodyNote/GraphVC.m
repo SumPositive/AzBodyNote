@@ -62,6 +62,13 @@
 	ibGraphView.frame = rc;
 
 	ibScrollView.contentOffset = CGPointMake(rc.size.width - ibScrollView.frame.size.width, 0);  // 右端（当日）を表示する
+
+	// ibLbBpHi.backgroundColor = self.view.backgroundColor とする。スクロール範囲外になったとき見えなくするため
+	ibLbBpHi.tag = ViewTAG_BpHi;				ibLbBpHi.text = NSLocalizedString(@"BpHi Name",nil);		
+	ibLbBpLo.tag = ViewTAG_BpLo;			ibLbBpLo.text = NSLocalizedString(@"BpLo Name",nil);
+	ibLbPuls.tag = ViewTAG_Puls;				ibLbPuls.text = NSLocalizedString(@"Pulse Name",nil);
+	ibLbWeight.tag = ViewTAG_Weight;	ibLbWeight.text = NSLocalizedString(@"Weight Name",nil);
+	ibLbTemp.tag = ViewTAG_Temp;			ibLbTemp.text = NSLocalizedString(@"Temp Name",nil);
 }
 
 - (void)viewWillAppear:(BOOL)animated 
