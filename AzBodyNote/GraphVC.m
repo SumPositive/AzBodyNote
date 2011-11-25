@@ -86,18 +86,20 @@
 								 where: [NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"] // 未保存を除外する
 								  sort: sortDesc]; // 最新日付から抽出
 	
-	if ([aE2records_ count] < 1) {
+/*	if ([aE2records_ count] < 1) {
 		aE2records_ = nil;
 		ibGraphView.RaE2records = aE2records_;
 		return;
-	}
+	}*/
 	
 	ibGraphView.RaE2records = aE2records_;
 	
 	// GraphView サイズを決める
 	CGRect rc = ibScrollView.bounds;
 	rc.origin.x = 0;
-	rc.size.width = RECORD_WIDTH * [aE2records_ count] + MARGIN_WIDTH*2;
+	int iCount = [aE2records_ count];
+	if (iCount < 1) iCount = 1;
+	rc.size.width = RECORD_WIDTH * iCount + MARGIN_WIDTH*2;
 	ibScrollView.contentSize = rc.size;
 	ibGraphView.frame = rc;
 	ibScrollView.contentOffset = CGPointMake(rc.size.width - ibScrollView.bounds.size.width, 0);  // 右端（当日）を表示する

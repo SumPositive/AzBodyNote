@@ -249,16 +249,14 @@
 #ifdef GD_Ad_ENABLED
 			//--------------------------------------------------------------------------------------------------------- AdMob
 			if (adMobView_==nil) {
-				adMobView_ = [[GADBannerView alloc] init];
+				adMobView_ = [[GADBannerView alloc]
+							   initWithFrame:CGRectMake(0, 0,			// TableCell用
+														GAD_SIZE_320x50.width,
+														GAD_SIZE_320x50.height)];
+				adMobView_.delegate = nil;  //もし self セットするならば、Unload時に解放処理しなければ落ちる。
 				adMobView_.rootViewController = self;
 				adMobView_.adUnitID = AdMobID_BodyNote;
 				GADRequest *request = [GADRequest request];
-				//[request setTesting:YES];
-				// GAD_SIZE_320x50
-				adMobView_.frame = cell.contentView.frame;
-				//adMobView_.alpha = 0;	// 0=非表示　　1=表示
-				//adMobView_.tag = 0;		// 0=広告なし　　1=あり　　（iAdを優先表示するために必要）
-				//adMobView_.delegate = self;
 				[adMobView_ loadRequest:request];
 			}
 			[cell.contentView addSubview:adMobView_];

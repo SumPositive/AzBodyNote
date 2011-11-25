@@ -35,7 +35,7 @@
 @property (nonatomic, retain) NSNumber   *nBpLo_mmHg;
 @property (nonatomic, retain) NSNumber   *nPulse_bpm;
 @property (nonatomic, retain) NSNumber   *nTemp_10c;
-@property (nonatomic, retain) NSNumber   *nWeight_g;
+@property (nonatomic, retain) NSNumber   *nWeight_10Kg;
 @property (nonatomic, retain) NSNumber   *nYearMM;			// セクション表示のため「年月」を記録
 @property (nonatomic, retain) NSString		*sEquipment;		// 場所や測定装置
 @property (nonatomic, retain) NSString		*sNote1;
@@ -48,7 +48,7 @@
 #define E2_nBpLo_mmHg			@"nBpLo_mmHg"
 #define E2_nPulse_bpm			@"nPulse_bpm"
 #define E2_nTemp_10c			@"nTemp_10c"
-#define E2_nWeight_g				@"nWeight_g"
+#define E2_nWeight_10Kg		@"nWeight_10Kg"
 #define E2_nYearMM					@"nYearMM"
 #define E2_sEquipment				@"sEquipment"
 #define E2_sNote1						@"sNote1"
@@ -62,7 +62,7 @@
 #define E2_nPuls_MIN			10
 #define E2_nPuls_MAX			200
 #define E2_nWeight_MIN		0
-#define E2_nWeight_MAX		200000	//(g)
+#define E2_nWeight_MAX		2000	//x10(Kg)
 #define E2_nTemp_MIN			310
 #define E2_nTemp_MAX		429			//x10(℃)
 

@@ -88,7 +88,7 @@
 		ibLbBpHi.text = [self strValue:[moE2node_.nBpHi_mmHg integerValue] dec:0]; 
 		ibLbBpLo.text = [self strValue:[moE2node_.nBpLo_mmHg integerValue] dec:0];
 		ibLbPuls.text = [self strValue:[moE2node_.nPulse_bpm integerValue] dec:0];
-		ibLbWeight.text = [self strValue:[moE2node_.nWeight_g integerValue] dec:1];
+		ibLbWeight.text = [self strValue:[moE2node_.nWeight_10Kg integerValue] dec:1];
 		ibLbTemp.text = [self strValue:[moE2node_.nTemp_10c integerValue] dec:1];
 		ibLbNote1.text = moE2node_.sNote1;
 		ibLbNote2.text = moE2node_.sNote2;

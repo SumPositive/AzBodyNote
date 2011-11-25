@@ -28,7 +28,7 @@
 @dynamic nBpLo_mmHg;
 @dynamic nPulse_bpm;
 @dynamic nTemp_10c;
-@dynamic nWeight_g;
+@dynamic nWeight_10Kg;
 @dynamic nYearMM;
 @dynamic sEquipment;
 @dynamic sNote1;

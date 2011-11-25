@@ -115,10 +115,7 @@
 		// 数値
 		const char *cc;
 		switch (valueType) {
-			case 2:	// Weight(999999g⇒999.99Kg)
-				cc = [[NSString stringWithFormat:@"%0.2f", (float)values[ iNo ] / 1000.0] cStringUsingEncoding:NSMacOSRomanStringEncoding];
-				break;
-			case 1:	// Temp(999⇒99.9℃)
+			case 1:	// Temp(999⇒99.9℃)  // Weight(9999⇒999.9Kg)
 				cc = [[NSString stringWithFormat:@"%0.1f", (float)values[ iNo ] / 10.0] cStringUsingEncoding:NSMacOSRomanStringEncoding];
 				break;
 			default:
@@ -204,7 +201,7 @@
 	NSInteger iMaxPuls = 0;
 	NSInteger iMinPuls = 999;
 	NSInteger iMaxWeight = 0;
-	NSInteger iMinWeight = 999;
+	NSInteger iMinWeight = 9999;
 	NSInteger iMaxTemp = 0;
 	NSInteger iMinTemp = 999;
 	NSInteger ii;
@@ -213,35 +210,40 @@
 		if (e2.nBpHi_mmHg) {
 			ii = [e2.nBpHi_mmHg integerValue];
 			if (E2_nBpHi_MIN<=ii && ii<=E2_nBpHi_MAX) {
-				if (ii < iMinBp) iMinBp = ii;	else if (iMaxBp < ii) iMaxBp = ii;
+				if (ii < iMinBp) iMinBp = ii;	//NG// else if (iMaxBp < ii) iMaxBp = ii; 1件だけのとき不具合
+				if (iMaxBp < ii) iMaxBp = ii;
 			}
 		}
 
 		if (e2.nBpLo_mmHg) {
 			ii = [e2.nBpLo_mmHg integerValue];
 			if (E2_nBpLo_MIN<=ii && ii<=E2_nBpLo_MAX) {
-				if (ii < iMinBp) iMinBp = ii;	else if (iMaxBp < ii) iMaxBp = ii;
+				if (ii < iMinBp) iMinBp = ii;	
+				if (iMaxBp < ii) iMaxBp = ii;
 			}
 		}
 		
 		if (e2.nPulse_bpm) {
 			ii = [e2.nPulse_bpm integerValue];
 			if (E2_nPuls_MIN<=ii && ii<=E2_nPuls_MAX) {
-				if (ii < iMinPuls) iMinPuls = ii;	else if (iMaxPuls < ii) iMaxPuls = ii;
+				if (ii < iMinPuls) iMinPuls = ii;	
+				if (iMaxPuls < ii) iMaxPuls = ii;
 			}
 		}
 		
-		if (e2.nWeight_g) {
-			ii = [e2.nWeight_g integerValue];
+		if (e2.nWeight_10Kg) {
+			ii = [e2.nWeight_10Kg integerValue];
 			if (E2_nWeight_MIN<=ii && ii<=E2_nWeight_MAX) {
-				if (ii < iMinWeight) iMinWeight = ii;	else if (iMaxWeight < ii) iMaxWeight = ii;
+				if (ii < iMinWeight) iMinWeight = ii;	
+				if (iMaxWeight < ii) iMaxWeight = ii;
 			}
 		}
 		
 		if (e2.nTemp_10c) {
 			ii = [e2.nTemp_10c integerValue];
 			if (E2_nTemp_MIN<=ii && ii<=E2_nTemp_MAX) {
-				if (ii < iMinTemp) iMinTemp = ii;	else if (iMaxTemp < ii) iMaxTemp = ii;
+				if (ii < iMinTemp) iMinTemp = ii;	
+				if (iMaxTemp < ii) iMaxTemp = ii;
 			}
 		}
 	}
@@ -336,8 +338,8 @@
 	po.x = self.bounds.size.width - 160;
 	arrayNo = 0;
 	for (E2record *e2 in aE2records_) {
-		if (e2.nWeight_g) {
-			ii = [e2.nWeight_g integerValue];
+		if (e2.nWeight_10Kg) {
+			ii = [e2.nWeight_10Kg integerValue];
 			if (E2_nWeight_MIN<=ii && ii<=E2_nWeight_MAX) {
 				po.y = rcWeight.origin.y + GRAPH_H_GAP + fYstep * (CGFloat)(ii - iMinWeight);
 				pointsArray[ arrayNo ] = po;
@@ -348,7 +350,7 @@
 		po.x -= RECORD_WIDTH;
 		if (po.x <= 0) break;
 	}
-	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueType:2  pointLower:rcWeight.origin.y];
+	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueType:1  pointLower:rcWeight.origin.y];
 
 	//-------------------------------------------------------------------------------------- Temp グラフ描画
 	fYstep = rcTemp.size.height / (iMaxTemp - iMinTemp + GRAPH_H_GAP*2);  // 1あたりのポイント数

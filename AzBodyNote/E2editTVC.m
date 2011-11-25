@@ -115,13 +115,13 @@
 	} else {
 		iPrevPuls_ = 70;
 	}
-	// E2_nWeight_g
+	// E2_nWeight_10Kg
 	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
-									  where:[NSPredicate predicateWithFormat: E2_nWeight_g @" > 0 AND " E2_dateTime @" < %@", dateNow]
+									  where:[NSPredicate predicateWithFormat: E2_nWeight_10Kg @" > 0 AND " E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 	if ([arFetch count]==1) {
 		e2prev = [arFetch objectAtIndex:0];
-		iPrevWeight_ = [e2prev.nWeight_g integerValue];
+		iPrevWeight_ = [e2prev.nWeight_10Kg integerValue];
 	} else {
 		iPrevWeight_ = 700;
 	}
@@ -150,7 +150,7 @@
 	moE2edit_.nBpHi_mmHg = nil;
 	moE2edit_.nBpLo_mmHg = nil;
 	moE2edit_.nPulse_bpm = nil;
-	moE2edit_.nWeight_g = nil;
+	moE2edit_.nWeight_10Kg = nil;
 	moE2edit_.nTemp_10c = nil;
 	
 	[self setE2recordPrev];
@@ -381,6 +381,24 @@
 {	// メモリ不足時、裏側にある場合に呼び出されるので、viewDidLoadで生成したObjを解放する。
 	//NSLog(@"--- viewDidUnload ---"); 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+	
+#ifdef GD_Ad_ENABLED
+	// ARCによりrelease不要になったが、delegateの解放は必須。
+	if (iAdBanner_) {
+		[iAdBanner_ cancelBannerViewAction];	// 停止
+		iAdBanner_.delegate = nil;							// 解放メソッドを呼び出さないように　　　
+		[iAdBanner_ removeFromSuperview];		// UIView解放		retainCount -1
+		//[iAdBanner_ release]
+		iAdBanner_ = nil;	// alloc解放			retainCount -1
+	}
+	
+	if (adMobView_) {
+		adMobView_.delegate = nil;  //受信STOP  ＜＜これが無いと破棄後に呼び出されて落ちる
+		//[adMobView_ release], 
+		adMobView_ = nil;
+	}
+#endif
+	
 	[super viewDidUnload];
 	// この後に loadView ⇒ viewDidLoad ⇒ viewWillAppear がコールされる
 }
@@ -581,11 +599,11 @@
 			cell.ibLbDetail.text = NSLocalizedString(@"Weight Detail",nil);
 			cell.ibLbUnit.text = @"Kg";
 			cell.Re2record = moE2edit_;
-			cell.RzKey = E2_nWeight_g;
+			cell.RzKey = E2_nWeight_10Kg;
 			cell.mValueMin = E2_nWeight_MIN;
 			cell.mValueMax = E2_nWeight_MAX;
 			cell.mValueDec = 1;
-			cell.mValueStep = 100;
+			cell.mValueStep = 1;
 			cell.mValuePrev = iPrevWeight_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
@@ -661,7 +679,7 @@
 
 
 #ifdef GD_Ad_ENABLED
-#pragma mark - <ADBannerViewDelegate>
+#pragma mark - iAd <ADBannerViewDelegate>
 
 // iAd取得できたときに呼ばれる　⇒　表示する
 - (void)bannerViewDidLoadAd:(ADBannerView *)banner
@@ -696,6 +714,9 @@
 	
 	[UIView commitAnimations];
 }
+
+
+#pragma mark - AdMob <GADBannerViewDelegate>
 
 - (void)adViewDidReceiveAd:(GADBannerView *)bannerView 
 {	// AdMob 広告あり
