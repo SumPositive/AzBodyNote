@@ -42,43 +42,58 @@
 - (void)graphDrawDate:(CGContextRef)cgc 
 				count:(int)count
 			   points:(const CGPoint *)points  
-			   values:(const long *)values		//= month*1000000 + day*10000 + hour*100 + minute
+			   values:(const long *)values		//= month*1000000 + day*10000 + hour*100 + minute  //=0:The GOAL
 {
 	assert(count <= RECORD_LIMIT);
 	//文字列の設定
 	CGContextSetTextDrawingMode (cgc, kCGTextFillStroke);
 	CGContextSelectFont (cgc, "Helvetica", 12.0, kCGEncodingMacRoman);
-	CGRect rc;
+	//CGRect rc;
 	for (int iNo=0; iNo < count; iNo++) 
 	{
 		CGPoint po = points[ iNo ];
 		// 数値
 		long val = values[ iNo ];
 		//NSLog(@"graphDrawDate: [ %d ]=%ld=(%.2f, %.2f)", iNo, val, po.x, po.y);
-		int iMonth = val / 1000000;
-		val -= iMonth * 1000000;
-		int iDay = val / 10000;
-		val -= iDay * 10000;
-		int iHour = val / 100;
-		val -= iHour * 100;
-		int iMinute = val;
-
 		// 文字列 カラー設定(0.0-1.0でRGBAを指定する)
 		CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 1.0);
 		CGContextSetRGBFillColor (cgc, 0, 0, 0, 1.0);
 		const char *cc;
-		cc = [[NSString stringWithFormat:@"%d/%d", iMonth, iDay] UTF8String];
-		CGContextShowTextAtPoint (cgc, po.x-15, po.y+20, cc, strlen(cc));
+		if (val < 1000000) {
+			cc = [[NSString stringWithString:NSLocalizedString(@"TheGoal",nil)] UTF8String];
+			CGContextShowTextAtPoint (cgc, po.x-15, po.y+14, cc, strlen(cc));
+			// 目標ヨコ軸
+			CGContextSetRGBFillColor(cgc, 0.5, 0.5, 0.5, 0.3);
+			CGContextAddRect(cgc, CGRectMake(MARGIN_WIDTH, po.y-3, po.x - MARGIN_WIDTH, po.y+3));
+			//画面に描画
+			CGContextFillPath(cgc); // パスを塗り潰す
+			// 文字列カラーに戻す
+			CGContextSetRGBFillColor (cgc, 0, 0, 0, 1.0);
+		}
+		else {
+			int iMonth = val / 1000000;
+			val -= iMonth * 1000000;
+			int iDay = val / 10000;
+			val -= iDay * 10000;
+			int iHour = val / 100;
+			val -= iHour * 100;
+			int iMinute = val;
+			
+			cc = [[NSString stringWithFormat:@"%d/%d", iMonth, iDay] UTF8String];
+			CGContextShowTextAtPoint (cgc, po.x-15, po.y+20, cc, strlen(cc));
+			
+			cc = [[NSString stringWithFormat:@"%02d:%02d", iHour, iMinute] UTF8String];
+			CGContextShowTextAtPoint (cgc, po.x-15, po.y+8, cc, strlen(cc));
+		}
 
-		cc = [[NSString stringWithFormat:@"%02d:%02d", iHour, iMinute] UTF8String];
-		CGContextShowTextAtPoint (cgc, po.x-15, po.y+8, cc, strlen(cc));
-
+#ifdef xxxNONxxxx
 		// タテ軸　カラー設定
-		CGContextSetRGBFillColor(cgc, 0.9, 0.9, 0.9, 0.3);
+		CGContextSetRGBFillColor(cgc, 0.5, 0.5, 0.5, 0.3);
 		rc = CGRectMake(po.x-1, 0, 2, po.y+3);
 		CGContextAddRect(cgc, rc);
 		//画面に描画
 		CGContextFillPath(cgc); // パスを塗り潰す
+#endif
 	}
 	//CGContextStrokePath(cgc);
 	//CGContextFillPath(cgc); // パスを塗り潰す
@@ -124,9 +139,9 @@
 				break;
 		}
 		if (po.y-13 <= pointLower) {	// 上側に表示
-			CGContextShowTextAtPoint (cgc, po.x-5, po.y+5, cc, strlen(cc));
+			CGContextShowTextAtPoint (cgc, po.x-10, po.y+5, cc, strlen(cc));
 		} else {
-			CGContextShowTextAtPoint (cgc, po.x-5, po.y-13, cc, strlen(cc));
+			CGContextShowTextAtPoint (cgc, po.x-10, po.y-13, cc, strlen(cc));
 		}
 	}
 	//CGContextStrokePath(cgc);
@@ -138,7 +153,7 @@
 	NSLog(@"graphDraw: frame=(%f, %f)-(%f, %f) ", self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
 	
 	//　全域クリア
-	CGContextSetRGBFillColor (cgc, 1, 1, 1, 1.0);
+	CGContextSetRGBFillColor (cgc, 0.67, 0.67, 0.67, 1.0); // スクロール領域外と同じグレー
 	CGContextFillRect(cgc, self.bounds);
 	//ストロークカラーの設定(0.0-1.0でRGBAを指定する)
 	CGContextSetRGBStrokeColor(cgc, 0.0, 0.0, 0.0, 1.0);
@@ -267,8 +282,12 @@
 	for (E2record *e2 in aE2records_) {
 		if (e2.dateTime) {
 			pointsArray[ arrayNo ] = po;
-			NSDateComponents *comp = [calendar components:unitFlags fromDate:e2.dateTime];
-			valuesArray[ arrayNo ] = comp.month * 1000000 + comp.day * 10000 + comp.hour * 100 + comp.minute;
+			if ([e2.nYearMM integerValue]==E2_nYearMM_GOAL) {
+				valuesArray[ arrayNo ] = 0; // The GOAL
+			} else {
+				NSDateComponents *comp = [calendar components:unitFlags fromDate:e2.dateTime];
+				valuesArray[ arrayNo ] = comp.month * 1000000 + comp.day * 10000 + comp.hour * 100 + comp.minute;
+			}
 			//NSLog(@"valuesArray[ %d ]=%ld", arrayNo, valuesArray[ arrayNo ]);
 			arrayNo++;
 		}

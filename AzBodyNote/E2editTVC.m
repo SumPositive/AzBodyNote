@@ -269,7 +269,8 @@
 	//--------------------------------------------------------------------------------------------------------- AdMob
 	if (adMobView_==nil) {
 		adMobView_ = [[GADBannerView alloc] init];
-		adMobView_.rootViewController = self;
+		adMobView_.delegate = self;
+		adMobView_.rootViewController = self.navigationController;
 		adMobView_.adUnitID = AdMobID_BodyNote;
 		GADRequest *request = [GADRequest request];
 		//[request setTesting:YES];
@@ -277,7 +278,6 @@
 		adMobView_.frame = rcAd;
 		adMobView_.alpha = 0;	// 0=非表示　　1=表示
 		adMobView_.tag = 0;		// 0=広告なし　　1=あり　　（iAdを優先表示するために必要）
-		adMobView_.delegate = self;
 		[adMobView_ loadRequest:request];
 		//[self.view addSubview:adMobView_];
 		[self.navigationController.view addSubview:adMobView_];
@@ -327,6 +327,21 @@
 			[self.tableView addSubview:buDelete_];
 		}
 	}
+	
+#ifdef GD_Ad_ENABLED
+	[UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+	[UIView setAnimationDuration:1.2];
+	if (iAdBanner_.tag==1) {
+		iAdBanner_.alpha = 1;
+	}
+	else if (adMobView_.tag==1) {
+		adMobView_.alpha = 1;
+	}
+	[UIView commitAnimations];
+	iAdBanner_.delegate = self;
+	adMobView_.delegate = self;
+#endif
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -345,6 +360,12 @@
 	}
 }
 
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    // Return YES for supported orientations
+	return (interfaceOrientation == UIInterfaceOrientationPortrait); // タテ正面のみ
+}
+
 - (void)viewWillDisappear:(BOOL)animated
 {	// 非表示になる前に呼び出される
     [super viewWillDisappear:animated];
@@ -358,14 +379,19 @@
 	}
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    // Return YES for supported orientations
-	return (interfaceOrientation == UIInterfaceOrientationPortrait); // タテ正面のみ
-}
-
 - (void)viewDidDisappear:(BOOL)animated
-{
+{	// 非表示になった後に呼び出される
+#ifdef GD_Ad_ENABLED
+	iAdBanner_.delegate = nil;
+	adMobView_.delegate = nil;
+	[UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+	[UIView setAnimationDuration:0.8];
+	iAdBanner_.alpha = 0;
+	adMobView_.alpha = 0;
+	[UIView commitAnimations];
+#endif
+
     [super viewDidDisappear:animated];
 }
 
@@ -455,37 +481,31 @@
 	static NSString *Cid = @"E2editCellDate";  //== Class名
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
 	if (cell == nil) {
-		/*
-		 cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:Cid] autorelease];
-		cell.textLabel.textAlignment = UITextAlignmentLeft;
-		cell.textLabel.font = [UIFont systemFontOfSize:20];
-		//cell.detailTextLabel.textAlignment = UITextAlignmentLeft;
-		//cell.detailTextLabel.font = [UIFont systemFontOfSize:20];
-		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;	// > ディスクロージャマーク
-		cell.textLabel.textColor = [UIColor blackColor];
-		cell.textLabel.backgroundColor = [UIColor clearColor];
-		cell.contentView.backgroundColor = [UIColor clearColor];
-		 */
 		UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
 		[nib instantiateWithOwner:self options:nil];
 		cell = (UITableViewCell*)[tableView dequeueReusableCellWithIdentifier:Cid];
 		assert(cell);
 	}
-
-	NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
-	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
-	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-	[fmt setCalendar:calendar];
-	//[calendar release];
-	//[df setLocale:[NSLocale systemLocale]];これがあると曜日が表示されない。
-	[fmt setDateFormat:@"yyyy-M-d EE HH:mm"];
-	if (bAddNew_ || moE2edit_.dateTime==nil) {
-		moE2edit_.dateTime = [NSDate date];
+	
+	if ([moE2edit_.nYearMM integerValue]==E2_nYearMM_GOAL) {
+		cell.textLabel.text = NSLocalizedString(@"TheGoal Section",nil);
+		cell.textLabel.textAlignment = UITextAlignmentCenter;
+		cell.accessoryType = UITableViewCellAccessoryNone;
+		cell.editing = NO;
+		cell.selected = NO;
 	}
-	//cell.detailTextLabel.text = [fmt stringFromDate:Re2edit_.datetime];
-	cell.textLabel.text = [NSString stringWithFormat:@"%@   %@", NSLocalizedString(@"DateTime",nil), 
-						   [fmt stringFromDate:moE2edit_.dateTime]];
-	//[fmt release];
+	else {
+		NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
+		// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
+		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+		[fmt setCalendar:calendar];
+		[fmt setDateFormat:@"yyyy-M-d EE HH:mm"];
+		if (bAddNew_ || moE2edit_.dateTime==nil) {
+			moE2edit_.dateTime = [NSDate date];
+		}
+		cell.textLabel.text = [NSString stringWithFormat:@"%@   %@", NSLocalizedString(@"DateTime",nil), 
+							   [fmt stringFromDate:moE2edit_.dateTime]];
+	}
 	return cell;
 }
 

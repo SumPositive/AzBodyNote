@@ -148,4 +148,22 @@ static NSManagedObjectContext *scMoc = nil;
 }
 
 
+#pragma mark - Function
+
+static NSDate *dateGoal_ = nil;
++ (NSDate*)dateGoal
+{	// .dateTime のための 固有日付(dateGoal)を求める
+	if (dateGoal_==nil) {
+		NSDateFormatter *df = [[NSDateFormatter alloc] init];
+		//[df setTimeStyle:NSDateFormatterFullStyle];
+		[df setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss ZZZZ"];
+		dateGoal_ = [df dateFromString: E2_dateTime_GOAL];
+	}
+	NSLog(@"MocFunction: dateGoal_=%@", dateGoal_);
+	assert(dateGoal_);
+	return dateGoal_;
+}
+
+
+
 @end

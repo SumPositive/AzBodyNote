@@ -22,7 +22,7 @@
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <subviews>
                                             <segmentedControl hidden="YES" opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="Ki5-mH-bkA">
-                                                <rect key="frame" x="160" y="50" width="100" height="30"/>
+                                                <rect key="frame" x="160" y="13" width="100" height="30"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 <segments>
                                                     <segment title="Line"/>
@@ -33,7 +33,7 @@
                                                 </connections>
                                             </segmentedControl>
                                         </subviews>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                         <connections>
                                             <outlet property="ibSegType" destination="Ki5-mH-bkA" id="ZBd-NT-E5h"/>
                                         </connections>
@@ -44,45 +44,45 @@
                                 <rect key="frame" x="0.0" y="1" width="320" height="410"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.40000000000000013" contentMode="left" text="BpHi" textAlignment="right" lineBreakMode="tailTruncation" minimumFontSize="10" id="f9h-H4-WxH">
-                                <rect key="frame" x="44" y="100" width="84" height="22"/>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.40000000000000013" contentMode="left" text="BpHi" lineBreakMode="tailTruncation" minimumFontSize="10" id="f9h-H4-WxH">
+                                <rect key="frame" x="190" y="100" width="84" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
-                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.40000000000000013" contentMode="left" text="BpLo" textAlignment="right" lineBreakMode="tailTruncation" minimumFontSize="10" id="wWJ-be-Hk6">
-                                <rect key="frame" x="44" y="165" width="84" height="22"/>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.40000000000000013" contentMode="left" text="BpLo" lineBreakMode="tailTruncation" minimumFontSize="10" id="wWJ-be-Hk6">
+                                <rect key="frame" x="190" y="155" width="84" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
-                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.40000000000000013" contentMode="left" text="Puls" textAlignment="right" lineBreakMode="tailTruncation" minimumFontSize="10" id="X6y-4Y-N9h">
-                                <rect key="frame" x="44" y="225" width="84" height="22"/>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.40000000000000013" contentMode="left" text="Puls" lineBreakMode="tailTruncation" minimumFontSize="10" id="X6y-4Y-N9h">
+                                <rect key="frame" x="190" y="225" width="84" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
-                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.40000000000000013" contentMode="left" text="Weight" textAlignment="right" lineBreakMode="tailTruncation" minimumFontSize="10" id="On8-t6-Isn">
-                                <rect key="frame" x="44" y="295" width="84" height="22"/>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.40000000000000013" contentMode="left" text="Weight" lineBreakMode="tailTruncation" minimumFontSize="10" id="On8-t6-Isn">
+                                <rect key="frame" x="190" y="295" width="84" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
-                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.40000000000000013" contentMode="left" text="Temp" textAlignment="right" lineBreakMode="tailTruncation" minimumFontSize="10" id="4iO-Ze-AQt">
-                                <rect key="frame" x="44" y="373" width="84" height="22"/>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.40000000000000013" contentMode="left" text="Temp" lineBreakMode="tailTruncation" minimumFontSize="10" id="4iO-Ze-AQt">
+                                <rect key="frame" x="190" y="373" width="84" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
-                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <view userInteractionEnabled="NO" alpha="0.30000000000000016" contentMode="scaleToFill" id="JCq-go-u0F">
-                                <rect key="frame" x="136" y="15" width="48" height="395"/>
+                            <view userInteractionEnabled="NO" alpha="0.20000000000000015" contentMode="scaleToFill" id="JCq-go-u0F">
+                                <rect key="frame" x="136" y="18" width="48" height="388"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="0.40000000596046448" green="0.80000001192092896" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>

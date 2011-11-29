@@ -10,7 +10,15 @@
 #import <CoreData/CoreData.h>
 #import "E2listCell.h"
 
-@interface E2listTVC : UITableViewController <UITableViewDelegate, UITableViewDataSource, NSFetchedResultsControllerDelegate>
+#ifdef GD_Ad_ENABLED
+#import "GADBannerView.h"
+#endif
+
+@interface E2listTVC : UITableViewController <UITableViewDelegate, UITableViewDataSource, NSFetchedResultsControllerDelegate
+#ifdef GD_Ad_ENABLED
+	, GADBannerViewDelegate
+#endif
+>
 
 @property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
 

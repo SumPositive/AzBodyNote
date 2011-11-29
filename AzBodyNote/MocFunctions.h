@@ -21,6 +21,7 @@
 + (BOOL)hasChanges;
 + (BOOL)commit;
 + (void)rollBack;
+
 + (NSArray *)select:(NSString *)zEntity
 			  limit:(NSInteger)iLimit
 			 offset:(NSInteger)iOffset
@@ -29,5 +30,6 @@
 
 + (void)e2delete:(E2record *)e2node;
 
++ (NSDate*)dateGoal;
 
 @end

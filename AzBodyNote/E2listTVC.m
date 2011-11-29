@@ -77,6 +77,23 @@
 	//self.tableView.separatorColor = [UIColor blackColor];
 	UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
 	self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
+	
+#ifdef GD_Ad_ENABLED
+	//--------------------------------------------------------------------------------------------------------- AdMob
+	if (adMobView_==nil) {
+		adMobView_ = [[GADBannerView alloc]
+					  initWithFrame:CGRectMake(0, 0,			// TableCell用
+											   GAD_SIZE_320x50.width,
+											   GAD_SIZE_320x50.height)];
+		adMobView_.delegate = self;		// Unload時に nil セットして解除すること。
+		adMobView_.rootViewController = self.navigationController;
+		adMobView_.adUnitID = AdMobID_BodyNote;
+		GADRequest *request = [GADRequest request];
+		[adMobView_ loadRequest:request];
+		adMobView_.tag = 0;
+		adMobView_.alpha = 0;
+	}
+#endif
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -151,11 +168,21 @@
     // Relinquish ownership any cached data, images, etc that aren't in use.
 }
 
-- (void)viewDidUnload
-{
+- (void)viewDidUnload 
+{	// メモリ不足時、裏側にある場合に呼び出されるので、viewDidLoadで生成したObjを解放する。
+	//NSLog(@"--- viewDidUnload ---"); 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [super viewDidUnload];
-	//[mDateFormatter release], mDateFormatter = nil;
+	
+#ifdef GD_Ad_ENABLED
+	// ARCによりrelease不要になったが、delegateの解放は必須。
+	if (adMobView_) {
+		adMobView_.delegate = nil;  //受信STOP  ＜＜これが無いと破棄後に呼び出されて落ちる
+		adMobView_ = nil;
+	}
+#endif
+	
+	[super viewDidUnload];
+	// この後に loadView ⇒ viewDidLoad ⇒ viewWillAppear がコールされる
 }
 
 /*
@@ -200,10 +227,14 @@
 		NSInteger iYearMM = [[[[self.fetchedResultsController sections] objectAtIndex:section] name] integerValue];
 		NSInteger iYear = iYearMM / 100;
 		
-		//NSLog(@"(2) currentLocale NSLocaleLanguageCode : %@",[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode]);
-		if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) { // 「書式」で変わる。　「言語」でない
+		if (iYearMM == E2_nYearMM_GOAL) {
+			return NSLocalizedString(@"TheGoal Section",nil);
+		}
+		else if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) 
+		{ // 「書式」で変わる。　「言語」でない
 			return [NSString stringWithFormat:@"%d年 %d月", iYear, iYearMM - (iYear * 100)]; 
-		} else {
+		}
+		else {
 			return [NSString stringWithFormat:@"%d / %d", iYearMM - (iYear * 100), iYear]; 
 		}
 	}
@@ -247,19 +278,9 @@
 			//cell.textLabel.textColor = [UIColor grayColor];
 			cell.textLabel.text = @"";
 #ifdef GD_Ad_ENABLED
-			//--------------------------------------------------------------------------------------------------------- AdMob
-			if (adMobView_==nil) {
-				adMobView_ = [[GADBannerView alloc]
-							   initWithFrame:CGRectMake(0, 0,			// TableCell用
-														GAD_SIZE_320x50.width,
-														GAD_SIZE_320x50.height)];
-				adMobView_.delegate = nil;  //もし self セットするならば、Unload時に解放処理しなければ落ちる。
-				adMobView_.rootViewController = self;
-				adMobView_.adUnitID = AdMobID_BodyNote;
-				GADRequest *request = [GADRequest request];
-				[adMobView_ loadRequest:request];
+			if (adMobView_) {
+				[cell.contentView addSubview:adMobView_];
 			}
-			[cell.contentView addSubview:adMobView_];
 #endif
 		}
 		return cell;
@@ -421,7 +442,7 @@
 	    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
 	    abort();
 	}
-
+	
     self.fetchedResultsController = aFrc; //retain
     //[aFrc release];
     //[fetchRequest release];
@@ -494,5 +515,37 @@
     [self.tableView reloadData];
 }
  */
+
+
+
+#ifdef GD_Ad_ENABLED
+#pragma mark - AdMob <GADBannerViewDelegate>
+
+- (void)adViewDidReceiveAd:(GADBannerView *)bannerView 
+{	// AdMob 広告あり
+	adMobView_.tag = 1;
+	if (adMobView_.alpha==1) return; // 既に表示
+	NSLog(@"E2list: AdMob - DidReceive");
+	// 非表示ならば、表示する
+	[UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+	[UIView setAnimationDuration:2.0];
+	adMobView_.alpha = 1;
+	[UIView commitAnimations];
+}
+
+- (void)adView:(GADBannerView *)bannerView didFailToReceiveAdWithError:(GADRequestError *)error 
+{	// AdMob 広告なし
+	adMobView_.tag = 0;
+	if (adMobView_.alpha==0) return; // 既に非表示
+	NSLog(@"E2list: AdMob - FailToReceive　Error:%@", [error localizedDescription]);
+	[UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+	[UIView setAnimationDuration:2.0];
+	adMobView_.alpha = 0;
+	[UIView commitAnimations];
+}
+
+#endif
 
 @end

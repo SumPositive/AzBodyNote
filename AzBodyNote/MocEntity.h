@@ -55,6 +55,9 @@
 #define E2_sNote2						@"sNote2"
 //#define E2_e1body					@"e1body"
 
+#define E2_dateTime_GOAL		@"2100-01-01T00:00:00 +0000"  // 目標値を記録したE2固有レコード（最大日付+1日）
+#define E2_nYearMM_GOAL			 21000101		// 比較レスポンス向上のために利用する
+#define E2_dateTime_MAX		@"2090-12-31T23:59:59 +0000"  // 最大入力許可日付
 #define E2_nBpHi_MIN			30
 #define E2_nBpHi_MAX			300			//.xcdatamodeldの最大値設定と合わせること （最小値は、nil 許可）
 #define E2_nBpLo_MIN			20
