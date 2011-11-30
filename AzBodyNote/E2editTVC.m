@@ -17,7 +17,7 @@
 @implementation E2editTVC
 {
 	AzBodyNoteAppDelegate		*appDelegate_;
-	NSManagedObjectContext		*moc_;
+	//NSManagedObjectContext		*moc_;
 	
 	BOOL			bAddNew_;
 	float				fADBannerY_;	//iAd表示位置のY座標
@@ -194,25 +194,21 @@
 
 #pragma mark - View lifecycle
 
-- (id)initWithStyle:(UITableViewStyle)style
-{
-    self = [super initWithStyle:UITableViewStyleGrouped];
-    if (self) {
-        // Custom initialization
-		appDelegate_ = [[UIApplication sharedApplication] delegate];
-		moc_ = [appDelegate_ managedObjectContext];
-    }
-    return self;
-}
+//- (id)initWithStyle:(UITableViewStyle)style　　＜＜呼び出されません
+//- (id)init　　＜＜呼び出されません
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
-	appDelegate_ = [[UIApplication sharedApplication] delegate];
-	moc_ = [appDelegate_ managedObjectContext];
+	if (!appDelegate_) {
+		appDelegate_ = [[UIApplication sharedApplication] delegate];
+	}
+/*	if (!moc_) {
+		moc_ = [appDelegate_ managedObjectContext];
+	}
 	NSLog(@"E2editTVC: moc_=%@", moc_);
-	assert(moc_);
+	assert(moc_);*/
 	
 	// listen to our app delegates notification that we might want to refresh our detail view
     [[NSNotificationCenter defaultCenter] addObserver:self 
@@ -262,6 +258,26 @@
 	// TableView
 	self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone; // セル区切り線なし
 	
+	static BOOL bGoalRecordCheck = YES;
+	if (bGoalRecordCheck) {	// 1度だけ通すため
+		bGoalRecordCheck = NO;
+		// didFinishLaunchingWithOptions:では、早すぎるためか落ちるため、ここに実装してた。
+		// E2 目標(The GOAL)固有レコードが無ければ追加する
+		NSArray *arFetch = [MocFunctions select:@"E2record"
+										  limit:1		//=0:無制限  ＜＜ 1にすると結果は0件になるのでダメ
+										 offset:0
+										  where:[NSPredicate predicateWithFormat: E2_dateTime @" = %@", [MocFunctions dateGoal]]
+										   sort:nil];
+		if ([arFetch count] <= 0) { // 無いので追加する
+			E2record *moE2goal = [MocFunctions insertAutoEntity:@"E2record"];
+			// 固有日付をセット
+			moE2goal.dateTime = [MocFunctions dateGoal];
+			moE2goal.nYearMM = [NSNumber numberWithInteger: E2_nYearMM_GOAL];	// 主に、こちらで比較チェックする
+			NSLog(@"moE2goal.dateTime=%@  .nYearMM=%@", moE2goal.dateTime, moE2goal.nYearMM);
+			// Save & Commit
+			[MocFunctions commit];
+		}
+	}
 	
 #ifdef GD_Ad_ENABLED
 	//CGRect rcAd = CGRectMake(0, self.view.frame.size.height-self.tabBarController.view.frame.size.height-50, 320, 50);
@@ -305,7 +321,8 @@
 	
 	if (bAddNew_) {
 		if (moE2edit_==nil) {
-			moE2edit_ = [NSEntityDescription insertNewObjectForEntityForName:@"E2record" inManagedObjectContext:moc_];//autorelease
+			//moE2edit_ = [NSEntityDescription insertNewObjectForEntityForName:@"E2record" inManagedObjectContext:moc_];//autorelease
+			moE2edit_ = [MocFunctions insertAutoEntity:@"E2record"];
 		}
 		[self actionClear];
 		self.view.alpha = 0; //AddNewのときだけディゾルブ
@@ -371,8 +388,7 @@
     [super viewWillDisappear:animated];
 	
 	if (bAddNew_) {
-		//[MocFunctions rollBack];  // 未保存取り消し
-		[moc_ rollback];
+		[MocFunctions rollBack];  // 未保存取り消し		//[moc_ rollback];
 		moE2edit_ = nil; //autorelease
 	} else {
 		[self actionCancel];

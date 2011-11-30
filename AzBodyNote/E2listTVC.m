@@ -21,7 +21,7 @@
 @implementation E2listTVC
 {
 	AzBodyNoteAppDelegate		*appDelegate_;
-	NSManagedObjectContext		*moc_;
+	//NSManagedObjectContext		*moc_;
 	NSIndexPath							*indexPathEdit_;
 	//BOOL										bEditReturn_;
 
@@ -39,9 +39,9 @@
 	[super viewDidLoad];
 
 	appDelegate_ = [[UIApplication sharedApplication] delegate];
-	moc_ = [appDelegate_ managedObjectContext];
+/*	moc_ = [appDelegate_ managedObjectContext];
 	NSLog(@"E2listTVC: moc_=%@", moc_);
-	assert(moc_);
+	assert(moc_);*/
 	//bEditReturn_ = NO;
 
 	//self.tableView.delegate = self;
@@ -228,7 +228,7 @@
 		NSInteger iYear = iYearMM / 100;
 		
 		if (iYearMM == E2_nYearMM_GOAL) {
-			return NSLocalizedString(@"TheGoal Section",nil);
+			return NSLocalizedString(@"Latest",nil);
 		}
 		else if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) 
 		{ // 「書式」で変わる。　「言語」でない
@@ -238,7 +238,7 @@
 			return [NSString stringWithFormat:@"%d / %d", iYearMM - (iYear * 100), iYear]; 
 		}
 	}
-	return @"Latest";
+	return @"";
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -302,16 +302,17 @@
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
         // Delete the managed object for the given index path
-        //NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
-        [moc_ deleteObject:[self.fetchedResultsController objectAtIndexPath:indexPath]];
+        //[moc_ deleteObject:[self.fetchedResultsController objectAtIndexPath:indexPath]];
+		[MocFunctions deleteEntity:[self.fetchedResultsController objectAtIndexPath:indexPath]];
         
         // Save the context.
-        NSError *error = nil;
+/*        NSError *error = nil;
         if (![moc_ save:&error])
         {
             NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
             abort();
-        }
+        }*/
+		[MocFunctions commit];
     }   
 }
 
@@ -367,27 +368,6 @@
 	[cell draw]; // moE2node を描画する
 }
 
-/*
-- (void)insertNewObject
-{
-    // Create a new instance of the entity managed by the fetched results controller.
-    //NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
-    NSEntityDescription *entity = [[self.fetchedResultsController fetchRequest] entity];
-    NSManagedObject *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:moc_];
-    
-    // If appropriate, configure the new managed object.
-    // Normally you should use accessor methods, but using KVC here avoids the need to add a custom class to the template.
-    [newManagedObject setValue:[NSDate date] forKey:E2_dateTime];
-    
-    // Save the context.
-    NSError *error = nil;
-    if (![moc_ save:&error])
-    {
-        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-        abort();
-    }
-}*/
-
 
 #pragma mark - Fetched results controller
 
@@ -406,7 +386,7 @@
 
 	// エンティティ指定
     // Edit the entity name as appropriate.
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"E2record" inManagedObjectContext:moc_];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"E2record" inManagedObjectContext:[MocFunctions getMoc]];
     [fetchRequest setEntity:entity];
     
     // Set the batch size to a suitable number.
@@ -430,7 +410,7 @@
     // Edit the section name key path and cache name if appropriate.
     // nil for section name key path means "no sections".
 	NSFetchedResultsController *aFrc = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
-																								managedObjectContext:moc_ 
+																								managedObjectContext:[MocFunctions getMoc] 
 																								  sectionNameKeyPath:E2_nYearMM	// セクション指定のため
 																										   cacheName:@"E2listDate"];
     aFrc.delegate = self;

@@ -72,16 +72,21 @@
 
 - (void)draw
 {
-	if (moE2node_) {
-		NSDateFormatter *fm = [[NSDateFormatter alloc] init];
-		// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
-		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-		[fm setCalendar:calendar];
-		//[calendar release];
-		//[df setLocale:[NSLocale systemLocale]];これがあると曜日が表示されない。
-		[fm setDateFormat:@"dd  HH:mm"];
-		ibLbDate.text = [fm stringFromDate:moE2node_.dateTime];
-		//[fm release];
+	if (moE2node_) 
+	{
+		if ([moE2node_.nYearMM integerValue]==E2_nYearMM_GOAL) {
+			ibLbDate.text = NSLocalizedString(@"TheGoal",nil);
+		} else {
+			NSDateFormatter *fm = [[NSDateFormatter alloc] init];
+			// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
+			NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+			[fm setCalendar:calendar];
+			//[calendar release];
+			//[df setLocale:[NSLocale systemLocale]];これがあると曜日が表示されない。
+			[fm setDateFormat:@"dd  HH:mm"];
+			ibLbDate.text = [fm stringFromDate:moE2node_.dateTime];
+			//[fm release];
+		}
 		
 		//NSLog(@"--- moE2node_.sNote2=%@", moE2node_.sNote2);
 

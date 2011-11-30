@@ -113,6 +113,7 @@ static NSManagedObjectContext *scMoc = nil;
 		
 		// where
 		if (predicate) {
+			NSLog(@"MocFunction: select: where: %@", predicate);
 			[req setPredicate:predicate];
 		}
 		

@@ -62,13 +62,6 @@
 		if (val < 1000000) {
 			cc = [[NSString stringWithString:NSLocalizedString(@"TheGoal",nil)] UTF8String];
 			CGContextShowTextAtPoint (cgc, po.x-15, po.y+14, cc, strlen(cc));
-			// 目標ヨコ軸
-			CGContextSetRGBFillColor(cgc, 0.5, 0.5, 0.5, 0.3);
-			CGContextAddRect(cgc, CGRectMake(MARGIN_WIDTH, po.y-3, po.x - MARGIN_WIDTH, po.y+3));
-			//画面に描画
-			CGContextFillPath(cgc); // パスを塗り潰す
-			// 文字列カラーに戻す
-			CGContextSetRGBFillColor (cgc, 0, 0, 0, 1.0);
 		}
 		else {
 			int iMonth = val / 1000000;
@@ -123,9 +116,17 @@
 	// グラフ ストロークカラー設定(0.0-1.0でRGBAを指定する)
 	CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 1.0);
 	CGContextSetRGBFillColor (cgc, 0, 0, 0, 1.0);
-	for (int iNo=0; iNo < count; iNo++) {
-		// 端点
+	// 記録プロット
+	for (int iNo=0; iNo < count; iNo++) 
+	{
 		CGPoint po = points[ iNo ];
+		if (iNo==0) {	//[0]目標
+			// 目標ヨコ軸
+			CGContextSetRGBFillColor(cgc, 0.0, 0.5, 0.5, 0.8);
+			CGContextAddRect(cgc, CGRectMake(MARGIN_WIDTH, po.y-3, po.x - MARGIN_WIDTH, po.y+3));
+			CGContextSetRGBFillColor (cgc, 0, 0, 0, 1.0);
+		}
+		// 端点
 		CGContextFillEllipseInRect(cgc, CGRectMake(po.x-1.5, po.y-1.5, 3, 3));	//円Fill
 		// 数値
 		const char *cc;

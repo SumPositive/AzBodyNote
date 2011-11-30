@@ -63,21 +63,8 @@
 	
 	// Moc初期化
 	[MocFunctions setMoc:self.managedObjectContext];
+	// この直後に、Moc処理を実装すると落ちる。 Ｍｏｃ初期化が間に合わないからでは？？？
 	
-	// E2 目標値固有レコードが無ければ追加する
-	// E2_nBpHi_mmHg
-	NSArray *arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
-									  where: [NSPredicate predicateWithFormat: E2_dateTime @" = %@", [MocFunctions dateGoal]]
-									   sort: nil];
-	if ([arFetch count] != 1) { // 無いので追加する
-		E2record *moE2goal = [MocFunctions insertAutoEntity:@"E2record"];
-		// 固有日付をセット
-		moE2goal.dateTime = [MocFunctions dateGoal];
-		moE2goal.nYearMM = [NSNumber numberWithInteger: E2_nYearMM_GOAL];	// 主に、こちらで比較チェックする
-		// Save & Commit
-		[MocFunctions commit];
-	}
-
     return YES;
 }
 
