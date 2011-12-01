@@ -14,12 +14,15 @@
 #import "E2editCellDial.h"
 #import "E2editCellNote.h"
 
+#define ALERT_TAG_DeleteE2		901
+
 @implementation E2editTVC
 {
 	AzBodyNoteAppDelegate		*appDelegate_;
 	//NSManagedObjectContext		*moc_;
 	
 	BOOL			bAddNew_;
+	BOOL			bEditDate_;
 	float				fADBannerY_;	//iAd表示位置のY座標
 	
 	NSInteger	iPrevBpHi_;
@@ -35,16 +38,6 @@
 #endif
 }
 @synthesize moE2edit = moE2edit_;
-
-
-
-#pragma mark - delegate
-
-- (void)editUpdate
-{
-	self.navigationItem.rightBarButtonItem.enabled = YES; // 変更あればYESにする
-}
-
 
 
 #pragma mark - IBAction
@@ -93,7 +86,7 @@
 		NSLog(@"Re2prev.nBpHi_mmHg=%d", [e2prev.nBpHi_mmHg integerValue]);
 		iPrevBpHi_ = [e2prev.nBpHi_mmHg integerValue];
 	} else {
-		iPrevBpHi_ = 130;
+		iPrevBpHi_ = E2_nBpHi_INIT;
 	}
 	// E2_nBpLo_mmHg
 	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
@@ -103,7 +96,7 @@
 		e2prev = [arFetch objectAtIndex:0];
 		iPrevBpLo_ = [e2prev.nBpLo_mmHg integerValue];
 	} else {
-		iPrevBpLo_ = 80;
+		iPrevBpLo_ = E2_nBpLo_INIT;
 	}
 	// E2_nPulse_bpm
 	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
@@ -113,7 +106,7 @@
 		e2prev = [arFetch objectAtIndex:0];
 		iPrevPuls_ = [e2prev.nPulse_bpm integerValue];
 	} else {
-		iPrevPuls_ = 70;
+		iPrevPuls_ = E2_nPuls_INIT;
 	}
 	// E2_nWeight_10Kg
 	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
@@ -123,7 +116,7 @@
 		e2prev = [arFetch objectAtIndex:0];
 		iPrevWeight_ = [e2prev.nWeight_10Kg integerValue];
 	} else {
-		iPrevWeight_ = 700;
+		iPrevWeight_ = E2_nWeight_INIT;
 	}
 	// E2_nTemp_10c
 	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
@@ -133,7 +126,7 @@
 		e2prev = [arFetch objectAtIndex:0];
 		iPrevTemp_= [e2prev.nTemp_10c integerValue];
 	} else {
-		iPrevTemp_ = 370;
+		iPrevTemp_ = E2_nTemp_INIT;
 	}
 }
 
@@ -189,6 +182,17 @@
 	[MocFunctions rollBack];
 	
 	[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
+}
+
+- (void)actionDelete:(UIButton *)button
+{
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Delete E2",nil)
+													message: nil
+												   delegate: self		// clickedButtonAtIndexが呼び出される
+										  cancelButtonTitle: NSLocalizedString(@"Cancel",nil)
+										  otherButtonTitles: NSLocalizedString(@"DELETE",nil), nil];
+	alert.tag = ALERT_TAG_DeleteE2;
+	[alert show];
 }
 
 
@@ -266,7 +270,7 @@
 		NSArray *arFetch = [MocFunctions select:@"E2record"
 										  limit:1		//=0:無制限  ＜＜ 1にすると結果は0件になるのでダメ
 										 offset:0
-										  where:[NSPredicate predicateWithFormat: E2_dateTime @" = %@", [MocFunctions dateGoal]]
+										  where:[NSPredicate predicateWithFormat: E2_dateTime @" == %@", [MocFunctions dateGoal]]
 										   sort:nil];
 		if ([arFetch count] <= 0) { // 無いので追加する
 			E2record *moE2goal = [MocFunctions insertAutoEntity:@"E2record"];
@@ -274,6 +278,12 @@
 			moE2goal.dateTime = [MocFunctions dateGoal];
 			moE2goal.nYearMM = [NSNumber numberWithInteger: E2_nYearMM_GOAL];	// 主に、こちらで比較チェックする
 			NSLog(@"moE2goal.dateTime=%@  .nYearMM=%@", moE2goal.dateTime, moE2goal.nYearMM);
+			// 目標の初期値　⇒ GOALの値がAddNewの初期値になる
+			moE2goal.nBpHi_mmHg = [NSNumber numberWithInteger: E2_nBpHi_INIT];
+			moE2goal.nBpLo_mmHg = [NSNumber numberWithInteger: E2_nBpLo_INIT];
+			moE2goal.nPulse_bpm = [NSNumber numberWithInteger: E2_nPuls_INIT];
+			moE2goal.nWeight_10Kg = [NSNumber numberWithInteger: E2_nWeight_INIT];
+			moE2goal.nTemp_10c = [NSNumber numberWithInteger: E2_nTemp_INIT];
 			// Save & Commit
 			[MocFunctions commit];
 		}
@@ -319,9 +329,12 @@
 {
     [super viewWillAppear:animated];
 	
-	if (bAddNew_) {
+	if (bEditDate_) {
+		// 日付修正から戻ったとき
+		bEditDate_ = NO;
+	}
+	else if (bAddNew_) {
 		if (moE2edit_==nil) {
-			//moE2edit_ = [NSEntityDescription insertNewObjectForEntityForName:@"E2record" inManagedObjectContext:moc_];//autorelease
 			moE2edit_ = [MocFunctions insertAutoEntity:@"E2record"];
 		}
 		[self actionClear];
@@ -333,7 +346,8 @@
 			buDelete_ = [UIButton buttonWithType:UIButtonTypeRoundedRect];
 			[buDelete_ setTitle:NSLocalizedString(@"Delete",nil) forState:UIControlStateNormal];
 			[buDelete_ setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
-			
+			[buDelete_ addTarget:self action:@selector(actionDelete:) forControlEvents:UIControlEventTouchUpInside];
+			 
 			NSIndexPath* indexPath = [NSIndexPath indexPathForRow:7 inSection:0];
 			CGRect rc = [self.tableView rectForRowAtIndexPath:indexPath];
 			rc.size.width /= 2;
@@ -387,10 +401,16 @@
 {	// 非表示になる前に呼び出される
     [super viewWillDisappear:animated];
 	
-	if (bAddNew_) {
+	if (bEditDate_) {
+		// 日付修正へ遷移
+	}
+	else if (bAddNew_) {
+		// 追加 中止
 		[MocFunctions rollBack];  // 未保存取り消し		//[moc_ rollback];
 		moE2edit_ = nil; //autorelease
-	} else {
+	}
+	else {
+		// Edit 中止
 		[self actionCancel];
 	}
 }
@@ -507,8 +527,7 @@
 		cell.textLabel.text = NSLocalizedString(@"TheGoal Section",nil);
 		cell.textLabel.textAlignment = UITextAlignmentCenter;
 		cell.accessoryType = UITableViewCellAccessoryNone;
-		cell.editing = NO;
-		cell.selected = NO;
+		cell.userInteractionEnabled = NO; // 操作なし
 	}
 	else {
 		NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
@@ -516,7 +535,7 @@
 		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 		[fmt setCalendar:calendar];
 		[fmt setDateFormat:@"yyyy-M-d EE HH:mm"];
-		if (bAddNew_ || moE2edit_.dateTime==nil) {
+		if (moE2edit_.dateTime==nil) {
 			moE2edit_.dateTime = [NSDate date];
 		}
 		cell.textLabel.text = [NSString stringWithFormat:@"%@   %@", NSLocalizedString(@"DateTime",nil), 
@@ -711,6 +730,55 @@
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];	// 選択状態を解除する
 	
     // Navigation logic may go here. Create and push another view controller.
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{	// 画面遷移のとき、didSelectRowAtIndexPath:よりも先に呼び出される
+	NSLog(@"prepareForSegue: sender=%@", sender);
+	NSLog(@"prepareForSegue: segue=%@", segue);
+	NSLog(@"prepareForSegue: [segue identifier]=%@", [segue identifier]);
+	NSLog(@"prepareForSegue: [segue sourceViewController]=%@", [segue sourceViewController]);
+	NSLog(@"prepareForSegue: [segue destinationViewController]=%@", [segue destinationViewController]);
+	
+	if ([[segue identifier] isEqualToString:@"pushDate"]) // EditDateVC
+	{
+		EditDateVC *editDate = [segue destinationViewController];
+		editDate.delegate = self;	// [Done]にて editDateDone: を呼び出すため
+		editDate.CdateSource = moE2edit_.dateTime;
+		bEditDate_ = YES;
+	}
+}
+
+
+#pragma mark - <EditDateDelegate>
+- (void)editDateDone:(id)sender  date:(NSDate*)date
+{
+	if (date) {
+		NSLog(@"editDateDone: date=%@", date);
+		moE2edit_.dateTime = date;
+		[self.tableView reloadData];
+		self.navigationItem.rightBarButtonItem.enabled = YES; // 変更あればYESにする
+	}
+}
+
+#pragma mark - <delegate>
+- (void)editUpdate
+{
+	self.navigationItem.rightBarButtonItem.enabled = YES; // 変更あればYESにする
+}
+
+- (void)alertView:(UIAlertView*)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+	if (buttonIndex != 1) return; // Cancel
+	// OK
+	switch (alertView.tag) 
+	{
+		case ALERT_TAG_DeleteE2: {	// この記録を削除する
+			[MocFunctions deleteEntity:moE2edit_];
+			[MocFunctions commit];
+			[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
+		}	break;
+	}
 }
 
 

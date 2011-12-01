@@ -101,7 +101,7 @@
 {
 	assert(count <= RECORD_LIMIT);
 	// グラフ ストロークカラー設定(0.0-1.0でRGBAを指定する)
-	CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 1.0);
+	CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 0.8); // 折れ線の色
 #ifdef YES
 	// 折れ線
 	CGContextAddLines(cgc, points, count);	
@@ -113,17 +113,18 @@
 	//文字列の設定
 	CGContextSetTextDrawingMode (cgc, kCGTextFillStroke);
 	CGContextSelectFont (cgc, "Helvetica", 12.0, kCGEncodingMacRoman);
+	CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 1.0);	// 文字の色
 	// グラフ ストロークカラー設定(0.0-1.0でRGBAを指定する)
-	CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 1.0);
-	CGContextSetRGBFillColor (cgc, 0, 0, 0, 1.0);
+	CGContextSetRGBFillColor (cgc, 0, 0, 0, 1.0); // Black
 	// 記録プロット
 	for (int iNo=0; iNo < count; iNo++) 
 	{
 		CGPoint po = points[ iNo ];
 		if (iNo==0) {	//[0]目標
 			// 目標ヨコ軸
-			CGContextSetRGBFillColor(cgc, 0.0, 0.5, 0.5, 0.8);
-			CGContextAddRect(cgc, CGRectMake(MARGIN_WIDTH, po.y-3, po.x - MARGIN_WIDTH, po.y+3));
+			CGContextSetRGBFillColor(cgc, 0.9, 0.9, 1, 0.2); // White
+			CGContextAddRect(cgc, CGRectMake(MARGIN_WIDTH, po.y-6, po.x - MARGIN_WIDTH, 12));
+			CGContextFillPath(cgc); // パスを塗り潰す
 			CGContextSetRGBFillColor (cgc, 0, 0, 0, 1.0);
 		}
 		// 端点
@@ -187,7 +188,7 @@
 	CGRect rcDate = self.bounds;
 	rcDate.origin.y = rcBp.origin.y + rcBp.size.height + SEPARATE_HEIGHT;				// Y開始
 	rcDate.size.height = fHeight * 1 / 8 - SEPARATE_HEIGHT;				// 高さ
-	// 区切り線
+/*	// 区切り線
 	//CGContextSetRGBFillColor(cgc, 0.8, 0.8, 0.8, 0.3); // Gray
 	CGContextSetRGBFillColor(cgc, 0.592, 0.313, 0.302, 0.3); //Azukid Color
 	rc = CGRectMake(MARGIN_WIDTH, 0, self.bounds.size.width - MARGIN_WIDTH*2 + 20, SEPARATE_HEIGHT);
@@ -197,7 +198,7 @@
 	rc.origin.y = rcDate.origin.y - SEPARATE_HEIGHT;		CGContextAddRect(cgc, rc);
 	//画面に描画
 	CGContextFillPath(cgc); // パスを塗り潰す
-	
+*/
 	// 右端の設定領域について
 	rc = ibSegType.frame;
 	rc.origin.x = self.bounds.size.width - MARGIN_WIDTH + 25;
@@ -298,7 +299,11 @@
 	[self graphDrawDate:cgc count:arrayNo points:pointsArray values:valuesArray];	
 	
 	//-------------------------------------------------------------------------------------- BpHi グラフ描画
-	fYstep = rcBp.size.height / (iMaxBp - iMinBp + GRAPH_H_GAP*2);  // 1あたりのポイント数
+	if (iMinBp==iMaxBp) {
+		iMinBp--;
+		iMaxBp++;
+	}
+	fYstep = (rcBp.size.height - GRAPH_H_GAP*2) / (iMaxBp - iMinBp);  // 1あたりのポイント数
 	po.x = self.bounds.size.width - MARGIN_WIDTH; // 最新日の描画位置
 	arrayNo = 0;
 	for (E2record *e2 in aE2records_) {
@@ -335,7 +340,11 @@
 	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueType:0  pointLower:rcBp.origin.y];
 	
 	//-------------------------------------------------------------------------------------- Puls グラフ描画
-	fYstep = rcPuls.size.height / (iMaxPuls - iMinPuls + GRAPH_H_GAP*2);  // 1あたりのポイント数
+	if (iMinPuls==iMaxPuls) {
+		iMinPuls--;
+		iMaxPuls++;
+	}
+	fYstep = (rcPuls.size.height - GRAPH_H_GAP*2) / (iMaxPuls - iMinPuls);  // 1あたりのポイント数
 	po.x = self.bounds.size.width - 160;
 	arrayNo = 0;
 	for (E2record *e2 in aE2records_) {
@@ -354,7 +363,11 @@
 	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueType:0  pointLower:rcPuls.origin.y];
 
 	//-------------------------------------------------------------------------------------- Weight グラフ描画
-	fYstep = rcWeight.size.height / (iMaxWeight - iMinWeight + GRAPH_H_GAP*2);  // 1あたりのポイント数
+	if (iMinWeight==iMaxWeight) {
+		iMinWeight--;
+		iMaxWeight++;
+	}
+	fYstep = (rcWeight.size.height - GRAPH_H_GAP*2) / (iMaxWeight - iMinWeight);  // 1あたりのポイント数
 	po.x = self.bounds.size.width - 160;
 	arrayNo = 0;
 	for (E2record *e2 in aE2records_) {
@@ -373,7 +386,11 @@
 	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueType:1  pointLower:rcWeight.origin.y];
 
 	//-------------------------------------------------------------------------------------- Temp グラフ描画
-	fYstep = rcTemp.size.height / (iMaxTemp - iMinTemp + GRAPH_H_GAP*2);  // 1あたりのポイント数
+	if (iMinTemp==iMaxTemp) {
+		iMinTemp--;
+		iMaxTemp++;
+	}
+	fYstep = (rcTemp.size.height - GRAPH_H_GAP*2) / (iMaxTemp - iMinTemp);  // 1あたりのポイント数
 	po.x = self.bounds.size.width - 160;
 	arrayNo = 0;
 	for (E2record *e2 in aE2records_) {

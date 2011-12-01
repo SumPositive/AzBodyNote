@@ -12,9 +12,18 @@
 
 @interface EditDateVC : UIViewController
 
-@property (nonatomic, unsafe_unretained) id						delegate;
-@property (nonatomic, strong) E2record			*Re2record;
-@property (nonatomic, assign) NSInteger	PiMinYearMMDD;
-@property (nonatomic, assign) NSInteger	PiMaxYearMMDD;
+@property (nonatomic, unsafe_unretained) id		delegate;
+//@property (nonatomic, retain) E2record			*Re2record;
+@property (nonatomic, copy) NSDate					*CdateSource;
+//@property (nonatomic, assign) NSInteger		PiMinYearMMDD;
+//@property (nonatomic, assign) NSInteger		PiMaxYearMMDD;
 
+@property (nonatomic, retain) IBOutlet UIDatePicker		*ibDatePicker;
+
+- (IBAction)ibBuToday:(UIButton *)button;
+
+@end
+
+@protocol EditDateDelegate <NSObject>
+- (void)editDateDone:(id)sender  date:(NSDate*)date;
 @end

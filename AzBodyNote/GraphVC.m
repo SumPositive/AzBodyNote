@@ -102,7 +102,8 @@
 	rc.size.width = RECORD_WIDTH * iCount + MARGIN_WIDTH*2;
 	ibScrollView.contentSize = rc.size;
 	ibGraphView.frame = rc;
-	ibScrollView.contentOffset = CGPointMake(rc.size.width - ibScrollView.bounds.size.width, 0);  // 右端（当日）を表示する
+	// 最新日を表示する　（GOALの手前）
+	ibScrollView.contentOffset = CGPointMake(rc.size.width - ibScrollView.bounds.size.width - RECORD_WIDTH, 0);  
 
 	//[ibGraphView drawRect:self.view.frame];  NG//これだと不具合発生する
 	[ibGraphView setNeedsDisplay]; //drawRect:が呼び出される

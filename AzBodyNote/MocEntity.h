@@ -58,16 +58,21 @@
 #define E2_dateTime_GOAL		@"2200-01-01T00:00:00 +0000"  // 目標値を記録したE2固有レコード（最大日付+1日）
 #define E2_nYearMM_GOAL			 220001		// 比較レスポンス向上のために利用する
 #define E2_dateTime_MAX		@"2090-12-31T23:59:59 +0000"  // 最大入力許可日付
-#define E2_nBpHi_MIN			30
-#define E2_nBpHi_MAX			300			//.xcdatamodeldの最大値設定と合わせること （最小値は、nil 許可）
+#define E2_nBpHi_MIN			30			//_MIN 最小値
+#define E2_nBpHi_INIT			120			//_INIT 初期値
+#define E2_nBpHi_MAX			300			//_MAX 最大値　 .xcdatamodeldの最大値設定と合わせること （最小値は、nil 許可）
 #define E2_nBpLo_MIN			20
+#define E2_nBpLo_INIT			80
 #define E2_nBpLo_MAX			200
 #define E2_nPuls_MIN			10
+#define E2_nPuls_INIT			65
 #define E2_nPuls_MAX			200
 #define E2_nWeight_MIN		0
+#define E2_nWeight_INIT		650
 #define E2_nWeight_MAX		2000	//x10(Kg)
 #define E2_nTemp_MIN			310
-#define E2_nTemp_MAX		429			//x10(℃)
+#define E2_nTemp_INIT			365
+#define E2_nTemp_MAX		429		//x10(℃)
 
 
 // END
