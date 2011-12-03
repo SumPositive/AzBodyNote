@@ -108,14 +108,17 @@
 	
 	// GraphView サイズを決める
 	CGRect rc = ibScrollView.bounds;
-	rc.origin.x = 0;
+	CGFloat fWhalf = rc.size.width / 2.0; // 表示幅の半分（画面中央）
 	int iCount = [aE2records_ count];
 	if (iCount < 1) iCount = 1;
-	rc.size.width = RECORD_WIDTH * iCount + MARGIN_WIDTH*2;
+	//                     (                 左余白                 ) + (               レコード               ) + (                 右余白                 ); 
+	rc.size.width = (fWhalf - RECORD_WIDTH/2) + (RECORD_WIDTH * iCount) + (fWhalf - RECORD_WIDTH/2);
 	ibScrollView.contentSize = rc.size;
+	rc.origin.x = (fWhalf - RECORD_WIDTH/2); // 左余白
+	rc.size.width = RECORD_WIDTH * iCount;	// レコード
 	ibGraphView.frame = rc;
 	// 最初、GOALを画面中央に表示する
-	ibScrollView.contentOffset = CGPointMake(rc.size.width - ibScrollView.bounds.size.width, 0);  
+	ibScrollView.contentOffset = CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);  
 
 	//[ibGraphView drawRect:self.view.frame];  NG//これだと不具合発生する
 	[ibGraphView setNeedsDisplay]; //drawRect:が呼び出される

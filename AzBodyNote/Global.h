@@ -6,7 +6,7 @@
 //  Copyright 2011 Sum Positive. All rights reserved.
 //
 
-#define NO_AD	// AppStore画面撮影用に「広告なし」にするため
+//#define NO_AD	// AppStore画面撮影用に「広告なし」にするため
 #if !defined(NO_AD)
 #define GD_Ad_ENABLED
 #define AdMobID_BodyNote				@"a14ece23da85f5e";		// 体調日記 パブリッシャー ID
@@ -34,7 +34,7 @@
 #define IOS_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
 
 
-#define GD_PRODUCTNAME	@"AzBodyNote"  // IMPORTANT PRODUCT NAME  和名「カラダ日記」
+#define GD_PRODUCTNAME	@"AzBodyNote"  // IMPORTANT PRODUCT NAME  和名「健康日記」
 													//↑↑変更禁止！！Keychainの'ServiceName'に使っているので読み出せなくなる。
 //#define GD_KEY_LOGINPASS  @"AzCreditLoginPass"  //←変更禁止！！Keychainの'Username'に使っているので読み出せなくなる。
 

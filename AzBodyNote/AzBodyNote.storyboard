@@ -80,7 +80,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <view userInteractionEnabled="NO" alpha="0.20000000000000015" contentMode="scaleToFill" id="JCq-go-u0F">
-                                <rect key="frame" x="136" y="18" width="48" height="388"/>
+                                <rect key="frame" x="141" y="18" width="38" height="388"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
@@ -113,7 +113,7 @@
                                 <rect key="frame" x="20" y="26" width="57" height="57"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             </imageView>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="体調日記" textAlignment="center" lineBreakMode="tailTruncation" minimumFontSize="10" id="UFo-kD-nCB" userLabel="Lb Title">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="健康日記" textAlignment="center" lineBreakMode="tailTruncation" minimumFontSize="10" id="UFo-kD-nCB" userLabel="Lb Title">
                                 <rect key="frame" x="101" y="15" width="199" height="72"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="40"/>
@@ -127,7 +127,8 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Limited simple app BodyNote (C)2011 Azukid Creator Sum Positive All Rights Reserved. " textAlignment="center" lineBreakMode="characterWrap" numberOfLines="6" adjustsFontSizeToFit="NO" minimumFontSize="10" id="znk-2Y-YR7" userLabel="Lb Copyright">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Healthy Diary
+(C)2011 Azukid Creator Sum Positive All Rights Reserved. " textAlignment="center" lineBreakMode="characterWrap" numberOfLines="6" adjustsFontSizeToFit="NO" minimumFontSize="10" id="znk-2Y-YR7" userLabel="Lb Copyright">
                                 <rect key="frame" x="101" y="114" width="199" height="91"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
@@ -161,7 +162,7 @@
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <action selector="ibBuGoSupport:" destination="xqp-wW-kAu" eventType="touchUpInside" id="sgz-xW-dVH"/>
+                                    <action selector="ibBuGoBlog:" destination="xqp-wW-kAu" eventType="touchUpInside" id="e72-N4-nTD"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="ACc-ff-wWb" userLabel="Bu Contact">
@@ -176,22 +177,7 @@
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <action selector="ibBuGoMail:" destination="xqp-wW-kAu" eventType="touchUpInside" id="eFF-ei-qfP"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="qqz-fO-VQX">
-                                <rect key="frame" x="228" y="205" width="72" height="37"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                <state key="normal" title="設定">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <segue destination="Mr3-t7-548" kind="modal" modalTransitionStyle="flipHorizontal" id="Syt-Gr-6vu"/>
+                                    <action selector="ibBuPostMail:" destination="xqp-wW-kAu" eventType="touchUpInside" id="nQ6-zg-B8v"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -199,38 +185,15 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="Info" image="Icon32-Information.png" id="ETi-AF-qg7"/>
                     <connections>
-                        <outlet property="ibLbVersion" destination="Kzr-02-XwG" id="8tV-hU-SsG"/>
+                        <outlet property="ibBuGoBlog" destination="Z1x-o2-Zf8" id="LZU-nL-xiA"/>
+                        <outlet property="ibBuPostMail" destination="ACc-ff-wWb" id="tAb-5h-PQN"/>
+                        <outlet property="ibLbNote" destination="gQ3-CY-0EL" id="M5W-ZW-OQ4"/>
+                        <outlet property="ibLbTitle" destination="UFo-kD-nCB" id="ypq-hx-2dF"/>
+                        <outlet property="ibLbVersion" destination="Kzr-02-XwG" id="hxJ-vb-QpA"/>
                     </connections>
                 </viewController>
             </objects>
             <point key="canvasLocation" x="-1" y="1153"/>
-        </scene>
-        <scene sceneID="lqa-Ml-Ye8">
-            <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="8jc-D2-jVF" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <viewController id="Mr3-t7-548" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="GtN-gE-JqQ">
-                        <rect key="frame" x="0.0" y="20" width="320" height="460"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Hwq-6e-b7W">
-                                <rect key="frame" x="228" y="20" width="72" height="37"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                <state key="normal" title="OK">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                            </button>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                    </view>
-                </viewController>
-            </objects>
-            <point key="canvasLocation" x="465" y="1150"/>
         </scene>
         <scene sceneID="f7r-rG-arv">
             <objects>
@@ -715,15 +678,18 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
             <source key="sourceIdentifier" type="project" relativePath="./Classes/GraphView.h"/>
             <relationships>
                 <relationship kind="action" name="ibSegTypeChange:" candidateClass="UISegmentedControl"/>
-                <relationship kind="outlet" name="ibSegType" candidateClass="UISegmentedControl"/>
             </relationships>
         </class>
         <class className="InformationVC" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/InformationVC.h"/>
             <relationships>
-                <relationship kind="action" name="ibBuGoMail:" candidateClass="UIButton"/>
-                <relationship kind="action" name="ibBuGoSupport:" candidateClass="UIButton"/>
-                <relationship kind="action" name="ibBuOK:" candidateClass="UIButton"/>
+                <relationship kind="action" name="ibBuGoBlog:" candidateClass="UIButton"/>
+                <relationship kind="action" name="ibBuPostMail:" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="ibBuGoBlog" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="ibBuPostMail" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="ibLbNote" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbTitle" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbVersion" candidateClass="UILabel"/>
             </relationships>
         </class>
     </classes>

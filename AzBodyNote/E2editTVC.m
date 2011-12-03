@@ -279,6 +279,13 @@
 		}
 	}
 	
+	 NSArray *aTab = self.tabBarController.childViewControllers;
+	 [[aTab objectAtIndex:0] setTitle: NSLocalizedString(@"TabAdd",nil)];
+	 [[aTab objectAtIndex:1] setTitle: NSLocalizedString(@"TabList",nil)];
+	 [[aTab objectAtIndex:2] setTitle: NSLocalizedString(@"TabGraph",nil)];
+	 [[aTab objectAtIndex:3] setTitle: NSLocalizedString(@"TabInfo",nil)];
+	
+
 #ifdef GD_Ad_ENABLED
 	//CGRect rcAd = CGRectMake(0, self.view.frame.size.height-self.tabBarController.view.frame.size.height-50, 320, 50);
 	CGRect rcAd = CGRectMake(0, self.view.frame.size.height-28-50, 320, 50);  // GAD_SIZE_320x50

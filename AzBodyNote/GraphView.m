@@ -124,7 +124,7 @@
 		if (iNo==0) {	//[0]目標
 			// 目標ヨコ軸
 			CGContextSetRGBFillColor(cgc, 0.9, 0.9, 1, 0.2); // White
-			CGContextAddRect(cgc, CGRectMake(MARGIN_WIDTH, po.y-6, po.x - MARGIN_WIDTH, 12));
+			CGContextAddRect(cgc, CGRectMake(RECORD_WIDTH/2, po.y-6, po.x-RECORD_WIDTH/2, 12));
 			CGContextFillPath(cgc); // パスを塗り潰す
 			CGContextSetRGBFillColor (cgc, 0, 0, 0, 1.0);
 		}
@@ -165,7 +165,7 @@
 
 	//--------------------------------------------------------------------------------------- 背景を描く
 	CGFloat fHeight = self.bounds.size.height - 3 - 15;  // 上下の余白を除いた有効な高さ
-	CGRect rc;
+	//CGRect rc;
 	// Temp領域 (H:1/8)
 	CGRect rcTemp = self.bounds;
 	rcTemp.origin.y = 3.0 + SEPARATE_HEIGHT;	// Y開始
@@ -201,9 +201,9 @@
 	CGContextFillPath(cgc); // パスを塗り潰す
 */
 	// 右端の設定領域について
-	rc = ibSegType.frame;
-	rc.origin.x = self.bounds.size.width - MARGIN_WIDTH + 25;
-	ibSegType.frame = rc;
+	//rc = ibSegType.frame;
+	//rc.origin.x = self.bounds.size.width - MARGIN_WIDTH + 25;
+	//ibSegType.frame = rc;
 	
 
 	// E2record
@@ -274,7 +274,7 @@
 	CGPoint	pointsArray[RECORD_LIMIT+1];
 	long			valuesArray[RECORD_LIMIT+1];
 	int			arrayNo;
-	CGFloat	fXgoal = self.bounds.size.width - MARGIN_WIDTH;		// 最初、GOALを中央に表示する
+	CGFloat	fXgoal = self.bounds.size.width - RECORD_WIDTH/2;		// 最初、GOALを中央に表示する
 
 	//-------------------------------------------------------------------------------------- Date 描画
 	//システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定

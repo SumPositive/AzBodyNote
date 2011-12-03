@@ -14,13 +14,6 @@
 #define ALERT_CONTACT			28
 
 @implementation InformationVC
-{
-	//IBOutlet UIButton		*ibBuOK;
-	//IBOutlet UIButton		*ibBuGoSupport;
-	//IBOutlet UIButton		*ibBuGoMail;
-	
-	IBOutlet UILabel				*ibLbVersion;
-}
 
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -45,12 +38,17 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	self.title = NSLocalizedString(@"TabInfo",nil);
 
-    // Do any additional setup after loading the view from its nib.
+	//self.title = NSLocalizedString(@"TabInfo",nil);
+	ibLbTitle.text = NSLocalizedString(@"InfoTitle",nil);
 
 	NSString *zVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 	ibLbVersion.text = [NSString stringWithFormat:@"Version %@", zVersion];
+
+	ibLbNote.text = NSLocalizedString(@"InfoNote",nil);
+
+	[ibBuGoBlog setTitle:NSLocalizedString(@"InfoGoBlog",nil) forState:UIControlStateNormal];
+	[ibBuPostMail setTitle:NSLocalizedString(@"InfoPostMail",nil) forState:UIControlStateNormal];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -95,7 +93,7 @@
 	[self dismissModalViewControllerAnimated:YES];
 }
 
-- (IBAction)ibBuGoSupport:(UIButton *)button
+- (IBAction)ibBuGoBlog:(UIButton *)button
 {
 	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"ToSupportSite",nil)
 													message:NSLocalizedString(@"ToSupportSite msg",nil)
@@ -107,7 +105,7 @@
 	//[alert autorelease];
 }
 
-- (IBAction)ibBuGoMail:(UIButton *)button
+- (IBAction)ibBuPostMail:(UIButton *)button
 {
 	//メール送信可能かどうかのチェック　　＜＜＜MessageUI.framework が必要＞＞＞
     if (![MFMailComposeViewController canSendMail]) {
@@ -142,7 +140,7 @@
 	switch (alertView.tag) 
 	{
 		case ALERT_ToSupportSite: {
-			NSURL *url = [NSURL URLWithString:@"http://splitpay.tumblr.com/"];
+			NSURL *url = [NSURL URLWithString:@"http://HealthyGoo.tumblr.com/"];
 			[[UIApplication sharedApplication] openURL:url];
 		}	break;
 			
@@ -151,13 +149,13 @@
 			picker.mailComposeDelegate = self;
 			
 			// To: 宛先
-			NSArray *toRecipients = [NSArray arrayWithObject:@"SplitPay@azukid.com"];
+			NSArray *toRecipients = [NSArray arrayWithObject:@"post@azukid.com"];
 			[picker setToRecipients:toRecipients];
 			//[picker setCcRecipients:nil];
 			//[picker setBccRecipients:nil];
 			
 			// Subject: 件名		CFBundleDisplayName
-			NSString *zSubj = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDisplayName"];
+			NSString *zSubj = NSLocalizedString(@"InfoTitle",nil);
 			[picker setSubject:zSubj];  
 			
 			// Body: 本文
@@ -168,9 +166,14 @@
 
 			UIDevice *device = [UIDevice currentDevice];
 			NSString* deviceID = [device platformString];	
-			zBody = [zBody stringByAppendingFormat:@"Device: %@   iOS: %@\n\n", 
+			zBody = [zBody stringByAppendingFormat:@"Device: %@   iOS: %@\n", 
 					 deviceID,
 					 [[UIDevice currentDevice] systemVersion]]; // OSの現在のバージョン
+
+			NSArray *languages = [NSLocale preferredLanguages];
+			zBody = [zBody stringByAppendingFormat:@"Locale: %@ (%@)\n\n",
+					 [[NSLocale currentLocale] objectForKey:NSLocaleIdentifier],
+					 [languages objectAtIndex:0]];
 			
 			zBody = [zBody stringByAppendingString:NSLocalizedString(@"Contact message",nil)];
 			[picker setMessageBody:zBody isHTML:NO];

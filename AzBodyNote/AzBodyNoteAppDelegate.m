@@ -54,25 +54,10 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {	// Override point for customization after application launch.
-/*    UITabBarController *tbc = (UITabBarController *)self.window.rootViewController;
-	E2editTVC *e2edit = (E2editTVC *)[tbc.childViewControllers objectAtIndex:0];
-	e2edit.managedObjectContext = self.managedObjectContext;
-
-	E2listTVC *e2list = (E2listTVC *)[tbc.childViewControllers objectAtIndex:1];
-	e2list.managedObjectContext = self.managedObjectContext;*/
-	
-/*-----------NG-----
-	NSArray *aTab = self.tabBarController.childViewControllers;
-	[[aTab objectAtIndex:0] setTitle: NSLocalizedString(@"TabAdd",nil)];
-	[[aTab objectAtIndex:1] setTitle: NSLocalizedString(@"TabList",nil)];
-	[[aTab objectAtIndex:2] setTitle: NSLocalizedString(@"TabGraph",nil)];
-	[[aTab objectAtIndex:3] setTitle: NSLocalizedString(@"TabInfo",nil)];
-*/
 	
 	// Moc初期化
 	mocBase = [[MocFunctions alloc] initWithMoc:[self managedObjectContext]]; //iCloud同期に使用される
-	// commit や rollback を使わず、ReadOnly ならば mocBase を使用可能。
-	// commit や rollback を使うならば、各viewDidLoad:にてMOC生成すること。
+	// TabBar画面毎にMOCを生成して個別にrollbackしたかったが、MOC間の変更反映が面倒だったので単一に戻した。
 	
     return YES;
 }
@@ -213,7 +198,7 @@
 			//NSURL *cloudURL = [fileManager URLForUbiquityContainerIdentifier:@"5C2UYK6F45.com.azukid.AzPacking"];
 			NSURL *cloudURL = [fileManager URLForUbiquityContainerIdentifier:nil]; // 自動取得されるようになった。
 			NSLog(@"cloudURL=%@", cloudURL);
-			NSString* coreDataCloudContent = [[cloudURL path] stringByAppendingPathComponent:@"test"];
+			NSString* coreDataCloudContent = [[cloudURL path] stringByAppendingPathComponent:@"CoreData"];
 			NSLog(@"coreDataCloudContent=%@", coreDataCloudContent);
 			
 			if (0 < [coreDataCloudContent length]) {
