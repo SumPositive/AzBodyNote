@@ -5,31 +5,35 @@
 //  Created by Sum Positive on 2011/10/01.
 //  Copyright 2011 Sum Positive@Azukid.com. All rights reserved.
 //
+//  マルチＭＯＣ対応のため、インスタンスメソッドにした。
 
 #import <Foundation/Foundation.h>
 #import "MocEntity.h"
 
 @interface MocFunctions : NSObject {
+@private
+	NSManagedObjectContext		*moc_;
 }
 
+// − インスタンスメソッド
+- (id)initWithMoc:(NSManagedObjectContext*)moc;
+- (void)setMoc:(NSManagedObjectContext *)moc;
+- (NSManagedObjectContext*)getMoc;
+- (id)insertAutoEntity:(NSString *)zEntityName;
+- (void)deleteEntity:(NSManagedObject *)entity;
+- (BOOL)hasChanges;
+- (BOOL)commit;
+- (void)rollBack;
 
-// クラスメソッド（グローバル関数）
-+ (void)setMoc:(NSManagedObjectContext *)moc;
-+ (NSManagedObjectContext*)getMoc;
-+ (id)insertAutoEntity:(NSString *)zEntityName;
-+ (void)deleteEntity:(NSManagedObject *)entity;
-+ (BOOL)hasChanges;
-+ (BOOL)commit;
-+ (void)rollBack;
-
-+ (NSArray *)select:(NSString *)zEntity
+- (NSArray *)select:(NSString *)zEntity
 			  limit:(NSInteger)iLimit
 			 offset:(NSInteger)iOffset
 			  where:(NSPredicate *)predicate
 			   sort:(NSArray *)arSort;
 
-+ (void)e2delete:(E2record *)e2node;
+- (void)e2delete:(E2record *)e2node;
 
+// ＋ クラスメソッド
 + (NSDate*)dateGoal;
 
 @end

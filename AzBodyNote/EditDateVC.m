@@ -18,16 +18,8 @@
 @end
 
 @implementation EditDateVC
-{
-	//__unsafe_unretained id						delegate;	
-	//__strong E2record			*Re2node;
-	//NSTimeInterval	MintervalPrev;
-}
 @synthesize delegate;
 @synthesize CdateSource;
-//@synthesize Re2record = e2record_;
-//@synthesize PiMinYearMMDD;
-//@synthesize PiMaxYearMMDD;
 @synthesize ibDatePicker;
 
 
@@ -35,7 +27,6 @@
 
 - (IBAction)ibBuToday:(UIButton *)button
 {
-	//ibDatePicker.date = [NSDate date]; // Now
 	[ibDatePicker setDate:[NSDate date] animated:YES];
 }
 
@@ -61,14 +52,14 @@
 - (void)loadView
 {
     [super loadView];
-/*
+
 #ifdef AzPAD
 	self.view.backgroundColor = [UIColor lightGrayColor];
 #else
 	self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
 	[self.navigationController setToolbarHidden:YES animated:NO]; // ツールバー消す
 #endif
-*/
+
 	// DONEボタンを右側に追加する
 	// 前画面に[SAVE]があるから、この[DONE]を無くして戻るだけで更新するように試してみたが、
 	// 右側にある[DONE]ボタンを押して、また右側にある[SAVE]ボタンを押す流れが安全
@@ -83,33 +74,25 @@
 {
 	
 }
-
+/*
 // viewWillAppear はView表示直前に呼ばれる。よって、Viewの変化要素はここに記述する。　 　// viewDidAppear はView表示直後に呼ばれる
 - (void)viewWillAppear:(BOOL)animated 
 {
 	[super viewWillAppear:animated];
-
 	//ここでキーを呼び出すと画面表示が無いまま待たされてしまうので、viewDidAppearでキー表示するように改良した。
 }
+*/
 
 // 画面表示された直後に呼び出される
 - (void)viewDidAppear:(BOOL)animated 
 {
 	[super viewDidAppear:animated];
 	NSLog(@"CdateSource=%@", CdateSource);
+	if (CdateSource==nil) {	// LOGIC ERROR!!!
+		CdateSource = [NSDate date];
+	}
 	[ibDatePicker setDate:CdateSource animated:YES];
-	
-	//self.title = NSLocalizedString(@"Use date",nil);  親側でセット
-	//viewWillAppearでキーを表示すると画面表示が無いまま待たされてしまうので、viewDidAppearでキー表示するように改良した。
 }
 
-
-#pragma mark  View - Unload - dealloc
-/*
-- (void)dealloc    // 最後に1回だけ呼び出される（デストラクタ）
-{
-	[super dealloc];
-}
-*/
 
 @end

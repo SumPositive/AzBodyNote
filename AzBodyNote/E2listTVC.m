@@ -21,9 +21,8 @@
 @implementation E2listTVC
 {
 	AzBodyNoteAppDelegate		*appDelegate_;
-	//NSManagedObjectContext		*moc_;
+	MocFunctions							*mocFunc_;
 	NSIndexPath							*indexPathEdit_;
-	//BOOL										bEditReturn_;
 
 #ifdef GD_Ad_ENABLED
 	GADBannerView		*adMobView_;
@@ -38,13 +37,17 @@
 {
 	[super viewDidLoad];
 
-	appDelegate_ = [[UIApplication sharedApplication] delegate];
-/*	moc_ = [appDelegate_ managedObjectContext];
-	NSLog(@"E2listTVC: moc_=%@", moc_);
-	assert(moc_);*/
-	//bEditReturn_ = NO;
-
-	//self.tableView.delegate = self;
+	if (!appDelegate_) {
+		appDelegate_ = [[UIApplication sharedApplication] delegate];
+	}
+	assert(appDelegate_);
+	
+	if (!mocFunc_) {
+		//  AddNew と Edit が別々に発する rollback の影響を避けるため、別々のContext上で処理する。
+		//mocFunc_ = [[MocFunctions alloc] initWithMoc:[appDelegate_ managedObjectContext]];
+		mocFunc_ = appDelegate_.mocBase; // Read Only
+	}
+	assert(mocFunc_);
 	
 	// listen to our app delegates notification that we might want to refresh our detail view
     [[NSNotificationCenter defaultCenter] addObserver:self 
@@ -55,22 +58,10 @@
 	// Set up the edit and add buttons.
 	//self.navigationItem.leftBarButtonItem = self.editButtonItem;
 
-	//UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject)];
-	//self.navigationItem.rightBarButtonItem = addButton;
-	//[addButton release];
-	
-/*	// TableCell表示で使う日付フォーマッタを定義する
-	assert(mDateFormatter==nil);
-	mDateFormatter = [[NSDateFormatter alloc] init];
-	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
-	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-	[mDateFormatter setCalendar:calendar];
-	[calendar release];
-	//[df setLocale:[NSLocale systemLocale]];これがあると曜日が表示されない。
-	[mDateFormatter setDateFormat:@"dd  HH:mm"];
-*/
-	
-	//self.managedObjectContext = [MocFunctions getMoc];
+	// NEXT (E2editTVC) Left Back [<<] buttons.
+	self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
+											 initWithTitle:NSLocalizedString(@"Cancel",nil)
+											 style:UIBarButtonItemStylePlain target:nil action:nil];
 
 	// TableView
 	//self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone; // セル区切り線なし
@@ -100,27 +91,40 @@
 {
     [super viewWillAppear:animated];
 	
-/*	// データ抽出する
-	NSError *error = nil;
+	// データ抽出する
+/*	NSError *error = nil;
 	if (![self.fetchedResultsController performFetch:&error])
 	{
 	    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
 	    abort();
 	}*/
-	
-	if (indexPathEdit_ && frc_) {
-		NSLog(@"viewWillAppear: indexPathEdit_=%@", indexPathEdit_);
-		NSArray *aPaths = [NSArray arrayWithObject:indexPathEdit_];
-		[self.tableView reloadRowsAtIndexPaths:aPaths withRowAnimation:UITableViewRowAnimationFade];
-	}
+//	frc_ = nil;
 	
 	if (indexPathEdit_) {
-		indexPathEdit_ = nil; // Editモード解除
-	} else { 
+		@try {	// 範囲オーバーで落ちる可能性があるため。　＜＜最終行を削除したとき。
+			NSLog(@"viewWillAppear: indexPathEdit_=%@", indexPathEdit_);
+			NSArray *aPaths = [NSArray arrayWithObject:indexPathEdit_];
+			[self.tableView reloadRowsAtIndexPaths:aPaths withRowAnimation:UITableViewRowAnimationFade];
+		}
+		@catch (NSException *exception) {
+			NSLog(@"LOGIC ERROR!!! - indexPathEdit_");
+		}
+		@finally {
+			indexPathEdit_ = nil; // Editモード解除
+		}
+	}
+	else { 
 		// 最終行を表示する
-		[self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:[[self.fetchedResultsController sections] count]] 
-							  atScrollPosition:UITableViewScrollPositionMiddle animated:NO];  // 実機検証結果:NO
-		self.view.alpha = 0;
+		@try {	// 範囲オーバーで落ちる可能性があるため。
+			[self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:[[self.fetchedResultsController sections] count]] 
+								  atScrollPosition:UITableViewScrollPositionMiddle animated:NO];  // 実機検証結果:NO
+			if (animated) { // NO ならば、viewDidAppear:が呼ばれないため。
+				self.view.alpha = 0;
+			}
+		}
+		@catch (NSException *exception) {
+			NSLog(@"LOGIC ERROR!!! - 最終行");
+		}
 	}
 }
 
@@ -199,7 +203,8 @@
 - (void)refreshAllViews:(NSNotification*)note 
 {	// iCloud-CoreData に変更があれば呼び出される
     if (note) {
-		[self viewWillAppear:YES];
+		//[self viewWillAppear:NO];
+		[self.tableView reloadData];
     }
 }
 
@@ -303,7 +308,7 @@
     {
         // Delete the managed object for the given index path
         //[moc_ deleteObject:[self.fetchedResultsController objectAtIndexPath:indexPath]];
-		[MocFunctions deleteEntity:[self.fetchedResultsController objectAtIndexPath:indexPath]];
+		[mocFunc_ deleteEntity:[self.fetchedResultsController objectAtIndexPath:indexPath]];
         
         // Save the context.
 /*        NSError *error = nil;
@@ -312,7 +317,7 @@
             NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
             abort();
         }*/
-		[MocFunctions commit];
+		[mocFunc_ commit];
     }   
 }
 
@@ -374,7 +379,7 @@
 - (NSFetchedResultsController *)fetchedResultsController
 {	// データ抽出コントローラを生成する
     if (frc_)
-    {
+    {	// 既に生成済み
         return frc_;
     }
     
@@ -386,7 +391,7 @@
 
 	// エンティティ指定
     // Edit the entity name as appropriate.
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"E2record" inManagedObjectContext:[MocFunctions getMoc]];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"E2record" inManagedObjectContext:[mocFunc_ getMoc]];
     [fetchRequest setEntity:entity];
     
     // Set the batch size to a suitable number.
@@ -410,9 +415,9 @@
     // Edit the section name key path and cache name if appropriate.
     // nil for section name key path means "no sections".
 	NSFetchedResultsController *aFrc = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
-																								managedObjectContext:[MocFunctions getMoc] 
+																								managedObjectContext:[mocFunc_ getMoc] 
 																								  sectionNameKeyPath:E2_nYearMM	// セクション指定のため
-																										   cacheName:@"E2listDate"];
+																					  cacheName:nil];  //@"E2listDate"];
     aFrc.delegate = self;
 
 	// データ抽出する

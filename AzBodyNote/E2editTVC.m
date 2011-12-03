@@ -19,7 +19,7 @@
 @implementation E2editTVC
 {
 	AzBodyNoteAppDelegate		*appDelegate_;
-	//NSManagedObjectContext		*moc_;
+	MocFunctions				*mocFunc_;
 	
 	BOOL			bAddNew_;
 	BOOL			bEditDate_;
@@ -42,30 +42,8 @@
 
 #pragma mark - IBAction
 
-/*
-- (IBAction)ibBuValue:(UIButton *)button
-{
-	NSLog(@"ibBuValue");
-}
-
-- (IBAction)ibSrValueChange:(UISlider *)slider
-{
-	NSLog(@"ibSrValueChange");
-}
-
-- (IBAction)actionCellValueTouch:(UIButton *)button
-{
-	NSLog(@"actionCellValueTouch .tag=%d", button.tag);
-}
-- (IBAction)actionCellSliderChange:(UISlider *)slider
-{
-	NSLog(@"actionCellSliderChange .tag=%d", slider.tag);
-}
-*/
-
-
 - (void)setE2recordPrev
-{
+{	// .dateTime より前の値を初期値としてセットする
 	assert(moE2edit_);
 	E2record	*e2prev;	// 直前のレコード
 	// Sort条件
@@ -77,56 +55,65 @@
 	NSDate *dateNow = moE2edit_.dateTime;	 // 現在編集中の日付
 	if (dateNow==nil) dateNow = [NSDate date];
 	
-	// E2_nBpHi_mmHg
-	NSArray *arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
+	if (moE2edit_.nBpHi_mmHg==nil) {
+		NSArray *arFetch = [mocFunc_ select:@"E2record" limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: E2_nBpHi_mmHg @" > 0 AND " E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
-	if ([arFetch count]==1) {
-		e2prev = [arFetch objectAtIndex:0];
-		NSLog(@"Re2prev.nBpHi_mmHg=%d", [e2prev.nBpHi_mmHg integerValue]);
-		iPrevBpHi_ = [e2prev.nBpHi_mmHg integerValue];
-	} else {
-		iPrevBpHi_ = E2_nBpHi_INIT;
+		if ([arFetch count]==1) {
+			e2prev = [arFetch objectAtIndex:0];
+			NSLog(@"Re2prev.nBpHi_mmHg=%d", [e2prev.nBpHi_mmHg integerValue]);
+			iPrevBpHi_ = [e2prev.nBpHi_mmHg integerValue];
+		} else {
+			iPrevBpHi_ = E2_nBpHi_INIT;
+		}
 	}
-	// E2_nBpLo_mmHg
-	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
+	
+	if (moE2edit_.nBpLo_mmHg==nil) {
+		NSArray *arFetch = [mocFunc_ select:@"E2record" limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: E2_nBpLo_mmHg @" > 0 AND " E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
-	if ([arFetch count]==1) {
-		e2prev = [arFetch objectAtIndex:0];
-		iPrevBpLo_ = [e2prev.nBpLo_mmHg integerValue];
-	} else {
-		iPrevBpLo_ = E2_nBpLo_INIT;
+		if ([arFetch count]==1) {
+			e2prev = [arFetch objectAtIndex:0];
+			iPrevBpLo_ = [e2prev.nBpLo_mmHg integerValue];
+		} else {
+			iPrevBpLo_ = E2_nBpLo_INIT;
+		}
 	}
-	// E2_nPulse_bpm
-	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
+	
+	if (moE2edit_.nPulse_bpm==nil) {
+		NSArray *arFetch = [mocFunc_ select:@"E2record" limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: E2_nPulse_bpm @" > 0 AND " E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
-	if ([arFetch count]==1) {
-		e2prev = [arFetch objectAtIndex:0];
-		iPrevPuls_ = [e2prev.nPulse_bpm integerValue];
-	} else {
-		iPrevPuls_ = E2_nPuls_INIT;
+		if ([arFetch count]==1) {
+			e2prev = [arFetch objectAtIndex:0];
+			iPrevPuls_ = [e2prev.nPulse_bpm integerValue];
+		} else {
+			iPrevPuls_ = E2_nPuls_INIT;
+		}
 	}
-	// E2_nWeight_10Kg
-	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
+
+	if (moE2edit_.nWeight_10Kg==nil) {
+		NSArray *arFetch = [mocFunc_ select:@"E2record" limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: E2_nWeight_10Kg @" > 0 AND " E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
-	if ([arFetch count]==1) {
-		e2prev = [arFetch objectAtIndex:0];
-		iPrevWeight_ = [e2prev.nWeight_10Kg integerValue];
-	} else {
-		iPrevWeight_ = E2_nWeight_INIT;
+		if ([arFetch count]==1) {
+			e2prev = [arFetch objectAtIndex:0];
+			iPrevWeight_ = [e2prev.nWeight_10Kg integerValue];
+		} else {
+			iPrevWeight_ = E2_nWeight_INIT;
+		}
 	}
-	// E2_nTemp_10c
-	arFetch = [MocFunctions select:@"E2record" limit:1 offset:0
+
+	if (moE2edit_.nTemp_10c==nil) {
+		NSArray *arFetch = [mocFunc_ select:@"E2record" limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: E2_nTemp_10c @" > 0 AND " E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
-	if ([arFetch count]==1) {
-		e2prev = [arFetch objectAtIndex:0];
-		iPrevTemp_= [e2prev.nTemp_10c integerValue];
-	} else {
-		iPrevTemp_ = E2_nTemp_INIT;
+		if ([arFetch count]==1) {
+			e2prev = [arFetch objectAtIndex:0];
+			iPrevTemp_= [e2prev.nTemp_10c integerValue];
+		} else {
+			iPrevTemp_ = E2_nTemp_INIT;
+		}
 	}
 }
 
@@ -134,8 +121,6 @@
 {
 	assert(bAddNew_);
 	assert(moE2edit_);
-	//appDelegate.mIsUpdate = NO;
-	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
 
 	moE2edit_.dateTime = [NSDate date];
 	moE2edit_.sNote1 = nil;
@@ -145,8 +130,9 @@
 	moE2edit_.nPulse_bpm = nil;
 	moE2edit_.nWeight_10Kg = nil;
 	moE2edit_.nTemp_10c = nil;
+	[self setE2recordPrev];	// .dateTime より前の値を初期値としてセットする
 	
-	[self setE2recordPrev];
+	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
 	[self.tableView reloadData];
 }
 
@@ -159,28 +145,28 @@
 	NSDateComponents* comp = [calendar components:NSYearCalendarUnit | NSMonthCalendarUnit
 										 fromDate:moE2edit_.dateTime];
 	moE2edit_.nYearMM = [NSNumber numberWithInteger:([comp year] * 100 + [comp month])];
-	
+
 	// Save & Commit
-	[MocFunctions commit];
-	//moE2edit_ = nil;	//autorelease
+	[mocFunc_ commit];
 	
 	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
 
 	if (bAddNew_) {
+		moE2edit_ = nil;	// viewWillAppear:にて新規生成される
 		// List画面に切り替えて、追加行を一時ハイライトする
 		self.navigationController.tabBarController.selectedIndex = 1; // List画面へ
-	} else {
-		// Edit mode
+	} 
+	else { // Edit mode
+		// moE2edit_ ＜＜　Edit mode だから = nil ダメ！
 		[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
 	}
 }
 
 - (void)actionCancel
-{
+{	// Edit mode ONLY
 	assert(bAddNew_==NO);
-	// Edit mode ONLY
-	[MocFunctions rollBack];
-	
+	[mocFunc_ rollBack];
+	// moE2edit_ ＜＜　Edit mode だから = nil ダメ！
 	[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
 }
 
@@ -208,11 +194,14 @@
 	if (!appDelegate_) {
 		appDelegate_ = [[UIApplication sharedApplication] delegate];
 	}
-/*	if (!moc_) {
-		moc_ = [appDelegate_ managedObjectContext];
+	assert(appDelegate_);
+	
+	if (!mocFunc_) {
+		//  AddNew と Edit が別々に発する rollback の影響を避けるため、別々のContext上で処理する。
+		//mocFunc_ = [[MocFunctions alloc] initWithMoc:[appDelegate_ managedObjectContext]];
+		mocFunc_ = appDelegate_.mocBase; // Read Only
 	}
-	NSLog(@"E2editTVC: moc_=%@", moc_);
-	assert(moc_);*/
+	assert(mocFunc_);
 	
 	// listen to our app delegates notification that we might want to refresh our detail view
     [[NSNotificationCenter defaultCenter] addObserver:self 
@@ -224,11 +213,14 @@
 		// Modify mode.
 		self.title = NSLocalizedString(@"Modify",nil);
 		bAddNew_ = NO;
-		/* [<Back]ボタンの方が解りやすい。 修正あるのにBackしたときはアラート表示してからRollback処理する。
-		// [Cancel]ボタンを左側に追加する  Navi標準の戻るボタンでは actionCancel 処理ができないため
-		self.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc]
-												  initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
-												  target:self action:@selector(actionCancel)] autorelease];*/
+
+		// [<Back]ボタン表示: 修正あるのにBackしたときはアラート表示してからRollback処理する。
+		// [Cancel]ボタンを左側に追加する
+		self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+												 initWithTitle:NSLocalizedString(@"Cancel",nil)
+												 style:UIBarButtonItemStyleBordered 
+												 target:self action:@selector(actionCancel)];
+
 		// TableView 背景
 		UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
 		self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
@@ -237,17 +229,15 @@
 		// AddNew mode.
 		self.title = NSLocalizedString(@"TabAdd",nil);
 		bAddNew_ = YES;
+		
 		// moE2edit_ は、viewWillAppear:にて生成する。
-/*		//NG//Re2edit_ = [MocFunctions insertAutoEntity:@"E2record"]; // autorelese
-		//NG//e2edit_ = [NSEntityDescription insertNewObjectForEntityForName:@"E2record" inManagedObjectContext:moc_];
-		// alloc生成する
-		NSEntityDescription *entity = [NSEntityDescription entityForName:@"E2record" inManagedObjectContext:moc_]; //autorelease
-		moE2edit_ = (E2record*)[[NSManagedObject alloc] initWithEntity:entity  insertIntoManagedObjectContext:moc_]; //alloc
- */
+
 		// [Clear]ボタンを左側に追加する
 		self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
-												  initWithTitle:NSLocalizedString(@"Clear",nil) style:UIBarButtonItemStyleBordered 
-												 target:self action:@selector(actionClear)];// autorelease];
+												  initWithTitle:NSLocalizedString(@"Clear",nil)
+												 style:UIBarButtonItemStyleBordered 
+												 target:self action:@selector(actionClear)];
+		
 		// TableView 背景
 		UIImage *imgTile = [UIImage imageNamed:@"Tx-LzBeige320"];
 		self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
@@ -267,13 +257,13 @@
 		bGoalRecordCheck = NO;
 		// didFinishLaunchingWithOptions:では、早すぎるためか落ちるため、ここに実装してた。
 		// E2 目標(The GOAL)固有レコードが無ければ追加する
-		NSArray *arFetch = [MocFunctions select:@"E2record"
+		NSArray *arFetch = [mocFunc_ select:@"E2record"
 										  limit:1		//=0:無制限  ＜＜ 1にすると結果は0件になるのでダメ
 										 offset:0
 										  where:[NSPredicate predicateWithFormat: E2_dateTime @" == %@", [MocFunctions dateGoal]]
 										   sort:nil];
 		if ([arFetch count] <= 0) { // 無いので追加する
-			E2record *moE2goal = [MocFunctions insertAutoEntity:@"E2record"];
+			E2record *moE2goal = [mocFunc_ insertAutoEntity:@"E2record"];
 			// 固有日付をセット
 			moE2goal.dateTime = [MocFunctions dateGoal];
 			moE2goal.nYearMM = [NSNumber numberWithInteger: E2_nYearMM_GOAL];	// 主に、こちらで比較チェックする
@@ -285,26 +275,26 @@
 			moE2goal.nWeight_10Kg = [NSNumber numberWithInteger: E2_nWeight_INIT];
 			moE2goal.nTemp_10c = [NSNumber numberWithInteger: E2_nTemp_INIT];
 			// Save & Commit
-			[MocFunctions commit];
+			[mocFunc_ commit];
 		}
 	}
 	
 #ifdef GD_Ad_ENABLED
 	//CGRect rcAd = CGRectMake(0, self.view.frame.size.height-self.tabBarController.view.frame.size.height-50, 320, 50);
-	CGRect rcAd = CGRectMake(0, self.view.frame.size.height-29-50, 320, 50);
+	CGRect rcAd = CGRectMake(0, self.view.frame.size.height-28-50, 320, 50);  // GAD_SIZE_320x50
 	//--------------------------------------------------------------------------------------------------------- AdMob
 	if (adMobView_==nil) {
 		adMobView_ = [[GADBannerView alloc] init];
 		adMobView_.delegate = self;
-		adMobView_.rootViewController = self.navigationController;
+		adMobView_.rootViewController = self; //.navigationController;
 		adMobView_.adUnitID = AdMobID_BodyNote;
+		adMobView_.frame = rcAd;
+		// 以上は、GADRequest より先に指定すること。
 		GADRequest *request = [GADRequest request];
 		//[request setTesting:YES];
-		// GAD_SIZE_320x50
-		adMobView_.frame = rcAd;
+		[adMobView_ loadRequest:request];
 		adMobView_.alpha = 0;	// 0=非表示　　1=表示
 		adMobView_.tag = 0;		// 0=広告なし　　1=あり　　（iAdを優先表示するために必要）
-		[adMobView_ loadRequest:request];
 		//[self.view addSubview:adMobView_];
 		[self.navigationController.view addSubview:adMobView_];
 	}
@@ -335,9 +325,9 @@
 	}
 	else if (bAddNew_) {
 		if (moE2edit_==nil) {
-			moE2edit_ = [MocFunctions insertAutoEntity:@"E2record"];
+			moE2edit_ = [mocFunc_ insertAutoEntity:@"E2record"];
+			[self actionClear];
 		}
-		[self actionClear];
 		self.view.alpha = 0; //AddNewのときだけディゾルブ
 	}
 	else {
@@ -399,35 +389,39 @@
 
 - (void)viewWillDisappear:(BOOL)animated
 {	// 非表示になる前に呼び出される
-    [super viewWillDisappear:animated];
 	
 	if (bEditDate_) {
 		// 日付修正へ遷移
 	}
 	else if (bAddNew_) {
-		// 追加 中止
-		[MocFunctions rollBack];  // 未保存取り消し		//[moc_ rollback];
+		// TabBar切替により隠されたとき、中止してクリアする
+		[mocFunc_ rollBack];  // 未保存取り消し		//[moc_ rollback];
 		moE2edit_ = nil; //autorelease
 	}
 	else {
-		// Edit 中止
-		[self actionCancel];
+		// TabBar切替により隠されたとき、中止してList画面に戻す
+		[mocFunc_ rollBack];
+		// moE2edit_ ＜＜　Edit mode だから = nil ダメ！
+		[self.navigationController popViewControllerAnimated:NO];	// < 前のViewへ戻る
 	}
+	
+    [super viewWillDisappear:animated];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {	// 非表示になった後に呼び出される
-#ifdef GD_Ad_ENABLED
-	iAdBanner_.delegate = nil;
-	adMobView_.delegate = nil;
-	[UIView beginAnimations:nil context:NULL];
-	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-	[UIView setAnimationDuration:0.8];
-	iAdBanner_.alpha = 0;
-	adMobView_.alpha = 0;
-	[UIView commitAnimations];
+#ifdef	GD_Ad_ENABLED		// TabBar切替では遷移時に消す必要なし。別の NaviView だから。
+	if (bEditDate_==NO) {	// EditDateならば隠さない
+		iAdBanner_.delegate = nil;
+		adMobView_.delegate = nil;
+		[UIView beginAnimations:nil context:NULL];
+		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+		[UIView setAnimationDuration:0.8];
+		iAdBanner_.alpha = 0;
+		adMobView_.alpha = 0;
+		[UIView commitAnimations];
+	}
 #endif
-
     [super viewDidDisappear:animated];
 }
 
@@ -756,6 +750,7 @@
 	if (date) {
 		NSLog(@"editDateDone: date=%@", date);
 		moE2edit_.dateTime = date;
+		[self setE2recordPrev]; // .dateTime より前の値を初期値としてセットする
 		[self.tableView reloadData];
 		self.navigationItem.rightBarButtonItem.enabled = YES; // 変更あればYESにする
 	}
@@ -774,8 +769,8 @@
 	switch (alertView.tag) 
 	{
 		case ALERT_TAG_DeleteE2: {	// この記録を削除する
-			[MocFunctions deleteEntity:moE2edit_];
-			[MocFunctions commit];
+			[mocFunc_ deleteEntity:moE2edit_];
+			[mocFunc_ commit];
 			[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
 		}	break;
 	}

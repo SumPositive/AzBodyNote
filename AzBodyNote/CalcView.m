@@ -259,8 +259,8 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 		// デフォルト丸め処理
 		//[mAnswer release], 
 		mAnswer = [mAnswer decimalNumberByRoundingAccordingToBehavior:mBehaviorDefault];
-		[mTarget performSelector:mActionSelector withObject:[mAnswer copy]];  // 受け取った側でreleaseすること
-		//[mTarget performSelector:mActionSelector withObject:mAnswer];  // 受け取った側でreleaseすること
+		//[mTarget performSelector:mActionSelector withObject:[mAnswer copy]];  // 受け取った側でreleaseすること
+		[mTarget performSelector:mActionSelector withObject:mAnswer];  // 受け取った側でreleaseすること
 	}
 	[self hide];
 }

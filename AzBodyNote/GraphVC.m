@@ -19,19 +19,26 @@
 	IBOutlet UIScrollView		*ibScrollView;
 	IBOutlet GraphView			*ibGraphView;
 	
-	NSArray		*aE2records_;
+	AzBodyNoteAppDelegate		*appDelegate_;
+	MocFunctions							*mocFunc_;
+	NSArray									*aE2records_;
 	
 }
 
-
+/*** XIB利用時には呼ばれません。
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
+		appDelegate_ = [[UIApplication sharedApplication] delegate];
+		assert(appDelegate_);
+		mocFunc_ = appDelegate_.mocBase; // Read Only
+		assert(mocFunc_);
     }
     return self;
 }
+*/
 
 - (void)didReceiveMemoryWarning
 {
@@ -55,6 +62,11 @@
 {
     [super viewDidLoad];
 	self.title = NSLocalizedString(@"TabGraph",nil);
+
+	appDelegate_ = [[UIApplication sharedApplication] delegate];
+	assert(appDelegate_);
+	mocFunc_ = appDelegate_.mocBase; // Read Only
+	assert(mocFunc_);
 
 	// listen to our app delegates notification that we might want to refresh our detail view
     [[NSNotificationCenter defaultCenter] addObserver:self 
@@ -80,7 +92,7 @@
 	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
 	NSArray *sortDesc = [NSArray arrayWithObjects: sort1,nil]; // 日付降順：Limit抽出に使用
 	
-	aE2records_ = [MocFunctions select: @"E2record"
+	aE2records_ = [mocFunc_ select: @"E2record"
 								 limit: RECORD_LIMIT
 								offset: 0
 								 where: [NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"] // 未保存を除外する
@@ -102,13 +114,15 @@
 	rc.size.width = RECORD_WIDTH * iCount + MARGIN_WIDTH*2;
 	ibScrollView.contentSize = rc.size;
 	ibGraphView.frame = rc;
-	// 最新日を表示する　（GOALの手前）
-	ibScrollView.contentOffset = CGPointMake(rc.size.width - ibScrollView.bounds.size.width - RECORD_WIDTH, 0);  
+	// 最初、GOALを画面中央に表示する
+	ibScrollView.contentOffset = CGPointMake(rc.size.width - ibScrollView.bounds.size.width, 0);  
 
 	//[ibGraphView drawRect:self.view.frame];  NG//これだと不具合発生する
 	[ibGraphView setNeedsDisplay]; //drawRect:が呼び出される
 	
-	self.view.alpha = 0;
+	if (animated) { // NO ならば、viewDidAppear:が呼ばれないため。
+		self.view.alpha = 0;
+	}
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -147,7 +161,8 @@
 {	// iCloud-CoreData に変更があれば呼び出される
     if (note) {
 		//[self.tableView reloadData];
-		[self viewWillAppear:YES];
+		[self viewWillAppear:NO]; // NO によりrefreshであることを知らせている。
+		// この後、viewDidAppear: は呼ばれないことに注意！
     }
 }
 

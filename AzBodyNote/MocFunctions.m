@@ -15,51 +15,61 @@
 
 @implementation MocFunctions
 
-static NSManagedObjectContext *scMoc = nil;
+//static NSManagedObjectContext *scMoc = nil;
 
-+ (void)setMoc:(NSManagedObjectContext *)moc
+- (id)initWithMoc:(NSManagedObjectContext*)moc
 {
+	self = [super init];
+	if (self==nil) return nil; // ERROR
+	
 	assert(moc);
-	scMoc = moc;
-}	
-
-+ (NSManagedObjectContext*)getMoc
-{
-	return scMoc;
+	moc_ = moc;
+	return self;
 }
 
-+ (id)insertAutoEntity:(NSString *)zEntityName	// autorelease
+- (void)setMoc:(NSManagedObjectContext *)moc
 {
-	assert(scMoc);
+	assert(moc);
+	moc_ = moc;
+}	
+
+- (NSManagedObjectContext*)getMoc
+{
+	return moc_;
+}
+
+- (id)insertAutoEntity:(NSString *)zEntityName	// autorelease
+{
+	assert(moc_);
 	// Newが含まれているが、自動解放インスタンスが生成される。
 	// 即commitされる。つまり、rollbackやcommitの対象外である。 ＜＜そんなことは無い！ roolback可能 save必要
-	return [NSEntityDescription insertNewObjectForEntityForName:zEntityName inManagedObjectContext:scMoc];
+	return [NSEntityDescription insertNewObjectForEntityForName:zEntityName inManagedObjectContext:moc_];
 	// ここで生成されたEntityは、rollBack では削除されない。　Cancel時には、deleteEntityが必要。 ＜＜そんなことは無い！ roolback可能 save必要
 }	
 
-+ (void)deleteEntity:(NSManagedObject *)entity
+- (void)deleteEntity:(NSManagedObject *)entity
 {
-	@synchronized(scMoc)
+	@synchronized(moc_)
 	{
 		if (entity) {
-			[scMoc deleteObject:entity];	// 即commitされる。つまり、rollbackやcommitの対象外である。 ＜＜そんなことは無い！ roolback可能 save必要
+			[moc_ deleteObject:entity];	// 即commitされる。つまり、rollbackやcommitの対象外である。 ＜＜そんなことは無い！ roolback可能 save必要
 		}
 	}
 }	
 
-+ (BOOL)hasChanges		// YES=commit以後に変更あり
+- (BOOL)hasChanges		// YES=commit以後に変更あり
 {
-	return [scMoc hasChanges];
+	return [moc_ hasChanges];
 }
 
-+ (BOOL)commit
+- (BOOL)commit
 {
-	assert(scMoc);
-	@synchronized(scMoc)
+	assert(moc_);
+	@synchronized(moc_)
 	{
 		// SAVE
 		NSError *err = nil;
-		if (![scMoc  save:&err]) {
+		if (![moc_  save:&err]) {
 			NSLog(@"*** MOC commit error ***\n%@\n%@\n***\n", err, [err userInfo]);
 			//exit(-1);  // Fail
 			alertBox(NSLocalizedString(@"MOC CommitErr",nil),
@@ -72,33 +82,33 @@ static NSManagedObjectContext *scMoc = nil;
 }
 
 
-+ (void)rollBack
+- (void)rollBack
 {
-	assert(scMoc);
-	@synchronized(scMoc)
+	assert(moc_);
+	@synchronized(moc_)
 	{
 		// ROLLBACK
-		[scMoc rollback]; // 前回のSAVE以降を取り消す
+		[moc_ rollback]; // 前回のSAVE以降を取り消す
 	}
 }
 
 
 #pragma mark - Search
 
-+ (NSArray *)select:(NSString *)zEntity
+- (NSArray *)select:(NSString *)zEntity
 			  limit:(NSInteger)iLimit
 			 offset:(NSInteger)iOffset
 			  where:(NSPredicate *)predicate
 			   sort:(NSArray *)arSort 
 {
-	assert(scMoc);
+	assert(moc_);
 	NSFetchRequest *req = nil;
 	@try {
 		req = [[NSFetchRequest alloc] init];
 		
 		// select
 		NSEntityDescription *entity = [NSEntityDescription entityForName:zEntity 
-												  inManagedObjectContext:scMoc];
+												  inManagedObjectContext:moc_];
 		[req setEntity:entity];
 		
 		// limit	抽出件数制限
@@ -123,7 +133,7 @@ static NSManagedObjectContext *scMoc = nil;
 		}
 
 		NSError *error = nil;
-		NSArray *arFetch = [scMoc executeFetchRequest:req error:&error];
+		NSArray *arFetch = [moc_ executeFetchRequest:req error:&error];
 		//[req release], req = nil;
 		if (error) {
 			NSLog(@"select: Error %@, %@", error, [error userInfo]);
@@ -141,15 +151,15 @@ static NSManagedObjectContext *scMoc = nil;
 }
 
 
-+ (void)e2delete:(E2record *)e2node
+- (void)e2delete:(E2record *)e2node
 {
-	assert(scMoc);
+	assert(moc_);
 	if (e2node==nil) return;
-	[scMoc deleteObject:e2node]; // 削除
+	[moc_ deleteObject:e2node]; // 削除
 }
 
 
-#pragma mark - Function
+#pragma mark - ＋ クラスメソッド
 
 static NSDate *dateGoal_ = nil;
 + (NSDate*)dateGoal
@@ -164,7 +174,6 @@ static NSDate *dateGoal_ = nil;
 	assert(dateGoal_);
 	return dateGoal_;
 }
-
 
 
 @end

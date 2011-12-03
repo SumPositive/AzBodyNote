@@ -6,7 +6,7 @@
 //  Copyright 2011 Sum Positive. All rights reserved.
 //
 
-//#define NO_AD	// AppStore画面撮影用に「広告なし」にするため
+#define NO_AD	// AppStore画面撮影用に「広告なし」にするため
 #if !defined(NO_AD)
 #define GD_Ad_ENABLED
 #define AdMobID_BodyNote				@"a14ece23da85f5e";		// 体調日記 パブリッシャー ID

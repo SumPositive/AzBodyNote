@@ -12,19 +12,31 @@
 #import "E2editTVC.h"
 #import "E2listTVC.h"
 
+//@interface AzBodyNoteAppDelegate (PrivateMethods)
+//- (NSManagedObjectContext *)managedObjectContext;
+//@end
+
 @implementation AzBodyNoteAppDelegate
 {
-	
+	@private
+	NSManagedObjectModel				*moModel_;
+	NSPersistentStoreCoordinator		*persistentStoreCoordinator_;
+	//NSManagedObjectContext				*mocBase_;	//iCloudのため
 }
+
 @synthesize window = window_;
-@synthesize managedObjectContext = moc_;
-@synthesize managedObjectModel = moModel_;
-@synthesize persistentStoreCoordinator = persistentStoreCoordinator_;
+@synthesize managedObjectContext;
+@synthesize mocBase;
+//@synthesize managedObjectModel = moModel_;
+//@synthesize persistentStoreCoordinator = persistentStoreCoordinator_;
 //@synthesize navigationController = _navigationController;
 @synthesize tabBarController = _tabBarController;
 //@synthesize mIsUpdate;
+//@synthesize mocEdit = mocEdit_;
+//@synthesize mocList = mocList_;
+//@synthesize mocGraph = mocGraph_;
 
-
+/*
 - (void)saveContext
 {
     NSError *error = nil;
@@ -33,16 +45,12 @@
     {
         if ([managedObjectContext hasChanges] && ![managedObjectContext save:&error])
         {
-            /*
-             Replace this implementation with code to handle the error appropriately.
-             
-             abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. If it is not possible to recover from the error, display an alert panel that instructs the user to quit the application by pressing the Home button.
-             */
             NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
             abort();
         } 
     }
 }
+*/
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {	// Override point for customization after application launch.
@@ -62,8 +70,9 @@
 */
 	
 	// Moc初期化
-	[MocFunctions setMoc:self.managedObjectContext];
-	// この直後に、Moc処理を実装すると落ちる。 Ｍｏｃ初期化が間に合わないからでは？？？
+	mocBase = [[MocFunctions alloc] initWithMoc:[self managedObjectContext]]; //iCloud同期に使用される
+	// commit や rollback を使わず、ReadOnly ならば mocBase を使用可能。
+	// commit や rollback を使うならば、各viewDidLoad:にてMOC生成すること。
 	
     return YES;
 }
@@ -101,7 +110,7 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
 	// Saves changes in the application's managed object context before the application terminates.
-	[self saveContext];
+	//[self saveContext];
 }
 
 - (void)dealloc
@@ -136,9 +145,10 @@
 // NSNotifications are posted synchronously on the caller's thread
 // make sure to vector this back to the thread we want, in this case
 // the main thread for our views & controller
-- (void)mergeChangesFrom_iCloud:(NSNotification *)notification {
-	NSManagedObjectContext* moc = [self managedObjectContext];
-	
+- (void)mergeChangesFrom_iCloud:(NSNotification *)notification
+						//withMoc:(NSManagedObjectContext*)moc
+{
+	NSManagedObjectContext* moc = [mocBase getMoc];
 	// this only works if you used NSMainQueueConcurrencyType
 	// otherwise use a dispatch_async back to the main thread yourself
 	[moc performBlock:^{
@@ -148,6 +158,26 @@
 
 
 #pragma mark - Core Data stack
+
+/**
+ Returns the managed object model for the application.
+ If the model doesn't already exist, it is created from the application's model.
+ */
+- (NSManagedObjectModel *)managedObjectModel
+{
+    if (moModel_ != nil) {
+        return moModel_;
+    }
+	
+#ifdef ENABLE_iCloud
+	moModel_ = [NSManagedObjectModel mergedModelFromBundles:nil];
+#else
+	NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"AzBodyNote" withExtension:@"momd"];
+	__managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];    
+#endif
+	
+	return moModel_;
+}
 
 /**
  Returns the persistent store coordinator for the application.
@@ -271,16 +301,18 @@
  */
 - (NSManagedObjectContext *)managedObjectContext
 {
-    if (moc_ != nil) {
-        return moc_;
-    }
+	//マルチMOC対応のため
+	//    if (moc_ != nil) {
+	//        return moc_;
+	//    }
     
     NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
+	NSManagedObjectContext* moc = nil;
 
 #ifdef ENABLE_iCloud
     if (coordinator != nil) {
 		if (IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
-			NSManagedObjectContext* moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+			moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 			
 			[moc performBlockAndWait:^{
 				// even the post initialization needs to be done within the Block
@@ -293,39 +325,20 @@
 			[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy]; // メモリを優先(Def.)
 			//[moc setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy]; // ストアを優先
 			//[moc setMergePolicy:NSOverwriteMergePolicy]; // 上書き
-			moc_ = moc;
+			//moc_ = moc;
         }
 		else {	// iOS5より前
-            moc_ = [[NSManagedObjectContext alloc] init];
-            [moc_ setPersistentStoreCoordinator:coordinator];
+            moc = [[NSManagedObjectContext alloc] init];
+            [moc setPersistentStoreCoordinator:coordinator];
         }		
     }
 #else
-	__managedObjectContext = [[NSManagedObjectContext alloc] init];
-	[__managedObjectContext setPersistentStoreCoordinator:coordinator];
+	moc = [[NSManagedObjectContext alloc] init];
+	[moc setPersistentStoreCoordinator:coordinator];
 #endif
-    return moc_;
+    return	moc;
 }
 
-/**
- Returns the managed object model for the application.
- If the model doesn't already exist, it is created from the application's model.
- */
-- (NSManagedObjectModel *)managedObjectModel
-{
-    if (moModel_ != nil) {
-        return moModel_;
-    }
-
-#ifdef ENABLE_iCloud
-	moModel_ = [NSManagedObjectModel mergedModelFromBundles:nil];
-#else
-	NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"AzBodyNote" withExtension:@"momd"];
-	 __managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];    
-#endif
-
-	return moModel_;
-}
 
 
 #pragma mark - Application's Documents directory

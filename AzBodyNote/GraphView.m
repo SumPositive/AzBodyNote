@@ -47,7 +47,7 @@
 	assert(count <= RECORD_LIMIT);
 	//文字列の設定
 	CGContextSetTextDrawingMode (cgc, kCGTextFillStroke);
-	CGContextSelectFont (cgc, "Helvetica", 12.0, kCGEncodingMacRoman);
+	CGContextSelectFont (cgc, "Helvetica", 12.0, kCGEncodingMacRoman); // ＜＜日本語NG
 	//CGRect rc;
 	for (int iNo=0; iNo < count; iNo++) 
 	{
@@ -273,12 +273,13 @@
 	CGPoint	pointsArray[RECORD_LIMIT+1];
 	long			valuesArray[RECORD_LIMIT+1];
 	int			arrayNo;
+	CGFloat	fXgoal = self.bounds.size.width - MARGIN_WIDTH;		// 最初、GOALを中央に表示する
 
 	//-------------------------------------------------------------------------------------- Date 描画
 	//システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
 	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 	unsigned unitFlags = NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit;
-	po.x = self.bounds.size.width - MARGIN_WIDTH; // 最新日の描画位置
+	po.x = fXgoal;
 	po.y = rcDate.origin.y + GRAPH_H_GAP;
 	arrayNo = 0;
 	for (E2record *e2 in aE2records_) {
@@ -304,7 +305,7 @@
 		iMaxBp++;
 	}
 	fYstep = (rcBp.size.height - GRAPH_H_GAP*2) / (iMaxBp - iMinBp);  // 1あたりのポイント数
-	po.x = self.bounds.size.width - MARGIN_WIDTH; // 最新日の描画位置
+	po.x = fXgoal;
 	arrayNo = 0;
 	for (E2record *e2 in aE2records_) {
 		if (e2.nBpHi_mmHg) {
@@ -322,7 +323,7 @@
 	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueType:0  pointLower:rcBp.origin.y];
 	
 	//-------------------------------------------------------------------------------------- BpLo グラフ描画
-	po.x = self.bounds.size.width - 160;
+	po.x = fXgoal;
 	arrayNo = 0;
 	for (E2record *e2 in aE2records_) {
 		if (e2.nBpLo_mmHg) {
@@ -345,7 +346,7 @@
 		iMaxPuls++;
 	}
 	fYstep = (rcPuls.size.height - GRAPH_H_GAP*2) / (iMaxPuls - iMinPuls);  // 1あたりのポイント数
-	po.x = self.bounds.size.width - 160;
+	po.x = fXgoal;
 	arrayNo = 0;
 	for (E2record *e2 in aE2records_) {
 		if (e2.nPulse_bpm) {
@@ -368,7 +369,7 @@
 		iMaxWeight++;
 	}
 	fYstep = (rcWeight.size.height - GRAPH_H_GAP*2) / (iMaxWeight - iMinWeight);  // 1あたりのポイント数
-	po.x = self.bounds.size.width - 160;
+	po.x = fXgoal;
 	arrayNo = 0;
 	for (E2record *e2 in aE2records_) {
 		if (e2.nWeight_10Kg) {
@@ -391,7 +392,7 @@
 		iMaxTemp++;
 	}
 	fYstep = (rcTemp.size.height - GRAPH_H_GAP*2) / (iMaxTemp - iMinTemp);  // 1あたりのポイント数
-	po.x = self.bounds.size.width - 160;
+	po.x = fXgoal;
 	arrayNo = 0;
 	for (E2record *e2 in aE2records_) {
 		if (e2.nTemp_10c) {

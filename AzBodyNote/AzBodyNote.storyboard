@@ -574,6 +574,9 @@
                                 <date key="date" timeIntervalSinceReferenceDate="340459436.93700099">
                                     <!--2011-10-16 21:03:56 +0900-->
                                 </date>
+                                <date key="minimumDate" timeIntervalSinceReferenceDate="315500400">
+                                    <!--2011-01-01 00:00:00 +0900-->
+                                </date>
                                 <locale key="locale" localeIdentifier="en_US"/>
                                 <timeZone key="timeZone" name="America/Los_Angeles">
                                     <data key="data">
