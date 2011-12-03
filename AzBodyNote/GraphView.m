@@ -60,7 +60,8 @@
 		CGContextSetRGBFillColor (cgc, 0, 0, 0, 1.0);
 		const char *cc;
 		if (val < 1000000) {
-			cc = [[NSString stringWithString:NSLocalizedString(@"TheGoal",nil)] UTF8String];
+			//cc = [[NSString stringWithString:NSLocalizedString(@"TheGoal",nil)] UTF8String]; ＜＜日本語NG
+			cc = [[NSString stringWithString:@"GOAL"] UTF8String];
 			CGContextShowTextAtPoint (cgc, po.x-15, po.y+14, cc, strlen(cc));
 		}
 		else {

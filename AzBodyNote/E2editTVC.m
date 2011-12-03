@@ -471,8 +471,7 @@
 - (void)refreshAllViews:(NSNotification*)note 
 {	// iCloud-CoreData に変更があれば呼び出される
     if (note) {
-		//[self.tableView reloadData];
-		[self viewWillAppear:YES];
+		[self.tableView reloadData];
     }
 }
 
