@@ -21,20 +21,12 @@
 	@private
 	NSManagedObjectModel				*moModel_;
 	NSPersistentStoreCoordinator		*persistentStoreCoordinator_;
-	//NSManagedObjectContext				*mocBase_;	//iCloudのため
 }
 
 @synthesize window = window_;
 @synthesize managedObjectContext;
 @synthesize mocBase;
-//@synthesize managedObjectModel = moModel_;
-//@synthesize persistentStoreCoordinator = persistentStoreCoordinator_;
-//@synthesize navigationController = _navigationController;
 @synthesize tabBarController = _tabBarController;
-//@synthesize mIsUpdate;
-//@synthesize mocEdit = mocEdit_;
-//@synthesize mocList = mocList_;
-//@synthesize mocGraph = mocGraph_;
 
 /*
 - (void)saveContext
@@ -54,6 +46,13 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {	// Override point for customization after application launch.
+/*	UIActivityIndicatorView *aiv = [[UIActivityIndicatorView alloc]
+									initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+	aiv.frame = CGRectMake(0,0, 50, 50);
+	aiv.center = self.window.center;
+	[self.window addSubview:aiv];
+	[aiv startAnimating];
+ */
 	
 	// Moc初期化
 	mocBase = [[MocFunctions alloc] initWithMoc:[self managedObjectContext]]; //iCloud同期に使用される
@@ -154,12 +153,7 @@
         return moModel_;
     }
 	
-#ifdef ENABLE_iCloud
 	moModel_ = [NSManagedObjectModel mergedModelFromBundles:nil];
-#else
-	NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"AzBodyNote" withExtension:@"momd"];
-	__managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];    
-#endif
 	
 	return moModel_;
 }
@@ -174,12 +168,10 @@
         return persistentStoreCoordinator_;
     }
     
-#ifdef ENABLE_iCloud
-    NSURL *storeUrl = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:@"AzBodyNote.sqlite"];
-	//NSString *storePath = [[self applicationDocumentsDirectory] stringByAppendingPathComponent:@"AzBodyNote.sqlite"];
-	//NSURL *storeUrl = [NSURL fileURLWithPath:storePath];
+    NSURL *storeUrl = [[self applicationDocumentsDirectory] 
+					   URLByAppendingPathComponent:@"azbodynote.sqlite"];	//【重要】リリース後変更禁止
 	NSLog(@"storeUrl=%@", storeUrl);
-	
+
 	// assign the PSC to our app delegate ivar before adding the persistent store in the background
 	// this leverages a behavior in Core Data where you can create NSManagedObjectContext and fetch requests
 	// even if the PSC has no stores.  Fetch requests return empty arrays until the persistent store is added
@@ -193,24 +185,28 @@
 			NSFileManager *fileManager = [NSFileManager defaultManager];
 			// Migrate datamodel
 			NSDictionary *options = nil;
+
 			// this needs to match the entitlements and provisioning profile
 			//@"<individual ID>.<project bundle identifier>"											5C2UYK6F45
 			//NSURL *cloudURL = [fileManager URLForUbiquityContainerIdentifier:@"5C2UYK6F45.com.azukid.AzPacking"];
-			NSURL *cloudURL = [fileManager URLForUbiquityContainerIdentifier:nil]; // 自動取得されるようになった。
-			NSLog(@"cloudURL=%@", cloudURL);
-			NSString* coreDataCloudContent = [[cloudURL path] stringByAppendingPathComponent:@"CoreData"];
-			NSLog(@"coreDataCloudContent=%@", coreDataCloudContent);
-			
-			if (0 < [coreDataCloudContent length]) {
+			NSURL *cloudURL = [fileManager URLForUbiquityContainerIdentifier:nil]; //.entitlementsから自動取得されるようになった。
+			NSLog(@"cloudURL=1=%@", cloudURL);
+			if (cloudURL) {
+				// アプリ内のコンテンツ名付加：["coredata"]　＜＜＜変わると共有できない。
+				cloudURL = [cloudURL URLByAppendingPathComponent:@"coredata"];
+				NSLog(@"cloudURL=2=%@", cloudURL);
+/*				NSString* coreDataCloudContent = [[cloudURL path] stringByAppendingPathComponent:@"store01"];
+				//NSString* coreDataCloudContent = [cloudURL path];
+				NSLog(@"coreDataCloudContent=%@", coreDataCloudContent);
 				// iCloud is available
 				cloudURL = [NSURL fileURLWithPath:coreDataCloudContent];
 				NSLog(@"-- cloudURL=%@", cloudURL);
-				
+*/			
 				options = [NSDictionary dictionaryWithObjectsAndKeys:
 						   [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
 						   [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption,
-						   @"AzBodyNote.store", NSPersistentStoreUbiquitousContentNameKey,
-						   cloudURL, NSPersistentStoreUbiquitousContentURLKey,
+						   @"com.azukid.azbodynote.coredata", NSPersistentStoreUbiquitousContentNameKey,	//【重要】リリース後変更禁止
+						   cloudURL, NSPersistentStoreUbiquitousContentURLKey,														//【重要】リリース後変更禁止
 						   nil];
 			} else {
 				// iCloud is not available
@@ -255,28 +251,6 @@
 			abort();
 		}
 	}
-	
-#else
-	
-    NSURL *storeUrl = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:@"AzBodyNote.sqlite"];
-    
-    __persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
-	
-	/*	options = [NSDictionary dictionaryWithObjectsAndKeys:
-	 [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,	// 自動移行
-	 [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption,			// 自動マッピング推論して処理
-	 nil];																									// NO ならば、「マッピングモデル」を使って移行処理される。
-	 */
-	
-	NSError *error = nil;
-	if (![__persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType
-													configuration:nil  URL:storeUrl  options:nil  error:&error])
-	{
-		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-		abort();
-	}
-#endif
-	
     return persistentStoreCoordinator_;
 }
 
@@ -294,7 +268,6 @@
     NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
 	NSManagedObjectContext* moc = nil;
 
-#ifdef ENABLE_iCloud
     if (coordinator != nil) {
 		if (IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
 			moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
@@ -307,8 +280,8 @@
 															name:NSPersistentStoreDidImportUbiquitousContentChangesNotification 
 														  object:coordinator];
 			}];
-			[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy]; // メモリを優先(Def.)
-			//[moc setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy]; // ストアを優先
+			//[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy]; // メモリを優先(Def.)
+			[moc setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy]; // ストアを優先　＜＜＜ＯＫ
 			//[moc setMergePolicy:NSOverwriteMergePolicy]; // 上書き
 			//moc_ = moc;
         }
@@ -317,10 +290,6 @@
             [moc setPersistentStoreCoordinator:coordinator];
         }		
     }
-#else
-	moc = [[NSManagedObjectContext alloc] init];
-	[moc setPersistentStoreCoordinator:coordinator];
-#endif
     return	moc;
 }
 
