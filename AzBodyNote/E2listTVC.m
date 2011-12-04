@@ -66,6 +66,14 @@
 											 initWithTitle:NSLocalizedString(@"Cancel",nil)
 											 style:UIBarButtonItemStylePlain target:nil action:nil];
 
+	ibLbDate.text = NSLocalizedString(@"List_Date",nil); 
+	ibLbTime.text = NSLocalizedString(@"List_Time",nil);
+	ibLbBpHi.text = NSLocalizedString(@"List_BpHi",nil);
+	ibLbBpLo.text = NSLocalizedString(@"List_BpLo",nil);
+	ibLbPuls.text = NSLocalizedString(@"List_Puls",nil);
+	//ibLbWeight.text = NSLocalizedString(@"List_Weight",nil);
+	//ibLbTemp.text = NSLocalizedString(@"List_Temp",nil);
+
 	// TableView
 	//self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone; // セル区切り線なし
 	//self.tableView.separatorColor = [UIColor blackColor];

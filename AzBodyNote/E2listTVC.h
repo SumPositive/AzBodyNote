@@ -19,6 +19,15 @@
 	, GADBannerViewDelegate
 #endif
 >
+{
+	IBOutlet UILabel				*ibLbDate;
+	IBOutlet UILabel				*ibLbTime;
+	IBOutlet UILabel				*ibLbBpHi;
+	IBOutlet UILabel				*ibLbBpLo;
+	IBOutlet UILabel				*ibLbPuls;
+	//IBOutlet UILabel				*ibLbWeight;
+	//IBOutlet UILabel				*ibLbTemp;
+}
 
 @property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
 
