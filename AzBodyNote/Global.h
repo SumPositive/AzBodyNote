@@ -25,7 +25,6 @@
 #define AzRETAIN_CHECK(...) 
 #endif
 
-#define ENABLE_iCloud
 // iOS VERSION		http://goddess-gate.com/dc2/index.php/post/452
 #define IOS_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
 #define IOS_VERSION_GREATER_THAN(v)              ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedDescending)

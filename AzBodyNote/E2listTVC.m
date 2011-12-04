@@ -13,6 +13,8 @@
 #import "E2listTVC.h"
 #import "E2editTVC.h"
 
+#define ALERT_TAG_DeleteE2		901
+
 
 @interface E2listTVC ()
 - (void)configureCell:(E2listCell *)cell atIndexPath:(NSIndexPath *)indexPath;
@@ -23,6 +25,7 @@
 	AzBodyNoteAppDelegate		*appDelegate_;
 	MocFunctions							*mocFunc_;
 	NSIndexPath							*indexPathEdit_;
+	NSIndexPath							*indexPathDelete_;
 
 #ifdef GD_Ad_ENABLED
 	GADBannerView		*adMobView_;
@@ -118,16 +121,16 @@
 		@try {	// 範囲オーバーで落ちる可能性があるため。
 			[self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:[[self.fetchedResultsController sections] count]] 
 								  atScrollPosition:UITableViewScrollPositionMiddle animated:NO];  // 実機検証結果:NO
-			if (animated) { // NO ならば、viewDidAppear:が呼ばれないため。
-				self.view.alpha = 0;
-			}
+			//if (animated) { // NO ならば、viewDidAppear:が呼ばれないため。
+			//	self.view.alpha = 0;
+			//}
 		}
 		@catch (NSException *exception) {
 			NSLog(@"LOGIC ERROR!!! - 最終行");
 		}
 	}
 }
-
+/*
 - (void)viewDidAppear:(BOOL)animated
 {
 	if (self.view.alpha != 1) {
@@ -142,7 +145,7 @@
 		// アニメ実行
 		[UIView commitAnimations];
 	}
-}
+}*/
 
 /*
 - (void)viewWillDisappear:(BOOL)animated
@@ -206,6 +209,26 @@
 		//[self viewWillAppear:NO];
 		[self.tableView reloadData];
     }
+}
+
+
+#pragma mark - <delegate>
+
+- (void)alertView:(UIAlertView*)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+	if (buttonIndex != 1) return; // Cancel
+	// OK
+	switch (alertView.tag) 
+	{
+		case ALERT_TAG_DeleteE2: {	// この記録を削除する
+			if (indexPathDelete_) {
+				[mocFunc_ deleteEntity:[self.fetchedResultsController objectAtIndexPath:indexPathDelete_]];
+				[mocFunc_ commit];
+				indexPathDelete_ = nil;
+			}
+			//[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
+		}	break;
+	}
 }
 
 
@@ -296,8 +319,11 @@
 /*
 // Override to support conditional editing of the table view.
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the specified item to be editable.
+{	// Return NO if you do not want the specified item to be editable.
+	E2record *e2 = [self.fetchedResultsController objectAtIndexPath:indexPath]; ＜＜＜落ちる
+	if (e2 && [e2.nYearMM integerValue] == E2_nYearMM_GOAL) {
+		return NO;
+	}
     return YES;
 }
 */
@@ -305,19 +331,16 @@
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (editingStyle == UITableViewCellEditingStyleDelete)
-    {
-        // Delete the managed object for the given index path
-        //[moc_ deleteObject:[self.fetchedResultsController objectAtIndexPath:indexPath]];
-		[mocFunc_ deleteEntity:[self.fetchedResultsController objectAtIndexPath:indexPath]];
-        
-        // Save the context.
-/*        NSError *error = nil;
-        if (![moc_ save:&error])
-        {
-            NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-            abort();
-        }*/
-		[mocFunc_ commit];
+    {	// Delete the managed object for the given index path
+		// Alert確認する
+		indexPathDelete_ = [indexPath copy];
+		UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Delete E2",nil)
+														message: nil
+													   delegate: self		// clickedButtonAtIndexが呼び出される
+											  cancelButtonTitle: NSLocalizedString(@"Cancel",nil)
+											  otherButtonTitles: NSLocalizedString(@"DELETE",nil), nil];
+		alert.tag = ALERT_TAG_DeleteE2;
+		[alert show];
     }   
 }
 
@@ -353,9 +376,9 @@
 	{
 		// Assume self.view is the table view
 		NSIndexPath *path = [self.tableView indexPathForSelectedRow];//選択中のセル位置
-		NSLog(@"prepareForSegue: path=%@", path);
+		//NSLog(@"prepareForSegue: path=%@", path);
 		E2record *e2 = [self.fetchedResultsController objectAtIndexPath:path];
-		NSLog(@"prepareForSegue: e2=%@", e2);
+		//NSLog(@"prepareForSegue: e2=%@", e2);
 
 		E2editTVC *editVc = [segue destinationViewController];
 		editVc.moE2edit = e2;  //[self.fetchedResultsController objectAtIndexPath:mIndexPathEdit];
@@ -417,7 +440,7 @@
 	NSFetchedResultsController *aFrc = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
 																								managedObjectContext:[mocFunc_ getMoc] 
 																								  sectionNameKeyPath:E2_nYearMM	// セクション指定のため
-																					  cacheName:nil];  //@"E2listDate"];
+																					  cacheName:@"E2listDate"];
     aFrc.delegate = self;
 
 	// データ抽出する
@@ -500,7 +523,6 @@
     [self.tableView reloadData];
 }
  */
-
 
 
 #ifdef GD_Ad_ENABLED

@@ -25,7 +25,7 @@
 @synthesize moE2node = moE2node_;
 //@synthesize ibLbBpHi, ibLbBpLo, ibLbDate, ibLbPuls, ibLbWeight, ibLbTemp;
 
-
+/***通らない
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
@@ -35,6 +35,7 @@
     }
     return self;
 }
+*/
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {

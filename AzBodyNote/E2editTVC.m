@@ -221,6 +221,22 @@
 												 style:UIBarButtonItemStyleBordered 
 												 target:self action:@selector(actionCancel)];
 
+		if (!buDelete_) { // [Delete]ボタンを 余白セルに置く
+			buDelete_ = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+			[buDelete_ setTitle:NSLocalizedString(@"Delete E2",nil) forState:UIControlStateNormal];
+			[buDelete_ setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+			[buDelete_ addTarget:self action:@selector(actionDelete:) forControlEvents:UIControlEventTouchUpInside];
+			
+			NSIndexPath* indexPath = [NSIndexPath indexPathForRow:7 inSection:0];
+			CGRect rc = [self.tableView rectForRowAtIndexPath:indexPath];
+			rc.size.width /= 2;
+			rc.origin.x = rc.size.width / 2;
+			rc.origin.y += 10;  //((rc.size.height - 30) / 2);
+			rc.size.height = 30;
+			buDelete_.frame = rc;
+			[self.tableView addSubview:buDelete_];
+		}
+
 		// TableView 背景
 		UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
 		self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
@@ -335,25 +351,10 @@
 			moE2edit_ = [mocFunc_ insertAutoEntity:@"E2record"];
 			[self actionClear];
 		}
-		self.view.alpha = 0; //AddNewのときだけディゾルブ
+		//self.view.alpha = 0; //AddNewのときだけディゾルブ
 	}
 	else {
 		[self setE2recordPrev];
-		if (!buDelete_) { // [Delete]ボタンを 余白セルに置く
-			buDelete_ = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-			[buDelete_ setTitle:NSLocalizedString(@"Delete",nil) forState:UIControlStateNormal];
-			[buDelete_ setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
-			[buDelete_ addTarget:self action:@selector(actionDelete:) forControlEvents:UIControlEventTouchUpInside];
-			 
-			NSIndexPath* indexPath = [NSIndexPath indexPathForRow:7 inSection:0];
-			CGRect rc = [self.tableView rectForRowAtIndexPath:indexPath];
-			rc.size.width /= 2;
-			rc.origin.x = rc.size.width / 2;
-			rc.origin.y += 10;  //((rc.size.height - 30) / 2);
-			rc.size.height = 30;
-			buDelete_.frame = rc;
-			[self.tableView addSubview:buDelete_];
-		}
 	}
 	
 #ifdef GD_Ad_ENABLED
@@ -371,7 +372,7 @@
 	adMobView_.delegate = self;
 #endif
 }
-
+/*
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
@@ -386,7 +387,7 @@
 		// アニメ実行
 		[UIView commitAnimations];
 	}
-}
+}*/
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {

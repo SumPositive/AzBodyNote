@@ -123,11 +123,11 @@
 	//[ibGraphView drawRect:self.view.frame];  NG//これだと不具合発生する
 	[ibGraphView setNeedsDisplay]; //drawRect:が呼び出される
 	
-	if (animated) { // NO ならば、viewDidAppear:が呼ばれないため。
-		self.view.alpha = 0;
-	}
+	//if (animated) { // NO ならば、viewDidAppear:が呼ばれないため。
+	//	self.view.alpha = 0;
+	//}
 }
-
+/*
 - (void)viewDidAppear:(BOOL)animated
 {
 	if (self.view.alpha != 1) {
@@ -144,7 +144,7 @@
 		// アニメ実行
 		[UIView commitAnimations];
 	}
-}
+}*/
 
 - (void)viewDidUnload
 {
