@@ -245,7 +245,7 @@
 // Customize the number of sections in the table view.
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-	return [[self.fetchedResultsController sections] count] + 1;
+	return [[self.fetchedResultsController sections] count] + 1;	//+1:Function
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -254,7 +254,11 @@
 		id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:section];
 		return [sectionInfo numberOfObjects];
 	}
-	return 1; // END LINE - AdMob
+#ifdef GD_Ad_ENABLED
+	return 2; //(0)AdMob (1)Dropbox
+#else
+	return 1;	//(0)Dropbox
+#endif
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
@@ -295,31 +299,36 @@
 		if (cell == nil) {
 			UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
 			[nib instantiateWithOwner:self options:nil];
-			//cell = self.ownerCell;
-			// 選択
-			//cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-			//cell.selectionStyle = UITableViewCellSelectionStyleNone; // 選択時ハイライトなし
 		}
 		// Configure the cell.
 		[self configureCell:cell atIndexPath:indexPath];
 		return cell;
 	}
 	else {
-		static NSString *CidEnd = @"E2listEnd";
-		UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CidEnd];
-		if (cell == nil) {
-			cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CidEnd];
-			cell.accessoryType = UITableViewCellAccessoryNone;
-			//cell.textLabel.textAlignment = UITextAlignmentCenter;
-			//cell.textLabel.textColor = [UIColor grayColor];
-			cell.textLabel.text = @"";
 #ifdef GD_Ad_ENABLED
-			if (adMobView_) {
-				[cell.contentView addSubview:adMobView_];
+		if (indexPath.row==0) {
+			static NSString *Cid = @"E2listAdMob";
+			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
+			if (cell == nil) {
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:Cid];
+				cell.accessoryType = UITableViewCellAccessoryNone;
+				//cell.textLabel.text = @"";
+				if (adMobView_) {
+					[cell.contentView addSubview:adMobView_];
+				}
 			}
-#endif
+			return cell;
 		}
-		return cell;
+#endif
+		{	// Dropbox  "esuslogo101409"
+			static NSString *Cid = @"E2listDropbox";
+			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
+			if (cell == nil) {
+				UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
+				[nib instantiateWithOwner:self options:nil];
+			}
+			return cell;
+		} 
 	}
     return nil;
 }
@@ -361,7 +370,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];	// 選択状態を解除する
-	//[indexPathEdit_ release]
+	
 	indexPathEdit_ = [indexPath copy];	// 戻ったときにセルを再描画するため
 
 	/* Storyboard導入により、prepareForSegue:が「先に」呼び出される。
@@ -370,6 +379,13 @@
     [self.navigationController pushViewController:editVc animated:YES];
     [editVc release];
 	 */
+	
+	if ([[self.fetchedResultsController sections] count] <= indexPath.section) {
+		// Dropbox
+		//[self dismissModalViewControllerAnimated:NO];
+		AzBodyNoteAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+		[appDelegate dropboxView];
+	}
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender

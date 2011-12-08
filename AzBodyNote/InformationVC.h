@@ -15,7 +15,7 @@
 	IBOutlet UILabel			*ibLbTitle;
 	IBOutlet UILabel			*ibLbVersion;
 	IBOutlet UILabel			*ibLbNote;
-	
+	IBOutlet UIImageView	*ibImgIcon;
 	IBOutlet UIButton		*ibBuGoBlog;
 	IBOutlet UIButton		*ibBuPostMail;
 }

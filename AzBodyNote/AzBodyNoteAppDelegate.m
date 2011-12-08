@@ -11,6 +11,7 @@
 #import "MocFunctions.h"
 #import "E2editTVC.h"
 #import "E2listTVC.h"
+#import "DropboxVC.h"
 
 //@interface AzBodyNoteAppDelegate (PrivateMethods)
 //- (NSManagedObjectContext *)managedObjectContext;
@@ -58,7 +59,29 @@
 	mocBase = [[MocFunctions alloc] initWithMoc:[self managedObjectContext]]; //iCloud同期に使用される
 	// TabBar画面毎にMOCを生成して個別にrollbackしたかったが、MOC間の変更反映が面倒だったので単一に戻した。
 	
+	// Dropbox
+	DBSession* dbSession = [[DBSession alloc]
+							 initWithAppKey: DBOX_KEY
+							 appSecret: DBOX_SECRET
+							 root:kDBRootAppFolder]; // either kDBRootAppFolder or kDBRootDropbox
+	[DBSession setSharedSession:dbSession];
+
     return YES;
+}
+
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url 
+{	// Free と Stable が共存している場合、Free から戻ったとき Stableが呼ばれる。
+    if ([[DBSession sharedSession] handleOpenURL:url]) {
+        if ([[DBSession sharedSession] isLinked]) 
+		{	// Dropbox 認証成功
+            NSLog(@"App linked successfully!");
+			// DropboxTVC を開ける
+			[self dropboxView];
+        }
+        return YES;
+    }
+    // Add whatever other url handling code your app requires here
+    return NO;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
@@ -114,6 +137,44 @@
 }
 
 
+#pragma mark - Dropbox
+
+- (void)dropboxView
+{	// 未認証の場合、認証処理後、AzCalcAppDelegate:handleOpenURL:から呼び出される
+	if ([[DBSession sharedSession] isLinked]) 
+	{	// Dropbox 認証済み
+		NSString *zHome = NSHomeDirectory();
+		NSString *zTmp = [zHome stringByAppendingPathComponent:@"tmp"]; // "Documents"
+		NSString *zPath = [zTmp stringByAppendingPathComponent:@"MyDiary." DBOX_EXTENSION];
+		NSLog(@"zPath=%@", zPath);
+		//
+		// E2record 取得
+		// Sort条件
+		NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
+		NSArray *sortDesc = [NSArray arrayWithObjects: sort1,nil]; // 日付降順：Limit抽出に使用
+		NSArray *aE2records = [mocBase select: @"E2record"
+								 limit: 100
+								offset: 0
+								 where: [NSPredicate predicateWithFormat:E2_nYearMM @" > 200000"] // 未保存を除外する
+								  sort: sortDesc]; // 最新日付から抽出
+		// JSON
+		SBJSON	*js = [SBJSON new];
+		NSString *zJson = [js stringWithObject:aE2records];
+		// 書き出す
+		//[zJson writeToFile:zPath atomically:YES]; NG//非推奨になった。
+		[zJson writeToFile:zPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
+		// DropboxVC 表示
+		DropboxVC *vc = [[DropboxVC alloc] initWithNibName:@"DropboxVC" bundle:nil];
+		vc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+		vc.mLocalPath = zPath;
+		vc.delegate = self;
+		[self.window.rootViewController presentModalViewController:vc animated:YES];
+	}
+	else {
+		// Dropbox 未認証
+		[[DBSession sharedSession] link];
+	}
+}
 
 #pragma mark - iCloud
 
@@ -187,13 +248,13 @@
 			NSDictionary *options = nil;
 
 			// this needs to match the entitlements and provisioning profile
-			//@"<individual ID>.<project bundle identifier>"											5C2UYK6F45
-			//NSURL *cloudURL = [fileManager URLForUbiquityContainerIdentifier:@"5C2UYK6F45.com.azukid.AzPacking"];
+			//@"<individual ID>.<project bundle identifier>"	 
+			//@"5C2UYK6F45.com.azukid.*"  ＜＜＜<individual ID>は、<Company ID>と同じ契約固有コード。
 			NSURL *cloudURL = [fileManager URLForUbiquityContainerIdentifier:nil]; //.entitlementsから自動取得されるようになった。
 			NSLog(@"cloudURL=1=%@", cloudURL);
 			if (cloudURL) {
 				// アプリ内のコンテンツ名付加：["coredata"]　＜＜＜変わると共有できない。
-				cloudURL = [cloudURL URLByAppendingPathComponent:@"coredata"];
+				cloudURL = [cloudURL URLByAppendingPathComponent:@"coredata1"];
 				NSLog(@"cloudURL=2=%@", cloudURL);
 /*				NSString* coreDataCloudContent = [[cloudURL path] stringByAppendingPathComponent:@"store01"];
 				//NSString* coreDataCloudContent = [cloudURL path];

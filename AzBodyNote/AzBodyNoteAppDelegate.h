@@ -14,10 +14,11 @@
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain, readonly) NSManagedObjectContext			*managedObjectContext;
 @property (nonatomic, retain, readonly) MocFunctions		*mocBase;
+@property (nonatomic, retain) IBOutlet UITabBarController *tabBarController;
 
+
+- (void)dropboxView;
 //- (void)saveContext;
 - (NSURL *)applicationDocumentsDirectory;
-
-@property (nonatomic, retain) IBOutlet UITabBarController *tabBarController;
 
 @end

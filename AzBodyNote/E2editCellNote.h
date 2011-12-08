@@ -11,7 +11,7 @@
 
 @interface E2editCellNote : UITableViewCell <UITextFieldDelegate>
 
-@property (nonatomic, unsafe_unretained) id						delegate;
-@property (nonatomic, retain) E2record			*Re2record;		// 結果を戻すため
+@property (nonatomic, unsafe_unretained) id		delegate;
+@property (nonatomic, retain) E2record				*Re2record;		// 結果を戻すため
 
 @end

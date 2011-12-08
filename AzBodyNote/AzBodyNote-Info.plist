@@ -38,6 +38,21 @@
 	<string>0.8.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLIconFile</key>
+			<string>Icon57</string>
+			<key>CFBundleURLName</key>
+			<string>Condition</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>db-qq4oke7nx6f8ivj</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>0.8.0.0</string>
 	<key>LSRequiresIPhoneOS</key>

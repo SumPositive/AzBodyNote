@@ -43,8 +43,22 @@
 	ibLbTitle.text = NSLocalizedString(@"InfoTitle",nil);
 
 	NSString *zVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+#ifdef AzSTABLE
+	if (72 <= ibImgIcon.frame.size.width) {
+		[ibImgIcon setImage:[UIImage imageNamed:@"Icon72"]];
+	} else {
+		[ibImgIcon setImage:[UIImage imageNamed:@"Icon57"]];
+	}
 	ibLbVersion.text = [NSString stringWithFormat:@"Version %@", zVersion];
-
+#else
+	if (72 <= ibImgIcon.frame.size.width) {
+		[ibImgIcon setImage:[UIImage imageNamed:@"Icon72Free"]];
+	} else {
+		[ibImgIcon setImage:[UIImage imageNamed:@"Icon57Free"]];
+	}
+	ibLbVersion.text = [NSString stringWithFormat:@"Version %@\nFree", zVersion];
+#endif
+	
 	ibLbNote.text = NSLocalizedString(@"InfoNote",nil);
 
 	[ibBuGoBlog setTitle:NSLocalizedString(@"InfoGoBlog",nil) forState:UIControlStateNormal];

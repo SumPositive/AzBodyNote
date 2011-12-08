@@ -295,6 +295,8 @@
 		}
 	}
 	
+	
+	
 	 NSArray *aTab = self.tabBarController.childViewControllers;
 	 [[aTab objectAtIndex:0] setTitle: NSLocalizedString(@"TabAdd",nil)];
 	 [[aTab objectAtIndex:1] setTitle: NSLocalizedString(@"TabList",nil)];
@@ -764,6 +766,18 @@
 }
 
 #pragma mark - <delegate>
+/*
+- (void)buttonSave:(BOOL)pop
+{
+	static BOOL prev = NO;
+	if (pop) {
+		self.navigationItem.rightBarButtonItem.enabled = prev;
+	} else {
+		prev = self.navigationItem.rightBarButtonItem.enabled;
+		self.navigationItem.rightBarButtonItem.enabled = NO;
+	}
+}*/
+
 - (void)editUpdate
 {
 	self.navigationItem.rightBarButtonItem.enabled = YES; // 変更あればYESにする

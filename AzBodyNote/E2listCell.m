@@ -20,7 +20,7 @@
 	IBOutlet UILabel			*ibLbWeight;
 	IBOutlet UILabel			*ibLbTemp;
 	IBOutlet UILabel			*ibLbNote1;
-	IBOutlet UILabel			*ibLbNote2;
+	//IBOutlet UILabel			*ibLbNote2;
 }
 @synthesize moE2node = moE2node_;
 //@synthesize ibLbBpHi, ibLbBpLo, ibLbDate, ibLbPuls, ibLbWeight, ibLbTemp;
@@ -96,8 +96,21 @@
 		ibLbPuls.text = [self strValue:[moE2node_.nPulse_bpm integerValue] dec:0];
 		ibLbWeight.text = [self strValue:[moE2node_.nWeight_10Kg integerValue] dec:1];
 		ibLbTemp.text = [self strValue:[moE2node_.nTemp_10c integerValue] dec:1];
-		ibLbNote1.text = moE2node_.sNote1;
-		ibLbNote2.text = moE2node_.sNote2;
+		//ibLbNote1.text = moE2node_.sNote1;
+		//ibLbNote2.text = moE2node_.sNote2;
+		if (0<[moE2node_.sNote1 length]) {
+			if (0<[moE2node_.sNote2 length]) {
+				ibLbNote1.text = [NSString stringWithFormat:@"%@  %@", moE2node_.sNote1,  moE2node_.sNote2];
+			} else {
+				ibLbNote1.text = moE2node_.sNote1;
+			}
+		} else {
+			if (0<[moE2node_.sNote2 length]) {
+				ibLbNote1.text = moE2node_.sNote2;
+			} else {
+				ibLbNote1.text = nil;
+			}
+		}
 	}
 }
 

@@ -5,14 +5,12 @@
 //  Created by Sum Positive on 2011/10/01.
 //  Copyright 2011 Sum Positive. All rights reserved.
 //
+#define OR  ||
 
-//#define NO_AD	// AppStore画面撮影用に「広告なし」にするため
-#if !defined(NO_AD)
+#ifdef AzFREE
 #define GD_Ad_ENABLED
 #define AdMobID_BodyNote				@"a14ece23da85f5e";		// 体調日記 パブリッシャー ID
 #endif
-
-#define OR  ||
 
 #ifdef DEBUG	//--------------------------------------------- DEBUG
 //#define AzLOG(...) NSLog(__VA_ARGS__)

@@ -28,6 +28,7 @@
 @property (nonatomic, retain) E2record		*moE2edit;		//==nil:AddNew,  !=nil:Edit
 
 // <delegate>
+//- (void)buttonSave:(BOOL)pop;
 - (void)editUpdate;
 
 @end

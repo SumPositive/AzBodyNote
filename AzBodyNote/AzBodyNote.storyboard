@@ -109,7 +109,7 @@
                         <rect key="frame" x="0.0" y="20" width="320" height="411"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <imageView contentMode="scaleToFill" image="Icon57.png" id="rt9-wX-Hrl" userLabel="ImgIcon">
+                            <imageView contentMode="scaleToFill" id="rt9-wX-Hrl" userLabel="ImgIcon">
                                 <rect key="frame" x="20" y="26" width="57" height="57"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             </imageView>
@@ -127,8 +127,15 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Healthy Diary (C)2011 Azukid Creator Sum Positive All Rights Reserved. " textAlignment="center" lineBreakMode="characterWrap" numberOfLines="6" adjustsFontSizeToFit="NO" minimumFontSize="10" id="znk-2Y-YR7" userLabel="Lb Copyright">
-                                <rect key="frame" x="101" y="114" width="199" height="91"/>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Condition" textAlignment="center" lineBreakMode="tailTruncation" minimumFontSize="10" id="LfF-gV-6d7" userLabel="Lb Version">
+                                <rect key="frame" x="101" y="118" width="199" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="(C)2011 Azukid Creator Sum Positive All Rights Reserved. " textAlignment="center" lineBreakMode="characterWrap" numberOfLines="6" adjustsFontSizeToFit="NO" minimumFontSize="10" id="znk-2Y-YR7" userLabel="Lb Copyright">
+                                <rect key="frame" x="101" y="136" width="199" height="63"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -186,6 +193,7 @@
                     <connections>
                         <outlet property="ibBuGoBlog" destination="Z1x-o2-Zf8" id="LZU-nL-xiA"/>
                         <outlet property="ibBuPostMail" destination="ACc-ff-wWb" id="tAb-5h-PQN"/>
+                        <outlet property="ibImgIcon" destination="rt9-wX-Hrl" id="7dZ-D7-pnA"/>
                         <outlet property="ibLbNote" destination="gQ3-CY-0EL" id="M5W-ZW-OQ4"/>
                         <outlet property="ibLbTitle" destination="UFo-kD-nCB" id="ypq-hx-2dF"/>
                         <outlet property="ibLbVersion" destination="Kzr-02-XwG" id="hxJ-vb-QpA"/>
@@ -253,15 +261,8 @@
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Note2" textAlignment="right" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" minimumFontSize="10" id="wBT-jF-cZC">
-                                            <rect key="frame" x="202" y="23" width="94" height="20"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                            <color key="textColor" red="0.59215686270000001" green="0.31372549020000001" blue="0.30196078430000001" alpha="1" colorSpace="calibratedRGB"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Note1" textAlignment="right" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" minimumFontSize="14" id="zeU-aD-Bh0">
-                                            <rect key="frame" x="86" y="23" width="108" height="20"/>
+                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Note1" lineBreakMode="tailTruncation" minimumFontSize="9" id="zeU-aD-Bh0">
+                                            <rect key="frame" x="38" y="23" width="258" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                             <color key="textColor" red="0.59215686270000001" green="0.31372549020000001" blue="0.30196078430000001" alpha="1" colorSpace="calibratedRGB"/>
@@ -290,12 +291,27 @@
                                     <outlet property="ibLbBpLo" destination="l0K-a8-Z43" id="m3V-gV-jg1"/>
                                     <outlet property="ibLbDate" destination="5ce-yH-bq1" id="na8-1C-Bpv"/>
                                     <outlet property="ibLbNote1" destination="zeU-aD-Bh0" id="PDr-UE-LV7"/>
-                                    <outlet property="ibLbNote2" destination="wBT-jF-cZC" id="2ER-Cl-A7S"/>
                                     <outlet property="ibLbPuls" destination="5cT-9I-8XZ" id="hPg-h9-qQe"/>
                                     <outlet property="ibLbTemp" destination="ORZ-qp-gXc" id="Gbf-ep-eiM"/>
                                     <outlet property="ibLbWeight" destination="5Cr-zr-Qgw" id="iWJ-OB-q29"/>
                                     <segue destination="g6r-81-43n" kind="push" identifier="pushE2edit" id="I2k-aE-IVK"/>
                                 </connections>
+                            </tableViewCell>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="E2listDropbox" rowHeight="44" id="EOD-Bg-ZzF" customClass="E2listCell">
+                                <rect key="frame" x="0.0" y="66" width="320" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                    <rect key="frame" x="0.0" y="0.0" width="300" height="43"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="Dropbox-130x44.png" id="ZhJ-y3-Y46">
+                                            <rect key="frame" x="85" y="0.0" width="130" height="44"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        </imageView>
+                                    </subviews>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                </view>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </tableViewCell>
                         </prototypes>
                         <connections>
@@ -309,50 +325,57 @@
                             <rect key="frame" x="5" y="6" width="310" height="33"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Condition" textAlignment="center" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" minimumFontSize="10" id="TnX-bm-9ef">
+                                    <rect key="frame" x="71" y="-3" width="169" height="22"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" name="Copperplate-Light" family="Copperplate" pointSize="20"/>
+                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="時刻" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="pAe-bA-3EX">
-                                    <rect key="frame" x="28" y="16" width="42" height="16"/>
+                                    <rect key="frame" x="28" y="17" width="42" height="16"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="日" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="596-DV-iiT">
-                                    <rect key="frame" x="6" y="16" width="27" height="16"/>
+                                    <rect key="frame" x="6" y="17" width="27" height="16"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="最高" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="Pyg-hM-X4T">
-                                    <rect key="frame" x="74" y="16" width="39" height="16"/>
+                                    <rect key="frame" x="74" y="17" width="39" height="16"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="最低" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="vUo-sG-OdT">
-                                    <rect key="frame" x="115" y="16" width="40" height="16"/>
+                                    <rect key="frame" x="115" y="17" width="40" height="16"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="脈拍" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="i19-iy-5nm">
-                                    <rect key="frame" x="154" y="16" width="42" height="16"/>
+                                    <rect key="frame" x="154" y="17" width="42" height="16"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Kg" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="Cs4-fg-BPI">
-                                    <rect key="frame" x="201" y="16" width="42" height="16"/>
+                                    <rect key="frame" x="201" y="17" width="42" height="16"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="℃" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="JnW-Tl-omj">
-                                    <rect key="frame" x="258" y="16" width="29" height="16"/>
+                                    <rect key="frame" x="258" y="17" width="29" height="16"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -414,13 +437,13 @@
                                             <rect key="frame" x="5" y="0.0" width="310" height="88"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         </imageView>
-                                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="一言" minimumFontSize="12" id="Pq1-iG-tto">
+                                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Condition memo" minimumFontSize="12" id="Pq1-iG-tto">
                                             <rect key="frame" x="15" y="10" width="290" height="31"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                             <textInputTraits key="textInputTraits" returnKeyType="done"/>
                                         </textField>
-                                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="くすり" minimumFontSize="12" id="yx1-s0-WCa">
+                                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Medicine memo" minimumFontSize="12" id="yx1-s0-WCa">
                                             <rect key="frame" x="15" y="47" width="290" height="31"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
@@ -632,14 +655,81 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         </scene>
     </scenes>
     <resources>
+        <image name="Dropbox-130x44.png" width="130" height="44"/>
         <image name="GraphDrum.png" width="320" height="410"/>
         <image name="Icon32-Information.png" width="32" height="32"/>
-        <image name="Icon57.png" width="57" height="57"/>
         <image name="Tab32-Add.png" width="32" height="32"/>
         <image name="Tab32-Graph.png" width="32" height="32"/>
         <image name="Tab32-List.png" width="32" height="32"/>
         <image name="Tx-Brown320x88.png" width="320" height="88"/>
     </resources>
+    <classes>
+        <class className="E2editCellDial" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2editCellDial.h"/>
+            <relationships>
+                <relationship kind="action" name="ibBuNone:" candidateClass="UIButton"/>
+                <relationship kind="action" name="ibBuValue:" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="ibLbDetail" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbName" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbUnit" candidateClass="UILabel"/>
+            </relationships>
+        </class>
+        <class className="E2editCellNote" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2editCellNote.h"/>
+        </class>
+        <class className="E2editTVC" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2editTVC.h"/>
+        </class>
+        <class className="E2listCell" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2listCell.h"/>
+        </class>
+        <class className="E2listTVC" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2listTVC.h"/>
+            <relationships>
+                <relationship kind="outlet" name="ibLbBpHi" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbBpLo" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbDate" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbPuls" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbTime" candidateClass="UILabel"/>
+            </relationships>
+        </class>
+        <class className="EditDateVC" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/EditDateVC.h"/>
+            <relationships>
+                <relationship kind="action" name="ibBuToday:" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="ibDatePicker" candidateClass="UIDatePicker"/>
+            </relationships>
+        </class>
+        <class className="GraphVC" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/GraphVC.h"/>
+            <relationships>
+                <relationship kind="outlet" name="ibLbBpHi" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbBpLo" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbPuls" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbTemp" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbWeight" candidateClass="UILabel"/>
+            </relationships>
+        </class>
+        <class className="GraphView" superclassName="UIView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/GraphView.h"/>
+            <relationships>
+                <relationship kind="action" name="ibSegTypeChange:" candidateClass="UISegmentedControl"/>
+            </relationships>
+        </class>
+        <class className="InformationVC" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/InformationVC.h"/>
+            <relationships>
+                <relationship kind="action" name="ibBuGoBlog:" candidateClass="UIButton"/>
+                <relationship kind="action" name="ibBuPostMail:" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="ibBuGoBlog" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="ibBuPostMail" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="ibImgIcon" candidateClass="UIImageView"/>
+                <relationship kind="outlet" name="ibLbNote" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbTitle" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbVersion" candidateClass="UILabel"/>
+            </relationships>
+        </class>
+    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>
