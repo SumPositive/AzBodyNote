@@ -47,7 +47,7 @@
 	// ここで生成されたEntityは、rollBack では削除されない。　Cancel時には、deleteEntityが必要。 ＜＜そんなことは無い！ roolback可能 save必要
 }	
 
-- (void)deleteEntity:(NSManagedObject *)entity
+- (void)deleteEntity:(AZManagedObject *)entity
 {
 	@synchronized(moc_)
 	{

@@ -17,7 +17,7 @@
 
 @implementation DropboxVC
 @synthesize delegate;
-@synthesize mLocalPath;
+//@synthesize mLocalPath;
 
 
 #pragma mark - Alert
@@ -199,32 +199,32 @@
 #endif
 		//[mMetadatas release], 
 		mMetadatas = nil;
-		if ([metadata.contents count]<=0) return;
-		
-		//mMetadatas = [[NSMutableArray alloc] initWithArray:metadata.contents];
-		mMetadatas = [NSMutableArray new];
-		for (DBMetadata *dbm in metadata.contents) {
-			if ([[dbm.filename pathExtension] caseInsensitiveCompare:DBOX_EXTENSION]==NSOrderedSame) { // 大小文字区別なく比較する
-				[mMetadatas addObject:dbm];
+		if (0 < [metadata.contents count]) {
+			//mMetadatas = [[NSMutableArray alloc] initWithArray:metadata.contents];
+			mMetadatas = [NSMutableArray new];
+			for (DBMetadata *dbm in metadata.contents) {
+				if ([[dbm.filename pathExtension] caseInsensitiveCompare:DBOX_EXTENSION]==NSOrderedSame) { // 大小文字区別なく比較する
+					[mMetadatas addObject:dbm];
+				}
 			}
+			// Sorting
+			if (ibSegSort.selectedSegmentIndex==0) { // Name Asc
+				NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:@"filename" ascending:YES];
+				NSArray *sorting = [[NSArray alloc] initWithObjects:sort1,nil];
+				//[sort1 release];
+				[mMetadatas sortUsingDescriptors:sorting]; // 降順から昇順にソートする
+				//[sorting release];
+			} else { // Date Desc
+				NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:@"lastModifiedDate" ascending:NO];
+				NSArray *sorting = [[NSArray alloc] initWithObjects:sort1,nil];
+				//[sort1 release];
+				[mMetadatas sortUsingDescriptors:sorting]; // 降順から昇順にソートする
+				//[sorting release];
+			}
+			[ibTableView reloadData];
 		}
-		// Sorting
-		if (ibSegSort.selectedSegmentIndex==0) { // Name Asc
-			NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:@"filename" ascending:YES];
-			NSArray *sorting = [[NSArray alloc] initWithObjects:sort1,nil];
-			//[sort1 release];
-			[mMetadatas sortUsingDescriptors:sorting]; // 降順から昇順にソートする
-			//[sorting release];
-		} else { // Date Desc
-			NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:@"lastModifiedDate" ascending:NO];
-			NSArray *sorting = [[NSArray alloc] initWithObjects:sort1,nil];
-			//[sort1 release];
-			[mMetadatas sortUsingDescriptors:sorting]; // 降順から昇順にソートする
-			//[sorting release];
-		}
-		[ibTableView reloadData];
 	}
-	//
+	// 必ず通ること。
 	[self alertIndicatorOff];
 }
 
@@ -471,22 +471,22 @@ replacementString:(NSString *)string
 	
 	switch (actionSheet.tag) {
 		case TAG_ACTION_Save:	// 保存
-			if (mLocalPath) {
+	/*		if (mLocalPath) {
 				NSString *filename = [ibTfName.text stringByDeletingPathExtension]; // 拡張子を除く
 				filename = [filename stringByAppendingFormat:@".%@", [mLocalPath pathExtension]]; // 拡張子を付ける
 				NSLog(@"mLocalPath=%@, filename=%@", mLocalPath, filename);
 				[self alertIndicatorOn:NSLocalizedString(@"Communicating", nil)];
 				[[self restClient] uploadFile:filename toPath:@"/" withParentRev:nil fromPath:mLocalPath];
-			}
+			}*/
 			break;
 		case TAG_ACTION_Retrieve:		// このキーボードを採用する。
 			if (mDidSelectRowAtIndexPath && mDidSelectRowAtIndexPath.row < [mMetadatas count]) {
-				DBMetadata *dbm = [mMetadatas objectAtIndex:mDidSelectRowAtIndexPath.row];
+		/*		DBMetadata *dbm = [mMetadatas objectAtIndex:mDidSelectRowAtIndexPath.row];
 				if (dbm) {
 					NSLog(@"dbm.path=%@ --> mLocalPath=%@", dbm.path, mLocalPath);
 					[self alertIndicatorOn:NSLocalizedString(@"Communicating", nil)];
 					[[self restClient] loadFile:dbm.path intoPath:mLocalPath]; // DownLoad開始 ---> delagate loadedFile:
-				}
+				}*/
 			}
 			break;
 

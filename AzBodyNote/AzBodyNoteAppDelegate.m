@@ -143,30 +143,9 @@
 {	// 未認証の場合、認証処理後、AzCalcAppDelegate:handleOpenURL:から呼び出される
 	if ([[DBSession sharedSession] isLinked]) 
 	{	// Dropbox 認証済み
-		NSString *zHome = NSHomeDirectory();
-		NSString *zTmp = [zHome stringByAppendingPathComponent:@"tmp"]; // "Documents"
-		NSString *zPath = [zTmp stringByAppendingPathComponent:@"MyDiary." DBOX_EXTENSION];
-		NSLog(@"zPath=%@", zPath);
-		//
-		// E2record 取得
-		// Sort条件
-		NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
-		NSArray *sortDesc = [NSArray arrayWithObjects: sort1,nil]; // 日付降順：Limit抽出に使用
-		NSArray *aE2records = [mocBase select: @"E2record"
-								 limit: 100
-								offset: 0
-								 where: [NSPredicate predicateWithFormat:E2_nYearMM @" > 200000"] // 未保存を除外する
-								  sort: sortDesc]; // 最新日付から抽出
-		// JSON
-		SBJSON	*js = [SBJSON new];
-		NSString *zJson = [js stringWithObject:aE2records];
-		// 書き出す
-		//[zJson writeToFile:zPath atomically:YES]; NG//非推奨になった。
-		[zJson writeToFile:zPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
 		// DropboxVC 表示
 		DropboxVC *vc = [[DropboxVC alloc] initWithNibName:@"DropboxVC" bundle:nil];
 		vc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-		vc.mLocalPath = zPath;
 		vc.delegate = self;
 		[self.window.rootViewController presentModalViewController:vc animated:YES];
 	}
@@ -175,6 +154,52 @@
 		[[DBSession sharedSession] link];
 	}
 }
+
+
+#pragma mark - delegate file I/O
+
+- (void)fileSavePath:(NSString*)zPath
+{	// NSManagedObject を zPath へ書き出す
+	//NSString *zHome = NSHomeDirectory();
+	//NSString *zTmp = [zHome stringByAppendingPathComponent:@"tmp"]; // "Documents"
+	//NSString *zPath = [zTmp stringByAppendingPathComponent:@"MyDiary." DBOX_EXTENSION];
+	NSLog(@"zPath=%@", zPath);
+	//
+	// E2record 取得
+	// Sort条件
+	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
+	NSArray *sortDesc = [NSArray arrayWithObjects: sort1,nil]; // 日付降順：Limit抽出に使用
+	NSArray *aE2records = [mocBase select: @"E2record"
+									limit: 100
+								   offset: 0
+									where: [NSPredicate predicateWithFormat:E2_nYearMM @" > 200000"] // 未保存を除外する
+									 sort: sortDesc]; // 最新日付から抽出
+	// NSManagedObject を NSDictionary変換する。　JSON変換できるようにするため
+	NSMutableArray *maE2 = [NSMutableArray new];
+	[maE2 addObject:[NSString stringWithFormat:@"AzBodyNote (C)Azukid %@", [NSDate date]]];
+	for (E2record *e2 in aE2records) {
+		@autoreleasepool {
+			NSDictionary *dic = [e2 toDictionary];
+			if (dic) {
+				[maE2 addObject:dic];
+			}
+		}
+	}
+	// JSON
+	SBJSON	*js = [SBJSON new];
+	NSError *err;
+	NSString *zJson = [js stringWithObject:maE2 error:&err];
+	NSLog(@"dropboxView: zJson=%@  (err=%@)", zJson, [err description]);
+	// 書き出す
+	//[zJson writeToFile:zPath atomically:YES]; NG//非推奨になった。
+	[zJson writeToFile:zPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
+}
+
+- (void)fileLoadPath:(NSString*)zPath
+{	// zPath から NSManagedObject を読み込む
+	
+}
+
 
 #pragma mark - iCloud
 
@@ -254,7 +279,7 @@
 			NSLog(@"cloudURL=1=%@", cloudURL);
 			if (cloudURL) {
 				// アプリ内のコンテンツ名付加：["coredata"]　＜＜＜変わると共有できない。
-				cloudURL = [cloudURL URLByAppendingPathComponent:@"coredata1"];
+				cloudURL = [cloudURL URLByAppendingPathComponent:@"coredata2"];
 				NSLog(@"cloudURL=2=%@", cloudURL);
 /*				NSString* coreDataCloudContent = [[cloudURL path] stringByAppendingPathComponent:@"store01"];
 				//NSString* coreDataCloudContent = [cloudURL path];

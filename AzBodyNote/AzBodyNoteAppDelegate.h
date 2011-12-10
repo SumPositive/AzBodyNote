@@ -18,7 +18,9 @@
 
 
 - (void)dropboxView;
-//- (void)saveContext;
+- (void)fileSavePath:(NSString*)zPath;
+- (void)fileLoadPath:(NSString*)zPath;
+
 - (NSURL *)applicationDocumentsDirectory;
 
 @end

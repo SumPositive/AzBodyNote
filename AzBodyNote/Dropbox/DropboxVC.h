@@ -25,7 +25,7 @@ UITextFieldDelegate, DBRestClientDelegate, UIActionSheetDelegate>
 	IBOutlet UITableView	*ibTableView;
 
 	id		delegate;
-	NSString			*mLocalPath;		//= "(HOME)/tmp/MyKeyboard.CalcRoll" or ".CalcRollPad"
+	//NSString			*mLocalPath;		//= "(HOME)/tmp/MyKeyboard.CalcRoll" or ".CalcRollPad"
 	DBRestClient	*restClient;
 	NSMutableArray		*mMetadatas;
 	UIActivityIndicatorView	*mActivityIndicator;
@@ -36,7 +36,7 @@ UITextFieldDelegate, DBRestClientDelegate, UIActionSheetDelegate>
 }
 
 @property (nonatomic, strong) id					delegate;
-@property (nonatomic, strong) NSString		*mLocalPath;
+//@property (nonatomic, strong) NSString		*mLocalPath;
 
 - (IBAction)ibBuClose:(UIButton *)button;
 - (IBAction)ibBuSave:(UIButton *)button;
