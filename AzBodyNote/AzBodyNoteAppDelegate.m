@@ -161,7 +161,7 @@
 - (void)fileSavePath:(NSString*)zPath
 {	// NSManagedObject を zPath へ書き出す
 	//NSString *zHome = NSHomeDirectory();
-	//NSString *zTmp = [zHome stringByAppendingPathComponent:@"tmp"]; // "Documents"
+	//NSString *zTmp = [zHome stringByAppendingPathComponent:@"tmp"]; // @"Documents"
 	//NSString *zPath = [zTmp stringByAppendingPathComponent:@"MyDiary." DBOX_EXTENSION];
 	NSLog(@"zPath=%@", zPath);
 	//
