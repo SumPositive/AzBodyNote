@@ -162,11 +162,11 @@
 #pragma mark - iCloud
 - (void)refreshAllViews:(NSNotification*)note 
 {	// iCloud-CoreData に変更があれば呼び出される
-    if (note) {
+    //if (note) {
 		//[self.tableView reloadData];
 		[self viewWillAppear:NO]; // NO によりrefreshであることを知らせている。
 		// この後、viewDidAppear: は呼ばれないことに注意！
-    }
+    //}
 }
 
 
