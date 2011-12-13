@@ -22,8 +22,8 @@
 - (id)initWithMoc:(NSManagedObjectContext*)moc;
 - (void)setMoc:(NSManagedObjectContext *)moc;
 - (NSManagedObjectContext*)getMoc;
-- (AZManagedObject*)insertAutoEntity:(NSString *)zEntityName;
-- (void)deleteEntity:(AZManagedObject *)entity;
+- (id)insertAutoEntity:(NSString *)zEntityName;
+- (void)deleteEntity:(NSManagedObject *)entity;
 - (BOOL)hasChanges;
 - (BOOL)commit;
 - (void)rollBack;
@@ -35,6 +35,9 @@
 			   sort:(NSArray *)arSort;
 
 - (void)e2delete:(E2record *)e2node;
+- (void)deleteAllCoreData;
 
+- (NSDictionary*)dictionaryObject:(NSManagedObject*)mobj;
+- (NSManagedObject*)insertNewObjectForDictionary:(NSDictionary*)dict;
 
 @end

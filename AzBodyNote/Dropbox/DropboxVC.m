@@ -38,8 +38,8 @@
 
 - (void)alertCommError
 {
-	UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"CommError", nil) 
-												   message:NSLocalizedString(@"CommErrorMsg", nil) 
+	UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Dropbox CommError", nil) 
+												   message:NSLocalizedString(@"Dropbox CommErrorMsg", nil) 
 												  delegate:nil cancelButtonTitle:nil 
 										 otherButtonTitles:NSLocalizedString(@"Roger", nil), nil];
 	[alv show];
@@ -68,19 +68,19 @@
 {
 	NSString *filename = [ibTfName.text stringByDeletingPathExtension]; // 拡張子を除く
 	if ([filename length] < 3) {
-		UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"NameLeast", nil) 
-													  message:NSLocalizedString(@"NameLeastMsg", nil)  
+		UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Dropbox NameLeast", nil) 
+													  message:NSLocalizedString(@"Dropbox NameLeastMsg", nil)  
 													  delegate:nil cancelButtonTitle:nil 
 											 otherButtonTitles:NSLocalizedString(@"Roger", nil), nil];
 		[alv show];
 		return;
 	}
 	
-	UIActionSheet *as = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Are you sure", nil) 
+	UIActionSheet *as = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Dropbox Are you sure", nil) 
 													delegate:self 
 										   cancelButtonTitle:NSLocalizedString(@"Cancel", nil) 
 									  destructiveButtonTitle:nil 
-											otherButtonTitles:NSLocalizedString(@"Save", nil), nil];
+											otherButtonTitles:NSLocalizedString(@"Dropbox Save", nil), nil];
 	as.tag = TAG_ACTION_Save;
 	[as showInView:self.view];
 	[ibTfName resignFirstResponder]; // キーボードを隠す
@@ -88,7 +88,7 @@
 
 - (IBAction)ibSegSort:(UISegmentedControl *)segment
 {
-	[self alertIndicatorOn:NSLocalizedString(@"Communicating", nil)];
+	[self alertIndicatorOn:NSLocalizedString(@"Dropbox Communicating", nil)];
 	[[self restClient] loadMetadata:@"/"];
 }
 
@@ -137,7 +137,7 @@
 {
     [super viewDidAppear:animated];
 	
-	[self alertIndicatorOn:NSLocalizedString(@"Communicating", nil)];
+	[self alertIndicatorOn:NSLocalizedString(@"Dropbox Communicating", nil)];
 	// Dropbox/App/CalcRoll 一覧表示
 	[[self restClient] loadMetadata:@"/"];
 }
@@ -242,20 +242,29 @@
 
 - (void)restClient:(DBRestClient*)client loadedFile:(NSString*)localPath 
 {	// ファイル読み込み成功
-    NSLog(@"File loaded into path: %@", localPath);
-	// mKmPages リセット
-	//---------------[delegate GvCalcRollLoad:localPath]; // .CalcRoll - Plist file
-	//
+    NSLog(@"File loaded into path: %@", localPath); //== [apd tmpFilePath]
+	// File Load
+	AzBodyNoteAppDelegate* apd = [[UIApplication sharedApplication] delegate];
+	if ([apd tmpFileLoad]) { // tmpフォルダの一時ファイル[apd tmpFilePath]から読み込む
+		// Done
+		UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Dropbox QuoteDone", nil)
+													  message:nil
+													 delegate:nil
+											cancelButtonTitle:nil
+											otherButtonTitles:NSLocalizedString(@"Roger", nil), nil];
+		[alv	show];
+	} else {
+		// NG
+		UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Dropbox QuoteErr", nil)
+													  message:nil
+													 delegate:nil
+											cancelButtonTitle:nil
+											otherButtonTitles:NSLocalizedString(@"Roger", nil), nil];
+		[alv	show];
+	}
 	[self alertIndicatorOff];
 	// 閉じる
 	[self dismissModalViewControllerAnimated:YES];
-	// Done
-	UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"QuoteDone", nil)
-												   message:nil
-												  delegate:nil
-										 cancelButtonTitle:nil
-										 otherButtonTitles:NSLocalizedString(@"Roger", nil), nil];
-	[alv	show];
 }
 
 - (void)restClient:(DBRestClient*)client loadFileFailedWithError:(NSError*)error 
@@ -272,7 +281,7 @@
 	// Dropbox/App/CalcRoll 一覧表示
 	[[self restClient] loadMetadata:@"/"];
 	[self alertIndicatorOff];
-	UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"SaveDone", nil) 
+	UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Dropbox SaveDone", nil) 
 												   message:nil  delegate:nil cancelButtonTitle:nil 
 										 otherButtonTitles:NSLocalizedString(@"Roger", nil), nil];
 	[alv show];
@@ -347,7 +356,7 @@
 				DBMetadata *dbm = [mMetadatas objectAtIndex:indexPath.row];
 				cell.textLabel.text = [dbm.filename stringByDeletingPathExtension]; // 拡張子を除く
 			} else {
-				cell.textLabel.text = NSLocalizedString(@"NoFile", nil);
+				cell.textLabel.text = NSLocalizedString(@"Dropbox NoFile", nil);
 			}
 		} break;
 	}
@@ -411,10 +420,10 @@
 			[userDef setObject:ibTfName.text  forKey:USER_FILENAME_KEY];
 			[userDef synchronize];
 			//
-			UIActionSheet *as = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Are you sure", nil) 
+			UIActionSheet *as = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Dropbox Are you sure", nil) 
 															 delegate:self 
 													cancelButtonTitle:NSLocalizedString(@"Cancel", nil) 
-											   destructiveButtonTitle:NSLocalizedString(@"ChangeKeyboard", nil) 
+											   destructiveButtonTitle:NSLocalizedString(@"Dropbox Change", nil) 
 													otherButtonTitles:nil];
 			as.tag = TAG_ACTION_Retrieve;
 			[as showInView:self.view];
@@ -471,32 +480,29 @@ replacementString:(NSString *)string
 	
 	switch (actionSheet.tag) {
 		case TAG_ACTION_Save: {	// 保存
-			NSString *filename = [ibTfName.text stringByDeletingPathExtension]; // 拡張子を除く
+			NSString *filename = [ibTfName.text stringByDeletingPathExtension]; // 拡張子らしきものがあれば除く
+			filename = [filename stringByAppendingPathExtension:DBOX_EXTENSION]; // 改めて拡張子を付ける
 			NSLog(@"TAG_ACTION_Save: filename=%@", filename);
-			[self alertIndicatorOn:NSLocalizedString(@"Communicating", nil)];
+			[self alertIndicatorOn:NSLocalizedString(@"Dropbox Communicating", nil)];
 			// File Save
 			AzBodyNoteAppDelegate* apd = [[UIApplication sharedApplication] delegate];
-			NSString *zPath = [apd fileSaveName:filename];
-			NSLog(@"TAG_ACTION_Save: fileSaveName: zPath=%@", zPath);
-			if (zPath) {
+			if ([apd tmpFileSave]) { // tmpフォルダの一時ファイル[apd tmpFilePath]に書き出す
 				// Upload
-				[[self restClient] uploadFile:filename toPath:@"/" withParentRev:nil fromPath:zPath];
+				[[self restClient] uploadFile:filename toPath:@"/" withParentRev:nil fromPath:[apd tmpFilePath]];
 			}
 		} break;
 			
-		case TAG_ACTION_Retrieve:		// このキーボードを採用する。
+		case TAG_ACTION_Retrieve:		// リストア
 			if (mDidSelectRowAtIndexPath && mDidSelectRowAtIndexPath.row < [mMetadatas count]) {
-		/*		DBMetadata *dbm = [mMetadatas objectAtIndex:mDidSelectRowAtIndexPath.row];
+				DBMetadata *dbm = [mMetadatas objectAtIndex:mDidSelectRowAtIndexPath.row];
 				if (dbm) {
-					NSLog(@"dbm.path=%@ --> mLocalPath=%@", dbm.path, mLocalPath);
-					[self alertIndicatorOn:NSLocalizedString(@"Communicating", nil)];
-					[[self restClient] loadFile:dbm.path intoPath:mLocalPath]; // DownLoad開始 ---> delagate loadedFile:
-				}*/
+					AzBodyNoteAppDelegate* apd = [[UIApplication sharedApplication] delegate];
+					[self alertIndicatorOn:NSLocalizedString(@"Dropbox Communicating", nil)];
+					NSLog(@"dbm.path=%@ --> [apd tmpFilePath]=%@", dbm.path, [apd tmpFilePath]);
+					[[self restClient] loadFile:dbm.path intoPath:[apd tmpFilePath]]; // DownLoad開始 ---> delagate loadedFile:
+				}
 			}
 			break;
-
-	/*	case TAG_ACTION_Delete:		// このファイルを削除する。
-			break;　*/
 	}
 }
 

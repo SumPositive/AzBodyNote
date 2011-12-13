@@ -18,8 +18,9 @@
 
 
 - (void)dropboxView;
-- (NSString*)fileSaveName:(NSString*)zName;
-- (void)fileLoadName:(NSString*)zName;
+- (NSString*)tmpFilePath;
+- (BOOL)tmpFileSave;
+- (BOOL)tmpFileLoad;
 
 - (NSURL *)applicationDocumentsDirectory;
 

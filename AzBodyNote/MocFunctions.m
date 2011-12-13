@@ -57,16 +57,16 @@ static NSDate *dateGoal_ = nil;
 	return moc_;
 }
 
-- (AZManagedObject*)insertAutoEntity:(NSString *)zEntityName	// autorelease
+- (id)insertAutoEntity:(NSString *)zEntityName	// autorelease
 {
 	assert(moc_);
 	// Newが含まれているが、自動解放インスタンスが生成される。
 	// 即commitされる。つまり、rollbackやcommitの対象外である。 ＜＜そんなことは無い！ roolback可能 save必要
-	return (AZManagedObject*)[NSEntityDescription insertNewObjectForEntityForName:zEntityName inManagedObjectContext:moc_];
+	return [NSEntityDescription insertNewObjectForEntityForName:zEntityName inManagedObjectContext:moc_];
 	// ここで生成されたEntityは、rollBack では削除されない。　Cancel時には、deleteEntityが必要。 ＜＜そんなことは無い！ roolback可能 save必要
 }	
 
-- (void)deleteEntity:(AZManagedObject *)entity
+- (void)deleteEntity:(NSManagedObject *)entity
 {
 	@synchronized(moc_)
 	{
@@ -177,6 +177,146 @@ static NSDate *dateGoal_ = nil;
 	[moc_ deleteObject:e2node]; // 削除
 }
 
+
+// 全データ削除する
+- (void)deleteAllCoreData
+{
+	NSUInteger count = 0;
+	
+	for (NSEntityDescription *entity in [[[moc_ persistentStoreCoordinator] managedObjectModel] entities]) 
+	{
+		NSFetchRequest *request = [[NSFetchRequest alloc] init];
+		[request setEntity:[NSEntityDescription entityForName:[entity name] inManagedObjectContext:moc_]];
+		
+		NSArray *temp = [moc_ executeFetchRequest:request error:NULL];
+		
+		if (temp) {
+			count += [temp count];
+		}
+		
+		//[request release];
+		
+		for (NSManagedObject *object in temp) {
+			[moc_ deleteObject:object];
+		}
+	}
+	NSLog(@"Entity = %d", count);
+	[self commit];
+}
+
+
+#pragma mark - JSON
+
+// JSON変換できるようにするため、NSManagedObject を NSDictionary に変換する。 ＜＜関連（リレーション）非対応
+- (NSDictionary*)dictionaryObject:(NSManagedObject*)mobj
+{
+    //self.traversed = YES;　　<<<--配下に自身があるとき無限ループしないためのフラグ　＜＜ありえないので未対応
+	NSArray* attributes = [[[mobj entity] attributesByName] allKeys];
+    //関連（リレーション）非対応
+	//NSArray* relationships = [[[mobj entity] relationshipsByName] allKeys];
+    //NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithCapacity: [attributes count] + [relationships count] + 1];
+	NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithCapacity: [attributes count] + 1];
+
+    //[dict setObject:[[mobj class] description] forKey:@"class"]; ＜＜ "NSManagedObject" になる
+    [dict setObject:[[mobj entity] name] forKey:@"class"];
+	
+	// 属性
+    for (NSString* attr in attributes) {
+        NSObject* value = [mobj valueForKey:attr];
+		
+        if ([value isKindOfClass:[NSDate class]]) 
+		{	
+			NSDate *dt = (NSDate*)value;
+			// NSDate ---> NSNumber
+			//CFTimeInterval seconds = [dt timeIntervalSince1970] * 1000.0;	// (double)
+			//[dict setObject:[NSNumber numberWithDouble:seconds] forKey:attr];
+			// NSDate ---> NSString
+			// utcFromDate: デフォルトタイムゾーンのNSDate型 を UTC協定世界時 文字列 "2010-12-31T00:00:00" にする
+			[dict setObject:utcFromDate(dt) forKey:attr];
+		}
+		else if (value != nil) {
+            [dict setObject:value forKey:attr];
+        }
+    }
+    return dict;
+	
+    /***　関連（リレーション）非対応
+    for (NSString* relationship in relationships) {	// 配下を再帰的にdict化する
+        NSObject* value = [mobj valueForKey:relationship];
+		
+        if ([value isKindOfClass:[NSSet class]]) {
+            // 対多
+            // The core data set holds a collection of managed objects
+            NSSet* relatedObjects = (NSSet*) value;
+			
+            // Our set holds a collection of dictionaries
+            NSMutableSet* dictSet = [NSMutableSet setWithCapacity:[relatedObjects count]];
+			
+            for (NSManagedObject* relatedObject in relatedObjects) {
+				[dictSet addObject:[self dictionaryObject:relatedObject]];
+            }
+
+            [dict setObject:dictSet forKey:relationship];
+        }
+        else if ([value isKindOfClass:[NSManagedObject class]]) {
+            // 対1
+            NSManagedObject* relatedObject = (NSManagedObject*) value;
+            [dict setObject:[self dictionaryObject:relatedObject] forKey:relationship];
+        }
+    }
+	***/
+}
+
+
+// JSON変換した NSDictionary から NSManagedObject を生成する。
+- (NSManagedObject*)insertNewObjectForDictionary:(NSDictionary*)dict
+{
+    //NSManagedObjectContext* context = [self managedObjectContext];
+
+    NSString* class = [dict objectForKey:@"class"];
+    NSManagedObject* newObject = [NSEntityDescription insertNewObjectForEntityForName:class inManagedObjectContext:moc_];
+	
+    for (NSString* key in dict) {
+        if ([key isEqualToString:@"class"]) {
+            continue;
+        }
+		
+        NSObject* value = [dict objectForKey:key];
+		
+        if ([value isKindOfClass:[NSDictionary class]]) {
+			/***　関連（リレーション）非対応
+            // This is a to-one relationship
+            NSManagedObject* childObject = [MocFunctions insertNewObjectFromDictionary:(NSDictionary*)value  inContext:moc_];
+            [mobj setValue:childObject forKey:key];　***/
+        }
+        else if ([value isKindOfClass:[NSSet class]]) {
+			/***　関連（リレーション）非対応
+            // This is a to-many relationship
+            NSSet* relatedObjectDictionaries = (NSSet*) value;
+            // Get a proxy set that represents the relationship, and add related objects to it.
+            // (Note: this is provided by Core Data)
+            NSMutableSet* relatedObjects = [mobj mutableSetValueForKey:key];
+			
+            for (NSDictionary* relatedObjectDict in relatedObjectDictionaries) {
+                NSManagedObject* childObject = [MocFunctions insertNewObjectFromDictionary:relatedObjectDict  inContext:moc_];
+                [relatedObjects addObject:childObject];
+            }***/
+        }
+        else if (value != nil) {
+            // This is an attribute
+			if ([[newObject valueForKey:key] isKindOfClass:[NSDate class]]) { // NSDate対応
+				// DTM日付文字列 ---> NSDate
+				NSString *str = (NSString*)value;
+				// dateFromUTC: UTC協定世界時 文字列 "2010-12-31T00:00:00" を デフォルトタイムゾーンのNSDate型にする
+				[newObject setValue:dateFromUTC(str) forKey:key];
+			}
+			else {
+				[newObject setValue:value forKey:key];
+			}
+        }
+    }
+	return newObject;
+}
 
 
 @end

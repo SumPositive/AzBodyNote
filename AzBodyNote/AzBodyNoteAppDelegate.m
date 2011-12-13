@@ -156,17 +156,21 @@
 }
 
 
-#pragma mark - delegate file I/O
+#pragma mark - delegate /tmp/file
 
-- (NSString*)fileSaveName:(NSString*)zName
-{	// AZManagedObject を //HOME/tmp/zName.Ext へ書き出す
+- (NSString*)tmpFilePath
+{
 	NSString *zPath = NSHomeDirectory();
 	zPath = [zPath stringByAppendingPathComponent:@"tmp"];	//NG//@"Documents"
-	zPath = [zPath stringByAppendingPathComponent:zName];
-	zPath = [zPath stringByAppendingPathExtension:DBOX_EXTENSION];
+	zPath = [zPath stringByAppendingPathComponent:@"json.condition"];
 	NSLog(@"zPath=%@", zPath);
-	// 成功時、return zPath;
-	//
+	return zPath;
+}
+
+#define FILE_HEADER_PREFIX		@"Condition(C)Azukid"
+
+- (BOOL)tmpFileSave;
+{	// NSManagedObject を [self tmpFilePath] へ書き出す
 	// E2record 取得
 	// Sort条件
 	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
@@ -176,19 +180,25 @@
 								   offset: 0
 									where: [NSPredicate predicateWithFormat:E2_nYearMM @" > 200000"] // 未保存を除外する
 									 sort: sortDesc]; // 最新日付から抽出
-	// AZManagedObject を NSDictionary変換する。　JSON変換できるようにするため
+	// NSManagedObject を NSDictionary変換する。　JSON変換できるようにするため
 	NSMutableArray *maE2 = [NSMutableArray new];
-	[maE2 addObject:[NSString stringWithFormat:@"Condition 1 (C)Azukid %@", [NSDate date]]];
+	NSDictionary *dict = [[NSDictionary alloc] initWithObjectsAndKeys:
+						  @"Header",									@"class",
+						  FILE_HEADER_PREFIX,					@"Header",
+						  utcFromDate([NSDate date]),	@"Update",
+						  @"1",												@"Version",
+						  nil];
+	[maE2 addObject:dict];
+	// E2record
 	for (E2record *e2 in aE2records) {
-		NSLog(@"----- e2=%@", e2);
-		//@autoreleasepool {
-			//AZManagedObject *azm = e2;
-			NSDictionary *dic = [e2 toDictionary];
+		//NSLog(@"----- e2=%@", e2);
+		@autoreleasepool {
+			NSDictionary *dic = [mocBase dictionaryObject:e2];
 			if (dic) {
-				NSLog(@"----- ----- dic=%@", dic);
+				//NSLog(@"----- ----- dic=%@", dic);
 				[maE2 addObject:dic];
 			}
-		//}
+		}
 	}
 	// JSON
 	SBJSON	*js = [SBJSON new];
@@ -196,29 +206,62 @@
 	NSString *zJson = [js stringWithObject:maE2 error:&err];
 	if (err) {
 		NSLog(@"dropboxView: SBJSON: stringWithObject: (err=%@) zJson=%@", [err description], zJson);
-		return nil;
+		return NO;
 	}
+	NSLog(@"dropboxView: zJson=%@", zJson);
 	// 書き出す
 	//[zJson writeToFile:zPath atomically:YES]; NG//非推奨になった。
-	[zJson writeToFile:zPath atomically:YES encoding:NSUTF8StringEncoding error:&err];
+	[zJson writeToFile:[self tmpFilePath] atomically:YES encoding:NSUTF8StringEncoding error:&err];
 	if (err) {
 		NSLog(@"dropboxView: writeToFile: (err=%@)", [err description]);
-		return nil;
+		return NO;
 	}
 	//
-	return zPath;
+	return YES;
 }
 
-- (void)fileLoadName:(NSString*)zName
-{	// zPath から NSManagedObject を読み込む
-	NSString *zPath = NSHomeDirectory();
-	zPath = [zPath stringByAppendingPathComponent:@"tmp"];	//NG//@"Documents"
-	zPath = [zPath stringByAppendingPathComponent:zName];
-	zPath = [zPath stringByAppendingPathExtension:DBOX_EXTENSION];
-	NSLog(@"zPath=%@", zPath);
+- (BOOL)tmpFileLoad;
+{	// [self tmpFilePath] から NSManagedObject を読み込む
+	NSError *err = nil;
+	// 読み込む
+	NSString *zJson = [NSString stringWithContentsOfFile:[self tmpFilePath] encoding:NSUTF8StringEncoding error:&err];
+	if (err OR zJson==nil) {
+		NSLog(@"dropboxView: stringWithContentsOfFile: (err=%@)", [err description]);
+		return NO;
+	}
+	// JSON
+	SBJSON	*js = [SBJSON new];
+	NSArray *ary = [js objectWithString:zJson error:&err];
+	if (err) {
+		NSLog(@"dropboxView: SBJSON: objectWithString: (err=%@) zJson=%@", [err description], zJson);
+		return NO;
+	}
+	NSLog(@"dropboxView: zJson=%@", zJson);
+	//
+	NSDictionary *dict = [ary objectAtIndex:0]; // Header
+	if (![[dict objectForKey:@"class"] isEqualToString:@"Header"]) {
+		NSLog(@"tmpFileLoad: class ERR: %@", dict);
+		return NO;
+	}
+	if (![[dict objectForKey:@"Header"] isEqualToString:FILE_HEADER_PREFIX]) {
+		NSLog(@"tmpFileLoad: Header ERR: %@", dict);
+		return NO;
+	}
+	// E2record 全クリア
+	[mocBase deleteAllCoreData];
+	// E2record 生成
+	for (NSDictionary *dict in ary)
+	{
+		NSString *zClass = [dict objectForKey:@"class"];
 
-	
-	
+		if ([zClass isEqualToString:@"E2record"]) {
+			[mocBase insertNewObjectForDictionary:dict];
+		}
+		//else if ([zClass isEqualToString:@"E1body"]) {
+		//	[mocBase insertNewObjectForDictionary:dict];
+		//}
+	}
+	return YES;
 }
 
 
