@@ -7,7 +7,7 @@
 //
 
 #import "DropboxVC.h"
-
+#import "AzBodyNoteAppDelegate.h"
 
 #define TAG_ACTION_Save			109
 #define TAG_ACTION_Retrieve		118
@@ -470,15 +470,20 @@ replacementString:(NSString *)string
 	if (buttonIndex==actionSheet.cancelButtonIndex) return; // CANCEL
 	
 	switch (actionSheet.tag) {
-		case TAG_ACTION_Save:	// 保存
-	/*		if (mLocalPath) {
-				NSString *filename = [ibTfName.text stringByDeletingPathExtension]; // 拡張子を除く
-				filename = [filename stringByAppendingFormat:@".%@", [mLocalPath pathExtension]]; // 拡張子を付ける
-				NSLog(@"mLocalPath=%@, filename=%@", mLocalPath, filename);
-				[self alertIndicatorOn:NSLocalizedString(@"Communicating", nil)];
-				[[self restClient] uploadFile:filename toPath:@"/" withParentRev:nil fromPath:mLocalPath];
-			}*/
-			break;
+		case TAG_ACTION_Save: {	// 保存
+			NSString *filename = [ibTfName.text stringByDeletingPathExtension]; // 拡張子を除く
+			NSLog(@"TAG_ACTION_Save: filename=%@", filename);
+			[self alertIndicatorOn:NSLocalizedString(@"Communicating", nil)];
+			// File Save
+			AzBodyNoteAppDelegate* apd = [[UIApplication sharedApplication] delegate];
+			NSString *zPath = [apd fileSaveName:filename];
+			NSLog(@"TAG_ACTION_Save: fileSaveName: zPath=%@", zPath);
+			if (zPath) {
+				// Upload
+				[[self restClient] uploadFile:filename toPath:@"/" withParentRev:nil fromPath:zPath];
+			}
+		} break;
+			
 		case TAG_ACTION_Retrieve:		// このキーボードを採用する。
 			if (mDidSelectRowAtIndexPath && mDidSelectRowAtIndexPath.row < [mMetadatas count]) {
 		/*		DBMetadata *dbm = [mMetadatas objectAtIndex:mDidSelectRowAtIndexPath.row];

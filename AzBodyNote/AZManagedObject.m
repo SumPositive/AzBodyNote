@@ -10,12 +10,10 @@
 
 
 @implementation AZManagedObject
-{
-	BOOL traversed_;
-}
-@synthesize traversed = traversed_;
+@synthesize traversed;
 
-// NSManagedObject --->>> NSDictionary
+
+// AZManagedObject --->>> NSDictionary
 - (NSDictionary*) toDictionary
 {
     self.traversed = YES;
@@ -35,11 +33,11 @@
         }
     }
 	
-    for (NSString* relationship in relationships) {
+    for (NSString* relationship in relationships) {	// 配下を再帰的にdict化する
         NSObject* value = [self valueForKey:relationship];
 		
         if ([value isKindOfClass:[NSSet class]]) {
-            // To-many relationship
+            // To-many relationship // 配下が多いとき
 			
             // The core data set holds a collection of managed objects
             NSSet* relatedObjects = (NSSet*) value;
@@ -56,7 +54,7 @@
             [dict setObject:dictSet forKey:relationship];
         }
         else if ([value isKindOfClass:[AZManagedObject class]]) {
-            // To-one relationship
+            // To-one relationship // 配下が1つだけのとき
 			
             AZManagedObject* relatedObject = (AZManagedObject*) value;
 			
@@ -70,7 +68,7 @@
     return dict;
 }
 
-// NSDictionary --->>> NSManagedObject
+// NSDictionary --->>> AZManagedObject
 - (void) fromDictionary:(NSDictionary*)dict
 {
     NSManagedObjectContext* context = [self managedObjectContext];
@@ -110,7 +108,7 @@
     }
 }
 
-// NSDictionary --->>> NSManagedObject alloc
+// NSDictionary --->>> AZManagedObject alloc
 + (AZManagedObject*) insertNewObjectFromDictionary:(NSDictionary*)dict
                                                    inContext:(NSManagedObjectContext*)context
 {

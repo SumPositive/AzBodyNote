@@ -8,11 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
-//
+// 出典
 // http://vladimir.zardina.org/2010/03/serializing-archivingunarchiving-an-nsmanagedobject-graph/
 //
 
 @interface AZManagedObject : NSManagedObject
+{
+    BOOL traversed;
+}
 
 @property (nonatomic, assign) BOOL traversed;
 

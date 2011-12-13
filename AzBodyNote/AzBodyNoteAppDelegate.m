@@ -158,12 +158,14 @@
 
 #pragma mark - delegate file I/O
 
-- (void)fileSavePath:(NSString*)zPath
-{	// NSManagedObject を zPath へ書き出す
-	//NSString *zHome = NSHomeDirectory();
-	//NSString *zTmp = [zHome stringByAppendingPathComponent:@"tmp"]; // @"Documents"
-	//NSString *zPath = [zTmp stringByAppendingPathComponent:@"MyDiary." DBOX_EXTENSION];
+- (NSString*)fileSaveName:(NSString*)zName
+{	// AZManagedObject を //HOME/tmp/zName.Ext へ書き出す
+	NSString *zPath = NSHomeDirectory();
+	zPath = [zPath stringByAppendingPathComponent:@"tmp"];	//NG//@"Documents"
+	zPath = [zPath stringByAppendingPathComponent:zName];
+	zPath = [zPath stringByAppendingPathExtension:DBOX_EXTENSION];
 	NSLog(@"zPath=%@", zPath);
+	// 成功時、return zPath;
 	//
 	// E2record 取得
 	// Sort条件
@@ -174,29 +176,48 @@
 								   offset: 0
 									where: [NSPredicate predicateWithFormat:E2_nYearMM @" > 200000"] // 未保存を除外する
 									 sort: sortDesc]; // 最新日付から抽出
-	// NSManagedObject を NSDictionary変換する。　JSON変換できるようにするため
+	// AZManagedObject を NSDictionary変換する。　JSON変換できるようにするため
 	NSMutableArray *maE2 = [NSMutableArray new];
-	[maE2 addObject:[NSString stringWithFormat:@"AzBodyNote (C)Azukid %@", [NSDate date]]];
+	[maE2 addObject:[NSString stringWithFormat:@"Condition 1 (C)Azukid %@", [NSDate date]]];
 	for (E2record *e2 in aE2records) {
-		@autoreleasepool {
+		NSLog(@"----- e2=%@", e2);
+		//@autoreleasepool {
+			//AZManagedObject *azm = e2;
 			NSDictionary *dic = [e2 toDictionary];
 			if (dic) {
+				NSLog(@"----- ----- dic=%@", dic);
 				[maE2 addObject:dic];
 			}
-		}
+		//}
 	}
 	// JSON
 	SBJSON	*js = [SBJSON new];
-	NSError *err;
+	NSError *err = nil;
 	NSString *zJson = [js stringWithObject:maE2 error:&err];
-	NSLog(@"dropboxView: zJson=%@  (err=%@)", zJson, [err description]);
+	if (err) {
+		NSLog(@"dropboxView: SBJSON: stringWithObject: (err=%@) zJson=%@", [err description], zJson);
+		return nil;
+	}
 	// 書き出す
 	//[zJson writeToFile:zPath atomically:YES]; NG//非推奨になった。
-	[zJson writeToFile:zPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
+	[zJson writeToFile:zPath atomically:YES encoding:NSUTF8StringEncoding error:&err];
+	if (err) {
+		NSLog(@"dropboxView: writeToFile: (err=%@)", [err description]);
+		return nil;
+	}
+	//
+	return zPath;
 }
 
-- (void)fileLoadPath:(NSString*)zPath
+- (void)fileLoadName:(NSString*)zName
 {	// zPath から NSManagedObject を読み込む
+	NSString *zPath = NSHomeDirectory();
+	zPath = [zPath stringByAppendingPathComponent:@"tmp"];	//NG//@"Documents"
+	zPath = [zPath stringByAppendingPathComponent:zName];
+	zPath = [zPath stringByAppendingPathExtension:DBOX_EXTENSION];
+	NSLog(@"zPath=%@", zPath);
+
+	
 	
 }
 

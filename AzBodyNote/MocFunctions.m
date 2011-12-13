@@ -17,6 +17,25 @@
 
 //static NSManagedObjectContext *scMoc = nil;
 
+#pragma mark - ＋ クラスメソッド
+
+static NSDate *dateGoal_ = nil;
++ (NSDate*)dateGoal
+{	// .dateTime のための 固有日付(dateGoal)を求める
+	if (dateGoal_==nil) {
+		NSDateFormatter *df = [[NSDateFormatter alloc] init];
+		//[df setTimeStyle:NSDateFormatterFullStyle];
+		[df setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss ZZZZ"];
+		dateGoal_ = [df dateFromString: E2_dateTime_GOAL];
+	}
+	NSLog(@"MocFunction: dateGoal_=%@", dateGoal_);
+	assert(dateGoal_);
+	return dateGoal_;
+}
+
+
+#pragma mark - ー インスタンスメソッド
+
 - (id)initWithMoc:(NSManagedObjectContext*)moc
 {
 	self = [super init];
@@ -38,12 +57,12 @@
 	return moc_;
 }
 
-- (id)insertAutoEntity:(NSString *)zEntityName	// autorelease
+- (AZManagedObject*)insertAutoEntity:(NSString *)zEntityName	// autorelease
 {
 	assert(moc_);
 	// Newが含まれているが、自動解放インスタンスが生成される。
 	// 即commitされる。つまり、rollbackやcommitの対象外である。 ＜＜そんなことは無い！ roolback可能 save必要
-	return [NSEntityDescription insertNewObjectForEntityForName:zEntityName inManagedObjectContext:moc_];
+	return (AZManagedObject*)[NSEntityDescription insertNewObjectForEntityForName:zEntityName inManagedObjectContext:moc_];
 	// ここで生成されたEntityは、rollBack では削除されない。　Cancel時には、deleteEntityが必要。 ＜＜そんなことは無い！ roolback可能 save必要
 }	
 
@@ -158,22 +177,6 @@
 	[moc_ deleteObject:e2node]; // 削除
 }
 
-
-#pragma mark - ＋ クラスメソッド
-
-static NSDate *dateGoal_ = nil;
-+ (NSDate*)dateGoal
-{	// .dateTime のための 固有日付(dateGoal)を求める
-	if (dateGoal_==nil) {
-		NSDateFormatter *df = [[NSDateFormatter alloc] init];
-		//[df setTimeStyle:NSDateFormatterFullStyle];
-		[df setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss ZZZZ"];
-		dateGoal_ = [df dateFromString: E2_dateTime_GOAL];
-	}
-	NSLog(@"MocFunction: dateGoal_=%@", dateGoal_);
-	assert(dateGoal_);
-	return dateGoal_;
-}
 
 
 @end

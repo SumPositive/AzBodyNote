@@ -15,11 +15,14 @@
 	NSManagedObjectContext		*moc_;
 }
 
+// ＋ クラスメソッド
++ (NSDate*)dateGoal;
+
 // − インスタンスメソッド
 - (id)initWithMoc:(NSManagedObjectContext*)moc;
 - (void)setMoc:(NSManagedObjectContext *)moc;
 - (NSManagedObjectContext*)getMoc;
-- (id)insertAutoEntity:(NSString *)zEntityName;
+- (AZManagedObject*)insertAutoEntity:(NSString *)zEntityName;
 - (void)deleteEntity:(AZManagedObject *)entity;
 - (BOOL)hasChanges;
 - (BOOL)commit;
@@ -33,7 +36,5 @@
 
 - (void)e2delete:(E2record *)e2node;
 
-// ＋ クラスメソッド
-+ (NSDate*)dateGoal;
 
 @end
