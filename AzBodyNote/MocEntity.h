@@ -9,10 +9,10 @@
 //#import "AZManagedObject.h"
 
 #define AzDataModelVersion			0
-
+/*
 //---------------------------------------------------------------------------------------E1
 @interface E1body : NSManagedObject 
-@property (nonatomic, retain) NSDate			*dBirthday;		// NSDateは、UTC(+0000)協定時刻で記録 ⇒ 表示でタイムゾーン変換する
+@property (nonatomic, retain) NSDate			*dBirthday;		// NSDate-->JSON文字列は、UTC協定時刻にする。
 @property (nonatomic, retain) NSNumber   *nMkBpHi_mmHg;
 @property (nonatomic, retain) NSNumber   *nMkBpLo_mmHg;
 @property (nonatomic, retain) NSNumber   *nMkWeight_g;
@@ -27,11 +27,12 @@
 #define E1_sName						@"sName"
 #define E1_sNote						@"sNote"
 //#define E1_e2records				@"e2records"
+*/
 
 //---------------------------------------------------------------------------------------E2
 @interface E2record : NSManagedObject 
 @property (nonatomic, retain) NSString		*bCaution;			// BOOL　YES=注意
-@property (nonatomic, retain) NSDate			*dateTime;			// NSDateは、UTC(+0000)協定時刻で記録 
+@property (nonatomic, retain) NSDate			*dateTime;			// NSDate型ならば定義名のPrefix(先頭)を"date"にする！JSON変換のため
 @property (nonatomic, retain) NSNumber   *nBpHi_mmHg;
 @property (nonatomic, retain) NSNumber   *nBpLo_mmHg;
 @property (nonatomic, retain) NSNumber   *nPulse_bpm;

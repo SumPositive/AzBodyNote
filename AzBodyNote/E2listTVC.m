@@ -15,6 +15,8 @@
 
 #define ALERT_TAG_DeleteE2		901
 
+#define LIST_PAGE_LIMIT				100		// 
+
 
 @interface E2listTVC ()
 - (void)configureCell:(E2listCell *)cell atIndexPath:(NSIndexPath *)indexPath;
@@ -80,6 +82,18 @@
 	UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
 	self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 	
+	//
+	UILabel *lbPagePrev = [[UILabel alloc] initWithFrame:CGRectMake(0, -35, 320, 30)];
+	lbPagePrev.textAlignment = UITextAlignmentCenter;
+	lbPagePrev.backgroundColor = [UIColor clearColor];
+#ifdef AzFREE
+	lbPagePrev.text = NSLocalizedString(@"PagePrevLimit",nil);
+#else
+	lbPagePrev.text = NSLocalizedString(@"PagePrev",nil);
+#endif
+	[self.tableView addSubview:lbPagePrev];
+
+	
 #ifdef GD_Ad_ENABLED
 	//--------------------------------------------------------------------------------------------------------- AdMob
 	if (adMobView_==nil) {
@@ -119,6 +133,7 @@
 		}
 		@catch (NSException *exception) {
 			NSLog(@"LOGIC ERROR!!! - indexPathEdit_");
+			assert(NO);
 		}
 		@finally {
 			indexPathEdit_ = nil; // Editモード解除
@@ -127,14 +142,16 @@
 	else { 
 		// 最終行を表示する
 		@try {	// 範囲オーバーで落ちる可能性があるため。
-			[self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:[[self.fetchedResultsController sections] count]] 
-								  atScrollPosition:UITableViewScrollPositionMiddle animated:NO];  // 実機検証結果:NO
+			[self.tableView scrollToRowAtIndexPath:
+			 [NSIndexPath indexPathForRow:0 inSection:[[self.fetchedResultsController sections] count]] 
+								  atScrollPosition:UITableViewScrollPositionBottom animated:NO];  // 実機検証結果:NO
 			//if (animated) { // NO ならば、viewDidAppear:が呼ばれないため。
 			//	self.view.alpha = 0;
 			//}
 		}
 		@catch (NSException *exception) {
 			NSLog(@"LOGIC ERROR!!! - 最終行");
+			assert(NO);
 		}
 	}
 }
@@ -254,11 +271,14 @@
 		id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:section];
 		return [sectionInfo numberOfObjects];
 	}
+	NSInteger iRows = 1;	// Dropbox
 #ifdef GD_Ad_ENABLED
-	return 2; //(0)AdMob (1)Dropbox
-#else
-	return 1;	//(0)Dropbox
+	iRows++; // AdMob
 #endif
+#ifdef AzFREE
+	iRows++; // PageNext
+#endif
+	return  iRows;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
@@ -306,7 +326,8 @@
 	}
 	else {
 #ifdef GD_Ad_ENABLED
-		if (indexPath.row==0) {
+		int iRow = indexPath.row;
+		if (iRow==0) {
 			static NSString *Cid = @"E2listAdMob";
 			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
 			if (cell == nil) {
@@ -319,9 +340,12 @@
 			}
 			return cell;
 		}
+#else
+		int iRow = 1 + indexPath.row;
 #endif
+		if (iRow==1)
 		{	// Dropbox  "esuslogo101409"
-			static NSString *Cid = @"E2listDropbox";
+			static NSString *Cid = @"E2listDropbox"; // .storyboard定義名
 			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
 			if (cell == nil) {
 				UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
@@ -329,8 +353,32 @@
 			}
 			return cell;
 		} 
+#ifdef AzFREE
+		else if (iRow==2)
+		{	// Page Next
+			static NSString *Cid = @"E2listBasic";
+			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
+			if (cell == nil) {
+				UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
+				[nib instantiateWithOwner:self options:nil];
+			}
+			cell.textLabel.textAlignment = UITextAlignmentCenter;
+			cell.textLabel.font = [UIFont systemFontOfSize:16];
+			cell.textLabel.text = NSLocalizedString(@"PagePrevLimit",nil);
+			return cell;
+		} 
+#endif
 	}
     return nil;
+}
+
+- (void)configureCell:(E2listCell *)cell atIndexPath:(NSIndexPath *)indexPath
+{
+	//NSLog(@"configureCell: indexPath=%@", indexPath);
+	E2record *e2 = [self.fetchedResultsController objectAtIndexPath:indexPath];
+	//NSLog(@"configureCell: indexPath=%@  moE2node=%@", indexPath, e2);
+	cell.moE2node = e2;
+	[cell draw]; // moE2node を描画する
 }
 
 /*
@@ -367,27 +415,6 @@
     return NO;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-	[tableView deselectRowAtIndexPath:indexPath animated:YES];	// 選択状態を解除する
-	
-	indexPathEdit_ = [indexPath copy];	// 戻ったときにセルを再描画するため
-
-	/* Storyboard導入により、prepareForSegue:が「先に」呼び出される。
-	E2editTVC *editVc = [[E2editTVC alloc] init];
-	editVc.Re2edit = [self.fetchedResultsController objectAtIndexPath:indexPath];
-    [self.navigationController pushViewController:editVc animated:YES];
-    [editVc release];
-	 */
-	
-	if ([[self.fetchedResultsController sections] count] <= indexPath.section) {
-		// Dropbox
-		//[self dismissModalViewControllerAnimated:NO];
-		AzBodyNoteAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
-		[appDelegate dropboxView];
-	}
-}
-
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {	// 画面遷移のとき、didSelectRowAtIndexPath:よりも先に呼び出される
 	NSLog(@"prepareForSegue: sender=%@", sender);
@@ -395,7 +422,7 @@
 	NSLog(@"prepareForSegue: [segue identifier]=%@", [segue identifier]);
 	NSLog(@"prepareForSegue: [segue sourceViewController]=%@", [segue sourceViewController]);
 	NSLog(@"prepareForSegue: [segue destinationViewController]=%@", [segue destinationViewController]);
-
+	
 	if ([[segue identifier] isEqualToString:@"pushE2edit"])
 	{
 		// Assume self.view is the table view
@@ -403,21 +430,35 @@
 		//NSLog(@"prepareForSegue: path=%@", path);
 		E2record *e2 = [self.fetchedResultsController objectAtIndexPath:path];
 		//NSLog(@"prepareForSegue: e2=%@", e2);
-
+		
 		E2editTVC *editVc = [segue destinationViewController];
 		editVc.moE2edit = e2;  //[self.fetchedResultsController objectAtIndexPath:mIndexPathEdit];
 		//bEditReturn_ = YES;
 	}
 }
 
-						 
-- (void)configureCell:(E2listCell *)cell atIndexPath:(NSIndexPath *)indexPath
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	//NSLog(@"configureCell: indexPath=%@", indexPath);
-	E2record *e2 = [self.fetchedResultsController objectAtIndexPath:indexPath];
-	//NSLog(@"configureCell: indexPath=%@  moE2node=%@", indexPath, e2);
-	cell.moE2node = e2;
-	[cell draw]; // moE2node を描画する
+	[tableView deselectRowAtIndexPath:indexPath animated:YES];	// 選択状態を解除する
+
+	// Storyboard導入により、prepareForSegue:が、ここよりも「先に」呼び出されることに留意。
+	
+	if ([[self.fetchedResultsController sections] count] <= indexPath.section) 
+	{	// Functions
+		indexPathEdit_ = nil; // Editモード解除
+#ifdef GD_Ad_ENABLED
+		int iRow = indexPath.row;
+#else
+		int iRow = 1 + indexPath.row;
+#endif
+		if (iRow==1) {	// Dropbox
+			AzBodyNoteAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+			[appDelegate dropboxView];
+		}
+	}
+	else {
+		indexPathEdit_ = [indexPath copy];	// 戻ったときにセルを再描画するため
+	}
 }
 
 
@@ -443,9 +484,16 @@
     
     // Set the batch size to a suitable number.
 	//[fetchRequest setFetchBatchSize:20];
-	//[fetchRequest setFetchLimit:50];
-	//[fetchRequest setFetchOffset:0];
-
+	
+	// 1ページ行数
+	[fetchRequest setFetchLimit:LIST_PAGE_LIMIT];
+#ifdef AzFREE
+	// 最新の LIST_PAGE_LIMIT 件のみ表示
+	[fetchRequest setFetchOffset:0];
+#else
+	// 有料版は、ページ変えできるようにする
+#endif
+	
 	// where
 	[fetchRequest setPredicate:[NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"]]; // 未保存を除外する
     

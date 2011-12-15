@@ -206,6 +206,7 @@ static NSDate *dateGoal_ = nil;
 
 
 #pragma mark - JSON
+#define TYPE_NSDate		@"#date#"
 
 // JSON変換できるようにするため、NSManagedObject を NSDictionary に変換する。 ＜＜関連（リレーション）非対応
 - (NSDictionary*)dictionaryObject:(NSManagedObject*)mobj
@@ -218,21 +219,18 @@ static NSDate *dateGoal_ = nil;
 	NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithCapacity: [attributes count] + 1];
 
     //[dict setObject:[[mobj class] description] forKey:@"class"]; ＜＜ "NSManagedObject" になる
-    [dict setObject:[[mobj entity] name] forKey:@"class"];
+    [dict setObject:[[mobj entity] name] forKey:@"#class"];
 	
 	// 属性
     for (NSString* attr in attributes) {
         NSObject* value = [mobj valueForKey:attr];
 		
-        if ([value isKindOfClass:[NSDate class]]) 
-		{	
+        if ([value isKindOfClass:[NSDate class]]) {		// JSON未定義型に対応するため
 			NSDate *dt = (NSDate*)value;
-			// NSDate ---> NSNumber
-			//CFTimeInterval seconds = [dt timeIntervalSince1970] * 1000.0;	// (double)
-			//[dict setObject:[NSNumber numberWithDouble:seconds] forKey:attr];
 			// NSDate ---> NSString
 			// utcFromDate: デフォルトタイムゾーンのNSDate型 を UTC協定世界時 文字列 "2010-12-31T00:00:00" にする
-			[dict setObject:utcFromDate(dt) forKey:attr];
+			// Key に Prefix: TYPE_NSDate を付ける
+			[dict setObject:utcFromDate(dt) forKey:[TYPE_NSDate stringByAppendingString:attr]];
 		}
 		else if (value != nil) {
             [dict setObject:value forKey:attr];
@@ -273,17 +271,35 @@ static NSDate *dateGoal_ = nil;
 {
     //NSManagedObjectContext* context = [self managedObjectContext];
 
-    NSString* class = [dict objectForKey:@"class"];
+    NSString* class = [dict objectForKey:@"#class"];
+
     NSManagedObject* newObject = [NSEntityDescription insertNewObjectForEntityForName:class inManagedObjectContext:moc_];
-	
-    for (NSString* key in dict) {
-        if ([key isEqualToString:@"class"]) {
-            continue;
-        }
-		
+	//NSLog(@"#class=%@,  newObject=%@", class, newObject);
+
+    for (NSString* key in dict) 
+	{
         NSObject* value = [dict objectForKey:key];
+		NSLog(@"key=%@,  value=%@", key, value);
+		if (value==nil) {
+			continue;
+		}
 		
-        if ([value isKindOfClass:[NSDictionary class]]) {
+		if ([key hasPrefix:@"#"]) {	// JSON未定義型に対応するため
+			if ([key isEqualToString:@"#class"]) {
+				continue;
+			}
+			else if ([key hasPrefix:TYPE_NSDate]) {
+				// UTC日付文字列 ---> NSDate
+				NSString *str = (NSString*)value;
+				// dateFromUTC: UTC協定世界時 文字列 "2010-12-31T00:00:00" を デフォルトタイムゾーンのNSDate型にする
+				// Prefix: TYPE_NSDate を取り除いてKeyにする
+				[newObject setValue:dateFromUTC(str) forKey: [key substringFromIndex:[TYPE_NSDate length]]];
+			}
+			else {
+				assert(NO);	// 未定義の型
+			}
+		}
+        else if ([value isKindOfClass:[NSDictionary class]]) {
 			/***　関連（リレーション）非対応
             // This is a to-one relationship
             NSManagedObject* childObject = [MocFunctions insertNewObjectFromDictionary:(NSDictionary*)value  inContext:moc_];
@@ -302,17 +318,8 @@ static NSDate *dateGoal_ = nil;
                 [relatedObjects addObject:childObject];
             }***/
         }
-        else if (value != nil) {
-            // This is an attribute
-			if ([[newObject valueForKey:key] isKindOfClass:[NSDate class]]) { // NSDate対応
-				// DTM日付文字列 ---> NSDate
-				NSString *str = (NSString*)value;
-				// dateFromUTC: UTC協定世界時 文字列 "2010-12-31T00:00:00" を デフォルトタイムゾーンのNSDate型にする
-				[newObject setValue:dateFromUTC(str) forKey:key];
-			}
-			else {
-				[newObject setValue:value forKey:key];
-			}
+        else {  // This is an attribute
+			[newObject setValue:value forKey:key];
         }
     }
 	return newObject;

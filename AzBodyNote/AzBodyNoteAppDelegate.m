@@ -28,6 +28,7 @@
 @synthesize managedObjectContext;
 @synthesize mocBase;
 @synthesize tabBarController = _tabBarController;
+@synthesize gud_iCloud = gud_iCloud_;
 
 /*
 - (void)saveContext
@@ -47,6 +48,27 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {	// Override point for customization after application launch.
+	
+	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+
+	//-------------------------------------------------Setting Defult
+	// User Defaultsを使い，キー値を変更したり読み出す前に，NSUserDefaultsクラスのインスタンスメソッド
+	// registerDefaultsメソッドを使い，初期値を指定します。
+	// ここで，appDefaultsは環境設定で初期値となるキー・バリューペアのNSDictonaryオブジェクトです。
+	// このメソッドは，すでに同じキーの環境設定が存在する場合，上書きしないので，環境設定の初期値を定めることに使えます。
+	NSDictionary *dicDef = [[NSDictionary alloc] initWithObjectsAndKeys: // 直後にreleaseしている
+							@"YES",			GUD_iCloud,
+							@"0",				GUD_Calc_Method,					// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
+							@"YES",			GUD_Calc_RoundBankers,		// YES=偶数丸め  NO=四捨五入
+							 nil];
+	[userDefaults registerDefaults:dicDef];	// 未定義のKeyのみ更新される
+	[userDefaults synchronize]; // plistへ書き出す
+	//[dicDef release];
+
+	// 画面表示に関係する Option Setting を取得する
+	gud_iCloud_ = [userDefaults boolForKey:GUD_iCloud];
+
+	
 /*	UIActivityIndicatorView *aiv = [[UIActivityIndicatorView alloc]
 									initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
 	aiv.frame = CGRectMake(0,0, 50, 50);
@@ -71,6 +93,17 @@
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url 
 {	// Free と Stable が共存している場合、Free から戻ったとき Stableが呼ばれる。
+	
+/*** DEBUG
+	NSString* msg = [NSString stringWithFormat:@"[URL]%@\n[schame]%@\n[Query]%@", 
+                     [url absoluteString], [url scheme], [url query]];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"debug"
+                                                    message:msg
+                                                   delegate:self
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles:nil, nil];
+    [alert show]; */
+	
     if ([[DBSession sharedSession] handleOpenURL:url]) {
         if ([[DBSession sharedSession] isLinked]) 
 		{	// Dropbox 認証成功
@@ -169,7 +202,7 @@
 
 #define FILE_HEADER_PREFIX		@"Condition(C)Azukid"
 
-- (BOOL)tmpFileSave;
+- (NSString*)tmpFileSave;
 {	// NSManagedObject を [self tmpFilePath] へ書き出す
 	// E2record 取得
 	// Sort条件
@@ -183,10 +216,10 @@
 	// NSManagedObject を NSDictionary変換する。　JSON変換できるようにするため
 	NSMutableArray *maE2 = [NSMutableArray new];
 	NSDictionary *dict = [[NSDictionary alloc] initWithObjectsAndKeys:
-						  @"Header",									@"class",
-						  FILE_HEADER_PREFIX,					@"Header",
-						  utcFromDate([NSDate date]),	@"Update",
-						  @"1",												@"Version",
+						  @"Header",									@"#class",
+						  FILE_HEADER_PREFIX,					@"#header",
+						  utcFromDate([NSDate date]),	@"#update",
+						  @"1",												@"#version",
 						  nil];
 	[maE2 addObject:dict];
 	// E2record
@@ -205,54 +238,54 @@
 	NSError *err = nil;
 	NSString *zJson = [js stringWithObject:maE2 error:&err];
 	if (err) {
-		NSLog(@"dropboxView: SBJSON: stringWithObject: (err=%@) zJson=%@", [err description], zJson);
-		return NO;
+		NSLog(@"tmpFileSave: SBJSON: stringWithObject: (err=%@) zJson=%@", [err description], zJson);
+		return [err description];
 	}
-	NSLog(@"dropboxView: zJson=%@", zJson);
+	NSLog(@"tmpFileSave: zJson=%@", zJson);
 	// 書き出す
 	//[zJson writeToFile:zPath atomically:YES]; NG//非推奨になった。
 	[zJson writeToFile:[self tmpFilePath] atomically:YES encoding:NSUTF8StringEncoding error:&err];
 	if (err) {
-		NSLog(@"dropboxView: writeToFile: (err=%@)", [err description]);
-		return NO;
+		NSLog(@"tmpFileSave: writeToFile: (err=%@)", [err description]);
+		return [err description];
 	}
-	//
-	return YES;
+	return nil;
 }
 
-- (BOOL)tmpFileLoad;
+- (NSString*)tmpFileLoad;
 {	// [self tmpFilePath] から NSManagedObject を読み込む
 	NSError *err = nil;
 	// 読み込む
 	NSString *zJson = [NSString stringWithContentsOfFile:[self tmpFilePath] encoding:NSUTF8StringEncoding error:&err];
 	if (err OR zJson==nil) {
-		NSLog(@"dropboxView: stringWithContentsOfFile: (err=%@)", [err description]);
-		return NO;
+		NSLog(@"tmpFileLoad: stringWithContentsOfFile: (err=%@)", [err description]);
+		return [err description];
 	}
+	NSLog(@"tmpFileLoad: zJson=%@", zJson);
 	// JSON
 	SBJSON	*js = [SBJSON new];
 	NSArray *ary = [js objectWithString:zJson error:&err];
 	if (err) {
-		NSLog(@"dropboxView: SBJSON: objectWithString: (err=%@) zJson=%@", [err description], zJson);
-		return NO;
+		NSLog(@"tmpFileLoad: SBJSON: objectWithString: (err=%@) zJson=%@", [err description], zJson);
+		return [err description];
 	}
-	NSLog(@"dropboxView: zJson=%@", zJson);
+	NSLog(@"tmpFileLoad: ary=%@", ary);
 	//
 	NSDictionary *dict = [ary objectAtIndex:0]; // Header
-	if (![[dict objectForKey:@"class"] isEqualToString:@"Header"]) {
-		NSLog(@"tmpFileLoad: class ERR: %@", dict);
-		return NO;
+	if (![[dict objectForKey:@"#class"] isEqualToString:@"Header"]) {
+		NSLog(@"tmpFileLoad: #class ERR: %@", dict);
+		return @"NG #class";
 	}
-	if (![[dict objectForKey:@"Header"] isEqualToString:FILE_HEADER_PREFIX]) {
-		NSLog(@"tmpFileLoad: Header ERR: %@", dict);
-		return NO;
+	if (![[dict objectForKey:@"#header"] isEqualToString:FILE_HEADER_PREFIX]) {
+		NSLog(@"tmpFileLoad: #header ERR: %@", dict);
+		return @"NG #header";
 	}
 	// E2record 全クリア
 	[mocBase deleteAllCoreData];
 	// E2record 生成
 	for (NSDictionary *dict in ary)
 	{
-		NSString *zClass = [dict objectForKey:@"class"];
+		NSString *zClass = [dict objectForKey:@"#class"];
 
 		if ([zClass isEqualToString:@"E2record"]) {
 			[mocBase insertNewObjectForDictionary:dict];
@@ -261,7 +294,12 @@
 		//	[mocBase insertNewObjectForDictionary:dict];
 		//}
 	}
-	return YES;
+	// コミット
+	[mocBase commit];
+	// リフレッシュ通知
+    NSNotification* refreshNotification = [NSNotification notificationWithName:@"RefreshAllViews" object:self  userInfo:nil];
+    [[NSNotificationCenter defaultCenter] postNotification:refreshNotification];
+	return nil;
 }
 
 
@@ -269,10 +307,10 @@
 
 - (void)mergeiCloudChanges:(NSNotification*)note forContext:(NSManagedObjectContext*)moc 
 {
+	if (gud_iCloud_==NO) return;
     [moc mergeChangesFromContextDidSaveNotification:note]; 
 	
     NSNotification* refreshNotification = [NSNotification notificationWithName:@"RefreshAllViews" object:self  userInfo:[note userInfo]];
-    
     [[NSNotificationCenter defaultCenter] postNotification:refreshNotification];
 }
 
@@ -282,6 +320,7 @@
 - (void)mergeChangesFrom_iCloud:(NSNotification *)notification
 						//withMoc:(NSManagedObjectContext*)moc
 {
+	if (gud_iCloud_==NO) return;
 	NSManagedObjectContext* moc = [mocBase getMoc];
 	// this only works if you used NSMainQueueConcurrencyType
 	// otherwise use a dispatch_async back to the main thread yourself
@@ -328,7 +367,7 @@
 	// so it's possible to bring up the UI and then fill in the results later
     persistentStoreCoordinator_ = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
 	
-	if (IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
+	if (gud_iCloud_  &&  IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
 		// do this asynchronously since if this is the first time this particular device is syncing with preexisting
 		// iCloud content it may take a long long time to download
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -343,7 +382,7 @@
 			NSLog(@"cloudURL=1=%@", cloudURL);
 			if (cloudURL) {
 				// アプリ内のコンテンツ名付加：["coredata"]　＜＜＜変わると共有できない。
-				cloudURL = [cloudURL URLByAppendingPathComponent:@"coredata2"];
+				cloudURL = [cloudURL URLByAppendingPathComponent:@"coredata"];
 				NSLog(@"cloudURL=2=%@", cloudURL);
 /*				NSString* coreDataCloudContent = [[cloudURL path] stringByAppendingPathComponent:@"store01"];
 				//NSString* coreDataCloudContent = [cloudURL path];
@@ -419,9 +458,13 @@
 	NSManagedObjectContext* moc = nil;
 
     if (coordinator != nil) {
-		if (IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
+		if (gud_iCloud_  &&  IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
 			moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 			
+			//[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy]; // メモリを優先(Def.)
+			//[moc setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy]; // ストアを優先　＜＜＜ＯＫ
+			//[moc setMergePolicy:NSOverwriteMergePolicy]; // 上書き
+
 			[moc performBlockAndWait:^{
 				// even the post initialization needs to be done within the Block
 				[moc setPersistentStoreCoordinator: coordinator];
@@ -430,10 +473,6 @@
 															name:NSPersistentStoreDidImportUbiquitousContentChangesNotification 
 														  object:coordinator];
 			}];
-			//[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy]; // メモリを優先(Def.)
-			[moc setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy]; // ストアを優先　＜＜＜ＯＫ
-			//[moc setMergePolicy:NSOverwriteMergePolicy]; // 上書き
-			//moc_ = moc;
         }
 		else {	// iOS5より前
             moc = [[NSManagedObjectContext alloc] init];

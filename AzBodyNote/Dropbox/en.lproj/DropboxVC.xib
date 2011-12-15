@@ -66,11 +66,11 @@
 								<int key="NSColorSpace">3</int>
 								<bytes key="NSWhite">MC41AA</bytes>
 							</object>
-							<object class="IBUIFontDescription" key="IBUIFontDescription" id="377298822">
+							<object class="IBUIFontDescription" key="IBUIFontDescription">
 								<int key="type">2</int>
 								<double key="pointSize">18</double>
 							</object>
-							<object class="NSFont" key="IBUIFont" id="397477672">
+							<object class="NSFont" key="IBUIFont">
 								<string key="NSName">Helvetica-Bold</string>
 								<double key="NSSize">18</double>
 								<int key="NSfFlags">16</int>
@@ -79,7 +79,7 @@
 						<object class="IBUIButton" id="794958297">
 							<reference key="NSNextResponder" ref="557484746"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{251, 47}, {59, 37}}</string>
+							<string key="NSFrame">{{246, 47}, {64, 37}}</string>
 							<reference key="NSSuperview" ref="557484746"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="758527512"/>
@@ -88,15 +88,22 @@
 							<int key="IBUIContentHorizontalAlignment">0</int>
 							<int key="IBUIContentVerticalAlignment">0</int>
 							<int key="IBUIButtonType">1</int>
-							<string key="IBUINormalTitle">Save</string>
+							<string key="IBUINormalTitle">Backup</string>
 							<reference key="IBUIHighlightedTitleColor" ref="193881541"/>
 							<object class="NSColor" key="IBUINormalTitleColor">
 								<int key="NSColorSpace">1</int>
 								<bytes key="NSRGB">MC4xOTYwNzg0MzQ2IDAuMzA5ODAzOTMyOSAwLjUyMTU2ODY1NgA</bytes>
 							</object>
 							<reference key="IBUINormalTitleShadowColor" ref="1010321602"/>
-							<reference key="IBUIFontDescription" ref="377298822"/>
-							<reference key="IBUIFont" ref="397477672"/>
+							<object class="IBUIFontDescription" key="IBUIFontDescription">
+								<int key="type">2</int>
+								<double key="pointSize">14</double>
+							</object>
+							<object class="NSFont" key="IBUIFont">
+								<string key="NSName">Helvetica-Bold</string>
+								<double key="NSSize">14</double>
+								<int key="NSfFlags">16</int>
+							</object>
 						</object>
 						<object class="IBUITableView" id="970988190">
 							<reference key="NSNextResponder" ref="557484746"/>
@@ -134,7 +141,7 @@
 							<int key="IBSelectedSegmentIndex">1</int>
 							<array key="IBSegmentTitles">
 								<string>Name ascending</string>
-								<string>Save date desc.</string>
+								<string>Backup date desc.</string>
 							</array>
 							<array class="NSMutableArray" key="IBSegmentWidths">
 								<real value="0.0"/>
@@ -165,7 +172,7 @@
 							<int key="IBUIContentMode">7</int>
 							<bool key="IBUIUserInteractionEnabled">NO</bool>
 							<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-							<string key="IBUIText">Saved to Dropbox.</string>
+							<string key="IBUIText">Backup to Dropbox.</string>
 							<reference key="IBUITextColor" ref="193881541"/>
 							<nil key="IBUIHighlightedColor"/>
 							<int key="IBUIBaselineAdjustment">1</int>
@@ -192,7 +199,7 @@
 							<int key="IBUIContentMode">7</int>
 							<bool key="IBUIUserInteractionEnabled">NO</bool>
 							<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-							<string key="IBUIText">Put the name of the file, touch the Save button.</string>
+							<string key="IBUIText">Put the name of the file, touch the Backup button.</string>
 							<object class="NSColor" key="IBUITextColor" id="430337958">
 								<int key="NSColorSpace">1</int>
 								<bytes key="NSRGB">MCAwIDAAA</bytes>

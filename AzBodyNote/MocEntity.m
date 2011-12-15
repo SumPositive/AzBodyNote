@@ -8,7 +8,7 @@
 
 #import "MocEntity.h"
 
-
+/*
 //---------------------------------------------------------------------------------------E1 
 @implementation E1body
 @dynamic dBirthday;
@@ -19,6 +19,7 @@
 @dynamic sNote;
 //@dynamic e2records;
 @end
+*/
 
 //---------------------------------------------------------------------------------------E2 
 @implementation E2record

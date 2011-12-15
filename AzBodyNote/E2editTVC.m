@@ -310,7 +310,7 @@
 	//--------------------------------------------------------------------------------------------------------- AdMob
 	if (adMobView_==nil) {
 		adMobView_ = [[GADBannerView alloc] init];
-		adMobView_.delegate = self;
+		adMobView_.delegate = nil;  // viewWillAppear:から開始するため
 		adMobView_.rootViewController = self; //.navigationController;
 		adMobView_.adUnitID = AdMobID_BodyNote;
 		adMobView_.frame = rcAd;
@@ -318,7 +318,7 @@
 		GADRequest *request = [GADRequest request];
 		//[request setTesting:YES];
 		[adMobView_ loadRequest:request];
-		adMobView_.alpha = 0;	// 0=非表示　　1=表示
+		adMobView_.alpha = 0;	// 0=非表示　　1=表示　　　// viewWillAppear:から開始するため、ここでは非表示
 		adMobView_.tag = 0;		// 0=広告なし　　1=あり　　（iAdを優先表示するために必要）
 		//[self.view addSubview:adMobView_];
 		[self.navigationController.view addSubview:adMobView_];
@@ -331,9 +331,9 @@
 		// iOS 4.2 以上限定　＜＜以前のOSでは落ちる！！！
 		iAdBanner_.requiredContentSizeIdentifiers = [NSSet setWithObjects:ADBannerContentSizeIdentifierPortrait, nil];
 		iAdBanner_.currentContentSizeIdentifier = ADBannerContentSizeIdentifierPortrait;
-		iAdBanner_.delegate = self;
 		iAdBanner_.frame = rcAd;
-		iAdBanner_.alpha = 0;
+		iAdBanner_.delegate = nil;  // viewWillAppear:から開始するため
+		iAdBanner_.alpha = 0;		// viewWillAppear:から開始するため、ここでは非表示
 		//[self.view addSubview:iAdBanner_];
 		[self.navigationController.view addSubview:iAdBanner_];
 	}
@@ -360,36 +360,22 @@
 	}
 	
 #ifdef GD_Ad_ENABLED
-	[UIView beginAnimations:nil context:NULL];
-	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-	[UIView setAnimationDuration:1.2];
-	if (iAdBanner_.tag==1) {
-		iAdBanner_.alpha = 1;
+	if (bAddNew_) {	// Editのとき、Ａｄなし
+		[UIView beginAnimations:nil context:NULL];
+		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+		[UIView setAnimationDuration:1.2];
+		if (iAdBanner_.tag==1) {
+			iAdBanner_.alpha = 1;
+		}
+		else if (adMobView_.tag==1) {
+			adMobView_.alpha = 1;
+		}
+		[UIView commitAnimations];
+		iAdBanner_.delegate = self;
+		adMobView_.delegate = self;
 	}
-	else if (adMobView_.tag==1) {
-		adMobView_.alpha = 1;
-	}
-	[UIView commitAnimations];
-	iAdBanner_.delegate = self;
-	adMobView_.delegate = self;
 #endif
 }
-/*
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-	if (self.view.alpha != 1) { //AddNewのときだけディゾルブ
-		// アニメ準備
-		CGContextRef context = UIGraphicsGetCurrentContext();
-		[UIView beginAnimations:nil context:context];
-		[UIView setAnimationDuration:TABBAR_CHANGE_TIME];
-		[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
-		// アニメ終了状態
-		self.view.alpha = 1;
-		// アニメ実行
-		[UIView commitAnimations];
-	}
-}*/
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {

@@ -76,6 +76,10 @@
 		return;
 	}
 	
+	NSUserDefaults *userDef = [NSUserDefaults standardUserDefaults];
+	[userDef setObject:filename  forKey:USER_FILENAME_KEY];
+	[userDef synchronize];
+
 	UIActionSheet *as = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Dropbox Are you sure", nil) 
 													delegate:self 
 										   cancelButtonTitle:NSLocalizedString(@"Cancel", nil) 
@@ -245,17 +249,18 @@
     NSLog(@"File loaded into path: %@", localPath); //== [apd tmpFilePath]
 	// File Load
 	AzBodyNoteAppDelegate* apd = [[UIApplication sharedApplication] delegate];
-	if ([apd tmpFileLoad]) { // tmpフォルダの一時ファイル[apd tmpFilePath]から読み込む
-		// Done
-		UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Dropbox QuoteDone", nil)
-													  message:nil
+	NSString *zErr = [apd tmpFileLoad];
+	if (zErr) { // tmpフォルダの一時ファイル[apd tmpFilePath]から読み込む
+		// NG
+		UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Dropbox QuoteErr", nil)
+													  message:zErr
 													 delegate:nil
 											cancelButtonTitle:nil
 											otherButtonTitles:NSLocalizedString(@"Roger", nil), nil];
 		[alv	show];
 	} else {
-		// NG
-		UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Dropbox QuoteErr", nil)
+		// Done
+		UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Dropbox QuoteDone", nil)
 													  message:nil
 													 delegate:nil
 											cancelButtonTitle:nil
@@ -415,11 +420,12 @@
 		if (dbm) {
 			mDidSelectRowAtIndexPath = [indexPath copy];
 			NSLog(@"dbm.filename=%@", dbm.filename);
+			/*　リビジョン連番が追記されるのを避けるため。
 			ibTfName.text = [dbm.filename stringByDeletingPathExtension];
-			NSUserDefaults *userDef = [NSUserDefaults standardUserDefaults];
+			 NSUserDefaults *userDef = [NSUserDefaults standardUserDefaults];
 			[userDef setObject:ibTfName.text  forKey:USER_FILENAME_KEY];
 			[userDef synchronize];
-			//
+			*/
 			UIActionSheet *as = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Dropbox Are you sure", nil) 
 															 delegate:self 
 													cancelButtonTitle:NSLocalizedString(@"Cancel", nil) 
@@ -486,7 +492,16 @@ replacementString:(NSString *)string
 			[self alertIndicatorOn:NSLocalizedString(@"Dropbox Communicating", nil)];
 			// File Save
 			AzBodyNoteAppDelegate* apd = [[UIApplication sharedApplication] delegate];
-			if ([apd tmpFileSave]) { // tmpフォルダの一時ファイル[apd tmpFilePath]に書き出す
+			NSString *zErr = [apd tmpFileSave];
+			if (zErr) { // tmpフォルダの一時ファイル[apd tmpFilePath]に書き出す
+				// NG
+				UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Dropbox SaveErr", nil)
+															  message:zErr
+															 delegate:nil
+													cancelButtonTitle:nil
+													otherButtonTitles:NSLocalizedString(@"Roger", nil), nil];
+				[alv	show];
+			} else {
 				// Upload
 				[[self restClient] uploadFile:filename toPath:@"/" withParentRev:nil fromPath:[apd tmpFilePath]];
 			}

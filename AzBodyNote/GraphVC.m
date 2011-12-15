@@ -93,7 +93,7 @@
 	NSArray *sortDesc = [NSArray arrayWithObjects: sort1,nil]; // 日付降順：Limit抽出に使用
 	
 	aE2records_ = [mocFunc_ select: @"E2record"
-								 limit: RECORD_LIMIT
+								 limit: GRAPH_PAGE_LIMIT
 								offset: 0
 								 where: [NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"] // 未保存を除外する
 								  sort: sortDesc]; // 最新日付から抽出

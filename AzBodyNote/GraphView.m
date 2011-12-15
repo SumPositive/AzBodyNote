@@ -44,7 +44,7 @@
 			   points:(const CGPoint *)points  
 			   values:(const long *)values		//= month*1000000 + day*10000 + hour*100 + minute  //=0:The GOAL
 {
-	assert(count <= RECORD_LIMIT);
+	assert(count <= GRAPH_PAGE_LIMIT);
 	//文字列の設定
 	CGContextSetTextDrawingMode (cgc, kCGTextFillStroke);
 	CGContextSelectFont (cgc, "Helvetica", 12.0, kCGEncodingMacRoman); // ＜＜日本語NG
@@ -100,7 +100,7 @@
 			valueType:(int)valueType					// 0=Integer  1=Temp(999⇒99.9℃)　　2=Weight(999999g⇒999.99Kg)
 			pointLower:(CGFloat)pointLower		// Y座標の最小値： 数値文字がこれ以下に描画されるならば、上側に表示する
 {
-	assert(count <= RECORD_LIMIT);
+	assert(count <= GRAPH_PAGE_LIMIT);
 	// グラフ ストロークカラー設定(0.0-1.0でRGBAを指定する)
 	CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 0.8); // 折れ線の色
 #ifdef YES
@@ -121,8 +121,8 @@
 	for (int iNo=0; iNo < count; iNo++) 
 	{
 		CGPoint po = points[ iNo ];
-		if (iNo==0) {	//[0]目標
-			// 目標ヨコ軸
+		if (iNo==0) {	//[0]Goal! 目標
+			//---------------------------------------------Goal! 目標ヨコ軸
 			CGContextSetRGBFillColor(cgc, 0.9, 0.9, 1, 0.2); // White
 			CGContextAddRect(cgc, CGRectMake(RECORD_WIDTH/2, po.y-6, po.x-RECORD_WIDTH/2, 12));
 			CGContextFillPath(cgc); // パスを塗り潰す
@@ -165,7 +165,7 @@
 
 	//--------------------------------------------------------------------------------------- 背景を描く
 	CGFloat fHeight = self.bounds.size.height - 3 - 15;  // 上下の余白を除いた有効な高さ
-	//CGRect rc;
+	CGRect rc;
 	// Temp領域 (H:1/8)
 	CGRect rcTemp = self.bounds;
 	rcTemp.origin.y = 3.0 + SEPARATE_HEIGHT;	// Y開始
@@ -189,17 +189,18 @@
 	CGRect rcDate = self.bounds;
 	rcDate.origin.y = rcBp.origin.y + rcBp.size.height + SEPARATE_HEIGHT;				// Y開始
 	rcDate.size.height = fHeight * 1 / 8 - SEPARATE_HEIGHT;				// 高さ
-/*	// 区切り線
+	// 区切り線
 	//CGContextSetRGBFillColor(cgc, 0.8, 0.8, 0.8, 0.3); // Gray
-	CGContextSetRGBFillColor(cgc, 0.592, 0.313, 0.302, 0.3); //Azukid Color
-	rc = CGRectMake(MARGIN_WIDTH, 0, self.bounds.size.width - MARGIN_WIDTH*2 + 20, SEPARATE_HEIGHT);
+	//CGContextSetRGBFillColor(cgc, 0.592, 0.313, 0.302, 0.3); //Azukid Color
+	CGContextSetRGBFillColor(cgc, 1, 1, 1, 0.3); //White
+	rc = CGRectMake(0, 0, self.bounds.size.width, SEPARATE_HEIGHT);	// self.bounds=正味グラフ描画領域
 	rc.origin.y = rcWeight.origin.y - SEPARATE_HEIGHT;	CGContextAddRect(cgc, rc);
 	rc.origin.y = rcPuls.origin.y - SEPARATE_HEIGHT;			CGContextAddRect(cgc, rc);
 	rc.origin.y = rcBp.origin.y - SEPARATE_HEIGHT;			CGContextAddRect(cgc, rc);
 	rc.origin.y = rcDate.origin.y - SEPARATE_HEIGHT;		CGContextAddRect(cgc, rc);
 	//画面に描画
 	CGContextFillPath(cgc); // パスを塗り潰す
-*/
+
 	// 右端の設定領域について
 	//rc = ibSegType.frame;
 	//rc.origin.x = self.bounds.size.width - MARGIN_WIDTH + 25;
@@ -271,8 +272,8 @@
 	//ストロークの線幅を設定
 	CGContextSetLineWidth(cgc, 0.5);
 
-	CGPoint	pointsArray[RECORD_LIMIT+1];
-	long			valuesArray[RECORD_LIMIT+1];
+	CGPoint	pointsArray[GRAPH_PAGE_LIMIT+1];
+	long			valuesArray[GRAPH_PAGE_LIMIT+1];
 	int			arrayNo;
 	CGFloat	fXgoal = self.bounds.size.width - RECORD_WIDTH/2;		// 最初、GOALを中央に表示する
 

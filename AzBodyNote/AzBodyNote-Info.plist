@@ -51,6 +51,8 @@
 			<array>
 				<string>db-qq4oke7nx6f8ivj</string>
 			</array>
+			<key>Target</key>
+			<string>Stable</string>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>

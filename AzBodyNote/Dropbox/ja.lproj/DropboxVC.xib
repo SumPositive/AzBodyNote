@@ -192,7 +192,7 @@
 							<int key="IBUIContentMode">7</int>
 							<bool key="IBUIUserInteractionEnabled">NO</bool>
 							<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-							<string key="IBUIText">ファイル名を入れて保存ボタンをタッチ。</string>
+							<string key="IBUIText">Conditionファイル名を入れて保存ボタンをタッチ。</string>
 							<object class="NSColor" key="IBUITextColor" id="981258164">
 								<int key="NSColorSpace">1</int>
 								<bytes key="NSRGB">MCAwIDAAA</bytes>
@@ -243,7 +243,7 @@
 							<int key="IBUIContentMode">7</int>
 							<bool key="IBUIUserInteractionEnabled">NO</bool>
 							<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-							<string key="IBUIText">復元したいファイル名をタッチ。</string>
+							<string key="IBUIText">復元したいConditionファイル名をタッチ。</string>
 							<reference key="IBUITextColor" ref="981258164"/>
 							<nil key="IBUIHighlightedColor"/>
 							<int key="IBUIBaselineAdjustment">1</int>
@@ -265,7 +265,7 @@
 							<int key="IBUIContentVerticalAlignment">0</int>
 							<string key="IBUIText"/>
 							<int key="IBUIBorderStyle">3</int>
-							<string key="IBUIPlaceholder">健康日記ファイル名</string>
+							<string key="IBUIPlaceholder">Conditionファイル名</string>
 							<object class="NSColor" key="IBUITextColor">
 								<int key="NSColorSpace">3</int>
 								<bytes key="NSWhite">MAA</bytes>
@@ -549,7 +549,7 @@
 				<string key="28.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="29.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="30.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-				<integer value="1" key="30.IUISegmentedControlInspectorSelectedSegmentMetadataKey"/>
+				<integer value="0" key="30.IUISegmentedControlInspectorSelectedSegmentMetadataKey"/>
 			</dictionary>
 			<dictionary class="NSMutableDictionary" key="unlocalizedProperties"/>
 			<nil key="activeLocalization"/>

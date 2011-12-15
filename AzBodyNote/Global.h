@@ -33,30 +33,13 @@
 
 #define GD_PRODUCTNAME	@"AzBodyNote"  // IMPORTANT PRODUCT NAME  和名「健康日記」
 													//↑↑変更禁止！！Keychainの'ServiceName'に使っているので読み出せなくなる。
-//#define GD_KEY_LOGINPASS  @"AzCreditLoginPass"  //←変更禁止！！Keychainの'Username'に使っているので読み出せなくなる。
 
 #define TABBAR_CHANGE_TIME				0.5		// TabBar切替時のディゾルブ時間(s)
 
-// UserDefault
-#define GD_OptRoundBankers					@"GD_OptRoundBankers"		// 偶数丸め
-
-// UserDefault  Settings
-#define GD_SetName0								@"GD_SetName0"
-#define GD_SetName1								@"GD_SetName1"
-#define GD_SetName2								@"GD_SetName2"
-#define GD_SetUnit1									@"GD_SetUnit1"
-#define GD_SetUnit2									@"GD_SetUnit2"
-#define GD_SetCalcMethod						@"GD_SetCalcMethod"
-
-// UserDefault  UseData
-#define GD_UseSplitIt									@"GD_UseSplitIt"
-#define GD_UsePersons0							@"GD_UsePersons0"
-#define GD_UsePersons1							@"GD_UsePersons1"
-#define GD_UsePersons2							@"GD_UsePersons2"
-#define GD_UseSplit0									@"GD_UseSplit0"
-#define GD_UseSplit1									@"GD_UseSplit1"
-#define GD_UseSplit2									@"GD_UseSplit2"
-
+// UserDefault ------------------------------------- Settings
+#define GUD_iCloud								@"GUD_iCloud"
+#define GUD_Calc_Method					@"GUD_Calc_Method"		// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
+#define GUD_Calc_RoundBankers			@"GUD_Calc_RoundBankers"
 
 //----------------------------------------------- Global.m グローバル関数
 void alertBox( NSString *zTitle, NSString *zMsg, NSString *zButton );

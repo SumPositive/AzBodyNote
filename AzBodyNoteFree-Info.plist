@@ -46,11 +46,13 @@
 			<key>CFBundleURLIconFile</key>
 			<string>Icon57Free</string>
 			<key>CFBundleURLName</key>
-			<string>Condition</string>
+			<string>Condition free</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>db-qq4oke7nx6f8ivj</string>
 			</array>
+			<key>Target</key>
+			<string>Free</string>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
