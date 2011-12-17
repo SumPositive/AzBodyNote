@@ -12,12 +12,13 @@
 @interface AzBodyNoteAppDelegate : NSObject <UIApplicationDelegate>
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
-@property (nonatomic, retain, readonly) NSManagedObjectContext			*managedObjectContext;
-@property (nonatomic, retain, readonly) MocFunctions		*mocBase;
 @property (nonatomic, retain) IBOutlet UITabBarController *tabBarController;
 
+@property (nonatomic, retain, readonly) NSManagedObjectContext			*managedObjectContext;
+@property (nonatomic, retain, readonly) MocFunctions		*mocBase;
+
 // Global User Defaults - Settings
-@property (nonatomic, assign) BOOL		gud_iCloud;
+//@property (nonatomic, assign) BOOL		gud_iCloud;
 
 
 - (void)dropboxView;
@@ -25,6 +26,6 @@
 - (NSString*)tmpFileSave;
 - (NSString*)tmpFileLoad;
 
-- (NSURL *)applicationDocumentsDirectory;
+- (NSString *)applicationDocumentsDirectory;
 
 @end

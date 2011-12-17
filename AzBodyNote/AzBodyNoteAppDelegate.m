@@ -19,16 +19,19 @@
 
 @implementation AzBodyNoteAppDelegate
 {
-	@private
+@private
 	NSManagedObjectModel				*moModel_;
 	NSPersistentStoreCoordinator		*persistentStoreCoordinator_;
+	NSManagedObjectContext				*managedObjectContext_;
+	
+	BOOL			gud_iCloud_;
 }
 
 @synthesize window = window_;
-@synthesize managedObjectContext;
+//@synthesize managedObjectContext = managedObjectContext_;
 @synthesize mocBase;
 @synthesize tabBarController = _tabBarController;
-@synthesize gud_iCloud = gud_iCloud_;
+//@synthesize gud_iCloud = gud_iCloud_;
 
 /*
 - (void)saveContext
@@ -297,7 +300,8 @@
 	// コミット
 	[mocBase commit];
 	// リフレッシュ通知
-    NSNotification* refreshNotification = [NSNotification notificationWithName:@"RefreshAllViews" object:self  userInfo:nil];
+    NSNotification* refreshNotification = [NSNotification notificationWithName:NFM_REFRESH_ALL_VIEWS
+																		object:self  userInfo:nil];
     [[NSNotificationCenter defaultCenter] postNotification:refreshNotification];
 	return nil;
 }
@@ -305,12 +309,13 @@
 
 #pragma mark - iCloud
 
-- (void)mergeiCloudChanges:(NSNotification*)note forContext:(NSManagedObjectContext*)moc 
+- (void)mergeiCloudChanges:(NSNotification*)notification forContext:(NSManagedObjectContext*)moc 
 {
-	if (gud_iCloud_==NO) return;
-    [moc mergeChangesFromContextDidSaveNotification:note]; 
+	NSLog(@"mergeiCloudChanges: notification=%@", notification);
+    [moc mergeChangesFromContextDidSaveNotification:notification]; 
 	
-    NSNotification* refreshNotification = [NSNotification notificationWithName:@"RefreshAllViews" object:self  userInfo:[note userInfo]];
+    NSNotification* refreshNotification = [NSNotification notificationWithName:NFM_REFRESH_ALL_VIEWS
+																		object:self  userInfo:[notification userInfo]];
     [[NSNotificationCenter defaultCenter] postNotification:refreshNotification];
 }
 
@@ -318,10 +323,8 @@
 // make sure to vector this back to the thread we want, in this case
 // the main thread for our views & controller
 - (void)mergeChangesFrom_iCloud:(NSNotification *)notification
-						//withMoc:(NSManagedObjectContext*)moc
 {
-	if (gud_iCloud_==NO) return;
-	NSManagedObjectContext* moc = [mocBase getMoc];
+	NSManagedObjectContext* moc = [self managedObjectContext];
 	// this only works if you used NSMainQueueConcurrencyType
 	// otherwise use a dispatch_async back to the main thread yourself
 	[moc performBlock:^{
@@ -357,9 +360,13 @@
         return persistentStoreCoordinator_;
     }
     
-    NSURL *storeUrl = [[self applicationDocumentsDirectory] 
+/*    NSURL *storeUrl = [[self applicationDocumentsDirectory] 
 					   URLByAppendingPathComponent:@"azbodynote.sqlite"];	//【重要】リリース後変更禁止
-	NSLog(@"storeUrl=%@", storeUrl);
+	NSLog(@"storeUrl=%@", storeUrl);*/
+	
+	NSString *storePath = [[self applicationDocumentsDirectory]
+						   stringByAppendingPathComponent:@"azbodynote.sqlite"];	//【重要】リリース後変更禁止
+	NSLog(@"storePath=%@", storePath);
 
 	// assign the PSC to our app delegate ivar before adding the persistent store in the background
 	// this leverages a behavior in Core Data where you can create NSManagedObjectContext and fetch requests
@@ -374,7 +381,7 @@
 			NSFileManager *fileManager = [NSFileManager defaultManager];
 			// Migrate datamodel
 			NSDictionary *options = nil;
-
+			NSURL *storeUrl = [NSURL fileURLWithPath:storePath];
 			// this needs to match the entitlements and provisioning profile
 			//@"<individual ID>.<project bundle identifier>"	 
 			//@"5C2UYK6F45.com.azukid.*"  ＜＜＜<individual ID>は、<Company ID>と同じ契約固有コード。
@@ -382,20 +389,16 @@
 			NSLog(@"cloudURL=1=%@", cloudURL);
 			if (cloudURL) {
 				// アプリ内のコンテンツ名付加：["coredata"]　＜＜＜変わると共有できない。
-				cloudURL = [cloudURL URLByAppendingPathComponent:@"coredata"];
-				NSLog(@"cloudURL=2=%@", cloudURL);
-/*				NSString* coreDataCloudContent = [[cloudURL path] stringByAppendingPathComponent:@"store01"];
-				//NSString* coreDataCloudContent = [cloudURL path];
-				NSLog(@"coreDataCloudContent=%@", coreDataCloudContent);
-				// iCloud is available
+				//cloudURL = [cloudURL URLByAppendingPathComponent:@"coredata"];
+				NSString* coreDataCloudContent = [[cloudURL path] stringByAppendingPathComponent:@"coredata"];
 				cloudURL = [NSURL fileURLWithPath:coreDataCloudContent];
-				NSLog(@"-- cloudURL=%@", cloudURL);
-*/			
+				NSLog(@"cloudURL=2=%@", cloudURL);
+
 				options = [NSDictionary dictionaryWithObjectsAndKeys:
 						   [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
 						   [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption,
-						   @"com.azukid.azbodynote.coredata", NSPersistentStoreUbiquitousContentNameKey,	//【重要】リリース後変更禁止
-						   cloudURL, NSPersistentStoreUbiquitousContentURLKey,														//【重要】リリース後変更禁止
+						   @"com.azukid.azbodynote.sqlog", NSPersistentStoreUbiquitousContentNameKey,		//【重要】リリース後変更禁止
+						   cloudURL, NSPersistentStoreUbiquitousContentURLKey,													//【重要】リリース後変更禁止
 						   nil];
 			} else {
 				// iCloud is not available
@@ -422,11 +425,13 @@
 			// NSFetchedResultsController to -performFetch again now there is a real store
 			dispatch_async(dispatch_get_main_queue(), ^{
 				NSLog(@"asynchronously added persistent store!");
-				[[NSNotificationCenter defaultCenter] postNotificationName:@"RefetchAllDatabaseData" object:self userInfo:nil];
+				[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFETCH_ALL_DATA
+																	object:self userInfo:nil];
 			});
 		});
 	} 
 	else {	// iOS5より前
+		NSURL *storeUrl = [NSURL fileURLWithPath:storePath];
 		NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
 								 [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
 								 [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption,
@@ -449,10 +454,9 @@
  */
 - (NSManagedObjectContext *)managedObjectContext
 {
-	//マルチMOC対応のため
-	//    if (moc_ != nil) {
-	//        return moc_;
-	//    }
+	if (managedObjectContext_ != nil) {
+		return managedObjectContext_;
+	}
     
     NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
 	NSManagedObjectContext* moc = nil;
@@ -461,13 +465,14 @@
 		if (gud_iCloud_  &&  IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
 			moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 			
-			//[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy]; // メモリを優先(Def.)
-			//[moc setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy]; // ストアを優先　＜＜＜ＯＫ
-			//[moc setMergePolicy:NSOverwriteMergePolicy]; // 上書き
-
 			[moc performBlockAndWait:^{
 				// even the post initialization needs to be done within the Block
 				[moc setPersistentStoreCoordinator: coordinator];
+				
+				//[moc setMergePolicy:NSOverwriteMergePolicy]; // 上書き
+				//[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy]; // 変更した方を優先(Def.)
+				//[moc setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy]; // ストアを優先　＜＜＜ＯＫ
+				
 				[[NSNotificationCenter defaultCenter]addObserver:self 
 														selector:@selector(mergeChangesFrom_iCloud:) 
 															name:NSPersistentStoreDidImportUbiquitousContentChangesNotification 
@@ -479,7 +484,9 @@
             [moc setPersistentStoreCoordinator:coordinator];
         }		
     }
-    return	moc;
+	//
+	managedObjectContext_ = moc;
+    return	managedObjectContext_;
 }
 
 
@@ -488,10 +495,13 @@
 
 /**
  Returns the URL to the application's Documents directory.
- */
+
 - (NSURL *)applicationDocumentsDirectory
 {
     return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+}*/
+- (NSString *)applicationDocumentsDirectory {
+	return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
 }
 
 @end

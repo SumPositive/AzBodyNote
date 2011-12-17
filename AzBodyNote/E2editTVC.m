@@ -206,7 +206,7 @@
 	// listen to our app delegates notification that we might want to refresh our detail view
     [[NSNotificationCenter defaultCenter] addObserver:self 
 											 selector:@selector(refreshAllViews:) 
-												 name:@"RefreshAllViews" 
+												 name:NFM_REFRESH_ALL_VIEWS
 											   object:[[UIApplication sharedApplication] delegate]];
 
 	if (moE2edit_) {

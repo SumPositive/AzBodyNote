@@ -36,6 +36,11 @@
 
 #define TABBAR_CHANGE_TIME				0.5		// TabBar切替時のディゾルブ時間(s)
 
+// NSNotification messages
+#define NFM_REFRESH_ALL_VIEWS			@"RefreshAllViews"
+#define NFM_REFETCH_ALL_DATA			@"RefetchAllDatabaseData"
+
+
 // UserDefault ------------------------------------- Settings
 #define GUD_iCloud								@"GUD_iCloud"
 #define GUD_Calc_Method					@"GUD_Calc_Method"		// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)

@@ -36,6 +36,35 @@
 @synthesize fetchedResultsController = frc_;
 
 
+#pragma mark - iCloud
+
+- (void)refreshAllViews:(NSNotification*)note 
+{	// iCloud-CoreData に変更があれば呼び出される
+    //if (note) {
+	//[self viewWillAppear:NO];
+	[self.tableView reloadData];
+    //}
+}
+
+- (void)reloadFetchedResults:(NSNotification*)note 
+{
+    NSError *error = nil;
+	if (![[self fetchedResultsController] performFetch:&error]) {
+		/*
+		 Replace this implementation with code to handle the error appropriately.
+		 
+		 abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. If it is not possible to recover from the error, display an alert panel that instructs the user to quit the application by pressing the Home button.
+		 */
+		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+		abort();
+	}		
+    
+    if (note) {
+        [self.tableView reloadData];
+    }
+}
+
+
 #pragma mark - View lifecycle
 
 - (void)viewDidLoad
@@ -54,12 +83,6 @@
 	}
 	assert(mocFunc_);
 	
-	// listen to our app delegates notification that we might want to refresh our detail view
-    [[NSNotificationCenter defaultCenter] addObserver:self 
-											 selector:@selector(refreshAllViews:) 
-												 name:@"RefreshAllViews" 
-											   object:[[UIApplication sharedApplication] delegate]];
-
 	// Set up the edit and add buttons.
 	//self.navigationItem.leftBarButtonItem = self.editButtonItem;
 
@@ -93,6 +116,17 @@
 #endif
 	[self.tableView addSubview:lbPagePrev];
 
+    [self reloadFetchedResults:nil];
+	// observe the app delegate telling us when it's finished asynchronously setting up the persistent store
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadFetchedResults:) 
+												 name:NFM_REFETCH_ALL_DATA
+											   object:[[UIApplication sharedApplication] delegate]];
+	
+	// listen to our app delegates notification that we might want to refresh our detail view
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+											 selector:@selector(refreshAllViews:) 
+												 name:NFM_REFRESH_ALL_VIEWS 
+											   object:[[UIApplication sharedApplication] delegate]];
 	
 #ifdef GD_Ad_ENABLED
 	//--------------------------------------------------------------------------------------------------------- AdMob
@@ -226,15 +260,6 @@
 }
 */
 
-
-#pragma mark - iCloud
-- (void)refreshAllViews:(NSNotification*)note 
-{	// iCloud-CoreData に変更があれば呼び出される
-    //if (note) {
-		//[self viewWillAppear:NO];
-		[self.tableView reloadData];
-    //}
-}
 
 
 #pragma mark - <delegate>

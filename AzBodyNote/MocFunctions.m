@@ -142,7 +142,7 @@ static NSDate *dateGoal_ = nil;
 		
 		// where
 		if (predicate) {
-			NSLog(@"MocFunction: select: where: %@", predicate);
+			//NSLog(@"MocFunction: select: where: %@", predicate);
 			[req setPredicate:predicate];
 		}
 		
@@ -269,8 +269,6 @@ static NSDate *dateGoal_ = nil;
 // JSON変換した NSDictionary から NSManagedObject を生成する。
 - (NSManagedObject*)insertNewObjectForDictionary:(NSDictionary*)dict
 {
-    //NSManagedObjectContext* context = [self managedObjectContext];
-
     NSString* class = [dict objectForKey:@"#class"];
 
     NSManagedObject* newObject = [NSEntityDescription insertNewObjectForEntityForName:class inManagedObjectContext:moc_];
