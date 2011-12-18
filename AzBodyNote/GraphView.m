@@ -423,9 +423,12 @@
 	CGContextTranslateCTM(cgc, 0, rect.size.height);
 	CGContextScaleCTM(cgc, 1.0, -1.0);
 	
+	/*NG* 縮小されてしまう不具合あり
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{ // 非同期処理
 		[self graphDraw:cgc];
 	});
+	 */
+	[self graphDraw:cgc];
 }
 
 

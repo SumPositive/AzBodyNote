@@ -60,7 +60,7 @@
 	// ここで，appDefaultsは環境設定で初期値となるキー・バリューペアのNSDictonaryオブジェクトです。
 	// このメソッドは，すでに同じキーの環境設定が存在する場合，上書きしないので，環境設定の初期値を定めることに使えます。
 	NSDictionary *dicDef = [[NSDictionary alloc] initWithObjectsAndKeys: // 直後にreleaseしている
-							@"YES",			GUD_iCloud,
+							@"NO",			GUD_iCloud,							
 							@"0",				GUD_Calc_Method,					// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
 							@"YES",			GUD_Calc_RoundBankers,		// YES=偶数丸め  NO=四捨五入
 							 nil];
@@ -69,7 +69,8 @@
 	//[dicDef release];
 
 	// 画面表示に関係する Option Setting を取得する
-	gud_iCloud_ = [userDefaults boolForKey:GUD_iCloud];
+	//gud_iCloud_ = [userDefaults boolForKey:GUD_iCloud];
+	gud_iCloud_ = NO;	//[0.8.0] 動作不安定につき、未対応とする
 
 	
 /*	UIActivityIndicatorView *aiv = [[UIActivityIndicatorView alloc]
@@ -96,7 +97,7 @@
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url 
 {	// Free と Stable が共存している場合、Free から戻ったとき Stableが呼ばれる。
-	
+
 /*** DEBUG
 	NSString* msg = [NSString stringWithFormat:@"[URL]%@\n[schame]%@\n[Query]%@", 
                      [url absoluteString], [url scheme], [url query]];
@@ -341,7 +342,7 @@
  */
 - (NSManagedObjectModel *)managedObjectModel
 {
-    if (moModel_ != nil) {
+    if (moModel_) {
         return moModel_;
     }
 	
@@ -356,7 +357,7 @@
  */
 - (NSPersistentStoreCoordinator *)persistentStoreCoordinator
 {
-    if (persistentStoreCoordinator_ != nil) {
+    if (persistentStoreCoordinator_) {
         return persistentStoreCoordinator_;
     }
     
@@ -454,7 +455,7 @@
  */
 - (NSManagedObjectContext *)managedObjectContext
 {
-	if (managedObjectContext_ != nil) {
+	if (managedObjectContext_) {
 		return managedObjectContext_;
 	}
     
@@ -469,8 +470,8 @@
 				// even the post initialization needs to be done within the Block
 				[moc setPersistentStoreCoordinator: coordinator];
 				
+				//[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy]; // 変更した方を優先(Default)
 				//[moc setMergePolicy:NSOverwriteMergePolicy]; // 上書き
-				//[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy]; // 変更した方を優先(Def.)
 				//[moc setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy]; // ストアを優先　＜＜＜ＯＫ
 				
 				[[NSNotificationCenter defaultCenter]addObserver:self 
@@ -482,7 +483,7 @@
 		else {	// iOS5より前
             moc = [[NSManagedObjectContext alloc] init];
             [moc setPersistentStoreCoordinator:coordinator];
-        }		
+        }
     }
 	//
 	managedObjectContext_ = moc;
