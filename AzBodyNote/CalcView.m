@@ -53,8 +53,9 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 	double						mMin;
 	double						mMax;
 	int							mDecimal;		// 小数桁数
-	__unsafe_unretained id								mTarget;
-	SEL							mActionSelector;
+
+	__unsafe_unretained  id	mTarget;
+	SEL										mActionSelector;
 	
 	//----------------------------------------------viewDidLoadでnil, dealloc時にrelese
 	UIView				*mSubView;
@@ -259,7 +260,7 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 		// デフォルト丸め処理
 		//[mAnswer release], 
 		mAnswer = [mAnswer decimalNumberByRoundingAccordingToBehavior:mBehaviorDefault];
-		[mTarget performSelector:mActionSelector withObject:[mAnswer copy]];  // 受け取った側でreleaseすること
+		[mTarget performSelector:mActionSelector  withObject:[mAnswer copy]]; // 受け取った側でreleaseすること
 		//[mTarget performSelector:mActionSelector withObject:mAnswer];  // 受け取った側でreleaseすること
 	}
 	[self hide];

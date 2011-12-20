@@ -23,8 +23,6 @@
 	NSManagedObjectModel				*moModel_;
 	NSPersistentStoreCoordinator		*persistentStoreCoordinator_;
 	NSManagedObjectContext				*managedObjectContext_;
-	
-	BOOL			gud_iCloud_;
 }
 
 @synthesize window = window_;
@@ -60,7 +58,6 @@
 	// ここで，appDefaultsは環境設定で初期値となるキー・バリューペアのNSDictonaryオブジェクトです。
 	// このメソッドは，すでに同じキーの環境設定が存在する場合，上書きしないので，環境設定の初期値を定めることに使えます。
 	NSDictionary *dicDef = [[NSDictionary alloc] initWithObjectsAndKeys: // 直後にreleaseしている
-							@"NO",			GUD_iCloud,							
 							@"0",				GUD_Calc_Method,					// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
 							@"YES",			GUD_Calc_RoundBankers,		// YES=偶数丸め  NO=四捨五入
 							 nil];
@@ -70,7 +67,6 @@
 
 	// 画面表示に関係する Option Setting を取得する
 	//gud_iCloud_ = [userDefaults boolForKey:GUD_iCloud];
-	gud_iCloud_ = NO;	//[0.8.0] 動作不安定につき、未対応とする
 
 	
 /*	UIActivityIndicatorView *aiv = [[UIActivityIndicatorView alloc]
@@ -375,7 +371,7 @@
 	// so it's possible to bring up the UI and then fill in the results later
     persistentStoreCoordinator_ = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
 	
-	if (gud_iCloud_  &&  IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
+	if (IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
 		// do this asynchronously since if this is the first time this particular device is syncing with preexisting
 		// iCloud content it may take a long long time to download
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -463,13 +459,14 @@
 	NSManagedObjectContext* moc = nil;
 
     if (coordinator != nil) {
-		if (gud_iCloud_  &&  IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
+		if (IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
 			moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 			
 			[moc performBlockAndWait:^{
 				// even the post initialization needs to be done within the Block
 				[moc setPersistentStoreCoordinator: coordinator];
 				
+				// 同期がおかしくなったときには、[設定]-[iCloud]-[ストレージとバックアップ]-[ストレージを管理]-[健康日記]-[編集]-[すべて削除] する。
 				//[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy]; // 変更した方を優先(Default)
 				//[moc setMergePolicy:NSOverwriteMergePolicy]; // 上書き
 				//[moc setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy]; // ストアを優先　＜＜＜ＯＫ

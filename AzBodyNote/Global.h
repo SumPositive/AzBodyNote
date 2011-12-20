@@ -42,7 +42,7 @@
 
 
 // UserDefault ------------------------------------- Settings
-#define GUD_iCloud								@"GUD_iCloud"
+//#define GUD_iCloud								@"GUD_iCloud"
 #define GUD_Calc_Method					@"GUD_Calc_Method"		// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
 #define GUD_Calc_RoundBankers			@"GUD_Calc_RoundBankers"
 
