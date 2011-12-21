@@ -20,7 +20,7 @@
 
 // 公開メソッド
 - (id)initWithTitle:(NSString*)title  min:(double)min  max:(double)max  decimal:(int)decimal  
-			 target:(id)target action:(SEL)action;
+			 target:(__strong id)target action:(SEL)action;
 - (void)show;
 
 @end

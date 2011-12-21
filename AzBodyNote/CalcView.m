@@ -47,15 +47,15 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 @implementation CalcView
 {
 	//--------------------------retain
-	NSString					*mTitle;		// [AC]で表示するため
-	NSDecimalNumber	*mAnswer;	// 結果
+	NSString		__strong			*mTitle;		// [AC]で表示するため
+	NSDecimalNumber __strong		*mAnswer;	// 結果
 	//----------------------------------------------assign
 	double						mMin;
 	double						mMax;
 	int							mDecimal;		// 小数桁数
 
-	__unsafe_unretained  id	mTarget;
-	SEL										mActionSelector;
+	id		__strong			mTarget;
+	SEL							mActionSelector;
 	
 	//----------------------------------------------viewDidLoadでnil, dealloc時にrelese
 	UIView				*mSubView;
@@ -260,8 +260,10 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 		// デフォルト丸め処理
 		//[mAnswer release], 
 		mAnswer = [mAnswer decimalNumberByRoundingAccordingToBehavior:mBehaviorDefault];
-		[mTarget performSelector:mActionSelector  withObject:[mAnswer copy]]; // 受け取った側でreleaseすること
-		//[mTarget performSelector:mActionSelector withObject:mAnswer];  // 受け取った側でreleaseすること
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"			// Warning除去
+		[mTarget performSelector:mActionSelector withObject:mAnswer];  // 受け取った側でreleaseすること
+#pragma clang diagnostic pop
 	}
 	[self hide];
 }
