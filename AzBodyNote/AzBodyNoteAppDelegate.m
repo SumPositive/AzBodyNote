@@ -362,7 +362,7 @@
 	NSLog(@"storeUrl=%@", storeUrl);*/
 	
 	NSString *storePath = [[self applicationDocumentsDirectory]
-						   stringByAppendingPathComponent:@"azbodynote.sqlite"];	//【重要】リリース後変更禁止
+						   stringByAppendingPathComponent:@"AzBodyNote.sqlite"];	//【重要】リリース後変更禁止
 	NSLog(@"storePath=%@", storePath);
 
 	// assign the PSC to our app delegate ivar before adding the persistent store in the background
@@ -394,7 +394,7 @@
 				options = [NSDictionary dictionaryWithObjectsAndKeys:
 						   [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
 						   [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption,
-						   @"com.azukid.azbodynote.sqlog", NSPersistentStoreUbiquitousContentNameKey,		//【重要】リリース後変更禁止
+						   @"com.azukid.AzBodyNote.sqlog", NSPersistentStoreUbiquitousContentNameKey,		//【重要】リリース後変更禁止
 						   cloudURL, NSPersistentStoreUbiquitousContentURLKey,													//【重要】リリース後変更禁止
 						   nil];
 			} else {
