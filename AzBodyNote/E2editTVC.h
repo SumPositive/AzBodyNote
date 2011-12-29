@@ -13,17 +13,12 @@
 #import "E2editCellNote.h"
 #import "EditDateVC.h"
 
-#ifdef GD_Ad_ENABLED
 #import <iAd/iAd.h>
 #import "GADBannerView.h"
-#endif
 
 
 @interface E2editTVC : UITableViewController <UITableViewDelegate, NSFetchedResultsControllerDelegate, EditDateDelegate
-#ifdef GD_Ad_ENABLED
-	,ADBannerViewDelegate, GADBannerViewDelegate
-#endif
->
+	,ADBannerViewDelegate, GADBannerViewDelegate>
 
 @property (nonatomic, retain) E2record		*moE2edit;		//==nil:AddNew,  !=nil:Edit
 

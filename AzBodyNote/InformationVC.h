@@ -9,18 +9,14 @@
 #import <UIKit/UIKit.h>
 #import <MessageUI/MessageUI.h>
 #import <MessageUI/MFMailComposeViewController.h>
+#import <StoreKit/StoreKit.h>
 
-@interface InformationVC : UIViewController <MFMailComposeViewControllerDelegate, UIAlertViewDelegate>
-{
-	IBOutlet UILabel			*ibLbTitle;
-	IBOutlet UILabel			*ibLbVersion;
-	IBOutlet UILabel			*ibLbNote;
-	IBOutlet UIImageView	*ibImgIcon;
-	IBOutlet UIButton		*ibBuGoBlog;
-	IBOutlet UIButton		*ibBuPostMail;
-}
+
+@interface InformationVC : UIViewController <MFMailComposeViewControllerDelegate, UIAlertViewDelegate, 
+																			SKProductsRequestDelegate, SKPaymentTransactionObserver>
 
 - (IBAction)ibBuGoBlog:(UIButton *)button;
 - (IBAction)ibBuPostMail:(UIButton *)button;
+- (IBAction)ibBuPaid:(UIButton *)button;
 
 @end

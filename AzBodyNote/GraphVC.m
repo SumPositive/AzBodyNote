@@ -63,7 +63,7 @@
     [super viewDidLoad];
 	self.title = NSLocalizedString(@"TabGraph",nil);
 
-	appDelegate_ = [[UIApplication sharedApplication] delegate];
+	appDelegate_ = (AzBodyNoteAppDelegate*)[[UIApplication sharedApplication] delegate];
 	assert(appDelegate_);
 	mocFunc_ = appDelegate_.mocBase; // Read Only
 	assert(mocFunc_);

@@ -7,10 +7,7 @@
 //
 #define OR  ||
 
-#ifdef AzFREE
-#define GD_Ad_ENABLED
 #define AdMobID_BodyNote				@"a14ece23da85f5e";		// 体調日記 パブリッシャー ID
-#endif
 
 #ifdef DEBUG	//--------------------------------------------- DEBUG
 //#define AzLOG(...) NSLog(__VA_ARGS__)
@@ -40,9 +37,11 @@
 #define NFM_REFRESH_ALL_VIEWS			@"RefreshAllViews"
 #define NFM_REFETCH_ALL_DATA			@"RefetchAllDatabaseData"
 
+#define STORE_PRODUCTID_UNLOCK		@"com.azukid.AzBodyNote.Unlock"
+
 
 // UserDefault ------------------------------------- Settings
-//#define GUD_iCloud								@"GUD_iCloud"
+#define GUD_bPaid									@"GUD_bPaid"
 #define GUD_Calc_Method					@"GUD_Calc_Method"		// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
 #define GUD_Calc_RoundBankers			@"GUD_Calc_RoundBankers"
 

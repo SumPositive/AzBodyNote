@@ -13,6 +13,7 @@
 #import "E2listTVC.h"
 #import "DropboxVC.h"
 
+
 //@interface AzBodyNoteAppDelegate (PrivateMethods)
 //- (NSManagedObjectContext *)managedObjectContext;
 //@end
@@ -29,7 +30,7 @@
 //@synthesize managedObjectContext = managedObjectContext_;
 @synthesize mocBase;
 @synthesize tabBarController = _tabBarController;
-//@synthesize gud_iCloud = gud_iCloud_;
+@synthesize gud_bPaid = gud_bPaid_;
 
 /*
 - (void)saveContext
@@ -47,6 +48,38 @@
 }
 */
 
+#pragma mark - StoreKit - In App Purchese
+
+- (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions
+{	// Observer: 
+	for (SKPaymentTransaction *tran in transactions)
+	{
+		switch (tran.transactionState) {
+			case SKPaymentTransactionStateRestored: // 購入済み ＜＜アプリ再インストールしたときのため
+				NSLog(@"SKPaymentTransactionStateRestored: productIdentifier=%@", tran.payment.productIdentifier);
+				if ([tran.payment.productIdentifier isEqualToString:STORE_PRODUCTID_UNLOCK]) {
+					// Unlock
+					if (gud_bPaid_==NO) {
+						gud_bPaid_ = YES;
+						[[NSUserDefaults standardUserDefaults] setBool:YES forKey:GUD_bPaid];
+						[[NSUserDefaults standardUserDefaults] synchronize];
+						[[SKPaymentQueue defaultQueue] finishTransaction:tran]; // 処理完了
+					}
+				}
+				break;
+		}
+	}
+}
+
+- (void)paymentQueue:(SKPaymentQueue *)queue removedTransactions:(NSArray *)transactions 
+{
+	[[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
+}
+
+
+
+#pragma mark - Application
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {	// Override point for customization after application launch.
 	
@@ -60,14 +93,19 @@
 	NSDictionary *dicDef = [[NSDictionary alloc] initWithObjectsAndKeys: // 直後にreleaseしている
 							@"0",				GUD_Calc_Method,					// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
 							@"YES",			GUD_Calc_RoundBankers,		// YES=偶数丸め  NO=四捨五入
+							@"NO",			GUD_bPaid,								// YES=PAID
 							 nil];
 	[userDefaults registerDefaults:dicDef];	// 未定義のKeyのみ更新される
 	[userDefaults synchronize]; // plistへ書き出す
 	//[dicDef release];
 
 	// 画面表示に関係する Option Setting を取得する
-	//gud_iCloud_ = [userDefaults boolForKey:GUD_iCloud];
-
+	gud_bPaid_ = [userDefaults boolForKey:GUD_bPaid];
+	if (gud_bPaid_==NO) {
+		[[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+		[[SKPaymentQueue defaultQueue] restoreCompletedTransactions]; //非消費型：購入情報の再読み込み--> updatedTransactions:
+	}
+	
 	
 /*	UIActivityIndicatorView *aiv = [[UIActivityIndicatorView alloc]
 									initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
@@ -386,9 +424,9 @@
 			NSLog(@"cloudURL=1=%@", cloudURL);
 			if (cloudURL) {
 				// アプリ内のコンテンツ名付加：["coredata"]　＜＜＜変わると共有できない。
-				//cloudURL = [cloudURL URLByAppendingPathComponent:@"coredata"];
-				NSString* coreDataCloudContent = [[cloudURL path] stringByAppendingPathComponent:@"coredata"];
-				cloudURL = [NSURL fileURLWithPath:coreDataCloudContent];
+				//NSString* coreDataCloudContent = [[cloudURL path] stringByAppendingPathComponent:@"coredata"];
+				//cloudURL = [NSURL fileURLWithPath:coreDataCloudContent];
+				cloudURL = [cloudURL URLByAppendingPathComponent:@"coredata"];
 				NSLog(@"cloudURL=2=%@", cloudURL);
 
 				options = [NSDictionary dictionaryWithObjectsAndKeys:

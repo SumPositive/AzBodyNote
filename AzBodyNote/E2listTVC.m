@@ -29,9 +29,7 @@
 	NSIndexPath							*indexPathEdit_;
 	NSIndexPath							*indexPathDelete_;
 
-#ifdef GD_Ad_ENABLED
 	GADBannerView		*adMobView_;
-#endif
 }
 @synthesize fetchedResultsController = frc_;
 
@@ -72,7 +70,7 @@
 	[super viewDidLoad];
 
 	if (!appDelegate_) {
-		appDelegate_ = [[UIApplication sharedApplication] delegate];
+		appDelegate_ = (AzBodyNoteAppDelegate*)[[UIApplication sharedApplication] delegate];
 	}
 	assert(appDelegate_);
 	
@@ -109,11 +107,11 @@
 	UILabel *lbPagePrev = [[UILabel alloc] initWithFrame:CGRectMake(0, -35, 320, 30)];
 	lbPagePrev.textAlignment = UITextAlignmentCenter;
 	lbPagePrev.backgroundColor = [UIColor clearColor];
-#ifdef AzFREE
-	lbPagePrev.text = NSLocalizedString(@"PagePrevLimit",nil);
-#else
-	lbPagePrev.text = NSLocalizedString(@"PagePrev",nil);
-#endif
+	if (appDelegate_.gud_bPaid) {
+		lbPagePrev.text = NSLocalizedString(@"PagePrev",nil);
+	} else {
+		lbPagePrev.text = NSLocalizedString(@"PagePrevLimit",nil);
+	}
 	[self.tableView addSubview:lbPagePrev];
 
     [self reloadFetchedResults:nil];
@@ -128,9 +126,8 @@
 												 name:NFM_REFRESH_ALL_VIEWS 
 											   object:[[UIApplication sharedApplication] delegate]];
 	
-#ifdef GD_Ad_ENABLED
 	//--------------------------------------------------------------------------------------------------------- AdMob
-	if (adMobView_==nil) {
+	if (appDelegate_.gud_bPaid==NO && adMobView_==nil) {
 		adMobView_ = [[GADBannerView alloc]
 					  initWithFrame:CGRectMake(0, 0,			// TableCell用
 											   GAD_SIZE_320x50.width,
@@ -143,7 +140,6 @@
 		adMobView_.tag = 0;
 		adMobView_.alpha = 0;
 	}
-#endif
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -239,13 +235,11 @@
 	//NSLog(@"--- viewDidUnload ---"); 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	
-#ifdef GD_Ad_ENABLED
 	// ARCによりrelease不要になったが、delegateの解放は必須。
-	if (adMobView_) {
+	if (appDelegate_.gud_bPaid==NO && adMobView_) {
 		adMobView_.delegate = nil;  //受信STOP  ＜＜これが無いと破棄後に呼び出されて落ちる
 		adMobView_ = nil;
 	}
-#endif
 	
 	[super viewDidUnload];
 	// この後に loadView ⇒ viewDidLoad ⇒ viewWillAppear がコールされる
@@ -297,12 +291,9 @@
 		return [sectionInfo numberOfObjects];
 	}
 	NSInteger iRows = 1;	// Dropbox
-#ifdef GD_Ad_ENABLED
-	iRows++; // AdMob
-#endif
-#ifdef AzFREE
-	iRows++; // PageNext
-#endif
+	if (appDelegate_.gud_bPaid==NO) {
+		iRows += 2; // AdMob, PageNext
+	}
 	return  iRows;
 }
 
@@ -350,24 +341,25 @@
 		return cell;
 	}
 	else {
-#ifdef GD_Ad_ENABLED
 		int iRow = indexPath.row;
-		if (iRow==0) {
-			static NSString *Cid = @"E2listAdMob";
-			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
-			if (cell == nil) {
-				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:Cid];
-				cell.accessoryType = UITableViewCellAccessoryNone;
-				//cell.textLabel.text = @"";
-				if (adMobView_) {
-					[cell.contentView addSubview:adMobView_];
+		if (appDelegate_.gud_bPaid) {
+			iRow++;
+		} else {
+			if (iRow==0) {
+				static NSString *Cid = @"E2listAdMob";
+				UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
+				if (cell == nil) {
+					cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:Cid];
+					cell.accessoryType = UITableViewCellAccessoryNone;
+					//cell.textLabel.text = @"";
+					if (adMobView_) {
+						[cell.contentView addSubview:adMobView_];
+					}
 				}
+				return cell;
 			}
-			return cell;
 		}
-#else
-		int iRow = 1 + indexPath.row;
-#endif
+		
 		if (iRow==1)
 		{	// Dropbox  "esuslogo101409"
 			static NSString *Cid = @"E2listDropbox"; // .storyboard定義名
@@ -378,8 +370,7 @@
 			}
 			return cell;
 		} 
-#ifdef AzFREE
-		else if (iRow==2)
+		else if (iRow==2 && appDelegate_.gud_bPaid==NO)
 		{	// Page Next
 			static NSString *Cid = @"E2listBasic";
 			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
@@ -392,7 +383,6 @@
 			cell.textLabel.text = NSLocalizedString(@"PagePrevLimit",nil);
 			return cell;
 		} 
-#endif
 	}
     return nil;
 }
@@ -471,13 +461,12 @@
 	if ([[self.fetchedResultsController sections] count] <= indexPath.section) 
 	{	// Functions
 		indexPathEdit_ = nil; // Editモード解除
-#ifdef GD_Ad_ENABLED
 		int iRow = indexPath.row;
-#else
-		int iRow = 1 + indexPath.row;
-#endif
+		if (appDelegate_.gud_bPaid) {
+			iRow++;
+		}
 		if (iRow==1) {	// Dropbox
-			AzBodyNoteAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+			AzBodyNoteAppDelegate *appDelegate = (AzBodyNoteAppDelegate*)[[UIApplication sharedApplication] delegate];
 			[appDelegate dropboxView];
 		}
 	}
@@ -512,12 +501,12 @@
 	
 	// 1ページ行数
 	[fetchRequest setFetchLimit:LIST_PAGE_LIMIT];
-#ifdef AzFREE
-	// 最新の LIST_PAGE_LIMIT 件のみ表示
-	[fetchRequest setFetchOffset:0];
-#else
-	// 有料版は、ページ変えできるようにする
-#endif
+	if (appDelegate_.gud_bPaid) {
+		// 有料版は、ページ変えできるようにする
+	} else {
+		// 最新の LIST_PAGE_LIMIT 件のみ表示
+		[fetchRequest setFetchOffset:0];
+	}
 	
 	// where
 	[fetchRequest setPredicate:[NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"]]; // 未保存を除外する
@@ -622,7 +611,6 @@
  */
 
 
-#ifdef GD_Ad_ENABLED
 #pragma mark - AdMob <GADBannerViewDelegate>
 
 - (void)adViewDidReceiveAd:(GADBannerView *)bannerView 
@@ -649,7 +637,5 @@
 	adMobView_.alpha = 0;
 	[UIView commitAnimations];
 }
-
-#endif
 
 @end

@@ -32,10 +32,8 @@
 	NSInteger	iPrevTemp_;
 	UIButton		*buDelete_;		// Edit時のみ使用
 
-#ifdef GD_Ad_ENABLED
 	ADBannerView		*iAdBanner_;
 	GADBannerView		*adMobView_;
-#endif
 }
 @synthesize moE2edit = moE2edit_;
 
@@ -192,7 +190,7 @@
     [super viewDidLoad];
 
 	if (!appDelegate_) {
-		appDelegate_ = [[UIApplication sharedApplication] delegate];
+		appDelegate_ = (AzBodyNoteAppDelegate*)[[UIApplication sharedApplication] delegate];
 	}
 	assert(appDelegate_);
 	
@@ -304,40 +302,40 @@
 	 [[aTab objectAtIndex:3] setTitle: NSLocalizedString(@"TabInfo",nil)];
 	
 
-#ifdef GD_Ad_ENABLED
-	//CGRect rcAd = CGRectMake(0, self.view.frame.size.height-self.tabBarController.view.frame.size.height-50, 320, 50);
-	CGRect rcAd = CGRectMake(0, self.view.frame.size.height-28-50, 320, 50);  // GAD_SIZE_320x50
-	//--------------------------------------------------------------------------------------------------------- AdMob
-	if (adMobView_==nil) {
-		adMobView_ = [[GADBannerView alloc] init];
-		adMobView_.delegate = nil;  // viewWillAppear:から開始するため
-		adMobView_.rootViewController = self; //.navigationController;
-		adMobView_.adUnitID = AdMobID_BodyNote;
-		adMobView_.frame = rcAd;
-		// 以上は、GADRequest より先に指定すること。
-		GADRequest *request = [GADRequest request];
-		//[request setTesting:YES];
-		[adMobView_ loadRequest:request];
-		adMobView_.alpha = 0;	// 0=非表示　　1=表示　　　// viewWillAppear:から開始するため、ここでは非表示
-		adMobView_.tag = 0;		// 0=広告なし　　1=あり　　（iAdを優先表示するために必要）
-		//[self.view addSubview:adMobView_];
-		[self.navigationController.view addSubview:adMobView_];
+	if (appDelegate_.gud_bPaid==NO) {
+		//CGRect rcAd = CGRectMake(0, self.view.frame.size.height-self.tabBarController.view.frame.size.height-50, 320, 50);
+		CGRect rcAd = CGRectMake(0, self.view.frame.size.height-28-50, 320, 50);  // GAD_SIZE_320x50
+		//--------------------------------------------------------------------------------------------------------- AdMob
+		if (adMobView_==nil) {
+			adMobView_ = [[GADBannerView alloc] init];
+			adMobView_.delegate = nil;  // viewWillAppear:から開始するため
+			adMobView_.rootViewController = self; //.navigationController;
+			adMobView_.adUnitID = AdMobID_BodyNote;
+			adMobView_.frame = rcAd;
+			// 以上は、GADRequest より先に指定すること。
+			GADRequest *request = [GADRequest request];
+			//[request setTesting:YES];
+			[adMobView_ loadRequest:request];
+			adMobView_.alpha = 0;	// 0=非表示　　1=表示　　　// viewWillAppear:から開始するため、ここでは非表示
+			adMobView_.tag = 0;		// 0=広告なし　　1=あり　　（iAdを優先表示するために必要）
+			//[self.view addSubview:adMobView_];
+			[self.navigationController.view addSubview:adMobView_];
+		}
+		
+		//--------------------------------------------------------------------------------------------------------- iAd
+		// iAd
+		if (iAdBanner_==nil) {
+			iAdBanner_ = [[ADBannerView alloc] init];
+			// iOS 4.2 以上限定　＜＜以前のOSでは落ちる！！！
+			iAdBanner_.requiredContentSizeIdentifiers = [NSSet setWithObjects:ADBannerContentSizeIdentifierPortrait, nil];
+			iAdBanner_.currentContentSizeIdentifier = ADBannerContentSizeIdentifierPortrait;
+			iAdBanner_.frame = rcAd;
+			iAdBanner_.delegate = nil;  // viewWillAppear:から開始するため
+			iAdBanner_.alpha = 0;		// viewWillAppear:から開始するため、ここでは非表示
+			//[self.view addSubview:iAdBanner_];
+			[self.navigationController.view addSubview:iAdBanner_];
+		}
 	}
-	
-	//--------------------------------------------------------------------------------------------------------- iAd
-	// iAd
-	if (iAdBanner_==nil) {
-		iAdBanner_ = [[ADBannerView alloc] init];
-		// iOS 4.2 以上限定　＜＜以前のOSでは落ちる！！！
-		iAdBanner_.requiredContentSizeIdentifiers = [NSSet setWithObjects:ADBannerContentSizeIdentifierPortrait, nil];
-		iAdBanner_.currentContentSizeIdentifier = ADBannerContentSizeIdentifierPortrait;
-		iAdBanner_.frame = rcAd;
-		iAdBanner_.delegate = nil;  // viewWillAppear:から開始するため
-		iAdBanner_.alpha = 0;		// viewWillAppear:から開始するため、ここでは非表示
-		//[self.view addSubview:iAdBanner_];
-		[self.navigationController.view addSubview:iAdBanner_];
-	}
-#endif
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -359,8 +357,7 @@
 		[self setE2recordPrev];
 	}
 	
-#ifdef GD_Ad_ENABLED
-	if (bAddNew_) {	// Editのとき、Ａｄなし
+	if (appDelegate_.gud_bPaid==NO && bAddNew_) {	// Editのとき、Ａｄなし
 		[UIView beginAnimations:nil context:NULL];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
 		[UIView setAnimationDuration:1.2];
@@ -374,7 +371,6 @@
 		iAdBanner_.delegate = self;
 		adMobView_.delegate = self;
 	}
-#endif
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -406,8 +402,8 @@
 
 - (void)viewDidDisappear:(BOOL)animated
 {	// 非表示になった後に呼び出される
-#ifdef	GD_Ad_ENABLED		// TabBar切替では遷移時に消す必要なし。別の NaviView だから。
-	if (bEditDate_==NO) {	// EditDateならば隠さない
+	// TabBar切替では遷移時に消す必要なし。別の NaviView だから。
+	if (appDelegate_.gud_bPaid==NO && bEditDate_==NO) {	// EditDateならば隠さない
 		iAdBanner_.delegate = nil;
 		adMobView_.delegate = nil;
 		[UIView beginAnimations:nil context:NULL];
@@ -417,7 +413,6 @@
 		adMobView_.alpha = 0;
 		[UIView commitAnimations];
 	}
-#endif
     [super viewDidDisappear:animated];
 }
 
@@ -434,22 +429,22 @@
 	//NSLog(@"--- viewDidUnload ---"); 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	
-#ifdef GD_Ad_ENABLED
-	// ARCによりrelease不要になったが、delegateの解放は必須。
-	if (iAdBanner_) {
-		[iAdBanner_ cancelBannerViewAction];	// 停止
-		iAdBanner_.delegate = nil;							// 解放メソッドを呼び出さないように　　　
-		[iAdBanner_ removeFromSuperview];		// UIView解放		retainCount -1
-		//[iAdBanner_ release]
-		iAdBanner_ = nil;	// alloc解放			retainCount -1
+	if (appDelegate_.gud_bPaid==NO) {
+		// ARCによりrelease不要になったが、delegateの解放は必須。
+		if (iAdBanner_) {
+			[iAdBanner_ cancelBannerViewAction];	// 停止
+			iAdBanner_.delegate = nil;							// 解放メソッドを呼び出さないように　　　
+			[iAdBanner_ removeFromSuperview];		// UIView解放		retainCount -1
+			//[iAdBanner_ release]
+			iAdBanner_ = nil;	// alloc解放			retainCount -1
+		}
+		
+		if (adMobView_) {
+			adMobView_.delegate = nil;  //受信STOP  ＜＜これが無いと破棄後に呼び出されて落ちる
+			//[adMobView_ release], 
+			adMobView_ = nil;
+		}
 	}
-	
-	if (adMobView_) {
-		adMobView_.delegate = nil;  //受信STOP  ＜＜これが無いと破棄後に呼び出されて落ちる
-		//[adMobView_ release], 
-		adMobView_ = nil;
-	}
-#endif
 	
 	[super viewDidUnload];
 	// この後に loadView ⇒ viewDidLoad ⇒ viewWillAppear がコールされる
@@ -784,7 +779,6 @@
 }
 
 
-#ifdef GD_Ad_ENABLED
 #pragma mark - iAd <ADBannerViewDelegate>
 
 // iAd取得できたときに呼ばれる　⇒　表示する
@@ -848,7 +842,5 @@
 	adMobView_.alpha = 0;
 	[UIView commitAnimations];
 }
-
-#endif
 
 @end

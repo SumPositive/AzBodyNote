@@ -162,6 +162,21 @@
                                     <action selector="ibBuGoBlog:" destination="xqp-wW-kAu" eventType="touchUpInside" id="e72-N4-nTD"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="hQk-On-l0k" userLabel="Bu ToSupport">
+                                <rect key="frame" x="153" y="211" width="147" height="28"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <state key="normal" title="Remove Ad">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="ibBuPaid:" destination="xqp-wW-kAu" eventType="touchUpInside" id="fLb-t1-28u"/>
+                                </connections>
+                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="ACc-ff-wWb" userLabel="Bu Contact">
                                 <rect key="frame" x="20" y="254" width="280" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -183,6 +198,7 @@
                     <tabBarItem key="tabBarItem" title="Info" image="Icon32-Information.png" id="ETi-AF-qg7"/>
                     <connections>
                         <outlet property="ibBuGoBlog" destination="Z1x-o2-Zf8" id="LZU-nL-xiA"/>
+                        <outlet property="ibBuPaid" destination="hQk-On-l0k" id="s1l-b1-odM"/>
                         <outlet property="ibBuPostMail" destination="ACc-ff-wWb" id="tAb-5h-PQN"/>
                         <outlet property="ibImgIcon" destination="rt9-wX-Hrl" id="7dZ-D7-pnA"/>
                         <outlet property="ibLbNote" destination="gQ3-CY-0EL" id="M5W-ZW-OQ4"/>
@@ -730,13 +746,8 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
             <source key="sourceIdentifier" type="project" relativePath="./Classes/InformationVC.h"/>
             <relationships>
                 <relationship kind="action" name="ibBuGoBlog:" candidateClass="UIButton"/>
+                <relationship kind="action" name="ibBuPaid:" candidateClass="UIButton"/>
                 <relationship kind="action" name="ibBuPostMail:" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="ibBuGoBlog" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="ibBuPostMail" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="ibImgIcon" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="ibLbNote" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbTitle" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbVersion" candidateClass="UILabel"/>
             </relationships>
         </class>
     </classes>

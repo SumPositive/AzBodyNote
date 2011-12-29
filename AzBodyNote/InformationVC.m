@@ -7,13 +7,55 @@
 //
 
 #import "Global.h"
+#import "AzBodyNoteAppDelegate.h"
 #import "InformationVC.h"
 #import "UIDevice-Hardware.h"
 
 #define ALERT_ToSupportSite	19
 #define ALERT_CONTACT			28
+#define ALERT_PAID					37
+
 
 @implementation InformationVC
+{
+	AzBodyNoteAppDelegate		*appDelegate_;
+
+	IBOutlet UILabel			*ibLbTitle;
+	IBOutlet UILabel			*ibLbVersion;
+	IBOutlet UILabel			*ibLbNote;
+	IBOutlet UIImageView	*ibImgIcon;
+	IBOutlet UIButton		*ibBuGoBlog;
+	IBOutlet UIButton		*ibBuPostMail;
+	IBOutlet UIButton		*ibBuPaid;
+	
+	UIAlertView						*alertProgress_;
+	UIActivityIndicatorView	*alertIndicator_;
+}
+
+
+#pragma mark - AlertProgressOn/Off
+
+- (void)alertProgressOn:(NSString*)zTitle
+{
+	if (alertProgress_==nil) {
+		alertProgress_ = [[UIAlertView alloc] initWithTitle:@"" message:@"" delegate:self cancelButtonTitle:nil otherButtonTitles:nil]; // deallocにて解放
+		if (alertIndicator_==nil) {
+			alertIndicator_ = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+			alertIndicator_.frame = CGRectMake(0, 0, 50, 50);
+		}
+		[alertProgress_ addSubview:alertIndicator_];
+	}
+	[alertProgress_ setTitle:zTitle];
+	[alertProgress_ show];
+	[alertIndicator_ setFrame:CGRectMake((alertProgress_.bounds.size.width-50)/2, alertProgress_.frame.size.height-75, 50, 50)];
+	[alertIndicator_ startAnimating];
+}
+
+- (void)alertProgressOff
+{
+	[alertIndicator_ stopAnimating];
+	[alertProgress_ dismissWithClickedButtonIndex:alertProgress_.cancelButtonIndex animated:YES];
+}
 
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -21,6 +63,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
+		appDelegate_ = (AzBodyNoteAppDelegate*)[[UIApplication sharedApplication] delegate];
     }
     return self;
 }
@@ -32,6 +75,90 @@
     
     // Release any cached data, images, etc that aren't in use.
 }
+
+
+#pragma mark - StoreKit
+
+- (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response
+{
+	if (0 < [response.invalidProductIdentifiers count]) {
+		NSLog(@"*** invalidProductIdentifiers: アイテムIDが不正");
+		return;
+	}
+
+	for (SKProduct *product in response.products) 
+	{
+		[ibBuPaid setTitle:product.localizedTitle forState:UIControlStateNormal];
+		ibBuPaid.hidden = NO;
+		break; // 1つだけだから
+	}	
+}
+
+- (void)paymentStart
+{
+	// 購入処理開始
+	[[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+	SKPayment *payment = [SKPayment paymentWithProductIdentifier:STORE_PRODUCTID_UNLOCK];
+	[[SKPaymentQueue defaultQueue] addPayment:payment];
+	// インジケータ開始
+	[self alertProgressOn:NSLocalizedString(@"Paid Progress",nil)];
+}
+
+- (void)paymentCompleate:(SKPaymentTransaction*)tran
+{
+	NSLog(@"paymentCompleate: productIdentifier=%@", tran.payment.productIdentifier);
+	
+	if ([tran.payment.productIdentifier isEqualToString:STORE_PRODUCTID_UNLOCK]) {
+		// Unlock
+		if (appDelegate_.gud_bPaid==NO) {
+			appDelegate_.gud_bPaid = YES;
+			[[NSUserDefaults standardUserDefaults] setBool:YES forKey:GUD_bPaid];
+			[[NSUserDefaults standardUserDefaults] synchronize];
+			// Compleate !
+			[[SKPaymentQueue defaultQueue] finishTransaction:tran]; // 処理完了
+			// インジケータ消す
+			[self alertProgressOff];
+			alertBox(	NSLocalizedString(@"Paid Compleate",nil), nil, @"OK" );
+		}
+	}
+}
+
+- (void)paymentFailed:(SKPaymentTransaction*)tran
+{
+	NSLog(@"paymentFailed: tran=%@", tran);
+	// インジケータ消す
+	[self alertProgressOff];
+	alertBox(	NSLocalizedString(@"Paid Failed",nil), nil, @"OK" );
+}
+
+- (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions
+{	// Observer: 
+	for (SKPaymentTransaction *tran in transactions)
+	{
+		switch (tran.transactionState) {
+			case SKPaymentTransactionStatePurchasing: // 購入中
+				break;
+				
+			case SKPaymentTransactionStateFailed: // 購入失敗
+				[self	paymentFailed:tran];
+				break;
+				
+			case SKPaymentTransactionStatePurchased:	// 購入完了
+				[self paymentCompleate:tran];
+				break;
+				
+			case SKPaymentTransactionStateRestored: // 購入済み
+				[self paymentCompleate:tran];
+				break;
+		}
+	}
+}
+
+- (void)paymentQueue:(SKPaymentQueue *)queue removedTransactions:(NSArray *)transactions 
+{
+	[[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
+}
+
 
 #pragma mark - View lifecycle
 
@@ -63,13 +190,23 @@
 
 	[ibBuGoBlog setTitle:NSLocalizedString(@"InfoGoBlog",nil) forState:UIControlStateNormal];
 	[ibBuPostMail setTitle:NSLocalizedString(@"InfoPostMail",nil) forState:UIControlStateNormal];
+	
+	// PAID 広告＆制限解除
+	ibBuPaid.hidden = YES;
+	if (appDelegate_.gud_bPaid==NO && [SKPaymentQueue canMakePayments])
+	{
+		NSSet *set = [NSSet setWithObjects:STORE_PRODUCTID_UNLOCK, nil];
+		SKProductsRequest *req = [[SKProductsRequest alloc] initWithProductIdentifiers:set];
+		req.delegate = self;
+		[req start];
+	}
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
 	
-	self.view.alpha = 0;
+	self.view.alpha = 0.3;
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -144,6 +281,17 @@
 	//[alert autorelease];
 }
 
+- (IBAction)ibBuPaid:(UIButton *)button
+{
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Paid Unlock",nil)
+													message:NSLocalizedString(@"Paid Unlock msg",nil)
+												   delegate:self		// clickedButtonAtIndexが呼び出される
+										  cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+										  otherButtonTitles:NSLocalizedString(@"PAID",nil), nil];
+	alert.tag = ALERT_PAID;
+	[alert show];
+}
+
 
 #pragma mark - <delegate>
 
@@ -195,6 +343,10 @@
 			[self presentModalViewController:picker animated:YES];
 			//[picker release];
 		}	break;
+
+		case ALERT_PAID:
+			[self	paymentStart];
+			break;
 	}
 }
 
