@@ -20,7 +20,8 @@
 @interface E2editTVC : UITableViewController <UITableViewDelegate, NSFetchedResultsControllerDelegate, EditDateDelegate
 	,ADBannerViewDelegate, GADBannerViewDelegate>
 
-@property (nonatomic, retain) E2record		*moE2edit;		//==nil:AddNew,  !=nil:Edit
+@property (nonatomic, assign) NSInteger	editMode;		//==0:AddNew,  1:Edit,  2:Goal Edit
+@property (nonatomic, retain) E2record		*moE2edit;
 
 // <delegate>
 //- (void)buttonSave:(BOOL)pop;

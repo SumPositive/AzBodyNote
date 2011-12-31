@@ -15,7 +15,7 @@
 
 #define ALERT_TAG_DeleteE2		901
 
-#define LIST_PAGE_LIMIT				100		// 
+#define LIST_PAGE_LIMIT				50		// 1ページ行数
 
 
 @interface E2listTVC ()
@@ -30,6 +30,9 @@
 	NSIndexPath							*indexPathDelete_;
 
 	GADBannerView		*adMobView_;
+	NSUInteger				e2offset_;
+	UILabel					*lbPagePrev_;
+	UILabel					*lbPageNext_;
 }
 @synthesize fetchedResultsController = frc_;
 
@@ -104,15 +107,17 @@
 	self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 	
 	//
-	UILabel *lbPagePrev = [[UILabel alloc] initWithFrame:CGRectMake(0, -35, 320, 30)];
-	lbPagePrev.textAlignment = UITextAlignmentCenter;
-	lbPagePrev.backgroundColor = [UIColor clearColor];
-	if (appDelegate_.gud_bPaid) {
-		lbPagePrev.text = NSLocalizedString(@"PagePrev",nil);
-	} else {
-		lbPagePrev.text = NSLocalizedString(@"PagePrevLimit",nil);
+	if (lbPagePrev_==nil) {
+		lbPagePrev_ = [[UILabel alloc] initWithFrame:CGRectMake(0, -35, 320, 30)];
 	}
-	[self.tableView addSubview:lbPagePrev];
+	lbPagePrev_.textAlignment = UITextAlignmentCenter;
+	lbPagePrev_.backgroundColor = [UIColor clearColor];
+	if (appDelegate_.gud_bPaid) {
+		lbPagePrev_.text = NSLocalizedString(@"PagePrev",nil);
+	} else {
+		lbPagePrev_.text = NSLocalizedString(@"PagePrevLimit",nil);
+	}
+	[self.tableView addSubview:lbPagePrev_];
 
     [self reloadFetchedResults:nil];
 	// observe the app delegate telling us when it's finished asynchronously setting up the persistent store
@@ -125,6 +130,41 @@
 											 selector:@selector(refreshAllViews:) 
 												 name:NFM_REFRESH_ALL_VIEWS 
 											   object:[[UIApplication sharedApplication] delegate]];
+	
+	
+/*** UserDef方式にした。
+	//---------------------------------------------------------------------------------------------------------
+	// didFinishLaunchingWithOptions:では、早すぎるためか落ちるため、ここに実装してた。
+	// E2 目標(The GOAL)固有レコードが無ければ追加する
+	NSArray *arFetch = [mocFunc_ select:@"E2record"
+										limit:0		//=0:無制限  ＜＜ 1にすると結果は0件になるのでダメ
+										offset:0
+										where:[NSPredicate predicateWithFormat: E2_dateTime @" == %@", [MocFunctions dateGoal]]
+										sort:nil];
+	if ([arFetch count] <= 0) { // 無いので追加する
+		E2record *moE2goal = [mocFunc_ insertAutoEntity:@"E2record"];
+		// 固有日付をセット
+		moE2goal.dateTime = [MocFunctions dateGoal];
+		moE2goal.nYearMM = [NSNumber numberWithInteger: E2_nYearMM_GOAL];	// 主に、こちらで比較チェックする
+		NSLog(@"moE2goal.dateTime=%@  .nYearMM=%@", moE2goal.dateTime, moE2goal.nYearMM);
+		// 目標の初期値　⇒ GOALの値がAddNewの初期値になる
+		moE2goal.nBpHi_mmHg = [NSNumber numberWithInteger: E2_nBpHi_INIT];
+		moE2goal.nBpLo_mmHg = [NSNumber numberWithInteger: E2_nBpLo_INIT];
+		moE2goal.nPulse_bpm = [NSNumber numberWithInteger: E2_nPuls_INIT];
+		moE2goal.nWeight_10Kg = [NSNumber numberWithInteger: E2_nWeight_INIT];
+		moE2goal.nTemp_10c = [NSNumber numberWithInteger: E2_nTemp_INIT];
+		// Save & Commit
+		[mocFunc_ commit];
+	}
+	else if (1 < [arFetch count]) { // 2以上あるので削除する
+		for (E2record *e2 in arFetch) {
+			------------??????????????????????
+			[mocFunc_ deleteEntity:e2];
+		}
+		// Save & Commit
+		[mocFunc_ commit];
+	}
+*/
 	
 	//--------------------------------------------------------------------------------------------------------- AdMob
 	if (appDelegate_.gud_bPaid==NO && adMobView_==nil) {
@@ -281,32 +321,32 @@
 // Customize the number of sections in the table view.
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-	return [[self.fetchedResultsController sections] count] + 1;	//+1:Function
+	return [[self.fetchedResultsController sections] count] + 1;	//+1:GOAL
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-	if (section < [[self.fetchedResultsController sections] count]) {
+	if (section < [[self.fetchedResultsController sections] count]) 
+	{ // 明細セクション
 		id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:section];
 		return [sectionInfo numberOfObjects];
 	}
-	NSInteger iRows = 1;	// Dropbox
+	// GOALセクション
+	NSInteger iRows = 2;	// GOAL & Dropbox
 	if (appDelegate_.gud_bPaid==NO) {
-		iRows += 2; // AdMob, PageNext
+		iRows += 2; // AdMob & Limit Message
 	}
 	return  iRows;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {	// セクション ヘッダ
-	if (section < [[self.fetchedResultsController sections] count]) {
+	if (section < [[self.fetchedResultsController sections] count])
+	{ // 明細セクション
 		NSInteger iYearMM = [[[[self.fetchedResultsController sections] objectAtIndex:section] name] integerValue];
 		NSInteger iYear = iYearMM / 100;
 		
-		if (iYearMM == E2_nYearMM_GOAL) {
-			return NSLocalizedString(@"Latest",nil);
-		}
-		else if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) 
+		if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) 
 		{ // 「書式」で変わる。　「言語」でない
 			return [NSString stringWithFormat:@"%d年 %d月", iYear, iYearMM - (iYear * 100)]; 
 		}
@@ -314,7 +354,8 @@
 			return [NSString stringWithFormat:@"%d / %d", iYearMM - (iYear * 100), iYear]; 
 		}
 	}
-	return @"";
+	// GOALセクション
+	return NSLocalizedString(@"Latest",nil);
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -322,14 +363,14 @@
 	if (indexPath.section < [[self.fetchedResultsController sections] count]) {
 		return 44; // Default
 	}
-    return 50; // END LINE - AdMob
+    return 50; // GOALセクション
 }
 
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	if (indexPath.section < [[self.fetchedResultsController sections] count]) 
-	{
+	{ // 明細セクション
 		static NSString *Cid = @"E2listCell";  //== Class名
 		E2listCell *cell = (E2listCell*)[tableView dequeueReusableCellWithIdentifier:Cid];
 		if (cell == nil) {
@@ -340,12 +381,23 @@
 		[self configureCell:cell atIndexPath:indexPath];
 		return cell;
 	}
-	else {
+	else { // GOALセクション
 		int iRow = indexPath.row;
+		if (iRow==0) {
+			static NSString *Cid = @"E2listCell";  //== Class名
+			E2listCell *cell = (E2listCell*)[tableView dequeueReusableCellWithIdentifier:Cid];
+			if (cell == nil) {
+				UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
+				[nib instantiateWithOwner:self options:nil];
+			}
+			// Configure the cell.
+			[self configureCell:cell atIndexPath:nil]; // GOAL!
+			return cell;
+		}
 		if (appDelegate_.gud_bPaid) {
-			iRow++;
+			iRow++; // AdMob行をパスするため
 		} else {
-			if (iRow==0) {
+			if (iRow==1) {
 				static NSString *Cid = @"E2listAdMob";
 				UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
 				if (cell == nil) {
@@ -360,7 +412,7 @@
 			}
 		}
 		
-		if (iRow==1)
+		if (iRow==2)
 		{	// Dropbox  "esuslogo101409"
 			static NSString *Cid = @"E2listDropbox"; // .storyboard定義名
 			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
@@ -369,8 +421,8 @@
 				[nib instantiateWithOwner:self options:nil];
 			}
 			return cell;
-		} 
-		else if (iRow==2 && appDelegate_.gud_bPaid==NO)
+		}
+		else if (iRow==3 && appDelegate_.gud_bPaid==NO)
 		{	// Page Next
 			static NSString *Cid = @"E2listBasic";
 			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
@@ -390,9 +442,11 @@
 - (void)configureCell:(E2listCell *)cell atIndexPath:(NSIndexPath *)indexPath
 {
 	//NSLog(@"configureCell: indexPath=%@", indexPath);
-	E2record *e2 = [self.fetchedResultsController objectAtIndexPath:indexPath];
-	//NSLog(@"configureCell: indexPath=%@  moE2node=%@", indexPath, e2);
-	cell.moE2node = e2;
+	if (indexPath) {
+		cell.moE2node = (E2record*)[self.fetchedResultsController objectAtIndexPath:indexPath];
+	} else {
+		cell.moE2node = nil; // GOAL!
+	}
 	[cell draw]; // moE2node を描画する
 }
 
@@ -408,7 +462,8 @@
 }
 */
 
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
+						forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {	// Delete the managed object for the given index path
@@ -443,12 +498,15 @@
 		// Assume self.view is the table view
 		NSIndexPath *path = [self.tableView indexPathForSelectedRow];//選択中のセル位置
 		//NSLog(@"prepareForSegue: path=%@", path);
-		E2record *e2 = [self.fetchedResultsController objectAtIndexPath:path];
-		//NSLog(@"prepareForSegue: e2=%@", e2);
-		
 		E2editTVC *editVc = [segue destinationViewController];
-		editVc.moE2edit = e2;  //[self.fetchedResultsController objectAtIndexPath:mIndexPathEdit];
-		//bEditReturn_ = YES;
+		if (path.section < [[self.fetchedResultsController sections] count]) 
+		{ // 明細セクション
+			editVc.editMode = 1;		//Edit
+			editVc.moE2edit = (E2record *)[self.fetchedResultsController objectAtIndexPath:path];
+		} else {
+			editVc.editMode = 2;		//GOAL Edit
+			editVc.moE2edit = nil;	//GOAL
+		}
 	}
 }
 
@@ -463,9 +521,9 @@
 		indexPathEdit_ = nil; // Editモード解除
 		int iRow = indexPath.row;
 		if (appDelegate_.gud_bPaid) {
-			iRow++;
+			iRow++; // AdMob行をパスするため
 		}
-		if (iRow==1) {	// Dropbox
+		if (iRow==2) {	// Dropbox
 			AzBodyNoteAppDelegate *appDelegate = (AzBodyNoteAppDelegate*)[[UIApplication sharedApplication] delegate];
 			[appDelegate dropboxView];
 		}
@@ -497,17 +555,19 @@
     [fetchRequest setEntity:entity];
     
     // Set the batch size to a suitable number.
-	//[fetchRequest setFetchBatchSize:20];
+	[fetchRequest setFetchBatchSize:20];
+	
+	// ページ先頭行
+	//NSLog(@"fetchedResultsController: e2offset_=%ld", (long)e2offset_);
+	//[fetchRequest setFetchOffset: e2offset_];
 	
 	// 1ページ行数
-	[fetchRequest setFetchLimit:LIST_PAGE_LIMIT];
 	if (appDelegate_.gud_bPaid) {
-		// 有料版は、ページ変えできるようにする
+		[fetchRequest setFetchLimit: 0]; // 無制限
 	} else {
-		// 最新の LIST_PAGE_LIMIT 件のみ表示
-		[fetchRequest setFetchOffset:0];
+		[fetchRequest setFetchLimit: LIST_PAGE_LIMIT];
 	}
-	
+
 	// where
 	[fetchRequest setPredicate:[NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"]]; // 未保存を除外する
     
@@ -609,6 +669,40 @@
     [self.tableView reloadData];
 }
  */
+
+
+#pragma mark - <UIScrollViewDelegate> Methods
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{	// スクロール中に呼ばれる
+	//NSLog(@"scrollViewDidScroll: .contentOffset.y=%f", scrollView.contentOffset.y);
+	if (appDelegate_.gud_bPaid) {
+		if (scrollView.contentOffset.y < -50) {
+			// 前ページへ予告表示
+			if (lbPagePrev_.tag != 1) {
+				lbPagePrev_.tag = 1;
+				lbPagePrev_.text = NSLocalizedString(@"PagePrevGo",nil);
+			}
+		} else {
+			if (lbPagePrev_.tag != 0) {
+				lbPagePrev_.tag = 0;
+				lbPagePrev_.text = NSLocalizedString(@"PagePrev",nil);
+			}
+		}
+	}
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{	// スクロール終了時（指を離した時）に呼ばれる
+	//NSLog(@"scrollViewDidEndDragging: .contentOffset.y=%f  decelerate=%d", scrollView.contentOffset.y, decelerate);
+	if (appDelegate_.gud_bPaid) {
+		if (scrollView.contentOffset.y < -50) {
+			// 前ページへ
+			//e2offset_ += LIST_PAGE_LIMIT;
+			//[self.tableView reloadData];
+		}
+	}
+}
 
 
 #pragma mark - AdMob <GADBannerViewDelegate>

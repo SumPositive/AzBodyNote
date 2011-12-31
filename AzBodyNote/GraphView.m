@@ -214,16 +214,38 @@
 	}
 	//NSLog(@"aE2records_=%@", aE2records_);
 	
+	//--------------------------------------------------------------------------------------- iCloud KVS GOAL!
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	NSInteger iGoalBpHi		= [[kvs objectForKey:Goal_nBpHi_mmHg] integerValue];
+	NSInteger iGoalBpLo		= [[kvs objectForKey:Goal_nBpLo_mmHg] integerValue];
+	NSInteger iGoalPuls			= [[kvs objectForKey:Goal_nPulse_bpm] integerValue];
+	NSInteger iGoalWeight	= [[kvs objectForKey:Goal_nWeight_10Kg] integerValue];
+	NSInteger iGoalTemp		= [[kvs objectForKey:Goal_nTemp_10c] integerValue];
+	
 	// Min, Max
-	NSInteger iMaxBp = 0;
-	NSInteger iMinBp = 999;
-	NSInteger iMaxPuls = 0;
-	NSInteger iMinPuls = 999;
-	NSInteger iMaxWeight = 0;
-	NSInteger iMinWeight = 9999;
-	NSInteger iMaxTemp = 0;
-	NSInteger iMinTemp = 999;
+	NSInteger iMaxBp			= iGoalBpHi;
+	NSInteger iMinBp				= iGoalBpLo;
+	NSInteger iMaxPuls			= iGoalPuls;
+	NSInteger iMinPuls			= iGoalPuls;
+	NSInteger iMaxWeight	= iGoalWeight;
+	NSInteger iMinWeight		= iGoalWeight;
+	NSInteger iMaxTemp		= iGoalTemp;
+	NSInteger iMinTemp		= iGoalTemp;
 	NSInteger ii;
+	
+/*	if (iMaxBp < iGoalBpHi) iMaxBp = iGoalBpHi;
+	if (iGoalBpLo < iMinBp) iMinBp = iGoalBpLo;
+
+	if (iMaxPuls < iGoalPuls) iMaxPuls = iGoalPuls;
+	if (iGoalPuls < iMinPuls) iMinPuls = iGoalPuls;
+
+	if (iMaxWeight < iGoalWeight) iMaxWeight = iGoalWeight;
+	if (iGoalWeight < iMinWeight) iMinWeight = iGoalWeight;
+	
+	if (iMaxTemp < iGoalTemp) iMaxTemp = iGoalTemp;
+	if (iGoalTemp < iMinTemp) iMinTemp = iGoalTemp;
+	*/
+	
 	for (E2record *e2 in aE2records_)
 	{	// 最新日から過去へ遡る
 		if (e2.nBpHi_mmHg) {
@@ -283,21 +305,20 @@
 	unsigned unitFlags = NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit;
 	po.x = fXgoal;
 	po.y = rcDate.origin.y + GRAPH_H_GAP;
-	arrayNo = 0;
+	pointsArray[0] = po;	// The GOAL
+	valuesArray[0] = 0;	// The GOAL
+	po.x -= RECORD_WIDTH;
+	arrayNo = 1;
 	for (E2record *e2 in aE2records_) {
+		if (po.x <= 0) break;
 		if (e2.dateTime) {
 			pointsArray[ arrayNo ] = po;
-			if ([e2.nYearMM integerValue]==E2_nYearMM_GOAL) {
-				valuesArray[ arrayNo ] = 0; // The GOAL
-			} else {
-				NSDateComponents *comp = [calendar components:unitFlags fromDate:e2.dateTime];
-				valuesArray[ arrayNo ] = comp.month * 1000000 + comp.day * 10000 + comp.hour * 100 + comp.minute;
-			}
+			NSDateComponents *comp = [calendar components:unitFlags fromDate:e2.dateTime];
+			valuesArray[ arrayNo ] = comp.month * 1000000 + comp.day * 10000 + comp.hour * 100 + comp.minute;
 			//NSLog(@"valuesArray[ %d ]=%ld", arrayNo, valuesArray[ arrayNo ]);
 			arrayNo++;
 		}
 		po.x -= RECORD_WIDTH;
-		if (po.x <= 0) break;
 	}
 	[self graphDrawDate:cgc count:arrayNo points:pointsArray values:valuesArray];	
 	
@@ -308,8 +329,13 @@
 	}
 	fYstep = (rcBp.size.height - GRAPH_H_GAP*2) / (iMaxBp - iMinBp);  // 1あたりのポイント数
 	po.x = fXgoal;
-	arrayNo = 0;
+	po.y = rcBp.origin.y + GRAPH_H_GAP + fYstep * (CGFloat)(iGoalBpHi - iMinBp);
+	pointsArray[0] = po;	// The GOAL
+	valuesArray[0] = iGoalBpHi;	// The GOAL
+	po.x -= RECORD_WIDTH;
+	arrayNo = 1;
 	for (E2record *e2 in aE2records_) {
+		if (po.x <= 0) break;
 		if (e2.nBpHi_mmHg) {
 			ii = [e2.nBpHi_mmHg integerValue];
 			if (E2_nBpHi_MIN<=ii && ii<=E2_nBpHi_MAX) {
@@ -320,14 +346,18 @@
 			}
 		}
 		po.x -= RECORD_WIDTH;
-		if (po.x <= 0) break;
 	}
 	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueType:0  pointLower:rcBp.origin.y];
 	
 	//-------------------------------------------------------------------------------------- BpLo グラフ描画
 	po.x = fXgoal;
-	arrayNo = 0;
+	po.y = rcBp.origin.y + GRAPH_H_GAP + fYstep * (CGFloat)(iGoalBpLo - iMinBp);
+	pointsArray[0] = po;	// The GOAL
+	valuesArray[0] = iGoalBpLo;	// The GOAL
+	po.x -= RECORD_WIDTH;
+	arrayNo = 1;
 	for (E2record *e2 in aE2records_) {
+		if (po.x <= 0) break;
 		if (e2.nBpLo_mmHg) {
 			ii = [e2.nBpLo_mmHg integerValue];
 			if (E2_nBpLo_MIN<=ii && ii<=E2_nBpLo_MAX) {
@@ -338,7 +368,6 @@
 			}
 		}
 		po.x -= RECORD_WIDTH;
-		if (po.x <= 0) break;
 	}
 	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueType:0  pointLower:rcBp.origin.y];
 	
@@ -349,8 +378,13 @@
 	}
 	fYstep = (rcPuls.size.height - GRAPH_H_GAP*2) / (iMaxPuls - iMinPuls);  // 1あたりのポイント数
 	po.x = fXgoal;
-	arrayNo = 0;
+	po.y = rcPuls.origin.y + GRAPH_H_GAP + fYstep * (CGFloat)(iGoalPuls - iMinPuls);
+	pointsArray[0] = po;	// The GOAL
+	valuesArray[0] = iGoalPuls;	// The GOAL
+	po.x -= RECORD_WIDTH;
+	arrayNo = 1;
 	for (E2record *e2 in aE2records_) {
+		if (po.x <= 0) break;
 		if (e2.nPulse_bpm) {
 			ii = [e2.nPulse_bpm integerValue];
 			if (E2_nPuls_MIN<=ii && ii<=E2_nPuls_MAX) {
@@ -361,7 +395,6 @@
 			}
 		}
 		po.x -= RECORD_WIDTH;
-		if (po.x <= 0) break;
 	}
 	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueType:0  pointLower:rcPuls.origin.y];
 
@@ -372,8 +405,13 @@
 	}
 	fYstep = (rcWeight.size.height - GRAPH_H_GAP*2) / (iMaxWeight - iMinWeight);  // 1あたりのポイント数
 	po.x = fXgoal;
-	arrayNo = 0;
+	po.y = rcWeight.origin.y + GRAPH_H_GAP + fYstep * (CGFloat)(iGoalWeight - iMinWeight);
+	pointsArray[0] = po;	// The GOAL
+	valuesArray[0] = iGoalWeight;	// The GOAL
+	po.x -= RECORD_WIDTH;
+	arrayNo = 1;
 	for (E2record *e2 in aE2records_) {
+		if (po.x <= 0) break;
 		if (e2.nWeight_10Kg) {
 			ii = [e2.nWeight_10Kg integerValue];
 			if (E2_nWeight_MIN<=ii && ii<=E2_nWeight_MAX) {
@@ -384,7 +422,6 @@
 			}
 		}
 		po.x -= RECORD_WIDTH;
-		if (po.x <= 0) break;
 	}
 	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueType:1  pointLower:rcWeight.origin.y];
 
@@ -395,8 +432,13 @@
 	}
 	fYstep = (rcTemp.size.height - GRAPH_H_GAP*2) / (iMaxTemp - iMinTemp);  // 1あたりのポイント数
 	po.x = fXgoal;
-	arrayNo = 0;
+	po.y = rcTemp.origin.y + GRAPH_H_GAP + fYstep * (CGFloat)(iGoalTemp - iMinTemp);
+	pointsArray[0] = po;	// The GOAL
+	valuesArray[0] = iGoalTemp;	// The GOAL
+	po.x -= RECORD_WIDTH;
+	arrayNo = 1;
 	for (E2record *e2 in aE2records_) {
+		if (po.x <= 0) break;
 		if (e2.nTemp_10c) {
 			ii = [e2.nTemp_10c integerValue];
 			if (E2_nTemp_MIN<=ii && ii<=E2_nTemp_MAX) {
@@ -407,7 +449,6 @@
 			}
 		}
 		po.x -= RECORD_WIDTH;
-		if (po.x <= 0) break;
 	}
 	[self graphDrawOne:cgc count:arrayNo  points:pointsArray  values:valuesArray  valueType:1  pointLower:rcTemp.origin.y];
 

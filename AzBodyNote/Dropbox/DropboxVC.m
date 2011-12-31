@@ -26,7 +26,7 @@
 {
 	[mAlert setTitle:zTitle];
 	[mAlert show];
-	[mActivityIndicator setFrame:CGRectMake((mAlert.bounds.size.width-50)/2, mAlert.frame.size.height-75, 50, 50)];
+	[mActivityIndicator setFrame:CGRectMake((mAlert.frame.size.width-50)/2, mAlert.frame.size.height-75, 50, 50)];
 	[mActivityIndicator startAnimating];
 }
 

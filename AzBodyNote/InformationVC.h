@@ -12,8 +12,8 @@
 #import <StoreKit/StoreKit.h>
 
 
-@interface InformationVC : UIViewController <MFMailComposeViewControllerDelegate, UIAlertViewDelegate, 
-																			SKProductsRequestDelegate, SKPaymentTransactionObserver>
+@interface InformationVC : UIViewController <MFMailComposeViewControllerDelegate, UIAlertViewDelegate,
+														SKProductsRequestDelegate>	// <SKPaymentTransactionObserver>は、AzBodyNoteAppDelegateに実装
 
 - (IBAction)ibBuGoBlog:(UIButton *)button;
 - (IBAction)ibBuPostMail:(UIButton *)button;

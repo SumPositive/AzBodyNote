@@ -13,6 +13,9 @@
 #import "E2listTVC.h"
 #import "DropboxVC.h"
 
+#ifdef DEBUG
+#import <stdlib.h>
+#endif
 
 //@interface AzBodyNoteAppDelegate (PrivateMethods)
 //- (NSManagedObjectContext *)managedObjectContext;
@@ -24,6 +27,9 @@
 	NSManagedObjectModel				*moModel_;
 	NSPersistentStoreCoordinator		*persistentStoreCoordinator_;
 	NSManagedObjectContext				*managedObjectContext_;
+
+	UIAlertView						*alertProgress_;
+	UIActivityIndicatorView	*alertIndicator_;
 }
 
 @synthesize window = window_;
@@ -31,6 +37,7 @@
 @synthesize mocBase;
 @synthesize tabBarController = _tabBarController;
 @synthesize gud_bPaid = gud_bPaid_;
+//@synthesize azStore = azStore_;
 
 /*
 - (void)saveContext
@@ -48,32 +55,28 @@
 }
 */
 
-#pragma mark - StoreKit - In App Purchese
+#pragma mark - alertProgressOn/Off
 
-- (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions
-{	// Observer: 
-	for (SKPaymentTransaction *tran in transactions)
-	{
-		switch (tran.transactionState) {
-			case SKPaymentTransactionStateRestored: // 購入済み ＜＜アプリ再インストールしたときのため
-				NSLog(@"SKPaymentTransactionStateRestored: productIdentifier=%@", tran.payment.productIdentifier);
-				if ([tran.payment.productIdentifier isEqualToString:STORE_PRODUCTID_UNLOCK]) {
-					// Unlock
-					if (gud_bPaid_==NO) {
-						gud_bPaid_ = YES;
-						[[NSUserDefaults standardUserDefaults] setBool:YES forKey:GUD_bPaid];
-						[[NSUserDefaults standardUserDefaults] synchronize];
-						[[SKPaymentQueue defaultQueue] finishTransaction:tran]; // 処理完了
-					}
-				}
-				break;
-		}
-	}
+- (void)alertProgressOff
+{
+	[alertIndicator_ stopAnimating];
+	[alertProgress_ dismissWithClickedButtonIndex:alertProgress_.cancelButtonIndex animated:YES];
 }
 
-- (void)paymentQueue:(SKPaymentQueue *)queue removedTransactions:(NSArray *)transactions 
+- (void)alertProgressOn:(NSString*)zTitle
 {
-	[[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
+	[alertProgress_ setTitle:zTitle];
+	[alertProgress_ show];
+
+	/*
+	NSLog(@"*** frame  x=%f  y=%f  width=%f  height=%f", alertProgress_.frame.origin.x, alertProgress_.frame.origin.y,
+		  alertProgress_.frame.size.width, alertProgress_.frame.size.height);
+	NSLog(@"*** bounds  x=%f  y=%f  width=%f  height=%f", alertProgress_.bounds.origin.x, alertProgress_.bounds.origin.y,
+		  alertProgress_.bounds.size.width, alertProgress_.bounds.size.height);
+	 */
+	// タイトルが変わるとサイズが変わり、インジケータの位置が変わるため、毎回以下の処理する必要あり
+	[alertIndicator_ setFrame:CGRectMake((alertProgress_.frame.size.width-50)/2, alertProgress_.frame.size.height-70, 50, 50)];
+	[alertIndicator_ startAnimating];
 }
 
 
@@ -97,27 +100,49 @@
 							 nil];
 	[userDefaults registerDefaults:dicDef];	// 未定義のKeyのみ更新される
 	[userDefaults synchronize]; // plistへ書き出す
-	//[dicDef release];
 
 	// 画面表示に関係する Option Setting を取得する
+#ifdef DEBUG
+	gud_bPaid_ = YES;
+#else
 	gud_bPaid_ = [userDefaults boolForKey:GUD_bPaid];
-	if (gud_bPaid_==NO) {
-		[[SKPaymentQueue defaultQueue] addTransactionObserver:self];
-		[[SKPaymentQueue defaultQueue] restoreCompletedTransactions]; //非消費型：購入情報の再読み込み--> updatedTransactions:
-	}
-	
-	
-/*	UIActivityIndicatorView *aiv = [[UIActivityIndicatorView alloc]
-									initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-	aiv.frame = CGRectMake(0,0, 50, 50);
-	aiv.center = self.window.center;
-	[self.window addSubview:aiv];
-	[aiv startAnimating];
- */
+#endif
 	
 	// Moc初期化
 	mocBase = [[MocFunctions alloc] initWithMoc:[self managedObjectContext]]; //iCloud同期に使用される
 	// TabBar画面毎にMOCを生成して個別にrollbackしたかったが、MOC間の変更反映が面倒だったので単一に戻した。
+	
+#ifdef DEBUGxxx
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+		// 全データを削除する
+		//[mocBase deleteAllCoreData];
+		// テストデータを追加する
+		// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
+		NSDate *dt = [NSDate date];
+		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+		for (int i=0; i<200; i++) {
+			E2record *e2 = [mocBase insertAutoEntity:@"E2record"];
+
+			e2.dateTime = dt;
+			NSDateComponents* comp = [calendar components: NSYearCalendarUnit | NSMonthCalendarUnit fromDate:dt];
+			e2.nYearMM = [NSNumber numberWithInteger:([comp year] * 100 + [comp month])];
+			dt = [dt initWithTimeInterval:-1*24*60*60 sinceDate:dt]; // 1日前
+			
+			e2.sNote1 = [NSString stringWithFormat:@"(%d)", i];
+			e2.sNote2 = nil;
+			e2.nBpHi_mmHg =		[NSNumber numberWithInteger:120 - 10 + (rand() % 21)];
+			e2.nBpLo_mmHg =	[NSNumber numberWithInteger:  80 - 10 + (rand() % 21)];
+			e2.nPulse_bpm =		[NSNumber numberWithInteger:  65 - 10 + (rand() % 21)];
+			e2.nWeight_10Kg =	[NSNumber numberWithInteger:650 - 50 + (rand() % 101)];
+			e2.nTemp_10c =		[NSNumber numberWithInteger:365 -   5 + (rand() % 11)];
+		}
+		// Save & Commit
+		[mocBase commit];
+		
+		NSLog(@"Test data added!");
+		[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFETCH_ALL_DATA object:self userInfo:nil];
+	});
+#endif
 	
 	// Dropbox
 	DBSession* dbSession = [[DBSession alloc]
@@ -126,8 +151,41 @@
 							 root:kDBRootAppFolder]; // either kDBRootAppFolder or kDBRootDropbox
 	[DBSession setSharedSession:dbSession];
 
+	// alertIndicatorOn/Off: のための準備
+	alertProgress_ = [[UIAlertView alloc] initWithTitle:@"" message:@"" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil];
+	alertIndicator_ = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+	//alertIndicator_.frame = CGRectMake(0, 0, 50, 50);
+	//[alertIndicator_ setFrame:CGRectMake((alertProgress_.frame.size.width-50)/2, alertProgress_.frame.size.height-70, 50, 50)];
+	[alertProgress_ addSubview:alertIndicator_];
+
+/*	// iCloud KVS 変更通知を icloud_KvsNotification: で受け取る
+	[[NSNotificationCenter defaultCenter] addObserver:self
+													selector:@selector(icloud_KvsNotification:) 
+													name:NSUbiquitousKeyValueStoreDidChangeExternallyNotification 
+													object:nil]; */
+	//  iCloud KVS 
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	if ([[kvs objectForKey:Goal_nBpHi_mmHg] length] <= 0) {
+		// 初期データ追加
+		[kvs setObject:@"" forKey:Goal_sNote1];
+		[kvs setObject:@"" forKey:Goal_sNote2];
+		[kvs setObject:[NSNumber numberWithInt:120] forKey:Goal_nBpHi_mmHg];
+		[kvs setObject:[NSNumber numberWithInt:  80] forKey:Goal_nBpLo_mmHg];
+		[kvs setObject:[NSNumber numberWithInt:  65] forKey:Goal_nPulse_bpm];
+		[kvs setObject:[NSNumber numberWithInt:365] forKey:Goal_nTemp_10c];
+		[kvs setObject:[NSNumber numberWithInt:650] forKey:Goal_nWeight_10Kg];
+		[kvs synchronize];
+	}
+	
     return YES;
 }
+/*
+- (void)icloud_KvsNotification:(NSNotification*)notification
+{
+	NSDictionary *dic = [notification userInfo];
+	NSLog(@"iCloud KVS userInfo=%@", [dic description]);
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+}*/
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url 
 {	// Free と Stable が共存している場合、Free から戻ったとき Stableが呼ばれる。
@@ -165,17 +223,12 @@
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
-	/*
-	 Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
-	 If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-	 */
+	[[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
-	/*
-	 Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
-	 */
+	[[SKPaymentQueue defaultQueue] addTransactionObserver:self];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
@@ -187,8 +240,8 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
-	// Saves changes in the application's managed object context before the application terminates.
-	//[self saveContext];
+	// iCloud KVS 変更通知の待ち受け解放
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)dealloc
@@ -539,5 +592,96 @@
 - (NSString *)applicationDocumentsDirectory {
 	return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
 }
+
+
+#pragma mark - <SKPaymentTransactionObserver>
+- (BOOL)purchasedCompleate:(SKPaymentTransaction*)tran
+{
+	// インジケータ消す
+	[self alertProgressOff];
+	if ([tran.payment.productIdentifier isEqualToString:STORE_PRODUCTID_UNLOCK]) {
+		// Unlock
+		gud_bPaid_ = YES;
+		[[NSUserDefaults standardUserDefaults] setBool:YES forKey:GUD_bPaid];
+		[[NSUserDefaults standardUserDefaults] synchronize];
+		// Compleate !
+		[[SKPaymentQueue defaultQueue] finishTransaction:tran]; // 処理完了
+		// 全画面リフレッシュ通知
+		NSNotification* refreshNotification = [NSNotification notificationWithName:NFM_REFRESH_ALL_VIEWS
+																			object:self  userInfo:nil];
+		[[NSNotificationCenter defaultCenter] postNotification:refreshNotification];
+
+		return YES;
+	}
+	alertBox(	NSLocalizedString(@"SK Failed",nil), NSLocalizedString(@"SK Failed msg",nil), @"OK" );
+	return NO;
+}
+
+- (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions
+{	// Observer: 
+	for (SKPaymentTransaction *tran in transactions)
+	{
+		switch (tran.transactionState) {
+			case SKPaymentTransactionStatePurchasing: // 購入中
+				NSLog(@"SKPaymentTransactionStatePurchasing: tran=%@", tran);
+				// インジケータ開始
+				[self	alertProgressOn: NSLocalizedString(@"SK Progress",nil)];
+				break;
+				
+			case SKPaymentTransactionStateFailed: // 購入失敗
+			{
+				NSLog(@"SKPaymentTransactionStateFailed: tran=%@", tran);
+				[[SKPaymentQueue defaultQueue] finishTransaction:tran]; // 処理完了
+				// インジケータ消す
+				[self alertProgressOff];
+				
+				if (tran.error.code == SKErrorUnknown) {
+					// クレジットカード情報入力画面に移り、購入処理が強制的に終了したとき
+					//alertBox(	NSLocalizedString(@"SK Cancel",nil), [tran.error localizedDescription], @"OK" );
+					// 途中で止まった処理を再開する Consumable アイテムにも有効
+					[[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
+				} else {
+					alertBox(	NSLocalizedString(@"SK Failed",nil), nil, @"OK" );
+				}
+			} break;
+				
+			case SKPaymentTransactionStatePurchased:	// 購入完了
+			{
+				NSLog(@"SKPaymentTransactionStatePurchased: tran=%@", tran);
+				if ([self purchasedCompleate:tran]) {
+					alertBox(	NSLocalizedString(@"SK Compleate",nil), NSLocalizedString(@"SK Compleate msg",nil), @"OK" );
+				}
+			} break;
+				
+			case SKPaymentTransactionStateRestored:		// 購入済み
+			{
+				NSLog(@"SKPaymentTransactionStateRestored: tran=%@", tran);
+				if ([self purchasedCompleate:tran]) {
+					alertBox(	NSLocalizedString(@"SK Restored",nil), NSLocalizedString(@"SK Restored msg",nil), @"OK" );
+				}
+			} break;
+
+			default:
+				NSLog(@"SKPaymentTransactionState: default: tran=%@", tran);
+				break;
+		}
+	}
+}
+
+- (void)paymentQueue:(SKPaymentQueue *)queue removedTransactions:(NSArray *)transactions 
+{
+	[[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
+}
+
+- (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError *)error
+{	// リストアの失敗
+	NSLog(@"paymentQueue: restoreCompletedTransactionsFailedWithError: ");
+}
+
+- (void)paymentQueueRestoreCompletedTransactionsFinished:(SKPaymentQueue *)queue 
+{	// 全てのリストア処理が終了
+	NSLog(@"paymentQueueRestoreCompletedTransactionsFinished: ");
+}
+
 
 @end

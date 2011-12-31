@@ -57,6 +57,15 @@
 #define E2_sNote2						@"sNote2"
 //#define E2_e1body					@"e1body"
 
+#define Goal_nBpHi_mmHg			@"Goal_nBpHi_mmHg"		// iCloud-KVS Key
+#define Goal_nBpLo_mmHg			@"Goal_nBpLo_mmHg"
+#define Goal_nPulse_bpm				@"Goal_nPulse_bpm"
+#define Goal_nTemp_10c				@"Goal_nTemp_10c"
+#define Goal_nWeight_10Kg			@"Goal_nWeight_10Kg"
+#define Goal_sEquipment				@"Goal_sEquipment"
+#define Goal_sNote1						@"Goal_sNote1"
+#define Goal_sNote2						@"Goal_sNote2"
+
 #define E2_dateTime_GOAL		@"2200-01-01T00:00:00 +0000"  // 目標値を記録したE2固有レコード（最大日付+1日）
 #define E2_nYearMM_GOAL			 220001		// 比較レスポンス向上のために利用する
 #define E2_dateTime_MAX		@"2090-12-31T23:59:59 +0000"  // 最大入力許可日付

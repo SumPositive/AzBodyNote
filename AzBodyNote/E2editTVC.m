@@ -21,7 +21,7 @@
 	AzBodyNoteAppDelegate		*appDelegate_;
 	MocFunctions				*mocFunc_;
 	
-	BOOL			bAddNew_;
+	//BOOL			bAddNew_;  >>>>>>>>>  editMode_==0
 	BOOL			bEditDate_;
 	float				fADBannerY_;	//iAd表示位置のY座標
 	
@@ -31,10 +31,12 @@
 	NSInteger	iPrevWeight_;
 	NSInteger	iPrevTemp_;
 	UIButton		*buDelete_;		// Edit時のみ使用
+	NSUbiquitousKeyValueStore *kvsGoal_;
 
 	ADBannerView		*iAdBanner_;
 	GADBannerView		*adMobView_;
 }
+@synthesize editMode = editMode_;
 @synthesize moE2edit = moE2edit_;
 
 
@@ -117,8 +119,9 @@
 
 - (void)actionClear
 {
-	assert(bAddNew_);
+	assert(editMode_==0);
 	assert(moE2edit_);
+	assert(kvsGoal_==nil);
 
 	moE2edit_.dateTime = [NSDate date];
 	moE2edit_.sNote1 = nil;
@@ -136,40 +139,60 @@
 
 - (void)actionSave
 {
-	assert(moE2edit_.dateTime);
-	// データ整合処理
-	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
-	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-	NSDateComponents* comp = [calendar components:NSYearCalendarUnit | NSMonthCalendarUnit
-										 fromDate:moE2edit_.dateTime];
-	moE2edit_.nYearMM = [NSNumber numberWithInteger:([comp year] * 100 + [comp month])];
-
-	// Save & Commit
-	[mocFunc_ commit];
-	
-	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
-
-	if (bAddNew_) {
-		moE2edit_ = nil;	// viewWillAppear:にて新規生成される
-		// List画面に切り替えて、追加行を一時ハイライトする
-		self.navigationController.tabBarController.selectedIndex = 1; // List画面へ
-	} 
-	else { // Edit mode
-		// moE2edit_ ＜＜　Edit mode だから = nil ダメ！
+	if (kvsGoal_) {
+		[kvsGoal_ setObject:moE2edit_.sNote1				forKey:Goal_sNote1];
+		[kvsGoal_ setObject:moE2edit_.sNote2				forKey:Goal_sNote2];
+		[kvsGoal_ setObject:moE2edit_.nBpHi_mmHg	forKey:Goal_nBpHi_mmHg];
+		[kvsGoal_ setObject:moE2edit_.nBpLo_mmHg	forKey:Goal_nBpLo_mmHg];
+		[kvsGoal_ setObject:moE2edit_.nPulse_bpm		forKey:Goal_nPulse_bpm];
+		[kvsGoal_ setObject:moE2edit_.nTemp_10c		forKey:Goal_nTemp_10c];
+		[kvsGoal_ setObject:moE2edit_.nWeight_10Kg	forKey:Goal_nWeight_10Kg];
+		[kvsGoal_ synchronize];
+		[mocFunc_ rollBack], moE2edit_ = nil;
 		[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
+	}
+	else {
+		assert(moE2edit_.dateTime);
+		// データ整合処理
+		// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
+		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+		NSDateComponents* comp = [calendar components:NSYearCalendarUnit | NSMonthCalendarUnit
+											 fromDate:moE2edit_.dateTime];
+		moE2edit_.nYearMM = [NSNumber numberWithInteger:([comp year] * 100 + [comp month])];
+		
+		// Save & Commit
+		[mocFunc_ commit];
+		
+		self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
+		
+		if (editMode_==1) { // Edit mode
+			// moE2edit_ ＜＜　Edit mode だから = nil ダメ！
+			[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
+		} 
+		else {
+			moE2edit_ = nil;	// viewWillAppear:にて新規生成される
+			// List画面に切り替えて、追加行を一時ハイライトする
+			self.navigationController.tabBarController.selectedIndex = 1; // List画面へ
+		}
 	}
 }
 
 - (void)actionCancel
 {	// Edit mode ONLY
-	assert(bAddNew_==NO);
-	[mocFunc_ rollBack];
-	// moE2edit_ ＜＜　Edit mode だから = nil ダメ！
+	assert(editMode_ !=0);
+	if (kvsGoal_) {
+		[mocFunc_ rollBack], moE2edit_ = nil;  // 一時エンティティ
+	} else {
+		[mocFunc_ rollBack];
+		// moE2edit_ ＜＜　Edit mode だから = nil ダメ！
+	}
 	[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
 }
 
 - (void)actionDelete:(UIButton *)button
 {
+	if (kvsGoal_) return;
+	
 	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Delete E2",nil)
 													message: nil
 												   delegate: self		// clickedButtonAtIndexが呼び出される
@@ -207,54 +230,74 @@
 												 name:NFM_REFRESH_ALL_VIEWS
 											   object:[[UIApplication sharedApplication] delegate]];
 
-	if (moE2edit_) {
-		// Modify mode.
-		self.title = NSLocalizedString(@"Modify",nil);
-		bAddNew_ = NO;
+	kvsGoal_ = nil;
+	switch (editMode_) 
+	{
+		case 0: //-------------------------------------------------------------------- AddNew
+		{
+			assert(moE2edit_==nil);
+			self.title = NSLocalizedString(@"TabAdd",nil);
+			// moE2edit_ は、viewWillAppear:にて生成する。
+			// [Clear]ボタンを左側に追加する
+			self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+													 initWithTitle:NSLocalizedString(@"Clear",nil)
+													 style:UIBarButtonItemStyleBordered 
+													 target:self action:@selector(actionClear)];
+			// TableView 背景
+			UIImage *imgTile = [UIImage imageNamed:@"Tx-LzBeige320"];
+			self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
+		}	break;
 
-		// [<Back]ボタン表示: 修正あるのにBackしたときはアラート表示してからRollback処理する。
-		// [Cancel]ボタンを左側に追加する
-		self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
-												 initWithTitle:NSLocalizedString(@"Cancel",nil)
-												 style:UIBarButtonItemStyleBordered 
-												 target:self action:@selector(actionCancel)];
-
-		if (!buDelete_) { // [Delete]ボタンを 余白セルに置く
-			buDelete_ = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-			[buDelete_ setTitle:NSLocalizedString(@"Delete E2",nil) forState:UIControlStateNormal];
-			[buDelete_ setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
-			[buDelete_ addTarget:self action:@selector(actionDelete:) forControlEvents:UIControlEventTouchUpInside];
+		case 1: //-------------------------------------------------------------------- Edit
+		{
+			assert(moE2edit_); // 必須
+			self.title = NSLocalizedString(@"Modify",nil);
 			
-			NSIndexPath* indexPath = [NSIndexPath indexPathForRow:7 inSection:0];
-			CGRect rc = [self.tableView rectForRowAtIndexPath:indexPath];
-			rc.size.width /= 2;
-			rc.origin.x = rc.size.width / 2;
-			rc.origin.y += 10;  //((rc.size.height - 30) / 2);
-			rc.size.height = 30;
-			buDelete_.frame = rc;
-			[self.tableView addSubview:buDelete_];
-		}
+			// [<Back]ボタン表示: 修正あるのにBackしたときはアラート表示してからRollback処理する。
+			// [Cancel]ボタンを左側に追加する
+			self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+													 initWithTitle:NSLocalizedString(@"Cancel",nil)
+													 style:UIBarButtonItemStyleBordered 
+													 target:self action:@selector(actionCancel)];
+			
+			if (!buDelete_) { // [Delete]ボタンを 余白セルに置く
+				buDelete_ = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+				[buDelete_ setTitle:NSLocalizedString(@"Delete E2",nil) forState:UIControlStateNormal];
+				[buDelete_ setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+				[buDelete_ addTarget:self action:@selector(actionDelete:) forControlEvents:UIControlEventTouchUpInside];
+				
+				NSIndexPath* indexPath = [NSIndexPath indexPathForRow:7 inSection:0];
+				CGRect rc = [self.tableView rectForRowAtIndexPath:indexPath];
+				rc.size.width /= 2;
+				rc.origin.x = rc.size.width / 2;
+				rc.origin.y += 10;  //((rc.size.height - 30) / 2);
+				rc.size.height = 30;
+				buDelete_.frame = rc;
+				[self.tableView addSubview:buDelete_];
+			}
+			// TableView 背景
+			UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
+			self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
+		}	break;
 
-		// TableView 背景
-		UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
-		self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
-	}
-	else {
-		// AddNew mode.
-		self.title = NSLocalizedString(@"TabAdd",nil);
-		bAddNew_ = YES;
-		
-		// moE2edit_ は、viewWillAppear:にて生成する。
-
-		// [Clear]ボタンを左側に追加する
-		self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
-												  initWithTitle:NSLocalizedString(@"Clear",nil)
-												 style:UIBarButtonItemStyleBordered 
-												 target:self action:@selector(actionClear)];
-		
-		// TableView 背景
-		UIImage *imgTile = [UIImage imageNamed:@"Tx-LzBeige320"];
-		self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
+		case 2: //-------------------------------------------------------------------- Goal Edit
+		{
+			assert(moE2edit_==nil);
+			kvsGoal_ = [NSUbiquitousKeyValueStore defaultStore];
+			//moE2edit_ = [[E2record alloc] init]; // MOCで無い！ 一時エンティティ
+			moE2edit_ = [mocFunc_ insertAutoEntity:@"E2record"]; // 一時利用なので後で破棄すること ＜＜SAVEしない
+			moE2edit_.sNote1 =				[kvsGoal_ objectForKey:Goal_sNote1];
+			moE2edit_.sNote2 =				[kvsGoal_ objectForKey:Goal_sNote2];
+			moE2edit_.nBpHi_mmHg =	[kvsGoal_ objectForKey:Goal_nBpHi_mmHg];
+			moE2edit_.nBpLo_mmHg =	[kvsGoal_ objectForKey:Goal_nBpLo_mmHg];
+			moE2edit_.nPulse_bpm =		[kvsGoal_ objectForKey:Goal_nPulse_bpm];
+			moE2edit_.nWeight_10Kg = [kvsGoal_ objectForKey:Goal_nWeight_10Kg];
+			moE2edit_.nTemp_10c =		[kvsGoal_ objectForKey:Goal_nTemp_10c];
+		}	break;
+			
+		default:
+			assert(NO);
+			break;
 	}
 	
 	// SAVEボタンを右側に追加する
@@ -265,35 +308,6 @@
 
 	// TableView
 	self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone; // セル区切り線なし
-	
-	static BOOL bGoalRecordCheck = YES;
-	if (bGoalRecordCheck) {	// 1度だけ通すため
-		bGoalRecordCheck = NO;
-		// didFinishLaunchingWithOptions:では、早すぎるためか落ちるため、ここに実装してた。
-		// E2 目標(The GOAL)固有レコードが無ければ追加する
-		NSArray *arFetch = [mocFunc_ select:@"E2record"
-										  limit:1		//=0:無制限  ＜＜ 1にすると結果は0件になるのでダメ
-										 offset:0
-										  where:[NSPredicate predicateWithFormat: E2_dateTime @" == %@", [MocFunctions dateGoal]]
-										   sort:nil];
-		if ([arFetch count] <= 0) { // 無いので追加する
-			E2record *moE2goal = [mocFunc_ insertAutoEntity:@"E2record"];
-			// 固有日付をセット
-			moE2goal.dateTime = [MocFunctions dateGoal];
-			moE2goal.nYearMM = [NSNumber numberWithInteger: E2_nYearMM_GOAL];	// 主に、こちらで比較チェックする
-			NSLog(@"moE2goal.dateTime=%@  .nYearMM=%@", moE2goal.dateTime, moE2goal.nYearMM);
-			// 目標の初期値　⇒ GOALの値がAddNewの初期値になる
-			moE2goal.nBpHi_mmHg = [NSNumber numberWithInteger: E2_nBpHi_INIT];
-			moE2goal.nBpLo_mmHg = [NSNumber numberWithInteger: E2_nBpLo_INIT];
-			moE2goal.nPulse_bpm = [NSNumber numberWithInteger: E2_nPuls_INIT];
-			moE2goal.nWeight_10Kg = [NSNumber numberWithInteger: E2_nWeight_INIT];
-			moE2goal.nTemp_10c = [NSNumber numberWithInteger: E2_nTemp_INIT];
-			// Save & Commit
-			[mocFunc_ commit];
-		}
-	}
-	
-	
 	
 	 NSArray *aTab = self.tabBarController.childViewControllers;
 	 [[aTab objectAtIndex:0] setTitle: NSLocalizedString(@"TabAdd",nil)];
@@ -346,18 +360,18 @@
 		// 日付修正から戻ったとき
 		bEditDate_ = NO;
 	}
-	else if (bAddNew_) {
+	else if (editMode_==0) {
 		if (moE2edit_==nil) {
 			moE2edit_ = [mocFunc_ insertAutoEntity:@"E2record"];
 			[self actionClear];
 		}
 		//self.view.alpha = 0; //AddNewのときだけディゾルブ
 	}
-	else {
+	else if (kvsGoal_==nil) {
 		[self setE2recordPrev];
 	}
 	
-	if (appDelegate_.gud_bPaid==NO && bAddNew_) {	// Editのとき、Ａｄなし
+	if (appDelegate_.gud_bPaid==NO && editMode_==0) {	// Editのとき、Ａｄなし
 		[UIView beginAnimations:nil context:NULL];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
 		[UIView setAnimationDuration:1.2];
@@ -385,10 +399,15 @@
 	if (bEditDate_) {
 		// 日付修正へ遷移
 	}
-	else if (bAddNew_) {
+	else if (editMode_==0) {
 		// TabBar切替により隠されたとき、中止してクリアする
 		[mocFunc_ rollBack];  // 未保存取り消し		//[moc_ rollback];
 		moE2edit_ = nil; //autorelease
+	}
+	else if (kvsGoal_) {
+		// TabBar切替により隠されたとき、中止してList画面に戻す
+		[mocFunc_ rollBack], moE2edit_ = nil;
+		[self.navigationController popViewControllerAnimated:NO];	// < 前のViewへ戻る
 	}
 	else {
 		// TabBar切替により隠されたとき、中止してList画面に戻す
@@ -396,7 +415,7 @@
 		// moE2edit_ ＜＜　Edit mode だから = nil ダメ！
 		[self.navigationController popViewControllerAnimated:NO];	// < 前のViewへ戻る
 	}
-	
+
     [super viewWillDisappear:animated];
 }
 
@@ -507,7 +526,7 @@
 		assert(cell);
 	}
 	
-	if ([moE2edit_.nYearMM integerValue]==E2_nYearMM_GOAL) {
+	if (kvsGoal_) {  	//if ([moE2edit_.nYearMM integerValue]==E2_nYearMM_GOAL)
 		cell.textLabel.text = NSLocalizedString(@"TheGoal Section",nil);
 		cell.textLabel.textAlignment = UITextAlignmentCenter;
 		cell.accessoryType = UITableViewCellAccessoryNone;

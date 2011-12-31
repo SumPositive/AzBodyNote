@@ -112,6 +112,33 @@
 			}
 		}
 	}
+	else { // GOAL!
+		//  iCloud KVS 
+		NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+
+		ibLbDate.text = @"The GOAL";  //NSLocalizedString(@"TheGoal",nil);
+		ibLbBpHi.text = [self strValue:[[kvs objectForKey:Goal_nBpHi_mmHg] integerValue] dec:0]; 
+		ibLbBpLo.text = [self strValue:[[kvs objectForKey:Goal_nBpLo_mmHg] integerValue] dec:0];
+		ibLbPuls.text = [self strValue:[[kvs objectForKey:Goal_nPulse_bpm] integerValue] dec:0];
+		ibLbWeight.text = [self strValue:[[kvs objectForKey:Goal_nWeight_10Kg] integerValue] dec:1];
+		ibLbTemp.text = [self strValue:[[kvs objectForKey:Goal_nTemp_10c] integerValue] dec:1];
+		//ibLbNote1.text = [kvs objectForKey:Goal_sNote1];
+		//ibLbNote2.text = [kvs objectForKey:Goal_sNote2];
+		if (0<[[kvs objectForKey:Goal_sNote1] length]) {
+			if (0<[[kvs objectForKey:Goal_sNote2] length]) {
+				ibLbNote1.text = [NSString stringWithFormat:@"%@  %@",
+								  [kvs objectForKey:Goal_sNote1],  [kvs objectForKey:Goal_sNote2]];
+			} else {
+				ibLbNote1.text = [kvs objectForKey:Goal_sNote1];
+			}
+		} else {
+			if (0<[[kvs objectForKey:Goal_sNote2] length]) {
+				ibLbNote1.text = [kvs objectForKey:Goal_sNote2];
+			} else {
+				ibLbNote1.text = nil;
+			}
+		}
+	}
 }
 
 @end
