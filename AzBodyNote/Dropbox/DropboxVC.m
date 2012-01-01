@@ -6,6 +6,7 @@
 //  Copyright (c) 2011 AzukiSoft. All rights reserved.
 //
 
+#import "Global.h"
 #import "DropboxVC.h"
 #import "AzBodyNoteAppDelegate.h"
 
@@ -13,7 +14,7 @@
 #define TAG_ACTION_Retrieve		118
 
 #define USER_FILENAME			@"My Condition"
-#define USER_FILENAME_KEY	@"MyCondition"
+#define USER_FILENAME_KEY	@"Dropbox_FileName"
 
 @implementation DropboxVC
 @synthesize delegate;
@@ -76,9 +77,12 @@
 		return;
 	}
 	
-	NSUserDefaults *userDef = [NSUserDefaults standardUserDefaults];
-	[userDef setObject:filename  forKey:USER_FILENAME_KEY];
-	[userDef synchronize];
+	//NSUserDefaults *userDef = [NSUserDefaults standardUserDefaults];
+	//[userDef setObject:filename  forKey:USER_FILENAME_KEY];
+	//[userDef synchronize];
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	[kvs setObject: toNSNull(filename) forKey:USER_FILENAME_KEY];
+	[kvs synchronize]; // iCloud最新同期（取得）
 
 	UIActionSheet *as = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Dropbox Are you sure", nil) 
 													delegate:self 
@@ -130,8 +134,12 @@
 {
     [super viewWillAppear:animated];
 	
-	NSUserDefaults *userDef = [NSUserDefaults standardUserDefaults];
-	ibTfName.text = [userDef objectForKey:USER_FILENAME_KEY];
+	//NSUserDefaults *userDef = [NSUserDefaults standardUserDefaults];
+	//ibTfName.text = [userDef objectForKey:USER_FILENAME_KEY];
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	[kvs synchronize]; // iCloud最新同期（取得）
+	ibTfName.text = toNil([kvs objectForKey:USER_FILENAME_KEY]);
+
 	if ([ibTfName.text length] < 3) {
 		ibTfName.text = USER_FILENAME;
 	}

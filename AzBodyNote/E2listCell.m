@@ -6,6 +6,7 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
+#import "Global.h"
 #import "E2listCell.h"
 #import "E2listTVC.h"
 
@@ -115,6 +116,7 @@
 	else { // GOAL!
 		//  iCloud KVS 
 		NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+		//E2listTVC:viewWillAppear:にて処理// [kvs synchronize]; // iCloud最新同期（取得）
 
 		ibLbDate.text = @"The GOAL";  //NSLocalizedString(@"TheGoal",nil);
 		ibLbBpHi.text = [self strValue:[[kvs objectForKey:Goal_nBpHi_mmHg] integerValue] dec:0]; 
@@ -124,15 +126,15 @@
 		ibLbTemp.text = [self strValue:[[kvs objectForKey:Goal_nTemp_10c] integerValue] dec:1];
 		//ibLbNote1.text = [kvs objectForKey:Goal_sNote1];
 		//ibLbNote2.text = [kvs objectForKey:Goal_sNote2];
-		if (0<[[kvs objectForKey:Goal_sNote1] length]) {
-			if (0<[[kvs objectForKey:Goal_sNote2] length]) {
+		if (0<[toNil([kvs objectForKey:Goal_sNote1]) length]) {
+			if (0<[toNil([kvs objectForKey:Goal_sNote2]) length]) {
 				ibLbNote1.text = [NSString stringWithFormat:@"%@  %@",
 								  [kvs objectForKey:Goal_sNote1],  [kvs objectForKey:Goal_sNote2]];
 			} else {
 				ibLbNote1.text = [kvs objectForKey:Goal_sNote1];
 			}
 		} else {
-			if (0<[[kvs objectForKey:Goal_sNote2] length]) {
+			if (0<[toNil([kvs objectForKey:Goal_sNote2]) length]) {
 				ibLbNote1.text = [kvs objectForKey:Goal_sNote2];
 			} else {
 				ibLbNote1.text = nil;

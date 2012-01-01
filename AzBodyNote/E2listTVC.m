@@ -60,9 +60,9 @@
 		abort();
 	}		
     
-    if (note) {
+    //if (note) {
         [self.tableView reloadData];
-    }
+    //}
 }
 
 
@@ -113,9 +113,9 @@
 	lbPagePrev_.textAlignment = UITextAlignmentCenter;
 	lbPagePrev_.backgroundColor = [UIColor clearColor];
 	if (appDelegate_.gud_bPaid) {
-		lbPagePrev_.text = NSLocalizedString(@"PagePrev",nil);
+		lbPagePrev_.text = NSLocalizedString(@"List Top",nil);
 	} else {
-		lbPagePrev_.text = NSLocalizedString(@"PagePrevLimit",nil);
+		lbPagePrev_.text = NSLocalizedString(@"List Limit",nil);
 	}
 	[self.tableView addSubview:lbPagePrev_];
 
@@ -131,6 +131,11 @@
 												 name:NFM_REFRESH_ALL_VIEWS 
 											   object:[[UIApplication sharedApplication] delegate]];
 	
+	// iCloud KVS 変更通知を受け取る
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(refreshAllViews:) 
+												 name:NSUbiquitousKeyValueStoreDidChangeExternallyNotification 
+											   object:nil];
 	
 /*** UserDef方式にした。
 	//---------------------------------------------------------------------------------------------------------
@@ -186,16 +191,7 @@
 {
     [super viewWillAppear:animated];
 	
-	// データ抽出する
-/*	NSError *error = nil;
-	if (![self.fetchedResultsController performFetch:&error])
-	{
-	    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-	    abort();
-	}*/
-//	frc_ = nil;
-	
-	if (indexPathEdit_) {
+	if (indexPathEdit_) { // E2editTVC:から戻ったとき、
 		@try {	// 範囲オーバーで落ちる可能性があるため。　＜＜最終行を削除したとき。
 			NSLog(@"viewWillAppear: indexPathEdit_=%@", indexPathEdit_);
 			NSArray *aPaths = [NSArray arrayWithObject:indexPathEdit_];
@@ -212,12 +208,15 @@
 	else { 
 		// 最終行を表示する
 		@try {	// 範囲オーバーで落ちる可能性があるため。
-			[self.tableView scrollToRowAtIndexPath:
-			 [NSIndexPath indexPathForRow:0 inSection:[[self.fetchedResultsController sections] count]] 
-								  atScrollPosition:UITableViewScrollPositionBottom animated:NO];  // 実機検証結果:NO
-			//if (animated) { // NO ならば、viewDidAppear:が呼ばれないため。
-			//	self.view.alpha = 0;
-			//}
+			NSIndexPath* ipGoal = [NSIndexPath indexPathForRow:0 inSection: [[self.fetchedResultsController sections] count]];
+			// GOAL! 行へ
+			[self.tableView scrollToRowAtIndexPath: ipGoal
+								  atScrollPosition:UITableViewScrollPositionMiddle animated:NO];  // 実機検証結果:NO
+			// GOAL! リフレッシュ
+			NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+			[kvs synchronize]; // iCloud最新同期（取得）
+			NSArray *aPaths = [NSArray arrayWithObject: ipGoal];
+			[self.tableView reloadRowsAtIndexPaths: aPaths withRowAnimation:UITableViewRowAnimationFade];
 		}
 		@catch (NSException *exception) {
 			NSLog(@"LOGIC ERROR!!! - 最終行");
@@ -334,7 +333,7 @@
 	// GOALセクション
 	NSInteger iRows = 2;	// GOAL & Dropbox
 	if (appDelegate_.gud_bPaid==NO) {
-		iRows += 2; // AdMob & Limit Message
+		iRows++; // AdMob
 	}
 	return  iRows;
 }
@@ -351,11 +350,25 @@
 			return [NSString stringWithFormat:@"%d年 %d月", iYear, iYearMM - (iYear * 100)]; 
 		}
 		else {
-			return [NSString stringWithFormat:@"%d / %d", iYearMM - (iYear * 100), iYear]; 
+			static const char *mon[] = { "???", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };			
+			int iMon = iYearMM - (iYear * 100);
+			if (iMon<1 OR 12<iMon ) iMon = 0;
+			return [NSString stringWithFormat:@"%s, %d", mon[ iMon ], iYear]; 
 		}
 	}
 	// GOALセクション
-	return NSLocalizedString(@"Latest",nil);
+	NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
+	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+	[fmt setCalendar:calendar];
+	if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) 
+	{ // 「書式」で変わる。　「言語」でない
+		[fmt setDateFormat:@"yyyy年 M月 d日 EE"];
+	}
+	else {
+		[fmt setDateFormat:@"EE, MMM d, yyyy"];
+	}
+	return [NSString stringWithFormat:@"%@  %@", NSLocalizedString(@"Latest",nil), [fmt stringFromDate:[NSDate date]]];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -422,7 +435,7 @@
 			}
 			return cell;
 		}
-		else if (iRow==3 && appDelegate_.gud_bPaid==NO)
+	/*	else if (iRow==3 && appDelegate_.gud_bPaid==NO)
 		{	// Page Next
 			static NSString *Cid = @"E2listBasic";
 			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
@@ -434,7 +447,7 @@
 			cell.textLabel.font = [UIFont systemFontOfSize:16];
 			cell.textLabel.text = NSLocalizedString(@"PagePrevLimit",nil);
 			return cell;
-		} 
+		}*/ 
 	}
     return nil;
 }
@@ -450,17 +463,15 @@
 	[cell draw]; // moE2node を描画する
 }
 
-/*
 // Override to support conditional editing of the table view.
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {	// Return NO if you do not want the specified item to be editable.
-	E2record *e2 = [self.fetchedResultsController objectAtIndexPath:indexPath]; ＜＜＜落ちる
-	if (e2 && [e2.nYearMM integerValue] == E2_nYearMM_GOAL) {
-		return NO;
+	if (indexPath.section < [[self.fetchedResultsController sections] count]) 
+	{ // 明細セクション
+		return YES;	// フリックDelete許可
 	}
-    return YES;
+	return NO; // GOAL! Delete禁止
 }
-*/
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
 						forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -515,6 +526,7 @@
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];	// 選択状態を解除する
 
 	// Storyboard導入により、prepareForSegue:が、ここよりも「先に」呼び出されることに留意。
+	// E2editTVC:遷移は、prepareForSegue:にて処理している。
 	
 	if ([[self.fetchedResultsController sections] count] <= indexPath.section) 
 	{	// Functions
@@ -586,7 +598,7 @@
 	NSFetchedResultsController *aFrc = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
 																								managedObjectContext:[mocFunc_ getMoc] 
 																								  sectionNameKeyPath:E2_nYearMM	// セクション指定のため
-																					  cacheName:@"E2listDate"];
+																					  cacheName:nil]; // CoreData: FATAL ERROR:がでるためcacheName:nilにした。
     aFrc.delegate = self;
 
 	// データ抽出する
@@ -676,22 +688,28 @@
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {	// スクロール中に呼ばれる
 	//NSLog(@"scrollViewDidScroll: .contentOffset.y=%f", scrollView.contentOffset.y);
-	if (appDelegate_.gud_bPaid) {
-		if (scrollView.contentOffset.y < -50) {
-			// 前ページへ予告表示
-			if (lbPagePrev_.tag != 1) {
-				lbPagePrev_.tag = 1;
-				lbPagePrev_.text = NSLocalizedString(@"PagePrevGo",nil);
+	if (scrollView.contentOffset.y < -50) {
+		// 前ページへ予告表示
+		if (lbPagePrev_.tag != 1) {
+			lbPagePrev_.tag = 1;
+			if (appDelegate_.gud_bPaid) {
+				lbPagePrev_.text = NSLocalizedString(@"List Top",nil);
+			} else {
+				lbPagePrev_.text = NSLocalizedString(@"List Paid",nil);
 			}
-		} else {
-			if (lbPagePrev_.tag != 0) {
-				lbPagePrev_.tag = 0;
-				lbPagePrev_.text = NSLocalizedString(@"PagePrev",nil);
+		}
+	} else {
+		if (lbPagePrev_.tag != 0) {
+			lbPagePrev_.tag = 0;
+			if (appDelegate_.gud_bPaid) {
+				lbPagePrev_.text = NSLocalizedString(@"List Top",nil);
+			} else {
+				lbPagePrev_.text = NSLocalizedString(@"List Limit",nil);
 			}
 		}
 	}
 }
-
+/*
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {	// スクロール終了時（指を離した時）に呼ばれる
 	//NSLog(@"scrollViewDidEndDragging: .contentOffset.y=%f  decelerate=%d", scrollView.contentOffset.y, decelerate);
@@ -703,7 +721,7 @@
 		}
 	}
 }
-
+*/
 
 #pragma mark - AdMob <GADBannerViewDelegate>
 

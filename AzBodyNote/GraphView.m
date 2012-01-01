@@ -216,36 +216,29 @@
 	
 	//--------------------------------------------------------------------------------------- iCloud KVS GOAL!
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	NSInteger iGoalBpHi		= [[kvs objectForKey:Goal_nBpHi_mmHg] integerValue];
+	NSInteger iGoalBpHi		= [[kvs objectForKey:Goal_nBpHi_mmHg] integerValue];  // NSNullならば "<null>"文字列となり数値化して0になる
 	NSInteger iGoalBpLo		= [[kvs objectForKey:Goal_nBpLo_mmHg] integerValue];
 	NSInteger iGoalPuls			= [[kvs objectForKey:Goal_nPulse_bpm] integerValue];
 	NSInteger iGoalWeight	= [[kvs objectForKey:Goal_nWeight_10Kg] integerValue];
 	NSInteger iGoalTemp		= [[kvs objectForKey:Goal_nTemp_10c] integerValue];
-	
+
 	// Min, Max
-	NSInteger iMaxBp			= iGoalBpHi;
-	NSInteger iMinBp				= iGoalBpLo;
-	NSInteger iMaxPuls			= iGoalPuls;
-	NSInteger iMinPuls			= iGoalPuls;
-	NSInteger iMaxWeight	= iGoalWeight;
-	NSInteger iMinWeight		= iGoalWeight;
-	NSInteger iMaxTemp		= iGoalTemp;
-	NSInteger iMinTemp		= iGoalTemp;
+	NSInteger iMaxBp			= 0;
+	NSInteger iMinBp				= 999;
+	NSInteger iMaxPuls			= 0;
+	NSInteger iMinPuls			= 999;
+	NSInteger iMaxWeight	= 0;
+	NSInteger iMinWeight		= 9999;
+	NSInteger iMaxTemp		= 0;
+	NSInteger iMinTemp		= 999;
 	NSInteger ii;
 	
-/*	if (iMaxBp < iGoalBpHi) iMaxBp = iGoalBpHi;
-	if (iGoalBpLo < iMinBp) iMinBp = iGoalBpLo;
-
-	if (iMaxPuls < iGoalPuls) iMaxPuls = iGoalPuls;
-	if (iGoalPuls < iMinPuls) iMinPuls = iGoalPuls;
-
-	if (iMaxWeight < iGoalWeight) iMaxWeight = iGoalWeight;
-	if (iGoalWeight < iMinWeight) iMinWeight = iGoalWeight;
-	
-	if (iMaxTemp < iGoalTemp) iMaxTemp = iGoalTemp;
-	if (iGoalTemp < iMinTemp) iMinTemp = iGoalTemp;
-	*/
-	
+	if (E2_nBpHi_MIN<=iGoalBpHi			&& iGoalBpHi<=E2_nBpHi_MAX)			iMaxBp = iGoalBpHi;
+	if (E2_nBpLo_MIN<=iGoalBpLo			&& iGoalBpLo<=E2_nBpLo_MAX)			iMinBp = iGoalBpLo;
+	if (E2_nPuls_MIN<=iGoalPuls				&& iGoalPuls<=E2_nPuls_MAX)				iMaxPuls = iGoalPuls,			iMinPuls = iGoalPuls;
+	if (E2_nWeight_MIN<=iGoalWeight	&& iGoalWeight<=E2_nWeight_MAX)	iMaxWeight = iGoalWeight, iMinWeight = iGoalWeight;
+	if (E2_nTemp_MIN<=iGoalTemp		&& iGoalTemp<=E2_nTemp_MAX)		iMaxTemp = iGoalTemp,		iMinTemp = iGoalTemp;
+		
 	for (E2record *e2 in aE2records_)
 	{	// 最新日から過去へ遡る
 		if (e2.nBpHi_mmHg) {

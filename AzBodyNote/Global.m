@@ -9,6 +9,7 @@
 #import "Global.h"
 
 
+
 void alertBox( NSString *zTitle, NSString *zMsg, NSString *zButton )
 {
 	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:zTitle
@@ -19,5 +20,25 @@ void alertBox( NSString *zTitle, NSString *zMsg, NSString *zButton )
 	[alert show];
 	//[alert release];
 }
+
+// nil --> [NSNull null]   コンテナ保存オブジェクトにnilが含まれる可能性があるときに使用
+id toNSNull( id obj )
+{
+	if (obj) return obj;
+	return [NSNull null];
+}
+
+// [NSNull null] --> nil
+id toNil( id obj )
+{
+	if (obj) {
+		if (obj==[NSNull null]) {
+			return nil;
+		}
+		return obj;
+	}
+	return nil;
+}
+
 
 

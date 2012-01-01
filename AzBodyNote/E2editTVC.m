@@ -139,6 +139,8 @@
 
 - (void)actionSave
 {
+	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
+
 	if (kvsGoal_) {
 		[kvsGoal_ setObject:moE2edit_.sNote1				forKey:Goal_sNote1];
 		[kvsGoal_ setObject:moE2edit_.sNote2				forKey:Goal_sNote2];
@@ -162,9 +164,7 @@
 		
 		// Save & Commit
 		[mocFunc_ commit];
-		
-		self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
-		
+
 		if (editMode_==1) { // Edit mode
 			// moE2edit_ ＜＜　Edit mode だから = nil ダメ！
 			[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
@@ -235,23 +235,26 @@
 	{
 		case 0: //-------------------------------------------------------------------- AddNew
 		{
-			assert(moE2edit_==nil);
 			self.title = NSLocalizedString(@"TabAdd",nil);
+			// TableView 背景
+			UIImage *imgTile = [UIImage imageNamed:@"Tx-LzBeige320"];
+			self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
+			assert(moE2edit_==nil);
 			// moE2edit_ は、viewWillAppear:にて生成する。
 			// [Clear]ボタンを左側に追加する
 			self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
 													 initWithTitle:NSLocalizedString(@"Clear",nil)
 													 style:UIBarButtonItemStyleBordered 
 													 target:self action:@selector(actionClear)];
-			// TableView 背景
-			UIImage *imgTile = [UIImage imageNamed:@"Tx-LzBeige320"];
-			self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 		}	break;
 
 		case 1: //-------------------------------------------------------------------- Edit
 		{
-			assert(moE2edit_); // 必須
 			self.title = NSLocalizedString(@"Modify",nil);
+			// TableView 背景
+			UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
+			self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
+			assert(moE2edit_); // 必須
 			
 			// [<Back]ボタン表示: 修正あるのにBackしたときはアラート表示してからRollback処理する。
 			// [Cancel]ボタンを左側に追加する
@@ -275,24 +278,26 @@
 				buDelete_.frame = rc;
 				[self.tableView addSubview:buDelete_];
 			}
-			// TableView 背景
-			UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
-			self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 		}	break;
 
 		case 2: //-------------------------------------------------------------------- Goal Edit
 		{
+			self.title = NSLocalizedString(@"Modify",nil);
+			// TableView 背景
+			UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
+			self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 			assert(moE2edit_==nil);
 			kvsGoal_ = [NSUbiquitousKeyValueStore defaultStore];
 			//moE2edit_ = [[E2record alloc] init]; // MOCで無い！ 一時エンティティ
 			moE2edit_ = [mocFunc_ insertAutoEntity:@"E2record"]; // 一時利用なので後で破棄すること ＜＜SAVEしない
-			moE2edit_.sNote1 =				[kvsGoal_ objectForKey:Goal_sNote1];
-			moE2edit_.sNote2 =				[kvsGoal_ objectForKey:Goal_sNote2];
-			moE2edit_.nBpHi_mmHg =	[kvsGoal_ objectForKey:Goal_nBpHi_mmHg];
-			moE2edit_.nBpLo_mmHg =	[kvsGoal_ objectForKey:Goal_nBpLo_mmHg];
-			moE2edit_.nPulse_bpm =		[kvsGoal_ objectForKey:Goal_nPulse_bpm];
-			moE2edit_.nWeight_10Kg = [kvsGoal_ objectForKey:Goal_nWeight_10Kg];
-			moE2edit_.nTemp_10c =		[kvsGoal_ objectForKey:Goal_nTemp_10c];
+			[kvsGoal_ synchronize]; // iCloud最新同期（取得）
+			moE2edit_.sNote1 =				toNil([kvsGoal_ objectForKey:Goal_sNote1]);
+			moE2edit_.sNote2 =				toNil([kvsGoal_ objectForKey:Goal_sNote2]);
+			moE2edit_.nBpHi_mmHg =	toNil([kvsGoal_ objectForKey:Goal_nBpHi_mmHg]);
+			moE2edit_.nBpLo_mmHg =	toNil([kvsGoal_ objectForKey:Goal_nBpLo_mmHg]);
+			moE2edit_.nPulse_bpm =		toNil([kvsGoal_ objectForKey:Goal_nPulse_bpm]);
+			moE2edit_.nWeight_10Kg = toNil([kvsGoal_ objectForKey:Goal_nWeight_10Kg]);
+			moE2edit_.nTemp_10c =		toNil([kvsGoal_ objectForKey:Goal_nTemp_10c]);
 		}	break;
 			
 		default:
@@ -528,16 +533,28 @@
 	
 	if (kvsGoal_) {  	//if ([moE2edit_.nYearMM integerValue]==E2_nYearMM_GOAL)
 		cell.textLabel.text = NSLocalizedString(@"TheGoal Section",nil);
+		cell.textLabel.font = [UIFont boldSystemFontOfSize:22];
 		cell.textLabel.textAlignment = UITextAlignmentCenter;
 		cell.accessoryType = UITableViewCellAccessoryNone;
 		cell.userInteractionEnabled = NO; // 操作なし
 	}
 	else {
+		cell.textLabel.font = [UIFont boldSystemFontOfSize:19];
+		cell.textLabel.textAlignment = UITextAlignmentLeft;
+		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+		cell.userInteractionEnabled = YES; // 操作あり
+		
 		NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
 		// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
 		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 		[fmt setCalendar:calendar];
-		[fmt setDateFormat:@"yyyy-M-d EE HH:mm"];
+		if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) 
+		{ // 「書式」で変わる。　「言語」でない
+			[fmt setDateFormat:@"yyyy年M月d日 EE  HH:mm"];
+		}
+		else {
+			[fmt setDateFormat:@"EE, MMM d, yyyy  HH:mm"];
+		}
 		if (moE2edit_.dateTime==nil) {
 			moE2edit_.dateTime = [NSDate date];
 		}

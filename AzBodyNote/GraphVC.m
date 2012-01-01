@@ -69,6 +69,10 @@
 	assert(appDelegate_);
 	mocFunc_ = appDelegate_.mocBase; // Read Only
 	assert(mocFunc_);
+	
+	if (appDelegate_.gud_bPaid==NO) {
+		uiActivePageMax_ = 0; // 0ページ制限
+	}
 
 	// listen to our app delegates notification that we might want to refresh our detail view
     [[NSNotificationCenter defaultCenter] addObserver:self 
@@ -125,6 +129,9 @@
 	rc.size.width = RECORD_WIDTH * iCount;	// レコード
 	ibGraphView.frame = rc;
 	
+	//[ibGraphView drawRect:self.view.frame];  NG//これだと不具合発生する
+	[ibGraphView setNeedsDisplay]; //drawRect:が呼び出される
+
 	if (page < uiActivePage_) {	// [ibGraphView setNeedsDisplay]より先にスクロールさせること
 		// 左端を画面中央に表示する
 		ibScrollView.contentOffset = CGPointMake(0, 0);  
@@ -133,9 +140,6 @@
 		ibScrollView.contentOffset = CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);  
 	}
 	uiActivePage_ = page;
-
-	//[ibGraphView drawRect:self.view.frame];  NG//これだと不具合発生する
-	[ibGraphView setNeedsDisplay]; //drawRect:が呼び出される
 }
 
 - (void)graphViewPage:(NSUInteger)page animated:(BOOL)animated
@@ -144,7 +148,7 @@
 		// アニメ準備
 		CGContextRef context = UIGraphicsGetCurrentContext();
 		[UIView beginAnimations:@"Graph" context:context];
-		[UIView setAnimationDuration:1.2];
+		[UIView setAnimationDuration:1.0];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
 		[UIView setAnimationDelegate:self];
 		[UIView setAnimationDidStopSelector:@selector(animation_after)]; //アニメーション終了後に呼び出す＜＜setAnimationDelegate必要
@@ -177,7 +181,7 @@
 	[self graphViewPage:0 animated:YES];
 
 	// 最初、GOALを画面中央に表示する
-	ibScrollView.contentOffset = CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);  
+	//ibScrollView.contentOffset = CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);  
 }
 
 - (void)viewDidUnload

@@ -102,11 +102,29 @@
 	[userDefaults synchronize]; // plistへ書き出す
 
 	// 画面表示に関係する Option Setting を取得する
-#ifdef DEBUG
+#ifdef DEBUGxxx
 	gud_bPaid_ = YES;
 #else
 	gud_bPaid_ = [userDefaults boolForKey:GUD_bPaid];
 #endif
+
+	//  iCloud KVS 
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	[kvs synchronize]; // 最新同期
+	if ([[kvs objectForKey:Goal_nBpHi_mmHg] integerValue] < E2_nBpHi_MIN) {
+		// 初期データ追加
+		[kvs setObject:[NSNull null]	forKey:Goal_sNote1]; // Attempt to insert non-property value '<null>' of class 'NSNull'.
+		[kvs setObject:[NSNull null]	forKey:Goal_sNote2];
+		[kvs setObject:[NSNumber numberWithInt:120] forKey:Goal_nBpHi_mmHg];
+		[kvs setObject:[NSNumber numberWithInt:  80] forKey:Goal_nBpLo_mmHg];
+		[kvs setObject:[NSNumber numberWithInt:  65] forKey:Goal_nPulse_bpm];
+		[kvs setObject:[NSNumber numberWithInt:365] forKey:Goal_nTemp_10c];
+		[kvs setObject:[NSNumber numberWithInt:650] forKey:Goal_nWeight_10Kg];
+		[kvs synchronize];
+	}
+	if (gud_bPaid_==NO) {
+		gud_bPaid_ = [kvs boolForKey:GUD_bPaid];
+	}
 	
 	// Moc初期化
 	mocBase = [[MocFunctions alloc] initWithMoc:[self managedObjectContext]]; //iCloud同期に使用される
@@ -158,25 +176,6 @@
 	//[alertIndicator_ setFrame:CGRectMake((alertProgress_.frame.size.width-50)/2, alertProgress_.frame.size.height-70, 50, 50)];
 	[alertProgress_ addSubview:alertIndicator_];
 
-/*	// iCloud KVS 変更通知を icloud_KvsNotification: で受け取る
-	[[NSNotificationCenter defaultCenter] addObserver:self
-													selector:@selector(icloud_KvsNotification:) 
-													name:NSUbiquitousKeyValueStoreDidChangeExternallyNotification 
-													object:nil]; */
-	//  iCloud KVS 
-	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	if ([[kvs objectForKey:Goal_nBpHi_mmHg] length] <= 0) {
-		// 初期データ追加
-		[kvs setObject:@"" forKey:Goal_sNote1];
-		[kvs setObject:@"" forKey:Goal_sNote2];
-		[kvs setObject:[NSNumber numberWithInt:120] forKey:Goal_nBpHi_mmHg];
-		[kvs setObject:[NSNumber numberWithInt:  80] forKey:Goal_nBpLo_mmHg];
-		[kvs setObject:[NSNumber numberWithInt:  65] forKey:Goal_nPulse_bpm];
-		[kvs setObject:[NSNumber numberWithInt:365] forKey:Goal_nTemp_10c];
-		[kvs setObject:[NSNumber numberWithInt:650] forKey:Goal_nWeight_10Kg];
-		[kvs synchronize];
-	}
-	
     return YES;
 }
 /*
@@ -295,6 +294,8 @@
 
 - (NSString*)tmpFileSave;
 {	// NSManagedObject を [self tmpFilePath] へ書き出す
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	[kvs synchronize]; // iCloud最新同期（取得）
 	// E2record 取得
 	// Sort条件
 	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
@@ -311,6 +312,16 @@
 						  FILE_HEADER_PREFIX,					@"#header",
 						  utcFromDate([NSDate date]),	@"#update",
 						  @"1",												@"#version",
+						 //----------------------------------------------------------------------------------  iCloud-KVS
+						  toNSNull([kvs objectForKey:Goal_nBpHi_mmHg]),		Goal_nBpHi_mmHg,
+						  toNSNull([kvs objectForKey:Goal_nBpLo_mmHg]),	Goal_nBpLo_mmHg,
+						  toNSNull([kvs objectForKey:Goal_nPulse_bpm]),		Goal_nPulse_bpm,
+						  toNSNull([kvs objectForKey:Goal_nTemp_10c]),		Goal_nTemp_10c,
+						  toNSNull([kvs objectForKey:Goal_nWeight_10Kg]),	Goal_nWeight_10Kg,
+						  toNSNull([kvs objectForKey:Goal_sEquipment]),			Goal_sEquipment,
+						  toNSNull([kvs objectForKey:Goal_sNote1]),				Goal_sNote1,
+						  toNSNull([kvs objectForKey:Goal_sNote2]),				Goal_sNote2,
+						  //---------------------------------------------------------------------------------- 
 						  nil];
 	[maE2 addObject:dict];
 	// E2record
@@ -371,6 +382,19 @@
 		NSLog(@"tmpFileLoad: #header ERR: %@", dict);
 		return @"NG #header";
 	}
+	//----------------------------------------------------------------------------------  iCloud-KVS
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	[kvs setObject: toNSNull([dict objectForKey:Goal_nBpHi_mmHg])		forKey:Goal_nBpHi_mmHg];
+	[kvs setObject: toNSNull([dict objectForKey:Goal_nBpLo_mmHg])	forKey:Goal_nBpLo_mmHg];
+	[kvs setObject: toNSNull([dict objectForKey:Goal_nPulse_bpm])		forKey:Goal_nPulse_bpm];
+	[kvs setObject: toNSNull([dict objectForKey:Goal_nTemp_10c])		forKey:Goal_nTemp_10c];
+	[kvs setObject: toNSNull([dict objectForKey:Goal_nWeight_10Kg])	forKey:Goal_nWeight_10Kg];
+	[kvs setObject: toNSNull([dict objectForKey:Goal_sEquipment])			forKey:Goal_sEquipment];
+	[kvs setObject: toNSNull([dict objectForKey:Goal_sNote1])				forKey:Goal_sNote1];
+	[kvs setObject: toNSNull([dict objectForKey:Goal_sNote2])				forKey:Goal_sNote2];
+	[kvs synchronize]; // iCloud最新同期（取得）
+	//---------------------------------------------------------------------------------- 
+
 	// E2record 全クリア
 	[mocBase deleteAllCoreData];
 	// E2record 生成
@@ -594,7 +618,7 @@
 }
 
 
-#pragma mark - <SKPaymentTransactionObserver>
+#pragma mark - StoreKit <SKPaymentTransactionObserver>
 - (BOOL)purchasedCompleate:(SKPaymentTransaction*)tran
 {
 	// インジケータ消す
@@ -602,14 +626,18 @@
 	if ([tran.payment.productIdentifier isEqualToString:STORE_PRODUCTID_UNLOCK]) {
 		// Unlock
 		gud_bPaid_ = YES;
+		// UserDefへ記録する （iOS5未満のため）
 		[[NSUserDefaults standardUserDefaults] setBool:YES forKey:GUD_bPaid];
 		[[NSUserDefaults standardUserDefaults] synchronize];
+		// iCloud-KVS に記録する
+		NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+		[kvs setBool:YES forKey:GUD_bPaid];
+		[kvs synchronize];
 		// Compleate !
 		[[SKPaymentQueue defaultQueue] finishTransaction:tran]; // 処理完了
-		// 全画面リフレッシュ通知
-		NSNotification* refreshNotification = [NSNotification notificationWithName:NFM_REFRESH_ALL_VIEWS
-																			object:self  userInfo:nil];
-		[[NSNotificationCenter defaultCenter] postNotification:refreshNotification];
+		// 再フィッチ＆画面リフレッシュ通知
+		[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFETCH_ALL_DATA		// NFM_REFRESH_ALL_VIEWS
+															object:self userInfo:nil];
 
 		return YES;
 	}

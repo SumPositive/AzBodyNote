@@ -20,6 +20,7 @@
 #define AzRETAIN_CHECK(...) 
 #endif
 
+
 // iOS VERSION		http://goddess-gate.com/dc2/index.php/post/452
 #define IOS_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
 #define IOS_VERSION_GREATER_THAN(v)              ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedDescending)
@@ -43,8 +44,13 @@
 #define GUD_Calc_Method					@"GUD_Calc_Method"		// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
 #define GUD_Calc_RoundBankers			@"GUD_Calc_RoundBankers"
 
+// iCloud-KVS UserDefault ------------------------------------- Settings
+// Goal_nBpHi_mmHg 関係は、"MocEntity.h" にて定義
+
 
 //----------------------------------------------- Global.m グローバル関数
 void alertBox( NSString *zTitle, NSString *zMsg, NSString *zButton );
+id toNSNull( id obj );
+id toNil( id obj );
 
 
