@@ -23,6 +23,8 @@
 	BOOL			bDrowRect_;
 }
 @synthesize RaE2records = aE2records_;
+//@synthesize iOverLeft = iOverLeft_;
+//@synthesize iOverRight = iOverRight_;
 
 
 - (id)initWithFrame:(CGRect)frame
@@ -44,7 +46,7 @@
 			   points:(const CGPoint *)points  
 			   values:(const long *)values		//= month*1000000 + day*10000 + hour*100 + minute  //=0:The GOAL
 {
-	assert(count <= GRAPH_PAGE_LIMIT);
+	//assert(count <= GRAPH_PAGE_LIMIT + );
 	//文字列の設定
 	CGContextSetTextDrawingMode (cgc, kCGTextFillStroke);
 	CGContextSelectFont (cgc, "Helvetica", 12.0, kCGEncodingMacRoman); // ＜＜日本語NG
@@ -100,7 +102,7 @@
 			valueType:(int)valueType					// 0=Integer  1=Temp(999⇒99.9℃)　　2=Weight(999999g⇒999.99Kg)
 			pointLower:(CGFloat)pointLower		// Y座標の最小値： 数値文字がこれ以下に描画されるならば、上側に表示する
 {
-	assert(count <= GRAPH_PAGE_LIMIT);
+	//assert(count <= GRAPH_PAGE_LIMIT + );
 	// グラフ ストロークカラー設定(0.0-1.0でRGBAを指定する)
 	CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 0.8); // 折れ線の色
 #ifdef YES
@@ -287,8 +289,8 @@
 	//ストロークの線幅を設定
 	CGContextSetLineWidth(cgc, 0.5);
 
-	CGPoint	pointsArray[GRAPH_PAGE_LIMIT+1];
-	long			valuesArray[GRAPH_PAGE_LIMIT+1];
+	CGPoint	pointsArray[GRAPH_PAGE_LIMIT+20+1];
+	long			valuesArray[GRAPH_PAGE_LIMIT+20+1];
 	int			arrayNo;
 	CGFloat	fXgoal = self.bounds.size.width - RECORD_WIDTH/2;		// 最初、GOALを中央に表示する
 
@@ -310,6 +312,7 @@
 			valuesArray[ arrayNo ] = comp.month * 1000000 + comp.day * 10000 + comp.hour * 100 + comp.minute;
 			//NSLog(@"valuesArray[ %d ]=%ld", arrayNo, valuesArray[ arrayNo ]);
 			arrayNo++;
+			assert(arrayNo < GRAPH_PAGE_LIMIT+20+1);
 		}
 		po.x -= RECORD_WIDTH;
 	}

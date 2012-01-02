@@ -25,6 +25,7 @@
 	NSUInteger								uiActivePage_;
 	NSUInteger								uiActivePageMax_;
 	UIActivityIndicatorView			*actIndicator_;
+	CGPoint									pointNext_;
 }
 
 /*** XIB利用時には呼ばれません。
@@ -105,41 +106,66 @@
 	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
 	NSArray *sortDesc = [NSArray arrayWithObjects: sort1,nil]; // 日付降順：Limit抽出に使用
 	
+	NSInteger iOverLeft = 3;  // iPad対応時に調整が必要
+	NSInteger iOverRight = 2;  // GOAL列が常に+1される
+	NSInteger iOffset = (GRAPH_PAGE_LIMIT * page);
+
+	if (page==0) {
+		iOverRight = 0;
+		iOffset = 0;
+	} else {
+		iOffset -= iOverRight;
+	}
+
 	NSArray *e2recs = [mocFunc_ select: @"E2record"
-									limit: GRAPH_PAGE_LIMIT
-									offset: (GRAPH_PAGE_LIMIT * page)
+									limit: iOverLeft + GRAPH_PAGE_LIMIT + iOverRight
+									offset: iOffset
 									where: [NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"] // 未保存を除外する
 									sort: sortDesc]; // 最新日付から抽出
 
-	if ([e2recs count] < GRAPH_PAGE_LIMIT) {
+	if ([e2recs count] <= iOverLeft + iOverRight) { // 次ページなし
 		uiActivePageMax_ = uiActivePage_;  // 最終ページ判明
+		return;
 	}
-	
-	ibGraphView.RaE2records = e2recs;
+	else if ([e2recs count] < iOverLeft + GRAPH_PAGE_LIMIT + iOverRight) {
+		uiActivePageMax_ = page;  // 最終ページ判明
+	}
 	
 	// GraphView サイズを決める
 	CGRect rc = ibScrollView.bounds;
 	CGFloat fWhalf = rc.size.width / 2.0; // 表示幅の半分（画面中央）
-	int iCount = [e2recs count];
+	int iCount = [e2recs count] - iOverLeft - iOverRight;
 	if (iCount < 2) iCount = 2; // 1だとスクロール出来なくなる
 	//                     (                 左余白                 ) + (               レコード               ) + (                 右余白                 ); 
 	rc.size.width = (fWhalf - RECORD_WIDTH/2) + (RECORD_WIDTH * iCount) + (fWhalf - RECORD_WIDTH/2);
 	ibScrollView.contentSize = rc.size;
-	rc.origin.x = (fWhalf - RECORD_WIDTH/2); // 左余白
-	rc.size.width = RECORD_WIDTH * iCount;	// レコード
+	rc.origin.x = (fWhalf - RECORD_WIDTH/2) - (RECORD_WIDTH * iOverLeft);  // 左余白
+	rc.size.width = RECORD_WIDTH * (iCount + iOverLeft + iOverRight + 1);	// +1はGOAL列
 	ibGraphView.frame = rc;
+
+	ibGraphView.RaE2records = e2recs;
+	//ibGraphView.iOverLeft = iOverLeft;
+	//ibGraphView.iOverRight = iOverRight;
 	
 	//[ibGraphView drawRect:self.view.frame];  NG//これだと不具合発生する
 	[ibGraphView setNeedsDisplay]; //drawRect:が呼び出される
 
 	if (page < uiActivePage_) {	// [ibGraphView setNeedsDisplay]より先にスクロールさせること
 		// 左端を画面中央に表示する
-		ibScrollView.contentOffset = CGPointMake(0, 0);  
+		pointNext_ = CGPointMake(0, 0); 
 	} else {
 		// 右端を画面中央に表示する
-		ibScrollView.contentOffset = CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);  
+		pointNext_ = CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);
 	}
+	ibScrollView.contentOffset = pointNext_;
 	uiActivePage_ = page;
+}
+
+- (void)animation_after
+{
+	[actIndicator_ stopAnimating];
+	
+	ibScrollView.contentOffset = pointNext_;
 }
 
 - (void)graphViewPage:(NSUInteger)page animated:(BOOL)animated
@@ -148,7 +174,7 @@
 		// アニメ準備
 		CGContextRef context = UIGraphicsGetCurrentContext();
 		[UIView beginAnimations:@"Graph" context:context];
-		[UIView setAnimationDuration:1.0];
+		[UIView setAnimationDuration:0.3];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
 		[UIView setAnimationDelegate:self];
 		[UIView setAnimationDidStopSelector:@selector(animation_after)]; //アニメーション終了後に呼び出す＜＜setAnimationDelegate必要
@@ -161,12 +187,8 @@
 		[UIView commitAnimations];
 	} else {
 		[actIndicator_ stopAnimating];
+		[self animation_after]; //アニメーション終了後に呼び出す
 	}
-}
-
-- (void)animation_after
-{
-	[actIndicator_ stopAnimating];
 }
 
 - (void)viewWillAppear:(BOOL)animated 
@@ -214,18 +236,31 @@
 {	// スクロール中に呼ばれる
 	//NSLog(@"scrollViewDidScroll: .contentOffset.x=%f", scrollView.contentOffset.x);
 	if (appDelegate_.gud_bPaid) {
-/*		if (scrollView.contentOffset.x < -50) {
-			// 前ページへ予告表示
-			if (lbPagePrev_.tag != 1) {
-				lbPagePrev_.tag = 1;
-				lbPagePrev_.text = NSLocalizedString(@"PagePrevGo",nil);
+		if (scrollView.contentOffset.x < -70) {
+			// PREV（過去）ページへ
+			if (uiActivePage_ < uiActivePageMax_) {
+				// 画面左側にインジケータ表示
+				if (![actIndicator_ isAnimating]) {
+					[actIndicator_ setFrame:CGRectMake(-50, ibScrollView.frame.size.height/2-25, 50, 50)];
+					[actIndicator_ startAnimating];
+				}
 			}
-		} else {
-			if (lbPagePrev_.tag != 0) {
-				lbPagePrev_.tag = 0;
-				lbPagePrev_.text = NSLocalizedString(@"PagePrev",nil);
+		}
+		else if (scrollView.contentSize.width - ibScrollView.bounds.size.width + 70 < scrollView.contentOffset.x) {
+			// NEXT（未来）ページへ
+			if (0 < uiActivePage_) {
+				// 画面右側にインジケータ表示
+				if (![actIndicator_ isAnimating]) {
+					[actIndicator_ setFrame:CGRectMake(ibScrollView.contentSize.width, ibScrollView.frame.size.height/2-25, 50, 50)];
+					[actIndicator_ startAnimating];
+				}
 			}
-		}*/
+		}
+		else {
+			if ([actIndicator_ isAnimating]) {
+				[actIndicator_ stopAnimating];
+			}
+		}
 	}
 }
 
@@ -233,23 +268,23 @@
 {	// スクロール終了時（指を離した時）に呼ばれる
 	NSLog(@"scrollViewDidEndDragging: .contentOffset.x=%f  decelerate=%d", scrollView.contentOffset.x, decelerate);
 	if (appDelegate_.gud_bPaid) {
-		if (scrollView.contentOffset.x < -50) {
+		if (scrollView.contentOffset.x < -70) {
 			// PREV（過去）ページへ
 			if (uiActivePage_ < uiActivePageMax_) {
 				NSLog(@"scrollViewDidEndDragging: PREV uiActivePage_=%d + 1", uiActivePage_);
 				// 画面左側にインジケータ表示
-				[actIndicator_ setFrame:CGRectMake(80, ibScrollView.frame.size.height/2-25, 50, 50)];
-				[actIndicator_ startAnimating];
+				//[actIndicator_ setFrame:CGRectMake(80, ibScrollView.frame.size.height/2-25, 50, 50)];
+				//[actIndicator_ startAnimating];
 				[self graphViewPage:uiActivePage_ + 1 animated:YES];
 			}
 		}
-		else if (scrollView.contentSize.width - ibScrollView.bounds.size.width + 50 < scrollView.contentOffset.x) {
+		else if (scrollView.contentSize.width - ibScrollView.bounds.size.width + 70 < scrollView.contentOffset.x) {
 			// NEXT（未来）ページへ
 			if (0 < uiActivePage_) {
 				NSLog(@"scrollViewDidEndDragging: NEXT uiActivePage_=%d - 1", uiActivePage_);
 				// 画面右側にインジケータ表示
-				[actIndicator_ setFrame:CGRectMake(ibScrollView.contentSize.width-80-50, ibScrollView.frame.size.height/2-25, 50, 50)];
-				[actIndicator_ startAnimating];
+				//[actIndicator_ setFrame:CGRectMake(ibScrollView.contentSize.width-80-50, ibScrollView.frame.size.height/2-25, 50, 50)];
+				//[actIndicator_ startAnimating];
 				[self graphViewPage:uiActivePage_ - 1 animated:YES];
 			}
 		}

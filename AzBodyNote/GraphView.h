@@ -14,6 +14,8 @@
 @interface GraphView : UIView
 
 @property (nonatomic, retain) NSArray	*RaE2records;
+//@property (nonatomic, assign) NSInteger	iOverLeft;		// スクロール範囲外（左側）に表示するレコード数
+//@property (nonatomic, assign) NSInteger	iOverRight;		// スクロール範囲外（右側）に表示するレコード数
 
 - (IBAction)ibSegTypeChange:(UISegmentedControl *)seg;
 

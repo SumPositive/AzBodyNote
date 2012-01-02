@@ -102,7 +102,7 @@
 	[userDefaults synchronize]; // plistへ書き出す
 
 	// 画面表示に関係する Option Setting を取得する
-#ifdef DEBUGxxx
+#ifdef DEBUG
 	gud_bPaid_ = YES;
 #else
 	gud_bPaid_ = [userDefaults boolForKey:GUD_bPaid];
@@ -129,38 +129,6 @@
 	// Moc初期化
 	mocBase = [[MocFunctions alloc] initWithMoc:[self managedObjectContext]]; //iCloud同期に使用される
 	// TabBar画面毎にMOCを生成して個別にrollbackしたかったが、MOC間の変更反映が面倒だったので単一に戻した。
-	
-#ifdef DEBUGxxx
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		// 全データを削除する
-		//[mocBase deleteAllCoreData];
-		// テストデータを追加する
-		// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
-		NSDate *dt = [NSDate date];
-		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-		for (int i=0; i<200; i++) {
-			E2record *e2 = [mocBase insertAutoEntity:@"E2record"];
-
-			e2.dateTime = dt;
-			NSDateComponents* comp = [calendar components: NSYearCalendarUnit | NSMonthCalendarUnit fromDate:dt];
-			e2.nYearMM = [NSNumber numberWithInteger:([comp year] * 100 + [comp month])];
-			dt = [dt initWithTimeInterval:-1*24*60*60 sinceDate:dt]; // 1日前
-			
-			e2.sNote1 = [NSString stringWithFormat:@"(%d)", i];
-			e2.sNote2 = nil;
-			e2.nBpHi_mmHg =		[NSNumber numberWithInteger:120 - 10 + (rand() % 21)];
-			e2.nBpLo_mmHg =	[NSNumber numberWithInteger:  80 - 10 + (rand() % 21)];
-			e2.nPulse_bpm =		[NSNumber numberWithInteger:  65 - 10 + (rand() % 21)];
-			e2.nWeight_10Kg =	[NSNumber numberWithInteger:650 - 50 + (rand() % 101)];
-			e2.nTemp_10c =		[NSNumber numberWithInteger:365 -   5 + (rand() % 11)];
-		}
-		// Save & Commit
-		[mocBase commit];
-		
-		NSLog(@"Test data added!");
-		[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFETCH_ALL_DATA object:self userInfo:nil];
-	});
-#endif
 	
 	// Dropbox
 	DBSession* dbSession = [[DBSession alloc]
@@ -301,7 +269,7 @@
 	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
 	NSArray *sortDesc = [NSArray arrayWithObjects: sort1,nil]; // 日付降順：Limit抽出に使用
 	NSArray *aE2records = [mocBase select: @"E2record"
-									limit: 100
+									limit: 0
 								   offset: 0
 									where: [NSPredicate predicateWithFormat:E2_nYearMM @" > 200000"] // 未保存を除外する
 									 sort: sortDesc]; // 最新日付から抽出

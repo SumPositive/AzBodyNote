@@ -200,7 +200,7 @@ static NSDate *dateGoal_ = nil;
 			[moc_ deleteObject:object];
 		}
 	}
-	NSLog(@"Entity = %d", count);
+	NSLog(@"deleteAllCoreData: count=%d", count);
 	[self commit];
 }
 

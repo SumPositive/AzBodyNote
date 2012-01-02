@@ -392,6 +392,48 @@
 	}
 }
 
+
+#ifdef DEBUGxxxxxx				// テストデータ生成
+- (void)viewDidAppear:(BOOL)animated
+{
+	[super viewDidAppear:animated];
+	
+	// 全データを削除する
+	//[mocBase deleteAllCoreData];
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+		// テストデータを追加する
+		// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
+		static NSDate *dt = nil;
+		if (dt==nil) {
+			dt =[NSDate date];
+		}
+		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+		static int iTotal = 1;
+		for (int i=1; i<=100; i++, iTotal++) {
+			E2record *e2 = [mocFunc_ insertAutoEntity:@"E2record"];
+			
+			e2.dateTime = dt;
+			NSDateComponents* comp = [calendar components: NSYearCalendarUnit | NSMonthCalendarUnit fromDate:dt];
+			e2.nYearMM = [NSNumber numberWithInteger:([comp year] * 100 + [comp month])];
+			dt = [dt initWithTimeInterval:-1*24*60*60 sinceDate:dt]; // 1日前
+			
+			e2.sNote1 = [NSString stringWithFormat:@"(%d)", i];
+			e2.sNote2 = [NSString stringWithFormat:@"(%d)", iTotal];
+			e2.nBpHi_mmHg =		[NSNumber numberWithInteger:120 - 10 + (rand() % 21)];
+			e2.nBpLo_mmHg =	[NSNumber numberWithInteger:  80 - 10 + (rand() % 21)];
+			e2.nPulse_bpm =		[NSNumber numberWithInteger:  65 - 10 + (rand() % 21)];
+			e2.nWeight_10Kg =	[NSNumber numberWithInteger: 10*i ];
+			e2.nTemp_10c =		[NSNumber numberWithInteger:365 -   5 + (rand() % 11)];
+		}
+		// Save & Commit
+		[mocFunc_ commit];
+		
+		NSLog(@"Test data added!");
+		[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFETCH_ALL_DATA object:self userInfo:nil];
+	});
+}
+#endif
+
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
@@ -539,7 +581,7 @@
 		cell.userInteractionEnabled = NO; // 操作なし
 	}
 	else {
-		cell.textLabel.font = [UIFont boldSystemFontOfSize:19];
+		cell.textLabel.font = [UIFont boldSystemFontOfSize:18];
 		cell.textLabel.textAlignment = UITextAlignmentLeft;
 		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 		cell.userInteractionEnabled = YES; // 操作あり
