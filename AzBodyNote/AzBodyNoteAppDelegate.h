@@ -24,6 +24,8 @@
 //@property (nonatomic, retain, readonly) AZStore				*azStore;
 @property (nonatomic, assign) BOOL		gud_bPaid;	// In App Purchese
 
+//@property (nonatomic, retain) E2record		*e2addNew;
+
 
 - (void)alertProgressOn:(NSString*)zTitle;
 - (void)alertProgressOff;

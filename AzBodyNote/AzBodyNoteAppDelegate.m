@@ -33,11 +33,10 @@
 }
 
 @synthesize window = window_;
-//@synthesize managedObjectContext = managedObjectContext_;
 @synthesize mocBase;
 @synthesize tabBarController = _tabBarController;
 @synthesize gud_bPaid = gud_bPaid_;
-//@synthesize azStore = azStore_;
+//@synthesize e2addNew = e2addNew_;
 
 /*
 - (void)saveContext

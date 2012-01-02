@@ -57,7 +57,10 @@
 	
 	if (moE2edit_.nBpHi_mmHg==nil) {
 		NSArray *arFetch = [mocFunc_ select:@"E2record" limit:1 offset:0
-									  where:[NSPredicate predicateWithFormat: E2_nBpHi_mmHg @" > 0 AND " E2_dateTime @" < %@", dateNow]
+									  where:[NSPredicate predicateWithFormat: 
+											 E2_nYearMM @" > 200000 AND " 
+											 E2_nBpHi_mmHg @" > 0 AND " 
+											 E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 		if ([arFetch count]==1) {
 			e2prev = [arFetch objectAtIndex:0];
@@ -70,7 +73,10 @@
 	
 	if (moE2edit_.nBpLo_mmHg==nil) {
 		NSArray *arFetch = [mocFunc_ select:@"E2record" limit:1 offset:0
-									  where:[NSPredicate predicateWithFormat: E2_nBpLo_mmHg @" > 0 AND " E2_dateTime @" < %@", dateNow]
+									  where:[NSPredicate predicateWithFormat: 
+											 E2_nYearMM @" > 200000 AND " 
+											 E2_nBpLo_mmHg @" > 0 AND " 
+											 E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 		if ([arFetch count]==1) {
 			e2prev = [arFetch objectAtIndex:0];
@@ -82,7 +88,10 @@
 	
 	if (moE2edit_.nPulse_bpm==nil) {
 		NSArray *arFetch = [mocFunc_ select:@"E2record" limit:1 offset:0
-									  where:[NSPredicate predicateWithFormat: E2_nPulse_bpm @" > 0 AND " E2_dateTime @" < %@", dateNow]
+									  where:[NSPredicate predicateWithFormat: 
+											 E2_nYearMM @" > 200000 AND " 
+											 E2_nPulse_bpm @" > 0 AND " 
+											 E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 		if ([arFetch count]==1) {
 			e2prev = [arFetch objectAtIndex:0];
@@ -94,7 +103,10 @@
 
 	if (moE2edit_.nWeight_10Kg==nil) {
 		NSArray *arFetch = [mocFunc_ select:@"E2record" limit:1 offset:0
-									  where:[NSPredicate predicateWithFormat: E2_nWeight_10Kg @" > 0 AND " E2_dateTime @" < %@", dateNow]
+									  where:[NSPredicate predicateWithFormat: 
+											 E2_nYearMM @" > 200000 AND " 
+											 E2_nWeight_10Kg @" > 0 AND " 
+											 E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 		if ([arFetch count]==1) {
 			e2prev = [arFetch objectAtIndex:0];
@@ -106,7 +118,10 @@
 
 	if (moE2edit_.nTemp_10c==nil) {
 		NSArray *arFetch = [mocFunc_ select:@"E2record" limit:1 offset:0
-									  where:[NSPredicate predicateWithFormat: E2_nTemp_10c @" > 0 AND " E2_dateTime @" < %@", dateNow]
+									  where:[NSPredicate predicateWithFormat: 
+											 E2_nYearMM @" > 200000 AND " 
+											 E2_nTemp_10c @" > 0 AND " 
+											 E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 		if ([arFetch count]==1) {
 			e2prev = [arFetch objectAtIndex:0];
@@ -124,6 +139,7 @@
 	assert(kvsGoal_==nil);
 
 	moE2edit_.dateTime = [NSDate date];
+	moE2edit_.nYearMM = [NSNumber numberWithInteger:196300]; // < 200000 : 未確定（AddNew途中）
 	moE2edit_.sNote1 = nil;
 	moE2edit_.sNote2 = nil;
 	moE2edit_.nBpHi_mmHg = nil;
@@ -365,10 +381,19 @@
 		// 日付修正から戻ったとき
 		bEditDate_ = NO;
 	}
-	else if (editMode_==0) {
+	else if (editMode_==0) { // AddNew
 		if (moE2edit_==nil) {
-			moE2edit_ = [mocFunc_ insertAutoEntity:@"E2record"];
-			[self actionClear];
+			//
+			NSArray *e2recs = [mocFunc_ select: @"E2record"		 limit: 0	offset: 0
+										 where: [NSPredicate predicateWithFormat: E2_nYearMM @" <= 200000"] // 未確定レコード
+										  sort: nil];
+			if (0 < [e2recs count]) {
+				NSLog(@"AddNew: *** E2_nYearMM <= 200000 *** [e2recs count]=%d", (int)[e2recs count]);
+				moE2edit_ = [e2recs objectAtIndex:0]; // AddNew途中のレコードを復帰させる
+			} else {
+				moE2edit_ = [mocFunc_ insertAutoEntity:@"E2record"]; // 新規追加
+				[self actionClear];
+			}
 		}
 		//self.view.alpha = 0; //AddNewのときだけディゾルブ
 	}
@@ -447,13 +472,14 @@
 		// 日付修正へ遷移
 	}
 	else if (editMode_==0) {
-		// TabBar切替により隠されたとき、中止してクリアする
-		[mocFunc_ rollBack];  // 未保存取り消し		//[moc_ rollback];
+		// TabBar切替により隠されたとき、中断し、戻ったときに復帰できるようにする
+		[mocFunc_ commit]; // 未確定のまま保存し、復帰継続できるようにする
 		moE2edit_ = nil; //autorelease
 	}
 	else if (kvsGoal_) {
 		// TabBar切替により隠されたとき、中止してList画面に戻す
-		[mocFunc_ rollBack], moE2edit_ = nil;
+		[mocFunc_ rollBack];  // GOAL!用のダミーなので破棄する
+		moE2edit_ = nil;
 		[self.navigationController popViewControllerAnimated:NO];	// < 前のViewへ戻る
 	}
 	else {
