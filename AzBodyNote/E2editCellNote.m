@@ -28,8 +28,9 @@
 
 - (void)drawRect:(CGRect)rect
 {
+	if (Re2record==nil) return;
 	assert(Re2record);
-	//assert(RzKey);
+
 	ibTfNote1.delegate = self;
 	ibTfNote1.text = Re2record.sNote1;
 	ibTfNote1.placeholder = NSLocalizedString(@"PH_Note1",nil); //@"Condition, memo";

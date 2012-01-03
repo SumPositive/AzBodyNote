@@ -146,6 +146,7 @@
 
 - (void)drawRect:(CGRect)rect
 {
+	if (Re2record==nil) return;
 	assert(Re2record);
 	assert(RzKey);
 	NSNumber *num = [Re2record valueForKey:RzKey];

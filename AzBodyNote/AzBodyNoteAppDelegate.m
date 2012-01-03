@@ -36,7 +36,6 @@
 @synthesize mocBase;
 @synthesize tabBarController = _tabBarController;
 @synthesize gud_bPaid = gud_bPaid_;
-//@synthesize e2addNew = e2addNew_;
 
 /*
 - (void)saveContext
@@ -64,17 +63,27 @@
 
 - (void)alertProgressOn:(NSString*)zTitle
 {
+	if (alertProgress_==nil) {
+		// alertIndicatorOn/Off: のための準備
+		alertProgress_ = [[UIAlertView alloc] initWithTitle:zTitle  message:@" " delegate:nil cancelButtonTitle:nil otherButtonTitles:nil];
+		alertIndicator_ = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+		alertIndicator_.frame = CGRectMake(0, 0, 50, 50);
+		[alertProgress_  addSubview:alertIndicator_];
+	}
+	
 	[alertProgress_ setTitle:zTitle];
 	[alertProgress_ show];
 
 	/*
 	NSLog(@"*** frame  x=%f  y=%f  width=%f  height=%f", alertProgress_.frame.origin.x, alertProgress_.frame.origin.y,
 		  alertProgress_.frame.size.width, alertProgress_.frame.size.height);
-	NSLog(@"*** bounds  x=%f  y=%f  width=%f  height=%f", alertProgress_.bounds.origin.x, alertProgress_.bounds.origin.y,
+	*/
+	 NSLog(@"*** bounds  x=%f  y=%f  width=%f  height=%f", alertProgress_.bounds.origin.x, alertProgress_.bounds.origin.y,
 		  alertProgress_.bounds.size.width, alertProgress_.bounds.size.height);
-	 */
+
 	// タイトルが変わるとサイズが変わり、インジケータの位置が変わるため、毎回以下の処理する必要あり
-	[alertIndicator_ setFrame:CGRectMake((alertProgress_.frame.size.width-50)/2, alertProgress_.frame.size.height-70, 50, 50)];
+	[alertIndicator_ setFrame:CGRectMake((	alertProgress_.bounds.size.width-50)/2, 
+																		alertProgress_.bounds.size.height-75, 50, 50)];
 	[alertIndicator_ startAnimating];
 }
 
@@ -84,6 +93,9 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {	// Override point for customization after application launch.
+
+	// インジケータ開始
+	//[self  alertProgressOn: NSLocalizedString(@"Please wait",nil)];
 	
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
@@ -101,12 +113,14 @@
 	[userDefaults synchronize]; // plistへ書き出す
 
 	// 画面表示に関係する Option Setting を取得する
-#ifdef DEBUG
-	gud_bPaid_ = YES;
-#else
 	gud_bPaid_ = [userDefaults boolForKey:GUD_bPaid];
-#endif
 
+	// Moc初期化
+	if (mocBase==nil) {
+		mocBase = [[MocFunctions alloc] initWithMoc:[self	 managedObjectContext]]; //iCloud同期に使用される
+	}
+	// TabBar画面毎にMOCを生成して個別にrollbackしたかったが、MOC間の変更反映が面倒だったので単一に戻した。
+	
 	//  iCloud KVS 
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	[kvs synchronize]; // 最新同期
@@ -124,10 +138,15 @@
 	if (gud_bPaid_==NO) {
 		gud_bPaid_ = [kvs boolForKey:GUD_bPaid];
 	}
-	
-	// Moc初期化
-	mocBase = [[MocFunctions alloc] initWithMoc:[self managedObjectContext]]; //iCloud同期に使用される
-	// TabBar画面毎にMOCを生成して個別にrollbackしたかったが、MOC間の変更反映が面倒だったので単一に戻した。
+
+#ifdef DEBUGxxxxxxxx
+	// DEBUG : 購入テストするため、強制的にFreeモードにする。
+	gud_bPaid_ = NO;
+	[userDefaults setBool:gud_bPaid_ forKey:GUD_bPaid];
+	[userDefaults synchronize]; // plistへ書き出す
+	[kvs setBool:gud_bPaid_ forKey:GUD_bPaid];
+	[kvs synchronize];
+#endif
 	
 	// Dropbox
 	DBSession* dbSession = [[DBSession alloc]
@@ -135,13 +154,6 @@
 							 appSecret: DBOX_SECRET
 							 root:kDBRootAppFolder]; // either kDBRootAppFolder or kDBRootDropbox
 	[DBSession setSharedSession:dbSession];
-
-	// alertIndicatorOn/Off: のための準備
-	alertProgress_ = [[UIAlertView alloc] initWithTitle:@"" message:@"" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil];
-	alertIndicator_ = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-	//alertIndicator_.frame = CGRectMake(0, 0, 50, 50);
-	//[alertIndicator_ setFrame:CGRectMake((alertProgress_.frame.size.width-50)/2, alertProgress_.frame.size.height-70, 50, 50)];
-	[alertProgress_ addSubview:alertIndicator_];
 
     return YES;
 }
@@ -302,6 +314,7 @@
 			}
 		}
 	}
+
 	// JSON
 	SBJSON	*js = [SBJSON new];
 	NSError *err = nil;
@@ -603,7 +616,9 @@
 		// Compleate !
 		[[SKPaymentQueue defaultQueue] finishTransaction:tran]; // 処理完了
 		// 再フィッチ＆画面リフレッシュ通知
-		[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFETCH_ALL_DATA		// NFM_REFRESH_ALL_VIEWS
+		[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFETCH_ALL_DATA
+															object:self userInfo:nil];
+		[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFRESH_ALL_VIEWS
 															object:self userInfo:nil];
 
 		return YES;

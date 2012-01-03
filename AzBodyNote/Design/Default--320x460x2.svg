@@ -16,9 +16,9 @@
    version="1.1"
    inkscape:version="0.48.1 r9760"
    sodipodi:docname="Default--320x460x2.svg"
-   inkscape:export-filename="/Users/masa/AzukiSoft/AzBodyNote/AzBodyNote/Default.png"
-   inkscape:export-xdpi="45"
-   inkscape:export-ydpi="45"
+   inkscape:export-filename="/Users/masa/AzukiSoft/AzBodyNote/AzBodyNote/Default@2x.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90"
    style="display:inline">
   <defs
      id="defs4">
@@ -2078,8 +2078,8 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.85434783"
-     inkscape:cx="252.0275"
-     inkscape:cy="356.63731"
+     inkscape:cx="320"
+     inkscape:cy="460"
      inkscape:document-units="px"
      inkscape:current-layer="layer5"
      showgrid="false"
@@ -2235,16 +2235,17 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot3359"
-       style="font-size:30.38993263px;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#a52a2a;fill-opacity:1;stroke:none;font-family:Apple Chancery;-inkscape-font-specification:Apple Chancery Italic"
-       transform="matrix(1.5794704,0,0,1.5794704,-50.93273,-248.98095)"><flowRegion
+       style="font-size:30.38993263px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#a52a2a;fill-opacity:1;stroke:none;font-family:Apple LiGothic;-inkscape-font-specification:Apple LiGothic Medium"
+       transform="matrix(1.5794704,0,0,1.5794704,-216.93273,-298.98095)"><flowRegion
          id="flowRegion3361"><rect
            id="rect3363"
            width="536.08142"
            height="163.86769"
            x="72.569977"
            y="689.41473"
-           style="font-size:30.38993263px;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#a52a2a;font-family:Apple Chancery;-inkscape-font-specification:Apple Chancery Italic" /></flowRegion><flowPara
-         id="flowPara3367">Synchronize with iCloud.</flowPara></flowRoot>    <text
+           style="font-size:30.38993263px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;fill:#a52a2a;font-family:Apple LiGothic;-inkscape-font-specification:Apple LiGothic Medium" /></flowRegion><flowPara
+         id="flowPara3337">Please wait.</flowPara><flowPara
+         id="flowPara3339">Synchronize with iCloud.</flowPara></flowRoot>    <text
        xml:space="preserve"
        style="font-size:60.46522903px;font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Zapfino;-inkscape-font-specification:Zapfino Bold Italic"
        x="123.83923"

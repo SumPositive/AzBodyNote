@@ -41,10 +41,16 @@
 
 - (void)refreshAllViews:(NSNotification*)note 
 {	// iCloud-CoreData に変更があれば呼び出される
-    //if (note) {
-	//[self viewWillAppear:NO];
-	[self.tableView reloadData];
-    //}
+    if (note) {
+		//  iCloud KVS 
+		if ([appDelegate_ gud_bPaid]==NO) {
+			NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+			[kvs synchronize]; // 最新同期
+			appDelegate_.gud_bPaid = [kvs boolForKey:GUD_bPaid];
+		}
+		//[self viewWillAppear:NO];
+		[self.tableView reloadData];
+    }
 }
 
 - (void)reloadFetchedResults:(NSNotification*)note 
@@ -60,9 +66,9 @@
 		abort();
 	}		
     
-    //if (note) {
+    if (note) {
         [self.tableView reloadData];
-    //}
+    }
 }
 
 
@@ -120,6 +126,7 @@
 	[self.tableView addSubview:lbPagePrev_];
 
     [self reloadFetchedResults:nil];
+	
 	// observe the app delegate telling us when it's finished asynchronously setting up the persistent store
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadFetchedResults:) 
 												 name:NFM_REFETCH_ALL_DATA

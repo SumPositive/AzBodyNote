@@ -235,7 +235,6 @@
 	
 	if (!mocFunc_) {
 		//  AddNew と Edit が別々に発する rollback の影響を避けるため、別々のContext上で処理する。
-		//mocFunc_ = [[MocFunctions alloc] initWithMoc:[appDelegate_ managedObjectContext]];
 		mocFunc_ = appDelegate_.mocBase; // Read Only
 	}
 	assert(mocFunc_);
@@ -245,6 +244,12 @@
 											 selector:@selector(refreshAllViews:) 
 												 name:NFM_REFRESH_ALL_VIEWS
 											   object:[[UIApplication sharedApplication] delegate]];
+
+	// iCloud KVS 変更通知を受け取る
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(refreshAllViews:) 
+												 name:NSUbiquitousKeyValueStoreDidChangeExternallyNotification 
+											   object:nil];
 
 	kvsGoal_ = nil;
 	switch (editMode_) 
@@ -401,15 +406,25 @@
 		[self setE2recordPrev];
 	}
 	
-	if (appDelegate_.gud_bPaid==NO && editMode_==0) {	// Editのとき、Ａｄなし
+	if (appDelegate_.gud_bPaid) {	// 支払済みにつきAd消す
+		iAdBanner_.delegate = nil;
+		adMobView_.delegate = nil;
 		[UIView beginAnimations:nil context:NULL];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
 		[UIView setAnimationDuration:1.2];
-		if (iAdBanner_.tag==1) {
-			iAdBanner_.alpha = 1;
+		iAdBanner_.alpha = 0;	// 非表示
+		adMobView_.alpha = 0;	// 非表示
+		[UIView commitAnimations];
+	}
+	else if (appDelegate_.gud_bPaid==NO && editMode_==0) {	// Free && AddNew
+		[UIView beginAnimations:nil context:NULL];
+		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+		[UIView setAnimationDuration:1.2];
+		if (iAdBanner_.tag==1) {	// 表示可能ならば
+			iAdBanner_.alpha = 1;	// 表示する
 		}
-		else if (adMobView_.tag==1) {
-			adMobView_.alpha = 1;
+		else if (adMobView_.tag==1) {	// 表示可能ならば
+			adMobView_.alpha = 1;			// 表示する
 		}
 		[UIView commitAnimations];
 		iAdBanner_.delegate = self;
@@ -418,11 +433,12 @@
 }
 
 
-#ifdef DEBUGxxxxxx				// テストデータ生成
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
+
 	
+#ifdef DEBUGxxxxxx				// テストデータ生成
 	// 全データを削除する
 	//[mocBase deleteAllCoreData];
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -456,8 +472,8 @@
 		NSLog(@"Test data added!");
 		[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFETCH_ALL_DATA object:self userInfo:nil];
 	});
-}
 #endif
+}
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
@@ -553,9 +569,15 @@
 #pragma mark - iCloud
 - (void)refreshAllViews:(NSNotification*)note 
 {	// iCloud-CoreData に変更があれば呼び出される
-    //if (note) {
+    if (note) {
+		//  iCloud KVS 
+		if ([appDelegate_ gud_bPaid]==NO) {
+			NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+			[kvs synchronize]; // 最新同期
+			appDelegate_.gud_bPaid = [kvs boolForKey:GUD_bPaid];
+		}
 		[self.tableView reloadData];
-    //}
+    }
 }
 
 

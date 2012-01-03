@@ -27,7 +27,7 @@
 {
 	[mAlert setTitle:zTitle];
 	[mAlert show];
-	[mActivityIndicator setFrame:CGRectMake((mAlert.frame.size.width-50)/2, mAlert.frame.size.height-75, 50, 50)];
+	[mActivityIndicator setFrame:CGRectMake((mAlert.bounds.size.width-50)/2, mAlert.bounds.size.height-75, 50, 50)];
 	[mActivityIndicator startAnimating];
 }
 
@@ -107,13 +107,6 @@
 {
     [super viewDidLoad];
 
-/*	bPad = (320 < self.view.frame.size.width);
-	if (bPad) {
-		mRootPath = @"/iPad/";
-	} else {
-		mRootPath = @"/iPhone/";
-	}*/
-	
 	//ibTfName.delegate = self;   IBにて定義済み
 	//ibTableView.delegate = self;
 	
@@ -122,7 +115,7 @@
 	
 	// alertIndicatorOn: alertIndicatorOff: のための準備
 	//[mAlert release];
-	mAlert = [[UIAlertView alloc] initWithTitle:@"" message:@"" delegate:self cancelButtonTitle:nil otherButtonTitles:nil]; // deallocにて解放
+	mAlert = [[UIAlertView alloc] initWithTitle:@"" message:@"" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil]; // deallocにて解放
 	//[self.view addSubview:mAlert];　　alertIndicatorOn:にてaddSubviewしている。
 	//[mActivityIndicator release];
 	mActivityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];

@@ -61,6 +61,8 @@
 	if (appDelegate_==nil) {
 		appDelegate_ = (AzBodyNoteAppDelegate*)[[UIApplication sharedApplication] delegate];
 	}
+	// インジケータ開始 ＜＜＜ここで一回表示しなければ、インジケータ位置が定まらない（原因不明のため対処療法）
+	[appDelegate_  alertProgressOn: NSLocalizedString(@"Please wait",nil)];
 	
 	//self.title = NSLocalizedString(@"TabInfo",nil);
 	ibLbTitle.text = NSLocalizedString(@"InfoTitle",nil);
@@ -97,6 +99,8 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+	// インジケータ終了
+	[appDelegate_	alertProgressOff];
 	
 	self.view.alpha = 0.3;
 }
@@ -199,7 +203,7 @@
 	switch (alertView.tag) 
 	{
 		case ALERT_ToSupportSite: {
-			NSURL *url = [NSURL URLWithString:@"http://HealthyGoo.tumblr.com/"];
+			NSURL *url = [NSURL URLWithString:@"http://Condition.azukid.com/"];
 			[[UIApplication sharedApplication] openURL:url];
 		}	break;
 			
@@ -216,9 +220,9 @@
 			// Subject: 件名		CFBundleDisplayName
 			NSString *zSubj = NSLocalizedString(@"InfoTitle",nil);
 			if (appDelegate_.gud_bPaid) {
-				zSubj = [zSubj stringByAppendingString:@"  Sponsor"];
+				zSubj = [zSubj stringByAppendingString:@"  (Sponsor)"];
 			} else {
-				zSubj = [zSubj stringByAppendingString:@"  Trial"];
+				zSubj = [zSubj stringByAppendingString:@"  (Trial)"];
 			}
 			[picker setSubject:zSubj];  
 			
@@ -250,9 +254,12 @@
 		{
 			// アドオン購入処理開始　　　　　　　<SKPaymentTransactionObserver>は、AzBodyNoteAppDelegateに実装
 			assert(appDelegate_);
-			[[SKPaymentQueue defaultQueue] addTransactionObserver: appDelegate_];
-			SKPayment *payment = [SKPayment paymentWithProductIdentifier: STORE_PRODUCTID_UNLOCK];
-			[[SKPaymentQueue defaultQueue] addPayment:payment];
+			if (productUnlock_) {
+				[[SKPaymentQueue defaultQueue] addTransactionObserver: appDelegate_];
+				//SKPayment *payment = [SKPayment paymentWithProductIdentifier: STORE_PRODUCTID_UNLOCK]; <<<Deprecated
+				SKPayment *payment = [SKPayment paymentWithProduct:productUnlock_];
+				[[SKPaymentQueue defaultQueue] addPayment:payment];
+			}
 		} break;
 	}
 }
