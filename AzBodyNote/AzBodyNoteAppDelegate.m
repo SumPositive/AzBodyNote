@@ -35,7 +35,8 @@
 @synthesize window = window_;
 @synthesize mocBase;
 @synthesize tabBarController = _tabBarController;
-@synthesize gud_bPaid = gud_bPaid_;
+@synthesize app_is_sponsor = app_is_sponsor_;
+@synthesize app_e2record_count = app_e2record_count_;
 
 /*
 - (void)saveContext
@@ -113,7 +114,7 @@
 	[userDefaults synchronize]; // plistへ書き出す
 
 	// 画面表示に関係する Option Setting を取得する
-	gud_bPaid_ = [userDefaults boolForKey:GUD_bPaid];
+	app_is_sponsor_ = [userDefaults boolForKey:GUD_bPaid];
 
 	// Moc初期化
 	if (mocBase==nil) {
@@ -135,8 +136,8 @@
 		[kvs setObject:[NSNumber numberWithInt:650] forKey:Goal_nWeight_10Kg];
 		[kvs synchronize];
 	}
-	if (gud_bPaid_==NO) {
-		gud_bPaid_ = [kvs boolForKey:GUD_bPaid];
+	if (app_is_sponsor_==NO) {
+		app_is_sponsor_ = [kvs boolForKey:GUD_bPaid];
 	}
 
 #ifdef DEBUGxxxxxxxx
@@ -279,7 +280,7 @@
 	// Sort条件
 	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
 	NSArray *sortDesc = [NSArray arrayWithObjects: sort1,nil]; // 日付降順：Limit抽出に使用
-	NSArray *aE2records = [mocBase select: @"E2record"
+	NSArray *aE2records = [mocBase select: E2_ENTITYNAME
 									limit: 0
 								   offset: 0
 									where: [NSPredicate predicateWithFormat:E2_nYearMM @" > 200000"] // 未保存を除外する
@@ -382,7 +383,7 @@
 	{
 		NSString *zClass = [dict objectForKey:@"#class"];
 
-		if ([zClass isEqualToString:@"E2record"]) {
+		if ([zClass isEqualToString:E2_ENTITYNAME]) {
 			[mocBase insertNewObjectForDictionary:dict];
 		}
 		//else if ([zClass isEqualToString:@"E1body"]) {
@@ -391,6 +392,8 @@
 	}
 	// コミット
 	[mocBase commit];
+	// E2 件数
+	app_e2record_count_ = [mocBase e2record_count];
 	// リフレッシュ通知
     NSNotification* refreshNotification = [NSNotification notificationWithName:NFM_REFRESH_ALL_VIEWS
 																		object:self  userInfo:nil];
@@ -605,7 +608,7 @@
 	[self alertProgressOff];
 	if ([tran.payment.productIdentifier isEqualToString:STORE_PRODUCTID_UNLOCK]) {
 		// Unlock
-		gud_bPaid_ = YES;
+		app_is_sponsor_ = YES;
 		// UserDefへ記録する （iOS5未満のため）
 		[[NSUserDefaults standardUserDefaults] setBool:YES forKey:GUD_bPaid];
 		[[NSUserDefaults standardUserDefaults] synchronize];

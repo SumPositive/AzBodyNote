@@ -39,7 +39,7 @@
 #define NFM_REFETCH_ALL_DATA			@"RefetchAllDatabaseData"
 
 
-// UserDefault ------------------------------------- Settings
+// UserDefault ------------------------------------- Settings		【注意】リリース後は変更厳禁！
 #define GUD_bPaid									@"GUD_bPaid"
 #define GUD_Calc_Method					@"GUD_Calc_Method"		// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
 #define GUD_Calc_RoundBankers			@"GUD_Calc_RoundBankers"

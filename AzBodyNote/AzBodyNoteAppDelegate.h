@@ -21,7 +21,9 @@
 @property (nonatomic, retain, readonly) NSManagedObjectContext			*managedObjectContext;
 @property (nonatomic, retain, readonly) MocFunctions		*mocBase;
 
-@property (nonatomic, assign) BOOL		gud_bPaid;	// In App Purchese
+// app_ Global paramaters
+@property (nonatomic, assign) BOOL			app_is_sponsor;				// In App Purchese
+@property (nonatomic, assign) NSInteger	app_e2record_count;		// Trial制限に使用。　 コメント投稿情報に表示。
 
 
 

@@ -83,7 +83,7 @@
 	
 	// PAID 広告＆制限解除
 	ibBuPaid.hidden = YES;
-	if (appDelegate_.gud_bPaid==NO)
+	if (appDelegate_.app_is_sponsor==NO)
 	{
 		if ([SKPaymentQueue canMakePayments]) { // 課金可能であるか確認する
 			// 課金可能
@@ -179,7 +179,7 @@
 
 - (IBAction)ibBuPaid:(UIButton *)button
 {
-	if (appDelegate_.gud_bPaid) {	// 購入済み
+	if (appDelegate_.app_is_sponsor) {	// 購入済み
 		alertBox(NSLocalizedString(@"SK Restored",nil), nil, @"OK");
 		return;
 	}
@@ -219,7 +219,7 @@
 			
 			// Subject: 件名		CFBundleDisplayName
 			NSString *zSubj = NSLocalizedString(@"InfoTitle",nil);
-			if (appDelegate_.gud_bPaid) {
+			if (appDelegate_.app_is_sponsor) {
 				zSubj = [zSubj stringByAppendingString:@"  (Sponsor)"];
 			} else {
 				zSubj = [zSubj stringByAppendingString:@"  (Trial)"];
@@ -239,11 +239,13 @@
 					 [[UIDevice currentDevice] systemVersion]]; // OSの現在のバージョン
 
 			NSArray *languages = [NSLocale preferredLanguages];
-			zBody = [zBody stringByAppendingFormat:@"Locale: %@ (%@)\n\n",
+			zBody = [zBody stringByAppendingFormat:@"Locale: %@ (%@)\n",
 					 [[NSLocale currentLocale] objectForKey:NSLocaleIdentifier],
 					 [languages objectAtIndex:0]];
+
+			zBody = [zBody stringByAppendingFormat:@"Records: %ld\n\n", appDelegate_.app_e2record_count];
 			
-			zBody = [zBody stringByAppendingString:NSLocalizedString(@"Contact message",nil)];
+			zBody = [zBody stringByAppendingString: NSLocalizedString(@"Contact message",nil)];
 			[picker setMessageBody:zBody isHTML:NO];
 			
 			[self presentModalViewController:picker animated:YES];

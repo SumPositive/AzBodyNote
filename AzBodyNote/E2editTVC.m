@@ -56,7 +56,7 @@
 	if (dateNow==nil) dateNow = [NSDate date];
 	
 	if (moE2edit_.nBpHi_mmHg==nil) {
-		NSArray *arFetch = [mocFunc_ select:@"E2record" limit:1 offset:0
+		NSArray *arFetch = [mocFunc_ select:E2_ENTITYNAME limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: 
 											 E2_nYearMM @" > 200000 AND " 
 											 E2_nBpHi_mmHg @" > 0 AND " 
@@ -72,7 +72,7 @@
 	}
 	
 	if (moE2edit_.nBpLo_mmHg==nil) {
-		NSArray *arFetch = [mocFunc_ select:@"E2record" limit:1 offset:0
+		NSArray *arFetch = [mocFunc_ select:E2_ENTITYNAME limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: 
 											 E2_nYearMM @" > 200000 AND " 
 											 E2_nBpLo_mmHg @" > 0 AND " 
@@ -87,7 +87,7 @@
 	}
 	
 	if (moE2edit_.nPulse_bpm==nil) {
-		NSArray *arFetch = [mocFunc_ select:@"E2record" limit:1 offset:0
+		NSArray *arFetch = [mocFunc_ select:E2_ENTITYNAME limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: 
 											 E2_nYearMM @" > 200000 AND " 
 											 E2_nPulse_bpm @" > 0 AND " 
@@ -102,7 +102,7 @@
 	}
 
 	if (moE2edit_.nWeight_10Kg==nil) {
-		NSArray *arFetch = [mocFunc_ select:@"E2record" limit:1 offset:0
+		NSArray *arFetch = [mocFunc_ select:E2_ENTITYNAME limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: 
 											 E2_nYearMM @" > 200000 AND " 
 											 E2_nWeight_10Kg @" > 0 AND " 
@@ -117,7 +117,7 @@
 	}
 
 	if (moE2edit_.nTemp_10c==nil) {
-		NSArray *arFetch = [mocFunc_ select:@"E2record" limit:1 offset:0
+		NSArray *arFetch = [mocFunc_ select:E2_ENTITYNAME limit:1 offset:0
 									  where:[NSPredicate predicateWithFormat: 
 											 E2_nYearMM @" > 200000 AND " 
 											 E2_nTemp_10c @" > 0 AND " 
@@ -157,6 +157,22 @@
 {
 	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
 
+	if (editMode_==0) { // AddNewのとき
+		appDelegate_.app_e2record_count = [mocFunc_ e2record_count];
+		if (appDelegate_.app_is_sponsor==NO) {
+			if (50 < appDelegate_.app_e2record_count) {
+				// 告知
+				alertBox(	NSLocalizedString(@"Trial Limit",nil), 
+								NSLocalizedString(@"Trial Limit msg",nil), 
+								NSLocalizedString(@"Roger",nil));
+				if (55 < appDelegate_.app_e2record_count) {
+					// 禁止
+					return;  // Cancel しかできない
+				}
+			}
+		}
+	}
+	
 	if (kvsGoal_) {
 		[kvsGoal_ setObject:moE2edit_.sNote1				forKey:Goal_sNote1];
 		[kvsGoal_ setObject:moE2edit_.sNote2				forKey:Goal_sNote2];
@@ -310,7 +326,7 @@
 			assert(moE2edit_==nil);
 			kvsGoal_ = [NSUbiquitousKeyValueStore defaultStore];
 			//moE2edit_ = [[E2record alloc] init]; // MOCで無い！ 一時エンティティ
-			moE2edit_ = [mocFunc_ insertAutoEntity:@"E2record"]; // 一時利用なので後で破棄すること ＜＜SAVEしない
+			moE2edit_ = [mocFunc_ insertAutoEntity:E2_ENTITYNAME]; // 一時利用なので後で破棄すること ＜＜SAVEしない
 			[kvsGoal_ synchronize]; // iCloud最新同期（取得）
 			moE2edit_.sNote1 =				toNil([kvsGoal_ objectForKey:Goal_sNote1]);
 			moE2edit_.sNote2 =				toNil([kvsGoal_ objectForKey:Goal_sNote2]);
@@ -342,7 +358,7 @@
 	 [[aTab objectAtIndex:3] setTitle: NSLocalizedString(@"TabInfo",nil)];
 	
 
-	if (appDelegate_.gud_bPaid==NO) {
+	if (appDelegate_.app_is_sponsor==NO) {
 		//CGRect rcAd = CGRectMake(0, self.view.frame.size.height-self.tabBarController.view.frame.size.height-50, 320, 50);
 		CGRect rcAd = CGRectMake(0, self.view.frame.size.height-28-50, 320, 50);  // GAD_SIZE_320x50
 		//--------------------------------------------------------------------------------------------------------- AdMob
@@ -389,14 +405,14 @@
 	else if (editMode_==0) { // AddNew
 		if (moE2edit_==nil) {
 			//
-			NSArray *e2recs = [mocFunc_ select: @"E2record"		 limit: 0	offset: 0
+			NSArray *e2recs = [mocFunc_ select: E2_ENTITYNAME		 limit: 0	offset: 0
 										 where: [NSPredicate predicateWithFormat: E2_nYearMM @" <= 200000"] // 未確定レコード
 										  sort: nil];
 			if (0 < [e2recs count]) {
 				NSLog(@"AddNew: *** E2_nYearMM <= 200000 *** [e2recs count]=%d", (int)[e2recs count]);
 				moE2edit_ = [e2recs objectAtIndex:0]; // AddNew途中のレコードを復帰させる
 			} else {
-				moE2edit_ = [mocFunc_ insertAutoEntity:@"E2record"]; // 新規追加
+				moE2edit_ = [mocFunc_ insertAutoEntity:E2_ENTITYNAME]; // 新規追加
 				[self actionClear];
 			}
 		}
@@ -406,7 +422,7 @@
 		[self setE2recordPrev];
 	}
 	
-	if (appDelegate_.gud_bPaid) {	// 支払済みにつきAd消す
+	if (appDelegate_.app_is_sponsor) {	// 支払済みにつきAd消す
 		iAdBanner_.delegate = nil;
 		adMobView_.delegate = nil;
 		[UIView beginAnimations:nil context:NULL];
@@ -416,7 +432,7 @@
 		adMobView_.alpha = 0;	// 非表示
 		[UIView commitAnimations];
 	}
-	else if (appDelegate_.gud_bPaid==NO && editMode_==0) {	// Free && AddNew
+	else if (appDelegate_.app_is_sponsor==NO && editMode_==0) {	// Free && AddNew
 		[UIView beginAnimations:nil context:NULL];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
 		[UIView setAnimationDuration:1.2];
@@ -451,7 +467,7 @@
 		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 		static int iTotal = 1;
 		for (int i=1; i<=100; i++, iTotal++) {
-			E2record *e2 = [mocFunc_ insertAutoEntity:@"E2record"];
+			E2record *e2 = [mocFunc_ insertAutoEntity:E2_ENTITYNAME];
 			
 			e2.dateTime = dt;
 			NSDateComponents* comp = [calendar components: NSYearCalendarUnit | NSMonthCalendarUnit fromDate:dt];
@@ -511,7 +527,7 @@
 - (void)viewDidDisappear:(BOOL)animated
 {	// 非表示になった後に呼び出される
 	// TabBar切替では遷移時に消す必要なし。別の NaviView だから。
-	if (appDelegate_.gud_bPaid==NO && bEditDate_==NO) {	// EditDateならば隠さない
+	if (appDelegate_.app_is_sponsor==NO && bEditDate_==NO) {	// EditDateならば隠さない
 		iAdBanner_.delegate = nil;
 		adMobView_.delegate = nil;
 		[UIView beginAnimations:nil context:NULL];
@@ -537,7 +553,7 @@
 	//NSLog(@"--- viewDidUnload ---"); 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	
-	if (appDelegate_.gud_bPaid==NO) {
+	if (appDelegate_.app_is_sponsor==NO) {
 		// ARCによりrelease不要になったが、delegateの解放は必須。
 		if (iAdBanner_) {
 			[iAdBanner_ cancelBannerViewAction];	// 停止
@@ -571,10 +587,10 @@
 {	// iCloud-CoreData に変更があれば呼び出される
     if (note) {
 		//  iCloud KVS 
-		if ([appDelegate_ gud_bPaid]==NO) {
+		if ([appDelegate_ app_is_sponsor]==NO) {
 			NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 			[kvs synchronize]; // 最新同期
-			appDelegate_.gud_bPaid = [kvs boolForKey:GUD_bPaid];
+			appDelegate_.app_is_sponsor = [kvs boolForKey:GUD_bPaid];
 		}
 		[self.tableView reloadData];
     }

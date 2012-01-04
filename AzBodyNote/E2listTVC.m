@@ -43,10 +43,10 @@
 {	// iCloud-CoreData に変更があれば呼び出される
     if (note) {
 		//  iCloud KVS 
-		if ([appDelegate_ gud_bPaid]==NO) {
+		if ([appDelegate_ app_is_sponsor]==NO) {
 			NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 			[kvs synchronize]; // 最新同期
-			appDelegate_.gud_bPaid = [kvs boolForKey:GUD_bPaid];
+			appDelegate_.app_is_sponsor = [kvs boolForKey:GUD_bPaid];
 		}
 		//[self viewWillAppear:NO];
 		[self.tableView reloadData];
@@ -118,7 +118,7 @@
 	}
 	lbPagePrev_.textAlignment = UITextAlignmentCenter;
 	lbPagePrev_.backgroundColor = [UIColor clearColor];
-	if (appDelegate_.gud_bPaid) {
+	if (appDelegate_.app_is_sponsor) {
 		lbPagePrev_.text = NSLocalizedString(@"List Top",nil);
 	} else {
 		lbPagePrev_.text = NSLocalizedString(@"List Limit",nil);
@@ -148,13 +148,13 @@
 	//---------------------------------------------------------------------------------------------------------
 	// didFinishLaunchingWithOptions:では、早すぎるためか落ちるため、ここに実装してた。
 	// E2 目標(The GOAL)固有レコードが無ければ追加する
-	NSArray *arFetch = [mocFunc_ select:@"E2record"
+	NSArray *arFetch = [mocFunc_ select:E2_ENTITYNAME
 										limit:0		//=0:無制限  ＜＜ 1にすると結果は0件になるのでダメ
 										offset:0
 										where:[NSPredicate predicateWithFormat: E2_dateTime @" == %@", [MocFunctions dateGoal]]
 										sort:nil];
 	if ([arFetch count] <= 0) { // 無いので追加する
-		E2record *moE2goal = [mocFunc_ insertAutoEntity:@"E2record"];
+		E2record *moE2goal = [mocFunc_ insertAutoEntity:E2_ENTITYNAME];
 		// 固有日付をセット
 		moE2goal.dateTime = [MocFunctions dateGoal];
 		moE2goal.nYearMM = [NSNumber numberWithInteger: E2_nYearMM_GOAL];	// 主に、こちらで比較チェックする
@@ -179,7 +179,7 @@
 */
 	
 	//--------------------------------------------------------------------------------------------------------- AdMob
-	if (appDelegate_.gud_bPaid==NO && adMobView_==nil) {
+	if (appDelegate_.app_is_sponsor==NO && adMobView_==nil) {
 		adMobView_ = [[GADBannerView alloc]
 					  initWithFrame:CGRectMake(0, 0,			// TableCell用
 											   GAD_SIZE_320x50.width,
@@ -282,7 +282,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	
 	// ARCによりrelease不要になったが、delegateの解放は必須。
-	if (appDelegate_.gud_bPaid==NO && adMobView_) {
+	if (appDelegate_.app_is_sponsor==NO && adMobView_) {
 		adMobView_.delegate = nil;  //受信STOP  ＜＜これが無いと破棄後に呼び出されて落ちる
 		adMobView_ = nil;
 	}
@@ -339,7 +339,7 @@
 	}
 	// GOALセクション
 	NSInteger iRows = 2;	// GOAL & Dropbox
-	if (appDelegate_.gud_bPaid==NO) {
+	if (appDelegate_.app_is_sponsor==NO) {
 		iRows++; // AdMob
 	}
 	return  iRows;
@@ -414,7 +414,7 @@
 			[self configureCell:cell atIndexPath:nil]; // GOAL!
 			return cell;
 		}
-		if (appDelegate_.gud_bPaid) {
+		if (appDelegate_.app_is_sponsor) {
 			iRow++; // AdMob行をパスするため
 		} else {
 			if (iRow==1) {
@@ -539,7 +539,7 @@
 	{	// Functions
 		indexPathEdit_ = nil; // Editモード解除
 		int iRow = indexPath.row;
-		if (appDelegate_.gud_bPaid) {
+		if (appDelegate_.app_is_sponsor) {
 			iRow++; // AdMob行をパスするため
 		}
 		if (iRow==2) {	// Dropbox
@@ -570,22 +570,17 @@
 
 	// エンティティ指定
     // Edit the entity name as appropriate.
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"E2record" inManagedObjectContext:[mocFunc_ getMoc]];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:E2_ENTITYNAME inManagedObjectContext:[mocFunc_ getMoc]];
     [fetchRequest setEntity:entity];
     
     // Set the batch size to a suitable number.
 	[fetchRequest setFetchBatchSize:20];
 	
 	// ページ先頭行
-	//NSLog(@"fetchedResultsController: e2offset_=%ld", (long)e2offset_);
-	//[fetchRequest setFetchOffset: e2offset_];
+	[fetchRequest setFetchOffset: 0];
 	
 	// 1ページ行数
-	if (appDelegate_.gud_bPaid) {
-		[fetchRequest setFetchLimit: 0]; // 無制限
-	} else {
-		[fetchRequest setFetchLimit: LIST_PAGE_LIMIT];
-	}
+	[fetchRequest setFetchLimit: 0]; // 無制限 //[0.8.1]新しい保存にて件数制限するようにした
 
 	// where
 	[fetchRequest setPredicate:[NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"]]; // 未保存を除外する
@@ -699,7 +694,7 @@
 		// 前ページへ予告表示
 		if (lbPagePrev_.tag != 1) {
 			lbPagePrev_.tag = 1;
-			if (appDelegate_.gud_bPaid) {
+			if (appDelegate_.app_is_sponsor) {
 				lbPagePrev_.text = NSLocalizedString(@"List Top",nil);
 			} else {
 				lbPagePrev_.text = NSLocalizedString(@"List Paid",nil);
@@ -708,7 +703,7 @@
 	} else {
 		if (lbPagePrev_.tag != 0) {
 			lbPagePrev_.tag = 0;
-			if (appDelegate_.gud_bPaid) {
+			if (appDelegate_.app_is_sponsor) {
 				lbPagePrev_.text = NSLocalizedString(@"List Top",nil);
 			} else {
 				lbPagePrev_.text = NSLocalizedString(@"List Limit",nil);

@@ -28,9 +28,11 @@
 - (BOOL)commit;
 - (void)rollBack;
 
+- (NSUInteger)e2record_count;
+
 - (NSArray *)select:(NSString *)zEntity
-			  limit:(NSInteger)iLimit
-			 offset:(NSInteger)iOffset
+			  limit:(NSUInteger)iLimit
+			 offset:(NSUInteger)iOffset
 			  where:(NSPredicate *)predicate
 			   sort:(NSArray *)arSort;
 

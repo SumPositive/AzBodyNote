@@ -71,7 +71,7 @@
 	mocFunc_ = appDelegate_.mocBase; // Read Only
 	assert(mocFunc_);
 	
-	if (appDelegate_.gud_bPaid==NO) {
+	if (appDelegate_.app_is_sponsor==NO) {
 		uiActivePageMax_ = 0; // 0ページ制限
 	}
 
@@ -117,7 +117,7 @@
 		iOffset -= iOverRight;
 	}
 
-	NSArray *e2recs = [mocFunc_ select: @"E2record"
+	NSArray *e2recs = [mocFunc_ select: E2_ENTITYNAME
 									limit: iOverLeft + GRAPH_PAGE_LIMIT + iOverRight
 									offset: iOffset
 									where: [NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"] // 未保存を除外する
@@ -235,7 +235,7 @@
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {	// スクロール中に呼ばれる
 	//NSLog(@"scrollViewDidScroll: .contentOffset.x=%f", scrollView.contentOffset.x);
-	if (appDelegate_.gud_bPaid) {
+	if (appDelegate_.app_is_sponsor) {
 		if (scrollView.contentOffset.x < -70) {
 			// PREV（過去）ページへ
 			if (uiActivePage_ < uiActivePageMax_) {
@@ -267,7 +267,7 @@
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {	// スクロール終了時（指を離した時）に呼ばれる
 	NSLog(@"scrollViewDidEndDragging: .contentOffset.x=%f  decelerate=%d", scrollView.contentOffset.x, decelerate);
-	if (appDelegate_.gud_bPaid) {
+	if (appDelegate_.app_is_sponsor) {
 		if (scrollView.contentOffset.x < -70) {
 			// PREV（過去）ページへ
 			if (uiActivePage_ < uiActivePageMax_) {

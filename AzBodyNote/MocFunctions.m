@@ -114,9 +114,38 @@ static NSDate *dateGoal_ = nil;
 
 #pragma mark - Search
 
+- (NSUInteger)e2record_count
+{
+	assert(moc_);
+	NSFetchRequest *req = nil;
+	@try {
+		req = [[NSFetchRequest alloc] init];
+		
+		// select
+		NSEntityDescription *entity = [NSEntityDescription entityForName:E2_ENTITYNAME 
+												  inManagedObjectContext:moc_];
+		[req setEntity:entity];
+		
+		// where
+		[req setPredicate: [NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"]];
+		
+		NSError *error = nil;
+		NSUInteger count = [moc_ countForFetchRequest:req error:&error];
+		if (error) {
+			NSLog(@"count: Error %@, %@", error, [error userInfo]);
+			return 0;
+		}
+		return count;
+	}
+	@catch (NSException *errEx) {
+		NSLog(@"count @catch:NSException: %@ : %@", [errEx name], [errEx reason]);
+	}
+	return 0;
+}
+
 - (NSArray *)select:(NSString *)zEntity
-			  limit:(NSInteger)iLimit
-			 offset:(NSInteger)iOffset
+			  limit:(NSUInteger)iLimit
+			 offset:(NSUInteger)iOffset
 			  where:(NSPredicate *)predicate
 			   sort:(NSArray *)arSort 
 {

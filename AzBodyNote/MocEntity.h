@@ -20,6 +20,7 @@
 @property (nonatomic, retain) NSString		*sNote;
 //@property (nonatomic, retain) NSSet			*e2records;		// E1 <-->> E2  ＜＜関連を無くした
 @end
+#define E1_ENTITYNAME			@"E1body"
 #define E1_dBirthday					@"dBirthday"
 #define E1_nMkBpHi_mmHg		@"nMkBpHi_mmHg"
 #define E1_nMkBpLo_mmHg	@"nMkBpLo_mmHg"
@@ -44,6 +45,7 @@
 @property (nonatomic, retain) NSString		*sNote2;
 //@property (nonatomic, retain) E1body			*e1body;		// E2 <<--> E1  ＜＜関連を無くした
 @end
+#define E2_ENTITYNAME			@"E2record"
 #define E2_bCaution					@"bCaution"
 #define E2_dateTime					@"dateTime"
 #define E2_nBpHi_mmHg			@"nBpHi_mmHg"
