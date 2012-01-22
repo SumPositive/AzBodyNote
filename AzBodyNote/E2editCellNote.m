@@ -14,29 +14,29 @@
 
 @implementation E2editCellNote
 {
-	__unsafe_unretained id						delegate;
-	__strong E2record			*Re2record;
+	//__unsafe_unretained id						delegate;
+	//__strong E2record			*Re2record;
 	
 	IBOutlet UITextField		*ibTfNote1;
 	IBOutlet UITextField		*ibTfNote2;
 }
-@synthesize delegate;
-@synthesize Re2record;
+@synthesize delegate = delegate_;
+@synthesize Re2record = e2record_;
 //@synthesize ibTfNote1, ibTfNote2;
 
 
 
 - (void)drawRect:(CGRect)rect
 {
-	if (Re2record==nil) return;
-	assert(Re2record);
+	if (e2record_==nil) return;
+	assert(e2record_);
 
 	ibTfNote1.delegate = self;
-	ibTfNote1.text = Re2record.sNote1;
+	ibTfNote1.text = e2record_.sNote1;
 	ibTfNote1.placeholder = NSLocalizedString(@"PH_Note1",nil); //@"Condition, memo";
 	
 	ibTfNote2.delegate = self;
-	ibTfNote2.text = Re2record.sNote2;
+	ibTfNote2.text = e2record_.sNote2;
 	ibTfNote2.placeholder = NSLocalizedString(@"PH_Note2",nil); //@"Medicine,  memo";
 }
 
@@ -46,16 +46,16 @@
 /*** [Done]を押さずに[Save]が押されたとき、textFieldDidEndEditing:を通らないため、文字入力の都度更新するようにした。
 - (void)textFieldDidEndEditing:(UITextField *)textField            
 {	// may be called if forced even if shouldEndEditing returns NO (e.g. view removed from window) or endEditing:YES called
-	if (textField==ibTfNote1 && ![Re2record.sNote1 isEqualToString:textField.text]) {
-		Re2record.sNote1 = textField.text;
-		if ([delegate respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
-			[delegate editUpdate];  // 変更あり
+	if (textField==ibTfNote1 && ![e2record_.sNote1 isEqualToString:textField.text]) {
+		e2record_.sNote1 = textField.text;
+		if ([delegate_ respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
+			[delegate_ editUpdate];  // 変更あり
 		}
 	}
-	else if (textField==ibTfNote2 && ![Re2record.sNote2 isEqualToString:textField.text]) {
-		Re2record.sNote2 = textField.text;
-		if ([delegate respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
-			[delegate editUpdate];  // 変更あり
+	else if (textField==ibTfNote2 && ![e2record_.sNote2 isEqualToString:textField.text]) {
+		e2record_.sNote2 = textField.text;
+		if ([delegate_ respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
+			[delegate_ editUpdate];  // 変更あり
 		}
 	}
 }*/
@@ -69,16 +69,16 @@
 	
 	// [Done]を押さずに[Save]が押されたとき、textFieldDidEndEditing:を通らないため、文字入力の都度更新するようにした。
 	// この時点で、textField.text は更新されていない。
-	if (textField==ibTfNote1 && ![Re2record.sNote1 isEqualToString:text]) {
-		Re2record.sNote1 = text;  //textField.text;
-		if ([delegate respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
-			[delegate editUpdate];  // 変更あり
+	if (textField==ibTfNote1 && ![e2record_.sNote1 isEqualToString:text]) {
+		e2record_.sNote1 = text;  //textField.text;
+		if ([delegate_ respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
+			[delegate_ editUpdate];  // 変更あり
 		}
 	}
-	else if (textField==ibTfNote2 && ![Re2record.sNote2 isEqualToString:text]) {
-		Re2record.sNote2 = text;  //textField.text;
-		if ([delegate respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
-			[delegate editUpdate];  // 変更あり
+	else if (textField==ibTfNote2 && ![e2record_.sNote2 isEqualToString:text]) {
+		e2record_.sNote2 = text;  //textField.text;
+		if ([delegate_ respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
+			[delegate_ editUpdate];  // 変更あり
 		}
 	}
 	return YES;

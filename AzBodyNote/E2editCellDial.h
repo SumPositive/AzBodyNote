@@ -24,7 +24,7 @@
 @property (nonatomic, assign) NSInteger		mValueMin;
 @property (nonatomic, assign) NSInteger		mValueMax;
 @property (nonatomic, assign) NSInteger		mValueDec;
-@property (nonatomic, assign) NSInteger		mValueStep;
+//@property (nonatomic, assign) NSInteger		mValueStep;
 @property (nonatomic, assign) NSInteger		mValuePrev;
 
 - (IBAction)ibBuValue:(UIButton *)button;

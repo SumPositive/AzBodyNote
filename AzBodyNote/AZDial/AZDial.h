@@ -1,10 +1,19 @@
 //
 //  AZDial.h
-//  AzBodyNote
+//  AZClass
 //
 //  Created by Sum Positive on 11/10/06.
 //  Copyright (c) 2011 Azukid. All rights reserved.
 //
+// ------------------------------------------------ AZClass 使用規則
+// マスタソースは、AZClass フォルダ配下に保存する。
+// 各アプリソースへコピーして使用する。
+// 修正あるときは、各アプリソースで仕上げた後、マスタへコピーすること。
+//
+// ------------------------------------------------ Update History
+// 2012-01-19 Fix: step>1のときmin未満になることを回避
+// 2011-10-06 Start.
+// ------------------------------------------------ 
 
 #import <UIKit/UIKit.h>
 
@@ -17,7 +26,7 @@
 			   step:(NSInteger)step			// 増減値
 			stepper:(BOOL)stepper;			// ステッパボタン有無
 
-- (void)setDialFrame:(CGRect)frame;	// NEW 回転のため
+- (void)setFrame:(CGRect)frame;	// NEW 回転のため
 
 - (void)setDial:(NSInteger)dial  animated:(BOOL)animated;  //NG//setValue:ダメ Key-Valueになってしまう。
 - (void)setMin:(NSInteger)vmin;

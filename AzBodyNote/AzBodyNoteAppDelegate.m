@@ -122,13 +122,22 @@
 	}
 	// TabBar画面毎にMOCを生成して個別にrollbackしたかったが、MOC間の変更反映が面倒だったので単一に戻した。
 	
+	// デバイス、ＯＳ確認
+	if ([[[UIDevice currentDevice] systemVersion] compare:@"5.0"]==NSOrderedAscending) { // ＜ "5.0"
+		// iOS5.0より前
+		alertBox(@"! STOP !", @"Need more iOS 5.0", nil);
+		exit(0);
+	}
+	//app_is_iPad_ = [[[UIDevice currentDevice] model] hasPrefix:@"iPad"];	// iPad
+	//NSLog(@"app_is_iPad_=%d,  app_is_Ad_=%d,  app_is_sponsor_=%d", app_is_iPad_, app_is_Ad_, app_is_sponsor_);
+
 	//  iCloud KVS 
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	[kvs synchronize]; // 最新同期
 	if ([[kvs objectForKey:Goal_nBpHi_mmHg] integerValue] < E2_nBpHi_MIN) {
 		// 初期データ追加
-		[kvs setObject:[NSNull null]	forKey:Goal_sNote1]; // Attempt to insert non-property value '<null>' of class 'NSNull'.
-		[kvs setObject:[NSNull null]	forKey:Goal_sNote2];
+		//[kvs setObject:[NSNull null]	forKey:Goal_sNote1]; // Attempt to insert non-property value '<null>' of class 'NSNull'.
+		//[kvs setObject:[NSNull null]	forKey:Goal_sNote2];
 		[kvs setObject:[NSNumber numberWithInt:120] forKey:Goal_nBpHi_mmHg];
 		[kvs setObject:[NSNumber numberWithInt:  80] forKey:Goal_nBpLo_mmHg];
 		[kvs setObject:[NSNumber numberWithInt:  65] forKey:Goal_nPulse_bpm];
@@ -316,7 +325,7 @@
 		}
 	}
 
-	// JSON
+	// NSArray --> JSON
 	SBJSON	*js = [SBJSON new];
 	NSError *err = nil;
 	NSString *zJson = [js stringWithObject:maE2 error:&err];
@@ -345,7 +354,7 @@
 		return [err description];
 	}
 	NSLog(@"tmpFileLoad: zJson=%@", zJson);
-	// JSON
+	// JSON --> NSArray
 	SBJSON	*js = [SBJSON new];
 	NSArray *ary = [js objectWithString:zJson error:&err];
 	if (err) {

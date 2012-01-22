@@ -15,17 +15,17 @@
 
 @implementation E2editCellDial
 {
-	__unsafe_unretained id						delegate;
-	__unsafe_unretained UIView				*viewParent;  // ここへCalcをaddSubviewする
+	//__unsafe_unretained id						delegate;
+	//__unsafe_unretained UIView				*viewParent;  // ここへCalcをaddSubviewする
 	
-	__strong E2record			*Re2record;
-	__strong NSString			*RzKey;
+	//__strong E2record			*Re2record;
+	//__strong NSString			*RzKey;
 	
-	NSInteger		mValueMin;
-	NSInteger		mValueMax;
-	NSInteger		mValueDec; // 小数桁数： 0=整数=10^0,  1=0.1=10^-1,  2=0.01=10^-2,  3=0.001=10^-3,
-	NSInteger		mValueStep; //増減単位
-	NSInteger		mValuePrev; // 直前の値（mValue=nil のときに表示する）
+	//NSInteger		mValueMin;
+	//NSInteger		mValueMax;
+	//NSInteger		mValueDec; // 小数桁数： 0=整数=10^0,  1=0.1=10^-1,  2=0.01=10^-2,  3=0.001=10^-3,
+	//NSInteger		mValueStep; //増減単位
+	//NSInteger		mValuePrev; // 直前の値（mValue=nil のときに表示する）
 	
 	IBOutlet UILabel			*ibLbName;
 	IBOutlet UILabel			*ibLbDetail;
@@ -36,31 +36,37 @@
 	NSInteger		mValue;
 	AZDial				*mDial;
 }
-
 @synthesize ibLbName, ibLbDetail, ibLbUnit;  // ibLbValue
-@synthesize  delegate, viewParent;
-@synthesize Re2record, RzKey, mValueMin, mValueMax, mValueDec, mValueStep, mValuePrev;
+@synthesize delegate = delegate_;
+@synthesize viewParent = viewParent_;
+@synthesize Re2record = Re2record_;
+@synthesize RzKey = RzKey_;
+@synthesize mValueMin = valueMin_;
+@synthesize mValueMax = valueMax_;
+@synthesize mValueDec = valueDec_;
+//@synthesize mValueStep = valueStep_;
+@synthesize mValuePrev = valuePrev_;
 
 
 - (void)refreshValue
 {
 	NSInteger  val = mValue;
 	if (val < 0) {
-		val = mValuePrev;
+		val = valuePrev_;
 		ibLbValue.textColor = [UIColor brownColor];
 	} else {
 		ibLbValue.textColor = [UIColor blackColor];
 	}
 
-	if (mValueDec<=0) {
+	if (valueDec_<=0) {
 		ibLbValue.text = [NSString stringWithFormat:@"%d", val];
 	} else {
-		NSInteger iPow = (NSInteger)pow(10, mValueDec); //= 10 ^ mValueDec;
+		NSInteger iPow = (NSInteger)pow(10, valueDec_); //= 10 ^ valueDec_;
 		NSInteger iInt = val / iPow;
 		NSInteger iDec = val - iInt * iPow;
 		if (iDec<=0) {
 			//ibLbValue.text = [NSString stringWithFormat:@"%ld", iInt];
-			switch (mValueDec) {
+			switch (valueDec_) {
 				case 1: ibLbValue.text =  [NSString stringWithFormat:@"%ld.0", iInt]; break;
 				case 2: ibLbValue.text =  [NSString stringWithFormat:@"%ld.00", iInt]; break;
 				default: ibLbValue.text =  [NSString stringWithFormat:@"%ld", iInt]; break;
@@ -95,35 +101,19 @@
 	return (NSInteger)[decLong doubleValue]; // 整数値を返す
 }
 
-- (void)calcDone:(NSDecimalNumber*)decAnswer
-{
-	mValue = [self integerFromDecimal:decAnswer digits:mValueDec];
-	if (mValue < mValueMin) mValue = mValueMin;  // min
-	else if (mValueMax < mValue) mValue = mValueMax; // max
-
-	[mDial setDial:mValue  animated:YES];
-	[self refreshValue];
-
-	if ([[Re2record valueForKey:RzKey] integerValue] != mValue) {
-		[Re2record setValue:[NSNumber numberWithInteger:mValue] forKey:RzKey];
-		if ([delegate respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
-			[delegate editUpdate];
-		}
-	}
-}
-
 - (IBAction)ibBuValue:(UIButton *)button
 {
 	NSLog(@"ibBuValue");
 	double dPow = 1.0;
-	if (1 <= mValueDec) {
-		dPow = pow(10.0, mValueDec);
+	if (1 <= valueDec_) {
+		dPow = pow(10.0, valueDec_);
 	}
-	double dMin = (double)mValueMin / dPow;
-	double dMax = (double)mValueMax / dPow;
-	CalcView *calc = [[CalcView alloc] initWithTitle: ibLbName.text  min: dMin  max: dMax  decimal: mValueDec
-											  target:self	  action:@selector(calcDone:)];
-	[viewParent addSubview:calc];
+	double dMin = (double)valueMin_ / dPow;
+	double dMax = (double)valueMax_ / dPow;
+	//CalcView *calc = [[CalcView alloc] initWithTitle: ibLbName.text  min: dMin  max: dMax  decimal: valueDec_
+	//										  target:self	  action:@selector(calcDone:)];
+	CalcView *calc = [[CalcView alloc] initWithTitle: ibLbName.text  min: dMin  max: dMax  decimal: valueDec_ delegate:self];
+	[viewParent_ addSubview:calc];
 	[calc show];
 	//[calc release];
 }
@@ -131,14 +121,14 @@
 - (IBAction)ibBuNone:(UIButton *)button
 {
 	NSLog(@"ibBuNone");
-	[mDial setDial:mValuePrev  animated:YES];
+	[mDial setDial:valuePrev_  animated:YES];
 	mValue = (-1); // None
 	[self refreshValue];
 	
-	if ([[Re2record valueForKey:RzKey] integerValue] != mValue) {
-		[Re2record setValue:[NSNumber numberWithInteger:mValue] forKey:RzKey];
-		if ([delegate respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
-			[delegate editUpdate];
+	if ([[Re2record_ valueForKey:RzKey_] integerValue] != mValue) {
+		[Re2record_ setValue:[NSNumber numberWithInteger:mValue] forKey:RzKey_];
+		if ([delegate_ respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
+			[delegate_ editUpdate];
 		}
 	}
 }
@@ -146,23 +136,23 @@
 
 - (void)drawRect:(CGRect)rect
 {
-	if (Re2record==nil) return;
-	assert(Re2record);
-	assert(RzKey);
-	NSNumber *num = [Re2record valueForKey:RzKey];
+	if (Re2record_==nil) return;
+	assert(Re2record_);
+	assert(RzKey_);
+	NSNumber *num = [Re2record_ valueForKey:RzKey_];
 	if (num) {
 		mValue = [num integerValue];
 	} else {
 		mValue = (-1); // None
 	}
 
-	if (mValuePrev<mValueMin || mValueMax<mValuePrev) {
-		mValuePrev = (mValueMax - mValueMin) / 2; //平均値
+	if (valuePrev_<valueMin_ || valueMax_<valuePrev_) {
+		valuePrev_ = (valueMax_ - valueMin_) / 2; //平均値
 	}
 	
 	NSInteger val = mValue;
-	if (val < mValueMin || mValueMax < val) {
-		val = mValuePrev;  //＜＜＜　前回値をセットする
+	if (val < valueMin_ || valueMax_ < val) {
+		val = valuePrev_;  //＜＜＜　前回値をセットする
 	}
 
 	
@@ -174,8 +164,8 @@
 		mDial = [[AZDial alloc] initWithFrame:CGRectMake(15, 44, 295, 44)
 									 delegate: self
 										 dial: val
-										  min: mValueMin
-										  max: mValueMax
+										  min: valueMin_
+										  max: valueMax_
 										 step: 1
 									stepper: YES ];
 		[self addSubview:mDial];
@@ -199,20 +189,61 @@
 	mValue = dial;
 	[self refreshValue];
 	
-	if ([[Re2record valueForKey:RzKey] integerValue] != mValue) {
-		[Re2record setValue:[NSNumber numberWithInteger:mValue] forKey:RzKey];
+	if ([[Re2record_ valueForKey:RzKey_] integerValue] != mValue) {
+		[Re2record_ setValue:[NSNumber numberWithInteger:mValue] forKey:RzKey_];
 		
-		if ([delegate respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
-			[delegate editUpdate];
+		if ([delegate_ respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
+			[delegate_ editUpdate];
+		}
+	}
+}
+
+#pragma mark - <AZCalcDelegate>
+- (void)calcChanged:(id)sender  answer:(NSDecimalNumber*)answer
+{
+	// Nothing
+}
+
+- (void)calcDone:(id)sender  answer:(NSDecimalNumber*)answer
+{
+	mValue = [self integerFromDecimal:answer digits:valueDec_];
+	if (mValue < valueMin_) mValue = valueMin_;  // min
+	else if (valueMax_ < mValue) mValue = valueMax_; // max
+	
+	[mDial setDial:mValue  animated:YES];
+	[self refreshValue];
+	
+	if ([[Re2record_ valueForKey:RzKey_] integerValue] != mValue) {
+		[Re2record_ setValue:[NSNumber numberWithInteger:mValue] forKey:RzKey_];
+		if ([delegate_ respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
+			[delegate_ editUpdate];
 		}
 	}
 }
 
 /*
+- (void)calcDone:(NSDecimalNumber*)decAnswer
+{
+	mValue = [self integerFromDecimal:decAnswer digits:valueDec_];
+	if (mValue < valueMin_) mValue = valueMin_;  // min
+	else if (valueMax_ < mValue) mValue = valueMax_; // max
+	
+	[mDial setDial:mValue  animated:YES];
+	[self refreshValue];
+	
+	if ([[Re2record_ valueForKey:RzKey_] integerValue] != mValue) {
+		[Re2record_ setValue:[NSNumber numberWithInteger:mValue] forKey:RzKey_];
+		if ([delegate_ respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
+			[delegate_ editUpdate];
+		}
+	}
+}*/
+
+/*
 - (void)dealloc
 {
-	[RzKey release], RzKey = nil;
-	[Re2record release], Re2record = nil;
+	[RzKey_ release], RzKey_ = nil;
+	[Re2record_ release], Re2record_ = nil;
 	[super dealloc];
 }*/
 

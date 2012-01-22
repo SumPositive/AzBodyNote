@@ -736,7 +736,7 @@
 			cell.mValueMin = E2_nBpHi_MIN;
 			cell.mValueMax = E2_nBpHi_MAX;
 			cell.mValueDec = 0;
-			cell.mValueStep = 1;
+			//cell.mValueStep = 1;
 			cell.mValuePrev = iPrevBpHi_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
@@ -752,7 +752,7 @@
 			cell.mValueMin = E2_nBpLo_MIN;
 			cell.mValueMax = E2_nBpLo_MAX;
 			cell.mValueDec = 0;
-			cell.mValueStep = 1;
+			//cell.mValueStep = 1;
 			cell.mValuePrev = iPrevBpLo_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
@@ -768,7 +768,7 @@
 			cell.mValueMin = E2_nPuls_MIN;
 			cell.mValueMax = E2_nPuls_MAX;
 			cell.mValueDec = 0;
-			cell.mValueStep = 1;
+			//cell.mValueStep = 1;
 			cell.mValuePrev = iPrevPuls_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
@@ -784,7 +784,7 @@
 			cell.mValueMin = E2_nWeight_MIN;
 			cell.mValueMax = E2_nWeight_MAX;
 			cell.mValueDec = 1;
-			cell.mValueStep = 1;
+			//cell.mValueStep = 1;
 			cell.mValuePrev = iPrevWeight_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
@@ -800,7 +800,7 @@
 			cell.mValueMin = E2_nTemp_MIN;
 			cell.mValueMax = E2_nTemp_MAX;
 			cell.mValueDec = 1;
-			cell.mValueStep = 1;
+			//cell.mValueStep = 1;
 			cell.mValuePrev = iPrevTemp_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;

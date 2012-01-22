@@ -236,8 +236,10 @@
 	//NSLog(@"-- scrollReset -- mValue=%d  mVmin=%d  mVmax=%d  :: mScrollMax=%.1f  mScrollOfs=%.1f",
 	//	  mValue, mVmin, mVmax, mScrollMax, mScrollOfs);
 
-	//NSLog(@"mDialStep=%d", mDialStep);
-	assert(0<mDialStep);
+	if (mDialStep < 1) {
+		NSLog(@"LOGIC ERROR!!!  mDialStep=%ld", (long)mDialStep);
+		mDialStep = 1;
+	}
 	CGFloat ff = (CGFloat)(mDialMax - mDialMin) / mDialStep * PITCH;
 	if (mScrollView.contentSize.width != ff + mScrollView.frame.size.width) 
 	{	// + mScrollView.frame.size.width は、Stepper有無でダイアル幅が変わることに対応するため。
@@ -293,7 +295,7 @@
 	return mDial;
 }
 
-- (void)setDialFrame:(CGRect)frame	// NEW 回転のため
+- (void)setFrame:(CGRect)frame	// NEW 回転のため
 {
 	[super setFrame:frame];
 	[self makeView:(mStepper!=nil || mStepBuUp!=nil)];
@@ -426,6 +428,9 @@
 	// valueChange
 	mDial = mDialMin + floor( (mScrollMax - scrollView.contentOffset.x) / PITCH ) * mDialStep;
 
+	if (mDial < mDialMin) mDial = mDialMin;	// Fix:2012-01-19
+	else if (mDialMax < mDial) mDial = mDialMax;
+	
 	if (mIsSetting==NO) {
 		if ([mDelegate respondsToSelector:@selector(dialChanged:dial:)]) {
 			[mDelegate dialChanged:self  dial:mDial];	// 変化、決定ではない
