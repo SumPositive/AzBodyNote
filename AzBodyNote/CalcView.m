@@ -73,28 +73,51 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 #pragma mark - Action
 
 // zFomula を計算し、答えを RdecAnswer に保持しながら mLbAnswer.text に表示する
-- (void)finalAnswer:(NSString *)zFomula
+- (void)finalAnswer:(NSString *)zFormula
 {
-	_answer = [self decimalAnswerFomula:zFomula]; // 戻りObjは、retainされている
-	//NSLog(@"**********1 RdecAnswer=%@", RdecAnswer);
-	if (_answer) {
-		if (ANSWER_MAX < fabs([_answer doubleValue])) {
+	if ([zFormula length]<=0) {
+		_lbAnswer.text = @"";
+		return;
+	}
+	
+	if (_lbFormula.hidden) {  // 数値文字列
+		if (12 < [zFormula length]) {
 			_lbAnswer.text = @"Game Over";
-			_answer = [[NSDecimalNumber alloc] initWithString:@"0.0"];
-			// textField.text は、そのままなので計算続行可能。
+		} else {
+			_lbAnswer.text = zFormula; // 小数以下[0]を入れたとき表示されるように、入力のままにした。
+		}
+		return;
+	}
+	else {	// 計算式文字列 <<< 演算子が入った
+		if (100 < [zFormula length]) {
+			_lbAnswer.text = @"Game Over";
 			return;
 		}
-		NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
-		[formatter setNumberStyle:NSNumberFormatterDecimalStyle]; // ＜＜計算途中、通貨小数＋2桁表示するため
-		[formatter setPositiveFormat:@"#,##0.####"];
-		[formatter setNegativeFormat:@"-#,##0.####"];
-		// 表示のみ　Rentity更新はしない
-		_lbAnswer.text = [formatter stringFromNumber:_answer];
-	}
-	else {
-		_lbAnswer.text = @"?";
+		else {
+			// 計算し、答えを MdecAnswer に保持しながら Rlabel.text に表示する
+			_answer = [self decimalAnswerFomula:zFormula];
+			if (_answer) {
+				if (ANSWER_MAX < fabs([_answer doubleValue])) {
+					_lbAnswer.text = @"Game Over";
+					_answer = [[NSDecimalNumber alloc] initWithString:@"0.0"];
+					// textField.text は、そのままなので計算続行可能。
+					return;
+				}
+				NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+				[formatter setNumberStyle:NSNumberFormatterDecimalStyle]; // ＜＜計算途中、通貨小数＋2桁表示するため
+				[formatter setPositiveFormat:@"#,##0.####"];
+				[formatter setNegativeFormat:@"-#,##0.####"];
+				// 表示のみ　Rentity更新はしない
+				_lbAnswer.text = [formatter stringFromNumber:_answer];
+				return;
+			}
+			else {
+				_lbAnswer.text = @"?";
+			}
+		}
 	}
 }
+
 
 - (void)formulaShow
 {
@@ -186,7 +209,6 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 	
 	// mLbFormula.text を計算し、その結果を mLbAnswer に表示する
 	[self finalAnswer:_lbFormula.text];
-	
 }
 
 - (void)show
