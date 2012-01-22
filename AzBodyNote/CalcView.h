@@ -19,8 +19,16 @@
 @interface CalcView : UIView //<UITextFieldDelegate>
 
 // 公開メソッド
-- (id)initWithTitle:(NSString*)title  min:(double)min  max:(double)max  decimal:(int)decimal  
-			 target:(__strong id)target action:(SEL)action;
+//- (id)initWithTitle:(NSString*)title  min:(double)min  max:(double)max  decimal:(int)decimal  
+//			 target:(__strong id)target action:(SEL)action;
+- (id)initWithTitle:(NSString*)title  min:(double)min  max:(double)max  decimal:(int)decimal  delegate:(id)delegate;
+
 - (void)show;
 
+@end
+
+@protocol AZCalcDelegate <NSObject>
+#pragma mark - <AZCalcDelegate>
+- (void)calcChanged:(id)sender  answer:(NSDecimalNumber*)answer;
+- (void)calcDone:(id)sender  answer:(NSDecimalNumber*)answer;
 @end
