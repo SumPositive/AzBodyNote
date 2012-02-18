@@ -17,6 +17,8 @@
 #import <stdlib.h>
 #endif
 
+#define CoreData_iCloud_SYNC		NO	// YES or NO
+
 //@interface AzBodyNoteAppDelegate (PrivateMethods)
 //- (NSManagedObjectContext *)managedObjectContext;
 //@end
@@ -478,7 +480,7 @@
 	// so it's possible to bring up the UI and then fill in the results later
     persistentStoreCoordinator_ = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
 	
-	if (IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
+	if (CoreData_iCloud_SYNC  && IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
 		// do this asynchronously since if this is the first time this particular device is syncing with preexisting
 		// iCloud content it may take a long long time to download
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -566,7 +568,7 @@
 	NSManagedObjectContext* moc = nil;
 
     if (coordinator != nil) {
-		if (IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
+		if (CoreData_iCloud_SYNC  && IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
 			moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 			
 			[moc performBlockAndWait:^{
