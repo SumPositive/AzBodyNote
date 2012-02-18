@@ -504,6 +504,9 @@
 		// 日付修正へ遷移
 	}
 	else if (editMode_==0) {
+		if (self.navigationItem.rightBarButtonItem.enabled) {
+			alertBox(NSLocalizedString(@"NotSaved",nil), NSLocalizedString(@"NotSaved AddNew",nil), @"OK");
+		}
 		// TabBar切替により隠されたとき、中断し、戻ったときに復帰できるようにする
 		[mocFunc_ commit]; // 未確定のまま保存し、復帰継続できるようにする
 		moE2edit_ = nil; //autorelease
@@ -904,6 +907,7 @@
 - (void)editUpdate
 {
 	self.navigationItem.rightBarButtonItem.enabled = YES; // 変更あればYESにする
+	//NG//self.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
 }
 
 - (void)alertView:(UIAlertView*)alertView clickedButtonAtIndex:(NSInteger)buttonIndex

@@ -517,6 +517,7 @@
 		NSIndexPath *path = [self.tableView indexPathForSelectedRow];//選択中のセル位置
 		//NSLog(@"prepareForSegue: path=%@", path);
 		E2editTVC *editVc = [segue destinationViewController];
+		editVc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
 		if (path.section < [[self.fetchedResultsController sections] count]) 
 		{ // 明細セクション
 			editVc.editMode = 1;		//Edit

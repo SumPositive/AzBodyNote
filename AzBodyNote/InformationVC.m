@@ -62,7 +62,7 @@
 		appDelegate_ = (AzBodyNoteAppDelegate*)[[UIApplication sharedApplication] delegate];
 	}
 	// インジケータ開始 ＜＜＜ここで一回表示しなければ、インジケータ位置が定まらない（原因不明のため対処療法）
-	[appDelegate_  alertProgressOn: NSLocalizedString(@"Please wait",nil)];
+//	[appDelegate_  alertProgressOn: NSLocalizedString(@"Please wait",nil)];
 	
 	//self.title = NSLocalizedString(@"TabInfo",nil);
 	ibLbTitle.text = NSLocalizedString(@"InfoTitle",nil);
@@ -100,7 +100,7 @@
 {
     [super viewWillAppear:animated];
 	// インジケータ終了
-	[appDelegate_	alertProgressOff];
+//	[appDelegate_	alertProgressOff];
 	
 	self.view.alpha = 0.3;
 }
