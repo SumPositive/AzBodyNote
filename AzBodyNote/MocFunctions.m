@@ -320,7 +320,9 @@ static NSDate *dateGoal_ = nil;
 				NSString *str = (NSString*)value;
 				// dateFromUTC: UTC協定世界時 文字列 "2010-12-31T00:00:00" を デフォルトタイムゾーンのNSDate型にする
 				// Prefix: TYPE_NSDate を取り除いてKeyにする
-				[newObject setValue:dateFromUTC(str) forKey: [key substringFromIndex:[TYPE_NSDate length]]];
+				//ok//NSLog(@"*** dateFromUTC(%@) ==> %@", str, [dateFromUTC(str) description]);  //設定が和暦でも正しい西暦になることを確認した。
+				[newObject  setValue:dateFromUTC(str) forKey: [key substringFromIndex:[TYPE_NSDate length]]];
+				//ok//NSLog(@"*** newObject.DATE=%@", [newObject valueForKey:[key substringFromIndex:[TYPE_NSDate length]]]);
 			}
 			else {
 				assert(NO);	// 未定義の型

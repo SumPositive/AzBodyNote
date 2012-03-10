@@ -58,9 +58,11 @@ NSDate *dateFromUTC( NSString *zUTC )
 	// 任意の日付をNSDate型に変換
 	NSDateFormatter *dfmt = [[NSDateFormatter alloc] init];
 	[dfmt setTimeZone:[NSTimeZone timeZoneWithName:@"UTC"]]; // 協定世界時(+0000)
+	// カレンダーの設定 ＜＜システム設定が「和暦」になると、2012-->平成2012年-->西暦4000年になるのを避けるため、西暦（グレゴリア）に固定
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+	[dfmt setCalendar:calendar];
 	[dfmt setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss"];
 	NSDate *dTZ = [dfmt dateFromString:zUTC];	
-	//[dfmt release];
 	return dTZ;
 }
 
@@ -69,10 +71,12 @@ NSString *utcFromDate( NSDate *dTZ )
 {
 	NSDateFormatter *dfmt = [[NSDateFormatter alloc] init];
 	[dfmt setTimeZone:[NSTimeZone timeZoneWithName:@"UTC"]]; // 協定世界時(+0000)
+	// カレンダーの設定 ＜＜システム設定が「和暦」になると、2012-->平成2012年-->西暦4000年になるのを避けるため、西暦（グレゴリア）に固定
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+	[dfmt setCalendar:calendar];
 	[dfmt setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss"];
 	NSString *zUTC = [dfmt stringFromDate:dTZ];
-	//[dfmt release];
-	return zUTC; // autorelease
+	return zUTC;
 }
 
 
