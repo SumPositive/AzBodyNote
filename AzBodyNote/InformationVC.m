@@ -28,7 +28,9 @@
 	IBOutlet UIButton		*ibBuPostMail;
 	IBOutlet UIButton		*ibBuPaid;
 	
-	SKProduct			*productUnlock_;
+	SKProductsRequest		*mProductRequest;
+	SKProduct						*productUnlock_;
+	UIActivityIndicatorView	*mProductIndicator;
 }
 
 
@@ -80,20 +82,6 @@
 
 	[ibBuGoBlog setTitle:NSLocalizedString(@"InfoGoBlog",nil) forState:UIControlStateNormal];
 	[ibBuPostMail setTitle:NSLocalizedString(@"InfoPostMail",nil) forState:UIControlStateNormal];
-	
-	// PAID 広告＆制限解除
-	ibBuPaid.hidden = YES;
-	if (appDelegate_.app_is_sponsor==NO)
-	{
-		if ([SKPaymentQueue canMakePayments]) { // 課金可能であるか確認する
-			// 課金可能
-			// 商品情報リクエスト ---> productsRequest:didReceiveResponse:が呼び出される
-			NSSet *set = [NSSet setWithObjects:STORE_PRODUCTID_UNLOCK, nil]; // 商品が複数ある場合は列記
-			SKProductsRequest *req = [[SKProductsRequest alloc] initWithProductIdentifiers:set];
-			req.delegate = self;
-			[req start];
-		}
-	}
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -101,8 +89,33 @@
     [super viewWillAppear:animated];
 	// インジケータ終了
 //	[appDelegate_	alertProgressOff];
-	
 	self.view.alpha = 0.3;
+	
+	// PAID 広告＆制限解除
+	ibBuPaid.hidden = YES;
+	if (mProductRequest) {
+		[mProductRequest cancel];			// 中断
+		mProductRequest.delegate = nil;  // これないと、通信中に閉じると落ちる
+	}
+	
+	if (appDelegate_.app_is_sponsor==NO)
+	{
+		if (mProductIndicator==nil) {
+			mProductIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+			mProductIndicator.frame = ibBuPaid.frame;
+			[self.view addSubview:mProductIndicator];
+		}
+		[mProductIndicator startAnimating];
+		
+		if ([SKPaymentQueue canMakePayments]) { // 課金可能であるか確認する
+			// 課金可能
+			// 商品情報リクエスト ---> productsRequest:didReceiveResponse:が呼び出される
+			NSSet *set = [NSSet setWithObjects:STORE_PRODUCTID_UNLOCK, nil]; // 商品が複数ある場合は列記
+			mProductRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:set];
+			mProductRequest.delegate = self;		//viewDidUnloadにて、cancel, nil している。さもなくば落ちる
+			[mProductRequest start];
+		}
+	}
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -121,19 +134,27 @@
 	}
 }
 
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
-}
-
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
+- (void)viewDidUnload		//＜＜実験では、呼ばれなかった！
+{
+	[mProductIndicator stopAnimating];
+    [super viewDidUnload];
+}
+
+- (void)dealloc 
+{	// 必ず最後に呼ばれる
+	[mProductIndicator stopAnimating], mProductRequest = nil;
+    [[SKPaymentQueue defaultQueue] removeTransactionObserver:appDelegate_]; // これが無いと、しばらくすると落ちる
+	if (mProductRequest) {
+		[mProductRequest cancel];			// 中断
+		mProductRequest.delegate = nil;  // これないと、通信中に閉じると落ちる
+	}
+}
 
 - (IBAction)ibBuOK:(UIButton *)button
 {
@@ -181,6 +202,7 @@
 {
 	if (appDelegate_.app_is_sponsor) {	// 購入済み
 		alertBox(NSLocalizedString(@"SK Restored",nil), nil, @"OK");
+		ibBuPaid.hidden = YES;
 		return;
 	}
 
@@ -308,6 +330,8 @@
 #pragma mark - <SKProductsRequestDelegate>
 - (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response
 {	// 商品情報を取得して購入ボタン表示などを整える
+	[mProductIndicator stopAnimating];
+	
 	if (0 < [response.invalidProductIdentifiers count]) {
 		NSLog(@"*** invalidProductIdentifiers: アイテムIDが不正");
 		return;
@@ -318,6 +342,7 @@
 		productUnlock_ = product;
 		[ibBuPaid setTitle:product.localizedTitle forState:UIControlStateNormal];
 		ibBuPaid.hidden = NO;
+		//NSLog(@"productsRequest: product: [%@] [%@]", product.localizedTitle, product.localizedDescription);
 		break; // 1つだけだから
 	}	
 }

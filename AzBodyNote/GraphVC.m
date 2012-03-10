@@ -71,7 +71,7 @@
 	mocFunc_ = appDelegate_.mocBase; // Read Only
 	assert(mocFunc_);
 	
-	if (appDelegate_.app_is_sponsor==NO) {
+	if (appDelegate_.app_is_unlock==NO) {
 		uiActivePageMax_ = 0; // 0ページ制限
 	}
 
@@ -235,7 +235,7 @@
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {	// スクロール中に呼ばれる
 	//NSLog(@"scrollViewDidScroll: .contentOffset.x=%f", scrollView.contentOffset.x);
-	if (appDelegate_.app_is_sponsor) {
+	if (appDelegate_.app_is_unlock) {
 		if (scrollView.contentOffset.x < -70) {
 			// PREV（過去）ページへ
 			if (uiActivePage_ < uiActivePageMax_) {
@@ -267,7 +267,7 @@
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {	// スクロール終了時（指を離した時）に呼ばれる
 	NSLog(@"scrollViewDidEndDragging: .contentOffset.x=%f  decelerate=%d", scrollView.contentOffset.x, decelerate);
-	if (appDelegate_.app_is_sponsor) {
+	if (appDelegate_.app_is_unlock) {
 		if (scrollView.contentOffset.x < -70) {
 			// PREV（過去）ページへ
 			if (uiActivePage_ < uiActivePageMax_) {

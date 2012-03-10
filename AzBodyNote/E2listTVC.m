@@ -47,6 +47,9 @@
 			NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 			[kvs synchronize]; // 最新同期
 			appDelegate_.app_is_sponsor = [kvs boolForKey:GUD_bPaid];
+			if (appDelegate_.app_is_sponsor && appDelegate_.app_is_unlock==NO) {
+				appDelegate_.app_is_unlock = YES;
+			}
 		}
 		//[self viewWillAppear:NO];
 		[self.tableView reloadData];
@@ -118,7 +121,7 @@
 	}
 	lbPagePrev_.textAlignment = UITextAlignmentCenter;
 	lbPagePrev_.backgroundColor = [UIColor clearColor];
-	if (appDelegate_.app_is_sponsor) {
+	if (appDelegate_.app_is_unlock) {
 		lbPagePrev_.text = NSLocalizedString(@"List Top",nil);
 	} else {
 		lbPagePrev_.text = NSLocalizedString(@"List Limit",nil);
@@ -205,7 +208,7 @@
 			[self.tableView reloadRowsAtIndexPaths:aPaths withRowAnimation:UITableViewRowAnimationFade];
 		}
 		@catch (NSException *exception) {
-			NSLog(@"LOGIC ERROR!!! - indexPathEdit_");
+			NSLog(@"LOGIC ERROR!!! - indexPathEdit_.row=%ld", (long)indexPathEdit_.row);
 			assert(NO);
 		}
 		@finally {
@@ -695,7 +698,7 @@
 		// 前ページへ予告表示
 		if (lbPagePrev_.tag != 1) {
 			lbPagePrev_.tag = 1;
-			if (appDelegate_.app_is_sponsor) {
+			if (appDelegate_.app_is_unlock) {
 				lbPagePrev_.text = NSLocalizedString(@"List Top",nil);
 			} else {
 				lbPagePrev_.text = NSLocalizedString(@"List Paid",nil);
@@ -704,7 +707,7 @@
 	} else {
 		if (lbPagePrev_.tag != 0) {
 			lbPagePrev_.tag = 0;
-			if (appDelegate_.app_is_sponsor) {
+			if (appDelegate_.app_is_unlock) {
 				lbPagePrev_.text = NSLocalizedString(@"List Top",nil);
 			} else {
 				lbPagePrev_.text = NSLocalizedString(@"List Limit",nil);

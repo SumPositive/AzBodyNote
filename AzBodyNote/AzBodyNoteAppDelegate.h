@@ -22,7 +22,8 @@
 @property (nonatomic, retain, readonly) MocFunctions		*mocBase;
 
 // app_ Global paramaters
-@property (nonatomic, assign) BOOL			app_is_sponsor;				// In App Purchese
+@property (nonatomic, assign) BOOL			app_is_sponsor;				// In App Purchese = 広告なし ＆ 制限解除
+@property (nonatomic, assign) BOOL			app_is_unlock;				// 制限解除
 @property (nonatomic, assign) NSInteger	app_e2record_count;		// Trial制限に使用。　 コメント投稿情報に表示。
 
 

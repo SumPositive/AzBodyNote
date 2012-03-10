@@ -159,16 +159,16 @@
 
 	if (editMode_==0) { // AddNewのとき
 		appDelegate_.app_e2record_count = [mocFunc_ e2record_count];
-		if (appDelegate_.app_is_sponsor==NO) {
+		if (appDelegate_.app_is_unlock==NO) {
 			if (50 < appDelegate_.app_e2record_count) {
 				// 告知
 				alertBox(	NSLocalizedString(@"Trial Limit",nil), 
 								NSLocalizedString(@"Trial Limit msg",nil), 
 								NSLocalizedString(@"Roger",nil));
-				if (55 < appDelegate_.app_e2record_count) {
-					// 禁止
-					return;  // Cancel しかできない
-				}
+				//if (55 < appDelegate_.app_e2record_count) {
+				//	// 禁止
+				//	return;  // Cancel しかできない
+				//}
 			}
 		}
 	}
@@ -267,6 +267,12 @@
 												 name:NSUbiquitousKeyValueStoreDidChangeExternallyNotification 
 											   object:nil];
 
+	// アクティブになったとき、未保存ならば日時更新する
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+											 selector:@selector(refreshDateTime:) 
+												 name:NFM_AppDidBecomeActive
+											   object:[[UIApplication sharedApplication] delegate]];
+	
 	kvsGoal_ = nil;
 	switch (editMode_) 
 	{
@@ -417,11 +423,12 @@
 			}
 		}
 		//self.view.alpha = 0; //AddNewのときだけディゾルブ
+		[self refreshDateTime:nil]; // 未保存ならば最新日時にする
 	}
 	else if (kvsGoal_==nil) {
 		[self setE2recordPrev];
 	}
-	
+
 	if (appDelegate_.app_is_sponsor) {	// 支払済みにつきAd消す
 		iAdBanner_.delegate = nil;
 		adMobView_.delegate = nil;
@@ -585,18 +592,28 @@
 }*/
 
 
-#pragma mark - iCloud
+#pragma mark - refresh
+- (void)refreshDateTime:(NSNotification*)note 
+{
+	if (editMode_==0 && moE2edit_) { // AddNew
+		if (self.navigationItem.rightBarButtonItem.enabled==NO) { // 未登録ならば最新日時にする
+			moE2edit_.dateTime = [NSDate date];
+			[self.tableView reloadData];
+		}
+	}
+}
+
 - (void)refreshAllViews:(NSNotification*)note 
 {	// iCloud-CoreData に変更があれば呼び出される
-    if (note) {
-		//  iCloud KVS 
-		if ([appDelegate_ app_is_sponsor]==NO) {
-			NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-			[kvs synchronize]; // 最新同期
-			appDelegate_.app_is_sponsor = [kvs boolForKey:GUD_bPaid];
+	if ([appDelegate_ app_is_sponsor]==NO) {
+		NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+		[kvs synchronize]; // 最新同期
+		appDelegate_.app_is_sponsor = [kvs boolForKey:GUD_bPaid];
+		if (appDelegate_.app_is_sponsor && appDelegate_.app_is_unlock==NO) {
+			appDelegate_.app_is_unlock = YES;
 		}
-		[self.tableView reloadData];
-    }
+	}
+	[self.tableView reloadData];
 }
 
 

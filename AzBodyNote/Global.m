@@ -18,7 +18,6 @@ void alertBox( NSString *zTitle, NSString *zMsg, NSString *zButton )
 										  cancelButtonTitle:nil
 										  otherButtonTitles:zButton, nil];
 	[alert show];
-	//[alert release];
 }
 
 // nil --> [NSNull null]   コンテナ保存オブジェクトにnilが含まれる可能性があるときに使用

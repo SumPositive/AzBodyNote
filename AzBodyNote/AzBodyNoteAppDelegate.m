@@ -32,12 +32,14 @@
 
 	UIAlertView						*alertProgress_;
 	UIActivityIndicatorView	*alertIndicator_;
+	BOOL								mAzukiUnlock;	// YES=購入意思ありと見なしてUnlockする
 }
 
 @synthesize window = window_;
 @synthesize mocBase;
 @synthesize tabBarController = _tabBarController;
 @synthesize app_is_sponsor = app_is_sponsor_;
+@synthesize app_is_unlock = mApp_is_unlock;
 @synthesize app_e2record_count = app_e2record_count_;
 
 /*
@@ -70,13 +72,13 @@
 		// alertIndicatorOn/Off: のための準備
 		alertProgress_ = [[UIAlertView alloc] initWithTitle:zTitle  message:@" " delegate:nil cancelButtonTitle:nil otherButtonTitles:nil];
 		alertIndicator_ = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-		alertIndicator_.frame = CGRectMake(0, 0, 50, 50);
+		//alertIndicator_.frame = CGRectMake(320/2, 0, 50, 50);
 		[alertProgress_  addSubview:alertIndicator_];
 	}
-	
+
 	[alertProgress_ setTitle:zTitle];
 	[alertProgress_ show];
-
+	
 	/*
 	NSLog(@"*** frame  x=%f  y=%f  width=%f  height=%f", alertProgress_.frame.origin.x, alertProgress_.frame.origin.y,
 		  alertProgress_.frame.size.width, alertProgress_.frame.size.height);
@@ -96,9 +98,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {	// Override point for customization after application launch.
-
-	// インジケータ開始
-	//[self  alertProgressOn: NSLocalizedString(@"Please wait",nil)];
+	mAzukiUnlock = NO;	// YES=購入意思ありと見なしてUnlockする
 	
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
@@ -111,12 +111,14 @@
 							@"0",				GUD_Calc_Method,					// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
 							@"YES",			GUD_Calc_RoundBankers,		// YES=偶数丸め  NO=四捨五入
 							@"NO",			GUD_bPaid,								// YES=PAID
+							@"NO",			GUD_bUnlock,							// YES=Unlock
 							 nil];
 	[userDefaults registerDefaults:dicDef];	// 未定義のKeyのみ更新される
 	[userDefaults synchronize]; // plistへ書き出す
 
 	// 画面表示に関係する Option Setting を取得する
 	app_is_sponsor_ = [userDefaults boolForKey:GUD_bPaid];
+	mApp_is_unlock = [userDefaults boolForKey:GUD_bUnlock];
 
 	// Moc初期化
 	if (mocBase==nil) {
@@ -149,6 +151,14 @@
 	}
 	if (app_is_sponsor_==NO) {
 		app_is_sponsor_ = [kvs boolForKey:GUD_bPaid];
+	}
+	//if (mApp_is_unlock==NO) {
+	//	mApp_is_unlock = [kvs boolForKey:GUD_bUnlock];  KVSには保存しない
+	//}
+	if (app_is_sponsor_ && mApp_is_unlock==NO) {
+		mApp_is_unlock = YES;
+		[userDefaults setBool:YES forKey:GUD_bUnlock];
+		//[kvs setBool:YES forKey:GUD_bUnlock];  KVSには保存しない ＜＜再インスト時にリセットさせるため
 	}
 
 #ifdef DEBUGxxxxxxxx
@@ -223,9 +233,9 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
-	/*
-	 Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-	 */
+    NSNotification* refreshNotification = [NSNotification notificationWithName:NFM_AppDidBecomeActive
+																		object:self  userInfo:nil];
+    [[NSNotificationCenter defaultCenter] postNotification:refreshNotification];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
@@ -613,12 +623,30 @@
 
 
 #pragma mark - StoreKit <SKPaymentTransactionObserver>
+- (void)unlockCompleate
+{
+	// Unlock
+	mApp_is_unlock = YES;
+	// UserDefへ記録する （iOS5未満のため）
+	[[NSUserDefaults standardUserDefaults] setBool:YES forKey:GUD_bUnlock];
+	[[NSUserDefaults standardUserDefaults] synchronize];
+	/*// iCloud-KVS に記録する
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	[kvs setBool:YES forKey:GUD_bUnlock];　KVSには保存しない ＜＜再インスト時にリセットさせるため
+	[kvs synchronize];*/
+	// 再フィッチ＆画面リフレッシュ通知
+	[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFETCH_ALL_DATA
+														object:self userInfo:nil];
+	[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFRESH_ALL_VIEWS
+														object:self userInfo:nil];
+}
+
 - (BOOL)purchasedCompleate:(SKPaymentTransaction*)tran
 {
 	// インジケータ消す
 	[self alertProgressOff];
 	if ([tran.payment.productIdentifier isEqualToString:STORE_PRODUCTID_UNLOCK]) {
-		// Unlock
+		// Sponsor
 		app_is_sponsor_ = YES;
 		// UserDefへ記録する （iOS5未満のため）
 		[[NSUserDefaults standardUserDefaults] setBool:YES forKey:GUD_bPaid];
@@ -627,17 +655,15 @@
 		NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 		[kvs setBool:YES forKey:GUD_bPaid];
 		[kvs synchronize];
+		// Unlock
+		[self unlockCompleate];
 		// Compleate !
 		[[SKPaymentQueue defaultQueue] finishTransaction:tran]; // 処理完了
-		// 再フィッチ＆画面リフレッシュ通知
-		[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFETCH_ALL_DATA
-															object:self userInfo:nil];
-		[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFRESH_ALL_VIEWS
-															object:self userInfo:nil];
-
 		return YES;
 	}
-	alertBox(	NSLocalizedString(@"SK Failed",nil), NSLocalizedString(@"SK Failed msg",nil), @"OK" );
+	// Unlock
+	[self unlockCompleate];		//[0.8.3]課金失敗だが購入意思ありとして制限解除する
+	alertBox( NSLocalizedString(@"SK Failed Unlock",nil), NSLocalizedString(@"SK Failed Unlock msg",nil), @"OK 6" );
 	return NO;
 }
 
@@ -647,31 +673,48 @@
 	{
 		switch (tran.transactionState) {
 			case SKPaymentTransactionStatePurchasing: // 購入中
-				NSLog(@"SKPaymentTransactionStatePurchasing: tran=%@", tran);
+				NSLog(@"SKPaymentTransactionState Purchasing: tran=%@", tran);
 				// インジケータ開始
 				[self	alertProgressOn: NSLocalizedString(@"SK Progress",nil)];
+				mAzukiUnlock = YES;	//[0.8.3] YES=購入意思ありと見なしてUnlockする
 				break;
 				
 			case SKPaymentTransactionStateFailed: // 購入失敗
 			{
-				NSLog(@"SKPaymentTransactionStateFailed: tran=%@", tran);
+				NSLog(@"SKPaymentTransactionState Failed: tran=%@, %@", tran, [tran.error description]);
 				[[SKPaymentQueue defaultQueue] finishTransaction:tran]; // 処理完了
 				// インジケータ消す
 				[self alertProgressOff];
 				
-				if (tran.error.code == SKErrorUnknown) {
-					// クレジットカード情報入力画面に移り、購入処理が強制的に終了したとき
-					//alertBox(	NSLocalizedString(@"SK Cancel",nil), [tran.error localizedDescription], @"OK" );
-					// 途中で止まった処理を再開する Consumable アイテムにも有効
-					[[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
-				} else {
-					alertBox(	NSLocalizedString(@"SK Failed",nil), nil, @"OK" );
+				switch (tran.error.code) {
+					case SKErrorClientInvalid:			// client is not allowed to issue the request, etc.
+						[self unlockCompleate];	//[0.8.3]課金失敗だが購入意思ありとして制限解除する
+						alertBox(	NSLocalizedString(@"SK Failed Unlock",nil), NSLocalizedString(@"SK Failed Unlock msg",nil), @"OK 1" );
+						break;
+					case SKErrorPaymentCancelled:	// user cancelled the request, etc.
+						// [Cancel]ボタンを押したとき。
+						alertBox(	NSLocalizedString(@"SK Cancel",nil), tran.error.localizedDescription, @"OK 2" );
+						break;
+					case SKErrorPaymentInvalid:		// purchase identifier was invalid, etc.
+						[self unlockCompleate];	//[0.8.3]課金失敗だが購入意思ありとして制限解除する
+						alertBox(	NSLocalizedString(@"SK Failed Unlock",nil), NSLocalizedString(@"SK Failed Unlock msg",nil), @"OK 3" );
+						break;
+					case SKErrorPaymentNotAllowed:	// this device is not allowed to make the payment
+						[self unlockCompleate];	//[0.8.3]課金失敗だが購入意思ありとして制限解除する
+						alertBox(	NSLocalizedString(@"SK Failed Unlock",nil), NSLocalizedString(@"SK Failed Unlock msg",nil), @"OK 4" );
+						break;
+					default: // case SKErrorUnknown:
+						// クレジットカード情報入力画面に移り、購入処理が強制的に終了したとき
+						//alertBox(	NSLocalizedString(@"SK Cancel",nil), [tran.error localizedDescription], @"OK" );
+						// 途中で止まった処理を再開する Consumable アイテムにも有効
+						[[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
+						break;
 				}
 			} break;
 				
 			case SKPaymentTransactionStatePurchased:	// 購入完了
 			{
-				NSLog(@"SKPaymentTransactionStatePurchased: tran=%@", tran);
+				NSLog(@"SKPaymentTransactionState Purchased: tran=%@", tran);
 				if ([self purchasedCompleate:tran]) {
 					alertBox(	NSLocalizedString(@"SK Compleate",nil), NSLocalizedString(@"SK Compleate msg",nil), @"OK" );
 				}
@@ -679,7 +722,7 @@
 				
 			case SKPaymentTransactionStateRestored:		// 購入済み
 			{
-				NSLog(@"SKPaymentTransactionStateRestored: tran=%@", tran);
+				NSLog(@"SKPaymentTransactionState Restored: tran=%@", tran);
 				if ([self purchasedCompleate:tran]) {
 					alertBox(	NSLocalizedString(@"SK Restored",nil), NSLocalizedString(@"SK Restored msg",nil), @"OK" );
 				}
@@ -700,6 +743,9 @@
 - (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError *)error
 {	// リストアの失敗
 	NSLog(@"paymentQueue: restoreCompletedTransactionsFailedWithError: ");
+	// Unlock
+	[self unlockCompleate];	//[0.8.3]課金失敗だが購入意思ありとして制限解除する
+	alertBox(	NSLocalizedString(@"SK Failed Unlock",nil), NSLocalizedString(@"SK Failed Unlock msg",nil), @"OK 5" );
 }
 
 - (void)paymentQueueRestoreCompletedTransactionsFinished:(SKPaymentQueue *)queue 
