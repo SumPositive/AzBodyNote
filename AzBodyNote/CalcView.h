@@ -13,7 +13,7 @@
 #define GOLDENPER				1.618	// 黄金比
 #define MINUS_SIGN				@"−"	// Unicode[2212] 表示用文字　[002D]より大きくするため
 #define ANSWER_MAX			999999.991	// double近似値で比較するため+0.001してある
-#define VIEW_HIGHT				(460 - 24)		// 画面有効高さ   -24=TabBarのため
+#define VIEW_HIGHT				480		//.window.rootViewController.view  addSubview:するため
 
 
 @interface CalcView : UIView //<UITextFieldDelegate>

@@ -366,7 +366,7 @@
 				[buDelete_ setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
 				[buDelete_ addTarget:self action:@selector(actionDelete:) forControlEvents:UIControlEventTouchUpInside];
 				
-				NSIndexPath* indexPath = [NSIndexPath indexPathForRow:7 inSection:0];
+				NSIndexPath* indexPath = [NSIndexPath indexPathForRow:10 inSection:0];
 				CGRect rc = [self.tableView rectForRowAtIndexPath:indexPath];
 				rc.size.width /= 2;
 				rc.origin.x = rc.size.width / 2;
@@ -734,7 +734,8 @@
 			cell.mValueMin = E2_nBpHi_MIN;
 			cell.mValueMax = E2_nBpHi_MAX;
 			cell.mValueDec = 0;
-			//cell.mValueStep = 1;
+			cell.mDialStep = 1;
+			cell.mStepperStep = 1;
 			cell.mValuePrev = iPrevBpHi_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
@@ -750,7 +751,8 @@
 			cell.mValueMin = E2_nBpLo_MIN;
 			cell.mValueMax = E2_nBpLo_MAX;
 			cell.mValueDec = 0;
-			//cell.mValueStep = 1;
+			cell.mDialStep = 1;
+			cell.mStepperStep = 1;
 			cell.mValuePrev = iPrevBpLo_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
@@ -766,7 +768,8 @@
 			cell.mValueMin = E2_nPuls_MIN;
 			cell.mValueMax = E2_nPuls_MAX;
 			cell.mValueDec = 0;
-			//cell.mValueStep = 1;
+			cell.mDialStep = 1;
+			cell.mStepperStep = 1;
 			cell.mValuePrev = iPrevPuls_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
@@ -782,7 +785,8 @@
 			cell.mValueMin = E2_nWeight_MIN;
 			cell.mValueMax = E2_nWeight_MAX;
 			cell.mValueDec = 1;
-			//cell.mValueStep = 1;
+			cell.mDialStep = 1;
+			cell.mStepperStep = 1;
 			cell.mValuePrev = iPrevWeight_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
@@ -798,7 +802,8 @@
 			cell.mValueMin = E2_nTemp_MIN;
 			cell.mValueMax = E2_nTemp_MAX;
 			cell.mValueDec = 1;
-			//cell.mValueStep = 1;
+			cell.mDialStep = 1;
+			cell.mStepperStep = 1;
 			cell.mValuePrev = iPrevTemp_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
@@ -814,7 +819,8 @@
 			cell.mValueMin = E2_nPedometer_MIN;
 			cell.mValueMax = E2_nPedometer_MAX;
 			cell.mValueDec = 0;
-			//cell.mValueStep = 1;
+			cell.mDialStep = 10;
+			cell.mStepperStep = 1;
 			cell.mValuePrev = iPrevPedometer_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
@@ -830,7 +836,8 @@
 			cell.mValueMin = E2_nBodyFat_MIN;
 			cell.mValueMax = E2_nBodyFat_MAX;
 			cell.mValueDec = 1;
-			//cell.mValueStep = 1;
+			cell.mDialStep = 1;
+			cell.mStepperStep = 1;
 			cell.mValuePrev = iPrevBodyFat_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
@@ -846,7 +853,8 @@
 			cell.mValueMin = E2_nSkMuscle_MIN;
 			cell.mValueMax = E2_nSkMuscle_MAX;
 			cell.mValueDec = 1;
-			//cell.mValueStep = 1;
+			cell.mDialStep = 1;
+			cell.mStepperStep = 1;
 			cell.mValuePrev = iPrevSkMuscle_;
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;

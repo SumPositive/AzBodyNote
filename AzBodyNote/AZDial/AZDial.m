@@ -26,10 +26,13 @@
 	UIImageView		*mImgBack;
 	id							mDelegate;
 	
-	NSInteger			mDial;
+	//------------------------------------ここから、
+	NSInteger			mDial;				//直接変更禁止 setDial:により変更する
 	NSInteger			mDialMin;
 	NSInteger			mDialMax;
 	NSInteger			mDialStep;
+	NSInteger			mStepperStep; //2012-03-29//
+	//------------------------------------ここまで、変更後は resetDial:を呼ぶこと
 	
 	//CGFloat				mScrollMin; = 0 固定
 	CGFloat				mScrollMax;		// ScrollView左端から右端までの距離
@@ -45,7 +48,7 @@
 	UIStepper				*mStepper;		// iOS5以上
 	UIButton				*mStepBuUp;		// iOS5未満
 	UIButton				*mStepBuDown;	// iOS5未満
-	CGFloat				mStepperMag;	// ステッパーの刻みを mVstep * mStepperMag にする
+	//2012-03-29//CGFloat				mStepperMag;	// ステッパーの刻みを mVstep * mStepperMag にする
 }
 
 
@@ -105,7 +108,8 @@
 			[mStepBuDown removeFromSuperview];
 			mStepBuDown = nil;
 		}
-		mStepperMag = 1.0; // Default
+		//mStepperMag = 1.0; // Default
+		mStepperStep = 1;
 	}
 	
 	// ScrollView		高さ:44　= self.bounds.size.height
@@ -165,7 +169,7 @@
 			   min:(NSInteger)min			// 最小値
 			   max:(NSInteger)max		// 最大値
 			   step:(NSInteger)step		// 増減値
-			stepper:(BOOL)stepper;
+			stepper:(NSInteger)stepperStep;	//2012-03-29// ステッパ増減値  0=非表示
 {
 	assert(delegate);
 	assert(min < max);
@@ -179,7 +183,8 @@
 	mDialMin = min;
 	mDialMax = max;
 	mDialStep = step;
-	mStepperMag = 1.0;
+	mStepperStep = stepperStep;
+	//mStepperMag = 1.0;
 	
 	UIImage *imgTile = [UIImage imageNamed:@"AZDialTile"];	// H30 x W10の倍数
 	if (imgTile==nil) return nil;
@@ -193,7 +198,11 @@
 	//mValue は、mScrollView生成後、setDial:によりセットしている。
 	mIsOS5 = ([[[UIDevice currentDevice] systemVersion] compare:@"5.0"] != NSOrderedAscending);  // !<  (>=) "5.0"
 
-	[self makeView:stepper];
+	if (stepperStep==0) {
+		[self makeView:NO];
+	} else {
+		[self makeView:YES];
+	}
 	
 	// Left BLOCK
 	CGRect rcImg = CGRectMake( (-2)*BLOCK, (FrameH - ImgH)/2, BLOCK, ImgH);	// scrollReset:にてBLOCK再配置処理されるように(-2)*している
@@ -240,6 +249,10 @@
 		NSLog(@"LOGIC ERROR!!!  mDialStep=%ld", (long)mDialStep);
 		mDialStep = 1;
 	}
+	if (mStepperStep < 1) {
+		NSLog(@"LOGIC ERROR!!!  mStepperStep=%ld", (long)mStepperStep);
+		mStepperStep = 1;
+	}
 	CGFloat ff = (CGFloat)(mDialMax - mDialMin) / mDialStep * PITCH;
 	if (mScrollView.contentSize.width != ff + mScrollView.frame.size.width) 
 	{	// + mScrollView.frame.size.width は、Stepper有無でダイアル幅が変わることに対応するため。
@@ -281,7 +294,7 @@
 		if (!mStepper) return;
 		mStepper.minimumValue = mDialMin;
 		mStepper.maximumValue = mDialMax;
-		mStepper.stepValue = mDialStep * mStepperMag;
+		mStepper.stepValue = mStepperStep;  // mDialStep * mStepperMag;
 		mStepper.value = mDial;
 	} else {
 		if (!mStepBuUp || !mStepBuDown) return;
@@ -301,14 +314,12 @@
 	[self makeView:(mStepper!=nil || mStepBuUp!=nil)];
 }
 
-- (void)setDial:(NSInteger)dial  animated:(BOOL)animated
+- (void)resetAnimated:(BOOL)animated
 {	// これで変位したときは、delegate< dialChanged: dialDone: > を呼び出さない。
-	if (dial < mDialMin) dial = mDialMin;
-	else if (mDialMax < dial) dial = mDialMax;
-	// SET
-	mDial = dial;
-
 	mIsSetting = YES; // delegate< dialChanged: dialDone: > を呼び出さない。
+	
+	if (mStepper) mStepper.value = mDial; //2012-03-29//BugFix
+	
 	if (animated) {
 		// アニメ準備
 		[UIView beginAnimations:nil context:NULL];
@@ -324,13 +335,20 @@
 	mIsSetting = NO;
 }
 
+- (void)setDial:(NSInteger)dial  animated:(BOOL)animated
+{	// これで変位したときは、delegate< dialChanged: dialDone: > を呼び出さない。
+	if (dial < mDialMin) dial = mDialMin;
+	else if (mDialMax < dial) dial = mDialMax;
+	// SET
+	mDial = dial;
+	[self resetAnimated:animated];
+}
+
 - (void)setStep:(NSInteger)vstep
 {
 	if (vstep < 1) mDialStep =1;
 	else mDialStep = vstep;
-	mIsSetting = YES; // delegate< dialChanged: dialDone: > を呼び出さない。
-	[self scrollReset];
-	mIsSetting = NO;
+	[self resetAnimated:NO];
 }
 
 - (void)setMin:(NSInteger)vmin
@@ -338,10 +356,7 @@
 	if (mDial < vmin) mDial = vmin;
 	// SET
 	mDialMin = vmin;
-	// mScrollView 座標系セット
-	mIsSetting = YES; // delegate< dialChanged: dialDone: > を呼び出さない。
-	[self scrollReset];
-	mIsSetting = NO;
+	[self resetAnimated:NO];
 }
 
 - (void)setMax:(NSInteger)vmax
@@ -349,18 +364,22 @@
 	if (vmax < mDial) mDial = vmax;
 	// SET
 	mDialMax = vmax;
-	// mScrollView 座標系セット
-	mIsSetting = YES; // delegate< dialChanged: dialDone: > を呼び出さない。
-	[self scrollReset];
-	mIsSetting = NO;
+	[self resetAnimated:NO];
 }
 
+/*//2012-03-29//
 - (void)setStepperMagnification:(CGFloat)vmagnif
 {	// ステッパーは刻みを、mVstep * vmagnif にする
 	mStepperMag = vmagnif;
 	mIsSetting = YES; // delegate< dialChanged: dialDone: > を呼び出さない。
 	[self scrollReset];
 	mIsSetting = NO;
+}*/
+- (void)setStepperStep:(NSInteger)vstep
+{
+	if (vstep < 1) mStepperStep =1;
+	else mStepperStep = vstep;
+	[self resetAnimated:NO];
 }
 
 - (void)setStepperShow:(BOOL)bShow
@@ -378,17 +397,20 @@
 #pragma mark - Action
 
 - (void)actionStepperChange:(UIStepper *)sender
-{
-	[self	setDial:(NSInteger)sender.value animated:YES];
-
-	if ([mDelegate respondsToSelector:@selector(dialDone:dial:)]) {
-		[mDelegate dialDone:self  dial:mDial];
+{	// iOS5以降
+	NSLog(@"actionStepperChange: sender.value=%.2lf  (.stepValue=%.2lf)", sender.value, sender.stepValue);
+	if (mIsSetting==NO) { //再帰防止のため
+		[self	setDial:(NSInteger)sender.value animated:YES];
+		
+		if ([mDelegate respondsToSelector:@selector(dialDone:dial:)]) {
+			[mDelegate dialDone:self  dial:mDial];
+		}
 	}
 }
 
 - (void)actionStepBuUpTouch:(UIButton*)sender
-{
-	NSInteger ii = mDial + (mDialStep * mStepperMag);
+{	// iOS5未満
+	NSInteger ii = mDial + mStepperStep; //(mDialStep * mStepperMag);
 	if (mDialMax < ii) ii = mDialMax;
 	[self	setDial:ii  animated:YES];
 	if ([mDelegate respondsToSelector:@selector(dialDone:dial:)]) {
@@ -397,8 +419,8 @@
 }
 
 - (void)actionStepBuDownTouch:(UIButton*)sender
-{
-	NSInteger ii = mDial - (mDialStep * mStepperMag);
+{	// iOS5未満
+	NSInteger ii = mDial - mStepperStep; //(mDialStep * mStepperMag);
 	if (ii < mDialMin) ii = mDialMin;
 	[self	setDial:ii  animated:YES];
 	if ([mDelegate respondsToSelector:@selector(dialDone:dial:)]) {
@@ -430,6 +452,7 @@
 
 	if (mDial < mDialMin) mDial = mDialMin;	// Fix:2012-01-19
 	else if (mDialMax < mDial) mDial = mDialMax;
+	//[self resetAnimated:NO];
 	
 	if (mIsSetting==NO) {
 		if ([mDelegate respondsToSelector:@selector(dialChanged:dial:)]) {
@@ -477,8 +500,9 @@
 		}
 	}
 	
-	NSInteger iStep = mDialStep * mStepperMag;
-	[self setDial:((mDial / iStep) * iStep)  animated:NO];	// ステッパーのステップに補正する
+	//[self resetAnimated:NO];
+	//NSInteger iStep = mDialStep * mStepperMag;
+	[self setDial:((mDial / mStepperStep) * mStepperStep)  animated:NO];	// ステッパーのステップに補正する
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate

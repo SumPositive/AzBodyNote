@@ -11,6 +11,7 @@
 // 修正あるときは、各アプリソースで仕上げた後、マスタへコピーすること。
 //
 // ------------------------------------------------ Update History
+// 2012-03-29 Up: setStepperMagnification:廃止し、setStepperStep:新設
 // 2012-01-19 Fix: step>1のときmin未満になることを回避
 // 2011-10-06 Start.
 // ------------------------------------------------ 
@@ -24,7 +25,7 @@
 				min:(NSInteger)min			// 最小値
 				max:(NSInteger)max		// 最大値
 			   step:(NSInteger)step			// 増減値
-			stepper:(BOOL)stepper;			// ステッパボタン有無
+			stepper:(NSInteger)stepperStep;	//2012-03-29// ステッパ増減値  0=非表示
 
 - (void)setFrame:(CGRect)frame;	// NEW 回転のため
 
@@ -33,7 +34,8 @@
 - (void)setMax:(NSInteger)vmax;
 - (void)setStep:(NSInteger)vstep;	// 増減値
 - (void)setStepperShow:(BOOL)bShow;
-- (void)setStepperMagnification:(CGFloat)vmagnif;
+- (void)setStepperStep:(NSInteger)vstep;	//2012-03-29// 増減値
+//2012-03-29//- (void)setStepperMagnification:(CGFloat)vmagnif;
 - (NSInteger)getDial;
 
 @end

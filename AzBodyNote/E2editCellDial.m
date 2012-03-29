@@ -44,7 +44,8 @@
 @synthesize mValueMin = valueMin_;
 @synthesize mValueMax = valueMax_;
 @synthesize mValueDec = valueDec_;
-//@synthesize mValueStep = valueStep_;
+@synthesize mDialStep = dialStep_;
+@synthesize mStepperStep = stepperStep_;
 @synthesize mValuePrev = valuePrev_;
 
 
@@ -113,7 +114,9 @@
 	//CalcView *calc = [[CalcView alloc] initWithTitle: ibLbName.text  min: dMin  max: dMax  decimal: valueDec_
 	//										  target:self	  action:@selector(calcDone:)];
 	CalcView *calc = [[CalcView alloc] initWithTitle: ibLbName.text  min: dMin  max: dMax  decimal: valueDec_ delegate:self];
-	[viewParent_ addSubview:calc];
+	//[viewParent_ addSubview:calc];
+	//広告やTabBarよりも上に出すため。
+	[viewParent_.window.rootViewController.view  addSubview:calc];
 	[calc show];
 	//[calc release];
 }
@@ -139,15 +142,16 @@
 	if (Re2record_==nil) return;
 	assert(Re2record_);
 	assert(RzKey_);
+	
+	if (valuePrev_<valueMin_ || valueMax_<valuePrev_) {
+		valuePrev_ = (valueMax_ - valueMin_) / 2; //平均値
+	}
+
 	NSNumber *num = [Re2record_ valueForKey:RzKey_];
 	if (num) {
 		mValue = [num integerValue];
 	} else {
-		mValue = (-1); // None
-	}
-
-	if (valuePrev_<valueMin_ || valueMax_<valuePrev_) {
-		valuePrev_ = (valueMax_ - valueMin_) / 2; //平均値
+		mValue = (-1); // 以下で valuePrev_(前回値)がセットされる
 	}
 	
 	NSInteger val = mValue;
@@ -155,10 +159,15 @@
 		val = valuePrev_;  //＜＜＜　前回値をセットする
 	}
 
+	if (dialStep_<1) dialStep_ = 1;
 	
 	// AZDial
 	if (mDial) {
-		[mDial setDial:val animated:YES];
+		[mDial setMin:valueMin_];
+		[mDial setMax:valueMax_];
+		[mDial setStep:dialStep_];
+		[mDial setStepperStep:stepperStep_];
+		[mDial setDial:val animated:NO];
 	} else {
 		// 新規生成
 		mDial = [[AZDial alloc] initWithFrame:CGRectMake(15, 44, 295, 44)
@@ -166,8 +175,8 @@
 										 dial: val
 										  min: valueMin_
 										  max: valueMax_
-										 step: 1
-									stepper: YES ];
+										 step: dialStep_
+									stepper: stepperStep_];
 		[self addSubview:mDial];
 		mDial.backgroundColor = [UIColor clearColor]; //self.backgroundColor;
 	}
