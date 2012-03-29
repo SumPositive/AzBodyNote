@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model name="" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1171" systemVersion="11D50" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="E1body">
+        <attribute name="dBirthday" optional="YES" attributeType="Date"/>
+        <attribute name="nMkBpHi_mmHg" optional="YES" attributeType="Integer 16" maxValueString="300"/>
+        <attribute name="nMkBpLo_mmHg" optional="YES" attributeType="Integer 16" maxValueString="200"/>
+        <attribute name="nMkWeight_g" optional="YES" attributeType="Integer 32" maxValueString="300000"/>
+        <attribute name="sName" optional="YES" attributeType="String"/>
+        <attribute name="sNote" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="E2record">
+        <attribute name="bCaution" optional="YES" attributeType="Boolean" defaultValueString="NO"/>
+        <attribute name="dateTime" attributeType="Date" indexed="YES"/>
+        <attribute name="nBodyFat_10p" optional="YES" attributeType="Integer 16" maxValueString="1000" syncable="YES"/>
+        <attribute name="nBpHi_mmHg" optional="YES" attributeType="Integer 16" maxValueString="300"/>
+        <attribute name="nBpLo_mmHg" optional="YES" attributeType="Integer 16" maxValueString="200"/>
+        <attribute name="nPedometer" optional="YES" attributeType="Integer 32" maxValueString="99999" syncable="YES"/>
+        <attribute name="nPulse_bpm" optional="YES" attributeType="Integer 16" maxValueString="200"/>
+        <attribute name="nSkMuscle_10p" optional="YES" attributeType="Integer 16" maxValueString="1000" syncable="YES"/>
+        <attribute name="nTemp_10c" optional="YES" attributeType="Integer 16" maxValueString="429"/>
+        <attribute name="nWeight_10Kg" optional="YES" attributeType="Integer 32" maxValueString="2000"/>
+        <attribute name="nYearMM" optional="YES" attributeType="Integer 32" maxValueString="299912" syncable="YES"/>
+        <attribute name="sEquipment" optional="YES" attributeType="String"/>
+        <attribute name="sNote1" optional="YES" attributeType="String"/>
+        <attribute name="sNote2" optional="YES" attributeType="String"/>
+    </entity>
+    <elements>
+        <element name="E1body" positionX="-92" positionY="231" width="128" height="150"/>
+        <element name="E2record" positionX="117" positionY="195" width="128" height="210"/>
+    </elements>
+</model>

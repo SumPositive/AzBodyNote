@@ -25,16 +25,18 @@
 @implementation E2record
 @dynamic bCaution;
 @dynamic dateTime;
+@dynamic nYearMM;
+@dynamic sNote1;
+@dynamic sNote2;
+@dynamic sEquipment;
 @dynamic nBpHi_mmHg;
 @dynamic nBpLo_mmHg;
 @dynamic nPulse_bpm;
 @dynamic nTemp_10c;
 @dynamic nWeight_10Kg;
-@dynamic nYearMM;
-@dynamic sEquipment;
-@dynamic sNote1;
-@dynamic sNote2;
-//@dynamic e1body;
+@dynamic nPedometer;
+@dynamic nBodyFat_10p;
+@dynamic nSkMuscle_10p;
 
 /* レスポンス向上のため属性(nYearMM)にした。　このように動的に求めることもできるとの例
 - (NSInteger)dateYearMM
