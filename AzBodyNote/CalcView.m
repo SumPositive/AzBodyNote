@@ -216,6 +216,7 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 
 - (void)show
 {
+	GA_TRACK_PAGE(@"CalcView");
 	// アニメ準備
 	CGContextRef context = UIGraphicsGetCurrentContext();
 	[UIView beginAnimations:nil context:context];

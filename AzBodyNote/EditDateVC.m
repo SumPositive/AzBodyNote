@@ -87,6 +87,7 @@
 - (void)viewDidAppear:(BOOL)animated 
 {
 	[super viewDidAppear:animated];
+	GA_TRACK_PAGE(@"EditDateVC");
 	NSLog(@"CdateSource=%@", CdateSource);
 	if (CdateSource==nil) {	// LOGIC ERROR!!!
 		CdateSource = [NSDate date];

@@ -29,7 +29,7 @@
 	NSIndexPath							*indexPathEdit_;
 	NSIndexPath							*indexPathDelete_;
 
-	GADBannerView		*adMobView_;
+	//GADBannerView		*adMobView_;
 	NSUInteger				e2offset_;
 	UILabel					*lbPagePrev_;
 	UILabel					*lbPageNext_;
@@ -181,7 +181,7 @@
 	}
 */
 	
-	//--------------------------------------------------------------------------------------------------------- AdMob
+/*	//--------------------------------------------------------------------------------------------------------- AdMob
 	if (appDelegate_.app_is_sponsor==NO && adMobView_==nil) {
 		adMobView_ = [[GADBannerView alloc]
 					  initWithFrame:CGRectMake(0, 0,			// TableCell用
@@ -194,12 +194,13 @@
 		[adMobView_ loadRequest:request];
 		adMobView_.tag = 0;
 		adMobView_.alpha = 0;
-	}
+	}*/
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+	GA_TRACK_PAGE(@"E2listTVC");
 	
 	if (indexPathEdit_) { // E2editTVC:から戻ったとき、
 		@try {	// 範囲オーバーで落ちる可能性があるため。　＜＜最終行を削除したとき。
@@ -234,34 +235,35 @@
 		}
 	}
 }
-/*
+
 - (void)viewDidAppear:(BOOL)animated
 {
-	if (self.view.alpha != 1) {
-		[super viewDidAppear:animated];
-		// アニメ準備
-		CGContextRef context = UIGraphicsGetCurrentContext();
-		[UIView beginAnimations:nil context:context];
-		[UIView setAnimationDuration:TABBAR_CHANGE_TIME];
-		[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
-		// アニメ終了状態
-		self.view.alpha = 1;
-		// アニメ実行
+	[super viewDidAppear:animated];
+	
+	if (appDelegate_.pAdWhirlView) {
+		[UIView beginAnimations:nil context:NULL];
+		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+		[UIView setAnimationDuration:1.2];
+		appDelegate_.pAdWhirlView.frame = CGRectMake(0, 480-49-50, 320, 50);  // GAD_SIZE_320x50
+		appDelegate_.pAdWhirlView.alpha = 1;	// 表示する
 		[UIView commitAnimations];
 	}
-}*/
+}
 
 /*
 - (void)viewWillDisappear:(BOOL)animated
 {
 	[super viewWillDisappear:animated];
 }
+*/
 
 - (void)viewDidDisappear:(BOOL)animated
-{
-	[super viewDidDisappear:animated];
+{	// 非表示になった後に呼び出される
+	if (appDelegate_.pAdWhirlView) {
+		appDelegate_.pAdWhirlView.alpha = 0;
+	}
+    [super viewDidDisappear:animated];
 }
-*/
 
 /*
  // Override to allow orientations other than the default portrait orientation.
@@ -284,24 +286,16 @@
 	//NSLog(@"--- viewDidUnload ---"); 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	
-	// ARCによりrelease不要になったが、delegateの解放は必須。
+/*	// ARCによりrelease不要になったが、delegateの解放は必須。
 	if (appDelegate_.app_is_sponsor==NO && adMobView_) {
 		adMobView_.delegate = nil;  //受信STOP  ＜＜これが無いと破棄後に呼び出されて落ちる
 		adMobView_ = nil;
-	}
+	}*/
 	
 	[super viewDidUnload];
 	// この後に loadView ⇒ viewDidLoad ⇒ viewWillAppear がコールされる
 }
 
-/*
-- (void)dealloc
-{
-	[__fetchedResultsController release];
-	[__managedObjectContext release];
-    [super dealloc];
-}
-*/
 
 
 
@@ -342,9 +336,9 @@
 	}
 	// GOALセクション
 	NSInteger iRows = 2;	// GOAL & Dropbox
-	if (appDelegate_.app_is_sponsor==NO) {
+/*	if (appDelegate_.app_is_sponsor==NO) {
 		iRows++; // AdMob
-	}
+	}*/
 	return  iRows;
 }
 
@@ -417,7 +411,7 @@
 			[self configureCell:cell atIndexPath:nil]; // GOAL!
 			return cell;
 		}
-		if (appDelegate_.app_is_sponsor) {
+	/*	if (appDelegate_.app_is_sponsor) {
 			iRow++; // AdMob行をパスするため
 		} else {
 			if (iRow==1) {
@@ -433,9 +427,9 @@
 				}
 				return cell;
 			}
-		}
+		}*/
 		
-		if (iRow==2)
+		if (iRow==1)
 		{	// Dropbox  "esuslogo101409"
 			static NSString *Cid = @"E2listDropbox"; // .storyboard定義名
 			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
@@ -445,19 +439,6 @@
 			}
 			return cell;
 		}
-	/*	else if (iRow==3 && appDelegate_.gud_bPaid==NO)
-		{	// Page Next
-			static NSString *Cid = @"E2listBasic";
-			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
-			if (cell == nil) {
-				UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
-				[nib instantiateWithOwner:self options:nil];
-			}
-			cell.textLabel.textAlignment = UITextAlignmentCenter;
-			cell.textLabel.font = [UIFont systemFontOfSize:16];
-			cell.textLabel.text = NSLocalizedString(@"PagePrevLimit",nil);
-			return cell;
-		}*/ 
 	}
     return nil;
 }
@@ -542,11 +523,7 @@
 	if ([[self.fetchedResultsController sections] count] <= indexPath.section) 
 	{	// Functions
 		indexPathEdit_ = nil; // Editモード解除
-		int iRow = indexPath.row;
-		if (appDelegate_.app_is_sponsor) {
-			iRow++; // AdMob行をパスするため
-		}
-		if (iRow==2) {	// Dropbox
+		if (indexPath.row==1) {	// Dropbox
 			AzBodyNoteAppDelegate *appDelegate = (AzBodyNoteAppDelegate*)[[UIApplication sharedApplication] delegate];
 			[appDelegate dropboxView];
 		}
@@ -729,8 +706,8 @@
 }
 */
 
+/*
 #pragma mark - AdMob <GADBannerViewDelegate>
-
 - (void)adViewDidReceiveAd:(GADBannerView *)bannerView 
 {	// AdMob 広告あり
 	adMobView_.tag = 1;
@@ -755,5 +732,6 @@
 	adMobView_.alpha = 0;
 	[UIView commitAnimations];
 }
+ */
 
 @end

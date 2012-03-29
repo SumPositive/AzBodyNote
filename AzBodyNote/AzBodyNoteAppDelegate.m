@@ -33,11 +33,16 @@
 	UIAlertView						*alertProgress_;
 	UIActivityIndicatorView	*alertIndicator_;
 	BOOL								mAzukiUnlock;	// YES=購入意思ありと見なしてUnlockする
+
+	//AdWhirlView							*mAdWhirlView;
+	NADView									*mNendView;
+	MasManagerViewController	*mMedibaAd; 
 }
 
 @synthesize window = window_;
 @synthesize mocBase;
-@synthesize tabBarController = _tabBarController;
+@synthesize tabBarController = pTabBarController_;
+@synthesize pAdWhirlView = pAdWhirlView_;
 @synthesize app_is_sponsor = app_is_sponsor_;
 @synthesize app_is_unlock = mApp_is_unlock;
 @synthesize app_e2record_count = app_e2record_count_;
@@ -98,8 +103,9 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {	// Override point for customization after application launch.
+	GA_INIT_TRACKER(@"UA-30305032-4", 10, nil);	//-4:Condition
+
 	mAzukiUnlock = NO;	// YES=購入意思ありと見なしてUnlockする
-	
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
 	//-------------------------------------------------Setting Defult
@@ -145,8 +151,11 @@
 		[kvs setObject:[NSNumber numberWithInt:120] forKey:Goal_nBpHi_mmHg];
 		[kvs setObject:[NSNumber numberWithInt:  80] forKey:Goal_nBpLo_mmHg];
 		[kvs setObject:[NSNumber numberWithInt:  65] forKey:Goal_nPulse_bpm];
-		[kvs setObject:[NSNumber numberWithInt:365] forKey:Goal_nTemp_10c];
 		[kvs setObject:[NSNumber numberWithInt:650] forKey:Goal_nWeight_10Kg];
+		[kvs setObject:[NSNumber numberWithInt:365] forKey:Goal_nTemp_10c];
+		[kvs setObject:[NSNumber numberWithInt:E2_nPedometer_INIT] forKey:Goal_nPedometer];
+		[kvs setObject:[NSNumber numberWithInt:E2_nBodyFat_INIT] forKey:Goal_nBodyFat_10p];
+		[kvs setObject:[NSNumber numberWithInt:E2_nSkMuscle_INIT] forKey:Goal_nSkMuscle_10p];
 		[kvs synchronize];
 	}
 	if (app_is_sponsor_==NO) {
@@ -177,6 +186,38 @@
 							 root:kDBRootAppFolder]; // either kDBRootAppFolder or kDBRootDropbox
 	[DBSession setSharedSession:dbSession];
 
+	if (app_is_sponsor_==NO) {
+		//CGRect rcAd = CGRectMake(0, self.view.frame.size.height-28-50, 320, 50);  // GAD_SIZE_320x50
+		//--------------------------------------------------------------------------------------------------------- AdWirl
+		if (pAdWhirlView_==nil) {
+			pAdWhirlView_ = [AdWhirlView requestAdWhirlViewWithDelegate:self];
+			pAdWhirlView_.frame = CGRectMake(0, 0, 320, 50);
+			//[pTabBarController_.view addSubview:pAdWhirlView_];
+			//[self.window addSubview:pAdWhirlView_];
+			[self.window.rootViewController.view addSubview:pAdWhirlView_];
+		}
+		
+		if ([NSLocalizedString(@"Country2code",nil) isEqualToString:@"ja"])
+		{	// これにより ja 以外はパスする
+			if (mNendView==nil) {	// AppBank nend
+				mNendView = [[NADView alloc] initWithFrame:CGRectMake(0,0,
+																	  NAD_ADVIEW_SIZE_320x50.width, NAD_ADVIEW_SIZE_320x50.height)];
+				//[nadview setNendID:@"apiKeyを入れてね" spotID:@"広告枠IDを入れてね"];
+				[mNendView setNendID:@"f905d0b348963ffc8834ac59465cfd9488ee646e" spotID:@"6949"]; // Condition
+				[mNendView setDelegate:self];
+				[mNendView setRootViewController:pTabBarController_];
+				[mNendView load:nil];
+			}
+			if (mMedibaAd==nil) {	// Mediba Ad
+				mMedibaAd = [[MasManagerViewController alloc] init];
+				//[self.view addSubview:pMedibaAd_.view];
+				[mMedibaAd setPosition:kMasMVPosition_bottom];
+				mMedibaAd.view.frame = pAdWhirlView_.bounds; //これが無ければ変にスクロールする
+				mMedibaAd.auID = @"165123";  // Condition
+				[mMedibaAd loadRequest];
+			}
+		}
+	}
     return YES;
 }
 /*
@@ -246,13 +287,20 @@
 
 - (void)dealloc
 {
-	//[_window release];
-	//[__managedObjectContext release];
-	//[__managedObjectModel release];
-	//[__persistentStoreCoordinator release];
-	//[_tabBarController release];
-    //[super dealloc];
+	if (mNendView) {
+		mNendView.delegate = nil;
+		mNendView = nil;
+	}
+	if (mMedibaAd) {
+		mMedibaAd.delegate = nil;
+		mMedibaAd = nil;
+	}
+	if (pAdWhirlView_) {
+		pAdWhirlView_.delegate = nil;
+		pAdWhirlView_ = nil;
+	}
 }
+
 
 - (void)awakeFromNib
 {
@@ -312,16 +360,19 @@
 						  @"Header",									@"#class",
 						  FILE_HEADER_PREFIX,					@"#header",
 						  utcFromDate([NSDate date]),	@"#update",
-						  @"1",												@"#version",
+						  @"2",												@"#version",
 						 //----------------------------------------------------------------------------------  iCloud-KVS
 						  toNSNull([kvs objectForKey:Goal_nBpHi_mmHg]),		Goal_nBpHi_mmHg,
-						  toNSNull([kvs objectForKey:Goal_nBpLo_mmHg]),	Goal_nBpLo_mmHg,
-						  toNSNull([kvs objectForKey:Goal_nPulse_bpm]),		Goal_nPulse_bpm,
-						  toNSNull([kvs objectForKey:Goal_nTemp_10c]),		Goal_nTemp_10c,
-						  toNSNull([kvs objectForKey:Goal_nWeight_10Kg]),	Goal_nWeight_10Kg,
+						  toNSNull([kvs objectForKey:Goal_nBpLo_mmHg]),		Goal_nBpLo_mmHg,
+						  toNSNull([kvs objectForKey:Goal_nPulse_bpm]),			Goal_nPulse_bpm,
+						  toNSNull([kvs objectForKey:Goal_nTemp_10c]),			Goal_nTemp_10c,
+						  toNSNull([kvs objectForKey:Goal_nWeight_10Kg]),		Goal_nWeight_10Kg,
 						  toNSNull([kvs objectForKey:Goal_sEquipment]),			Goal_sEquipment,
-						  toNSNull([kvs objectForKey:Goal_sNote1]),				Goal_sNote1,
-						  toNSNull([kvs objectForKey:Goal_sNote2]),				Goal_sNote2,
+						  toNSNull([kvs objectForKey:Goal_sNote1]),					Goal_sNote1,
+						  toNSNull([kvs objectForKey:Goal_sNote2]),					Goal_sNote2,
+						  toNSNull([kvs objectForKey:Goal_nPedometer]),			Goal_nPedometer,
+						  toNSNull([kvs objectForKey:Goal_nBodyFat_10p]),		Goal_nBodyFat_10p,
+						  toNSNull([kvs objectForKey:Goal_nSkMuscle_10p]),	Goal_nSkMuscle_10p,
 						  //---------------------------------------------------------------------------------- 
 						  nil];
 	[maE2 addObject:dict];
@@ -387,13 +438,16 @@
 	//----------------------------------------------------------------------------------  iCloud-KVS
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	[kvs setObject: toNSNull([dict objectForKey:Goal_nBpHi_mmHg])		forKey:Goal_nBpHi_mmHg];
-	[kvs setObject: toNSNull([dict objectForKey:Goal_nBpLo_mmHg])	forKey:Goal_nBpLo_mmHg];
-	[kvs setObject: toNSNull([dict objectForKey:Goal_nPulse_bpm])		forKey:Goal_nPulse_bpm];
-	[kvs setObject: toNSNull([dict objectForKey:Goal_nTemp_10c])		forKey:Goal_nTemp_10c];
-	[kvs setObject: toNSNull([dict objectForKey:Goal_nWeight_10Kg])	forKey:Goal_nWeight_10Kg];
+	[kvs setObject: toNSNull([dict objectForKey:Goal_nBpLo_mmHg])		forKey:Goal_nBpLo_mmHg];
+	[kvs setObject: toNSNull([dict objectForKey:Goal_nPulse_bpm])			forKey:Goal_nPulse_bpm];
+	[kvs setObject: toNSNull([dict objectForKey:Goal_nTemp_10c])			forKey:Goal_nTemp_10c];
+	[kvs setObject: toNSNull([dict objectForKey:Goal_nWeight_10Kg])		forKey:Goal_nWeight_10Kg];
 	[kvs setObject: toNSNull([dict objectForKey:Goal_sEquipment])			forKey:Goal_sEquipment];
-	[kvs setObject: toNSNull([dict objectForKey:Goal_sNote1])				forKey:Goal_sNote1];
-	[kvs setObject: toNSNull([dict objectForKey:Goal_sNote2])				forKey:Goal_sNote2];
+	[kvs setObject: toNSNull([dict objectForKey:Goal_sNote1])					forKey:Goal_sNote1];
+	[kvs setObject: toNSNull([dict objectForKey:Goal_sNote2])					forKey:Goal_sNote2];
+	[kvs setObject: toNSNull([dict objectForKey:Goal_nPedometer])			forKey:Goal_nPedometer];
+	[kvs setObject: toNSNull([dict objectForKey:Goal_nBodyFat_10p])		forKey:Goal_nBodyFat_10p];
+	[kvs setObject: toNSNull([dict objectForKey:Goal_nSkMuscle_10p])	forKey:Goal_nSkMuscle_10p];
 	[kvs synchronize]; // iCloud最新同期（取得）
 	//---------------------------------------------------------------------------------- 
 
@@ -751,6 +805,45 @@
 - (void)paymentQueueRestoreCompletedTransactionsFinished:(SKPaymentQueue *)queue 
 {	// 全てのリストア処理が終了
 	NSLog(@"paymentQueueRestoreCompletedTransactionsFinished: ");
+}
+
+
+#pragma mark - Ads <AdWhirlDelegate>
+- (NSString *)adWhirlApplicationKey
+{	//return @"ここにAdwhirl管理画面のアプリのページ上部に記載されているSDK Keyをコピペ";
+	return @"68f2b24bfca64225a1553bdbc0b31edc"; // Condition
+}
+
+- (UIViewController *)viewControllerForPresentingModalView
+{	//return UIWindow.rootViewController;
+	NSLog(@"AdWhirl - viewControllerForPresentingModalView");
+    return self.window.rootViewController;
+}
+
+- (void)adWhirlDidReceiveAd:(AdWhirlView *)adWhirlView
+{	// 広告を受信したタイミングでなにかアクションを起こしたい場合
+	NSLog(@"AdWhirl - adWhirlDidReceiveAd");
+}
+
+- (void)performEventAppBank:(AdWhirlView *)adWhirlView 
+{	// AppBank nend
+	NSLog(@"AdWhirl - performEventAppBank");
+	if (mNendView) {
+		[adWhirlView replaceBannerViewWith:mNendView];
+	}
+}
+
+- (void)nadViewDidFinishLoad:(NADView *)adView
+{
+	NSLog(@"AppBank nend - nadViewDidFinishLoad");
+}
+
+- (void)performEventMedibaAd:(AdWhirlView *)adWhirlView 
+{
+	NSLog(@"AdWhirl - performEventMedibaAd");
+	if (mMedibaAd) { // これにより ja 以外は、MedibaAd をパスする
+		[adWhirlView replaceBannerViewWith:mMedibaAd.view];
+	}
 }
 
 

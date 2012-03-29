@@ -30,11 +30,14 @@
 	NSInteger	iPrevPuls_;
 	NSInteger	iPrevWeight_;
 	NSInteger	iPrevTemp_;
+	NSInteger	iPrevPedometer_;
+	NSInteger	iPrevBodyFat_;
+	NSInteger	iPrevSkMuscle_;
 	UIButton		*buDelete_;		// Edit時のみ使用
 	NSUbiquitousKeyValueStore *kvsGoal_;
 
-	ADBannerView		*iAdBanner_;
-	GADBannerView		*adMobView_;
+	//ADBannerView		*iAdBanner_;
+	//GADBannerView		*adMobView_;
 }
 @synthesize editMode = editMode_;
 @synthesize moE2edit = moE2edit_;
@@ -130,6 +133,51 @@
 			iPrevTemp_ = E2_nTemp_INIT;
 		}
 	}
+	
+	if (moE2edit_.nPedometer==nil) {
+		NSArray *arFetch = [mocFunc_ select:E2_ENTITYNAME limit:1 offset:0
+									  where:[NSPredicate predicateWithFormat: 
+											 E2_nYearMM @" > 200000 AND " 
+											 E2_nPedometer @" > 0 AND " 
+											 E2_dateTime @" < %@", dateNow]
+									   sort:sortDesc]; // 日付降順の先頭から1件抽出
+		if ([arFetch count]==1) {
+			e2prev = [arFetch objectAtIndex:0];
+			iPrevPedometer_= [e2prev.nPedometer integerValue];
+		} else {
+			iPrevPedometer_ = E2_nPedometer_INIT;
+		}
+	}
+	
+	if (moE2edit_.nBodyFat_10p==nil) {
+		NSArray *arFetch = [mocFunc_ select:E2_ENTITYNAME limit:1 offset:0
+									  where:[NSPredicate predicateWithFormat: 
+											 E2_nYearMM @" > 200000 AND " 
+											 E2_nBodyFat_10p @" > 0 AND " 
+											 E2_dateTime @" < %@", dateNow]
+									   sort:sortDesc]; // 日付降順の先頭から1件抽出
+		if ([arFetch count]==1) {
+			e2prev = [arFetch objectAtIndex:0];
+			iPrevBodyFat_= [e2prev.nBodyFat_10p integerValue];
+		} else {
+			iPrevBodyFat_ = E2_nBodyFat_INIT;
+		}
+	}
+	
+	if (moE2edit_.nSkMuscle_10p==nil) {
+		NSArray *arFetch = [mocFunc_ select:E2_ENTITYNAME limit:1 offset:0
+									  where:[NSPredicate predicateWithFormat: 
+											 E2_nYearMM @" > 200000 AND " 
+											 E2_nSkMuscle_10p @" > 0 AND " 
+											 E2_dateTime @" < %@", dateNow]
+									   sort:sortDesc]; // 日付降順の先頭から1件抽出
+		if ([arFetch count]==1) {
+			e2prev = [arFetch objectAtIndex:0];
+			iPrevSkMuscle_= [e2prev.nSkMuscle_10p integerValue];
+		} else {
+			iPrevSkMuscle_ = E2_nSkMuscle_INIT;
+		}
+	}
 }
 
 - (void)actionClear
@@ -147,6 +195,9 @@
 	moE2edit_.nPulse_bpm = nil;
 	moE2edit_.nWeight_10Kg = nil;
 	moE2edit_.nTemp_10c = nil;
+	moE2edit_.nPedometer = nil;
+	moE2edit_.nBodyFat_10p = nil;
+	moE2edit_.nSkMuscle_10p = nil;
 	[self setE2recordPrev];	// .dateTime より前の値を初期値としてセットする
 	
 	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
@@ -179,8 +230,11 @@
 		[kvsGoal_ setObject:moE2edit_.nBpHi_mmHg	forKey:Goal_nBpHi_mmHg];
 		[kvsGoal_ setObject:moE2edit_.nBpLo_mmHg	forKey:Goal_nBpLo_mmHg];
 		[kvsGoal_ setObject:moE2edit_.nPulse_bpm		forKey:Goal_nPulse_bpm];
-		[kvsGoal_ setObject:moE2edit_.nTemp_10c		forKey:Goal_nTemp_10c];
 		[kvsGoal_ setObject:moE2edit_.nWeight_10Kg	forKey:Goal_nWeight_10Kg];
+		[kvsGoal_ setObject:moE2edit_.nTemp_10c		forKey:Goal_nTemp_10c];
+		[kvsGoal_ setObject:moE2edit_.nPedometer			forKey:Goal_nPedometer];
+		[kvsGoal_ setObject:moE2edit_.nBodyFat_10p		forKey:Goal_nBodyFat_10p];
+		[kvsGoal_ setObject:moE2edit_.nSkMuscle_10p	forKey:Goal_nSkMuscle_10p];
 		[kvsGoal_ synchronize];
 		[mocFunc_ rollBack], moE2edit_ = nil;
 		[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
@@ -341,6 +395,9 @@
 			moE2edit_.nPulse_bpm =		toNil([kvsGoal_ objectForKey:Goal_nPulse_bpm]);
 			moE2edit_.nWeight_10Kg = toNil([kvsGoal_ objectForKey:Goal_nWeight_10Kg]);
 			moE2edit_.nTemp_10c =		toNil([kvsGoal_ objectForKey:Goal_nTemp_10c]);
+			moE2edit_.nPedometer =			toNil([kvsGoal_ objectForKey:Goal_nPedometer]);
+			moE2edit_.nBodyFat_10p =		toNil([kvsGoal_ objectForKey:Goal_nBodyFat_10p]);
+			moE2edit_.nSkMuscle_10p =	toNil([kvsGoal_ objectForKey:Goal_nSkMuscle_10p]);
 		}	break;
 			
 		default:
@@ -362,42 +419,6 @@
 	 [[aTab objectAtIndex:1] setTitle: NSLocalizedString(@"TabList",nil)];
 	 [[aTab objectAtIndex:2] setTitle: NSLocalizedString(@"TabGraph",nil)];
 	 [[aTab objectAtIndex:3] setTitle: NSLocalizedString(@"TabInfo",nil)];
-	
-
-	if (appDelegate_.app_is_sponsor==NO) {
-		//CGRect rcAd = CGRectMake(0, self.view.frame.size.height-self.tabBarController.view.frame.size.height-50, 320, 50);
-		CGRect rcAd = CGRectMake(0, self.view.frame.size.height-28-50, 320, 50);  // GAD_SIZE_320x50
-		//--------------------------------------------------------------------------------------------------------- AdMob
-		if (adMobView_==nil) {
-			adMobView_ = [[GADBannerView alloc] init];
-			adMobView_.delegate = nil;  // viewWillAppear:から開始するため
-			adMobView_.rootViewController = self; //.navigationController;
-			adMobView_.adUnitID = AdMobID_BodyNote;
-			adMobView_.frame = rcAd;
-			// 以上は、GADRequest より先に指定すること。
-			GADRequest *request = [GADRequest request];
-			//[request setTesting:YES];
-			[adMobView_ loadRequest:request];
-			adMobView_.alpha = 0;	// 0=非表示　　1=表示　　　// viewWillAppear:から開始するため、ここでは非表示
-			adMobView_.tag = 0;		// 0=広告なし　　1=あり　　（iAdを優先表示するために必要）
-			//[self.view addSubview:adMobView_];
-			[self.navigationController.view addSubview:adMobView_];
-		}
-		
-		//--------------------------------------------------------------------------------------------------------- iAd
-		// iAd
-		if (iAdBanner_==nil) {
-			iAdBanner_ = [[ADBannerView alloc] init];
-			// iOS 4.2 以上限定　＜＜以前のOSでは落ちる！！！
-			iAdBanner_.requiredContentSizeIdentifiers = [NSSet setWithObjects:ADBannerContentSizeIdentifierPortrait, nil];
-			iAdBanner_.currentContentSizeIdentifier = ADBannerContentSizeIdentifierPortrait;
-			iAdBanner_.frame = rcAd;
-			iAdBanner_.delegate = nil;  // viewWillAppear:から開始するため
-			iAdBanner_.alpha = 0;		// viewWillAppear:から開始するため、ここでは非表示
-			//[self.view addSubview:iAdBanner_];
-			[self.navigationController.view addSubview:iAdBanner_];
-		}
-	}
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -408,7 +429,7 @@
 		// 日付修正から戻ったとき
 		bEditDate_ = NO;
 	}
-	else if (editMode_==0) { // AddNew
+	else if (editMode_==0) {
 		if (moE2edit_==nil) {
 			//
 			NSArray *e2recs = [mocFunc_ select: E2_ENTITYNAME		 limit: 0	offset: 0
@@ -417,9 +438,11 @@
 			if (0 < [e2recs count]) {
 				NSLog(@"AddNew: *** E2_nYearMM <= 200000 *** [e2recs count]=%d", (int)[e2recs count]);
 				moE2edit_ = [e2recs objectAtIndex:0]; // AddNew途中のレコードを復帰させる
+				GA_TRACK_PAGE(@"E2edit-Edit");
 			} else {
 				moE2edit_ = [mocFunc_ insertAutoEntity:E2_ENTITYNAME]; // 新規追加
 				[self actionClear];
+				GA_TRACK_PAGE(@"E2edit-AddNew");
 			}
 		}
 		//self.view.alpha = 0; //AddNewのときだけディゾルブ
@@ -428,31 +451,6 @@
 	else if (kvsGoal_==nil) {
 		[self setE2recordPrev];
 	}
-
-	if (appDelegate_.app_is_sponsor) {	// 支払済みにつきAd消す
-		iAdBanner_.delegate = nil;
-		adMobView_.delegate = nil;
-		[UIView beginAnimations:nil context:NULL];
-		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-		[UIView setAnimationDuration:1.2];
-		iAdBanner_.alpha = 0;	// 非表示
-		adMobView_.alpha = 0;	// 非表示
-		[UIView commitAnimations];
-	}
-	else if (appDelegate_.app_is_sponsor==NO && editMode_==0) {	// Free && AddNew
-		[UIView beginAnimations:nil context:NULL];
-		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-		[UIView setAnimationDuration:1.2];
-		if (iAdBanner_.tag==1) {	// 表示可能ならば
-			iAdBanner_.alpha = 1;	// 表示する
-		}
-		else if (adMobView_.tag==1) {	// 表示可能ならば
-			adMobView_.alpha = 1;			// 表示する
-		}
-		[UIView commitAnimations];
-		iAdBanner_.delegate = self;
-		adMobView_.delegate = self;
-	}
 }
 
 
@@ -460,6 +458,18 @@
 {
 	[super viewDidAppear:animated];
 
+	if (appDelegate_.pAdWhirlView) {
+		[UIView beginAnimations:nil context:NULL];
+		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+		[UIView setAnimationDuration:1.2];
+		if (editMode_) {
+			appDelegate_.pAdWhirlView.frame = CGRectMake(0, 480-50, 320, 50);  // GAD_SIZE_320x50
+		} else {
+			appDelegate_.pAdWhirlView.frame = CGRectMake(0, 480-49-50, 320, 50);  // GAD_SIZE_320x50
+		}
+		appDelegate_.pAdWhirlView.alpha = 1;	// 表示する
+		[UIView commitAnimations];
+	}
 	
 #ifdef DEBUGxxxxxx				// テストデータ生成
 	// 全データを削除する
@@ -536,16 +546,8 @@
 
 - (void)viewDidDisappear:(BOOL)animated
 {	// 非表示になった後に呼び出される
-	// TabBar切替では遷移時に消す必要なし。別の NaviView だから。
-	if (appDelegate_.app_is_sponsor==NO && bEditDate_==NO) {	// EditDateならば隠さない
-		iAdBanner_.delegate = nil;
-		adMobView_.delegate = nil;
-		[UIView beginAnimations:nil context:NULL];
-		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-		[UIView setAnimationDuration:0.8];
-		iAdBanner_.alpha = 0;
-		adMobView_.alpha = 0;
-		[UIView commitAnimations];
+	if (appDelegate_.pAdWhirlView) {
+		appDelegate_.pAdWhirlView.alpha = 0;
 	}
     [super viewDidDisappear:animated];
 }
@@ -563,33 +565,9 @@
 	//NSLog(@"--- viewDidUnload ---"); 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	
-	if (appDelegate_.app_is_sponsor==NO) {
-		// ARCによりrelease不要になったが、delegateの解放は必須。
-		if (iAdBanner_) {
-			[iAdBanner_ cancelBannerViewAction];	// 停止
-			iAdBanner_.delegate = nil;							// 解放メソッドを呼び出さないように　　　
-			[iAdBanner_ removeFromSuperview];		// UIView解放		retainCount -1
-			//[iAdBanner_ release]
-			iAdBanner_ = nil;	// alloc解放			retainCount -1
-		}
-		
-		if (adMobView_) {
-			adMobView_.delegate = nil;  //受信STOP  ＜＜これが無いと破棄後に呼び出されて落ちる
-			//[adMobView_ release], 
-			adMobView_ = nil;
-		}
-	}
-	
 	[super viewDidUnload];
 	// この後に loadView ⇒ viewDidLoad ⇒ viewWillAppear がコールされる
 }
-
-/*
-- (void)dealloc
-{
-	[Re2edit_ release], Re2edit_ = nil;
-	[super dealloc];
-}*/
 
 
 #pragma mark - refresh
@@ -626,7 +604,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {	// Return the number of rows in the section.
-	return 7 + 1;  // +1:末尾の余白セル
+	return 10 + 2;  // +1:末尾の余白セル
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -825,6 +803,54 @@
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
 		}	break;
+			
+		case 7: {
+			E2editCellDial *cell = [self cellDial:tableView];
+			cell.ibLbName.text = NSLocalizedString(@"Pedometer Name",nil);
+			cell.ibLbDetail.text = NSLocalizedString(@"Pedometer Detail",nil);
+			cell.ibLbUnit.text = NSLocalizedString(@"Pedometer Unit",nil);
+			cell.Re2record = moE2edit_;
+			cell.RzKey = E2_nPedometer;
+			cell.mValueMin = E2_nPedometer_MIN;
+			cell.mValueMax = E2_nPedometer_MAX;
+			cell.mValueDec = 0;
+			//cell.mValueStep = 1;
+			cell.mValuePrev = iPrevPedometer_;
+			[cell drawRect:cell.frame]; // コンテンツ描画
+			return cell;
+		}	break;
+			
+		case 8: {
+			E2editCellDial *cell = [self cellDial:tableView];
+			cell.ibLbName.text = NSLocalizedString(@"BodyFat Name",nil);
+			cell.ibLbDetail.text = NSLocalizedString(@"BodyFat Detail",nil);
+			cell.ibLbUnit.text = @"％";
+			cell.Re2record = moE2edit_;
+			cell.RzKey = E2_nBodyFat_10p;
+			cell.mValueMin = E2_nBodyFat_MIN;
+			cell.mValueMax = E2_nBodyFat_MAX;
+			cell.mValueDec = 1;
+			//cell.mValueStep = 1;
+			cell.mValuePrev = iPrevBodyFat_;
+			[cell drawRect:cell.frame]; // コンテンツ描画
+			return cell;
+		}	break;
+			
+		case 9: {
+			E2editCellDial *cell = [self cellDial:tableView];
+			cell.ibLbName.text = NSLocalizedString(@"SkMuscle Name",nil);
+			cell.ibLbDetail.text = NSLocalizedString(@"SkMuscle Detail",nil);
+			cell.ibLbUnit.text = @"％";
+			cell.Re2record = moE2edit_;
+			cell.RzKey = E2_nSkMuscle_10p;
+			cell.mValueMin = E2_nSkMuscle_MIN;
+			cell.mValueMax = E2_nSkMuscle_MAX;
+			cell.mValueDec = 1;
+			//cell.mValueStep = 1;
+			cell.mValuePrev = iPrevSkMuscle_;
+			[cell drawRect:cell.frame]; // コンテンツ描画
+			return cell;
+		}	break;
 }
 	return [self cellBlank:tableView];
 }
@@ -942,6 +968,8 @@
 }
 
 
+
+#ifdef xxxxxxxxxxxxxxxxxxxxx
 #pragma mark - iAd <ADBannerViewDelegate>
 
 // iAd取得できたときに呼ばれる　⇒　表示する
@@ -1005,5 +1033,7 @@
 	adMobView_.alpha = 0;
 	[UIView commitAnimations];
 }
+#endif
+
 
 @end

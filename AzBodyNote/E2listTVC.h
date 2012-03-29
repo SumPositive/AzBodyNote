@@ -9,11 +9,10 @@
 #import <UIKit/UIKit.h>
 #import <CoreData/CoreData.h>
 #import "E2listCell.h"
-#import "GADBannerView.h"
+//#import "GADBannerView.h"
 
 
-@interface E2listTVC : UITableViewController <UITableViewDelegate, UITableViewDataSource, NSFetchedResultsControllerDelegate
-	, GADBannerViewDelegate>
+@interface E2listTVC : UITableViewController <UITableViewDelegate, UITableViewDataSource, NSFetchedResultsControllerDelegate>
 {
 	IBOutlet UILabel				*ibLbDate;
 	IBOutlet UILabel				*ibLbTime;

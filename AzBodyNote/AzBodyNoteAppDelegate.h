@@ -12,14 +12,23 @@
 #import <StoreKit/StoreKit.h>
 #define STORE_PRODUCTID_UNLOCK		@"com.azukid.AzBodyNote.Unlock"		// In-App Purchase ProductIdentifier
 
+#import <iAd/iAd.h>
+#import "AdWhirlView.h"
+#import "AdWhirlDelegateProtocol.h"
+#define GAD_SIZE_320x50     CGSizeMake(320, 50)
+#import "MasManagerViewController.h"
+#import "NADView.h"  //AppBank nend
 
-@interface AzBodyNoteAppDelegate : NSObject <UIApplicationDelegate, SKPaymentTransactionObserver>
+
+@interface AzBodyNoteAppDelegate : NSObject <UIApplicationDelegate, SKPaymentTransactionObserver,
+															AdWhirlDelegate, NADViewDelegate, ADBannerViewDelegate>
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) IBOutlet UITabBarController *tabBarController;
 
 @property (nonatomic, retain, readonly) NSManagedObjectContext			*managedObjectContext;
 @property (nonatomic, retain, readonly) MocFunctions		*mocBase;
+@property (nonatomic, retain, readonly) AdWhirlView			*pAdWhirlView;
 
 // app_ Global paramaters
 @property (nonatomic, assign) BOOL			app_is_sponsor;				// In App Purchese = 広告なし ＆ 制限解除

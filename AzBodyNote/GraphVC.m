@@ -199,6 +199,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
+	GA_TRACK_PAGE(@"GraphVC");
 	uiActivePageMax_ = 999; // この時点で最終ページは不明
 	[self graphViewPage:0 animated:YES];
 

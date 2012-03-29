@@ -13,12 +13,9 @@
 #import "E2editCellNote.h"
 #import "EditDateVC.h"
 
-#import <iAd/iAd.h>
-#import "GADBannerView.h"
 
-
-@interface E2editTVC : UITableViewController <UITableViewDelegate, NSFetchedResultsControllerDelegate, EditDateDelegate
-	,ADBannerViewDelegate, GADBannerViewDelegate>
+@interface E2editTVC : UITableViewController 
+			<UITableViewDelegate, NSFetchedResultsControllerDelegate, EditDateDelegate>
 
 @property (nonatomic, assign) NSInteger	editMode;		//==0:AddNew,  1:Edit,  2:Goal Edit
 @property (nonatomic, retain) E2record		*moE2edit;

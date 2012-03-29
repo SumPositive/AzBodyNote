@@ -121,6 +121,8 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+	GA_TRACK_PAGE(@"InformationVC");
+
 	if (self.view.alpha != 1) { //AddNewのときだけディゾルブ
 		// アニメ準備
 		CGContextRef context = UIGraphicsGetCurrentContext();
