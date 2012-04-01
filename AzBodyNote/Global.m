@@ -39,5 +39,26 @@ id toNil( id obj )
 	return nil;
 }
 
+NSString *strValue( NSInteger val,  NSInteger dec )
+{
+	if (val <= 0) return @"";
+	if (dec<=0) {
+		return [NSString stringWithFormat:@"%ld", (long)val];
+	} else {
+		NSInteger iPow = (NSInteger)pow(10, dec); //= 10 ^ mValueDec;
+		NSInteger iInt = val / iPow;
+		NSInteger iDec = val - iInt * iPow;
+		if (iDec<=0) {
+			switch (dec) {
+				case 1: return [NSString stringWithFormat:@"%ld.0", (long)iInt]; break;
+				case 2: return [NSString stringWithFormat:@"%ld.00", (long)iInt]; break;
+				default:return [NSString stringWithFormat:@"%ld", (long)iInt]; break;
+			}
+		} else {
+			return [NSString stringWithFormat:@"%ld.%ld", (long)iInt, (long)iDec];
+		}
+	}
+}
+
 
 

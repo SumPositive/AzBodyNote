@@ -28,7 +28,7 @@
 @property (nonatomic, assign) NSInteger		mStepperStep;
 @property (nonatomic, assign) NSInteger		mValuePrev;
 
-- (IBAction)ibBuValue:(UIButton *)button;
-- (IBAction)ibBuNone:(UIButton *)button;
+//- (IBAction)ibBuValue:(UIButton *)button;
+//- (IBAction)ibBuNone:(UIButton *)button;
 
 @end

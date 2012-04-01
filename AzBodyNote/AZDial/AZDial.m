@@ -1,6 +1,6 @@
 //
 //  AZDial.m
-//  AzBodyNote
+//  AZDialは、SplitPay「割勘」をリファレンスプロジェクトとし、最新を維持すること。他は、このコピーである。
 //
 //  Created by Sum Positive on 11/10/06.
 //  Copyright (c) 2011 Azukid. All rights reserved.

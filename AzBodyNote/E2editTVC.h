@@ -9,9 +9,10 @@
 #import <UIKit/UIKit.h>
 //#import <iAd/iAd.h>
 #import "MocEntity.h"
-#import "E2editCellDial.h"
-#import "E2editCellNote.h"
 #import "EditDateVC.h"
+#import "E2editCellNote.h"
+#import "E2editCellDial.h"
+#import "E2editCellTweet.h"
 
 
 @interface E2editTVC : UITableViewController 

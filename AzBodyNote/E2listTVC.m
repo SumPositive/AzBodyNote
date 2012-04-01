@@ -24,6 +24,18 @@
 
 @implementation E2listTVC
 {
+	IBOutlet UILabel				*ibLbDate;
+	IBOutlet UILabel				*ibLbTime;
+	IBOutlet UILabel				*ibLbBpHi;
+	IBOutlet UILabel				*ibLbBpLo;
+	IBOutlet UILabel				*ibLbPuls;
+	IBOutlet UILabel				*ibLbWeight;
+	IBOutlet UILabel				*ibLbTemp;
+	//IBOutlet UILabel				*ibLbNote1;
+	IBOutlet UILabel				*ibLbPedo;
+	IBOutlet UILabel				*ibLbBodyFat;
+	IBOutlet UILabel				*ibLbSkMuscle;
+	
 	AzBodyNoteAppDelegate		*appDelegate_;
 	MocFunctions							*mocFunc_;
 	NSIndexPath							*indexPathEdit_;
@@ -106,8 +118,11 @@
 	ibLbBpHi.text = NSLocalizedString(@"List_BpHi",nil);
 	ibLbBpLo.text = NSLocalizedString(@"List_BpLo",nil);
 	ibLbPuls.text = NSLocalizedString(@"List_Puls",nil);
-	//ibLbWeight.text = NSLocalizedString(@"List_Weight",nil);
-	//ibLbTemp.text = NSLocalizedString(@"List_Temp",nil);
+	ibLbWeight.text = NSLocalizedString(@"List_Weight",nil);
+	ibLbTemp.text = NSLocalizedString(@"List_Temp",nil);
+	ibLbPedo.text = NSLocalizedString(@"List_Pedo",nil);
+	ibLbBodyFat.text = NSLocalizedString(@"List_BodyFat",nil);
+	ibLbSkMuscle.text = NSLocalizedString(@"List_SkMuscle",nil);
 
 	// TableView
 	//self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone; // セル区切り線なし
@@ -209,8 +224,9 @@
 			[self.tableView reloadRowsAtIndexPaths:aPaths withRowAnimation:UITableViewRowAnimationFade];
 		}
 		@catch (NSException *exception) {
+			// 最終行を削除したとき
 			NSLog(@"LOGIC ERROR!!! - indexPathEdit_.row=%ld", (long)indexPathEdit_.row);
-			assert(NO);
+			//assert(NO);
 		}
 		@finally {
 			indexPathEdit_ = nil; // Editモード解除
@@ -335,11 +351,11 @@
 		return [sectionInfo numberOfObjects];
 	}
 	// GOALセクション
-	NSInteger iRows = 2;	// GOAL & Dropbox
-/*	if (appDelegate_.app_is_sponsor==NO) {
-		iRows++; // AdMob
-	}*/
-	return  iRows;
+	if (appDelegate_.app_is_sponsor) {
+		return  2;	// Goal + Dropbox
+	} else {
+		return  3;	// Goal + Dropbox + Ad余白
+	}
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
@@ -377,10 +393,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	if (indexPath.section < [[self.fetchedResultsController sections] count]) {
-		return 44; // Default
-	}
-    return 50; // GOALセクション
+    return 60;
 }
 
 // Customize the appearance of table view cells.
@@ -399,45 +412,42 @@
 		return cell;
 	}
 	else { // GOALセクション
-		int iRow = indexPath.row;
-		if (iRow==0) {
-			static NSString *Cid = @"E2listCell";  //== Class名
-			E2listCell *cell = (E2listCell*)[tableView dequeueReusableCellWithIdentifier:Cid];
-			if (cell == nil) {
-				UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
-				[nib instantiateWithOwner:self options:nil];
-			}
-			// Configure the cell.
-			[self configureCell:cell atIndexPath:nil]; // GOAL!
-			return cell;
-		}
-	/*	if (appDelegate_.app_is_sponsor) {
-			iRow++; // AdMob行をパスするため
-		} else {
-			if (iRow==1) {
-				static NSString *Cid = @"E2listAdMob";
+		switch (indexPath.row) {
+			case 0: {
+				static NSString *Cid = @"E2listCell";  //== Class名
+				E2listCell *cell = (E2listCell*)[tableView dequeueReusableCellWithIdentifier:Cid];
+				if (cell == nil) {
+					UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
+					[nib instantiateWithOwner:self options:nil];
+				}
+				// Configure the cell.
+				[self configureCell:cell atIndexPath:nil]; // GOAL!
+				return cell;
+			}	break;
+
+			case 1: {	// Dropbox  "esuslogo101409"
+				static NSString *Cid = @"E2listDropbox"; // .storyboard定義名
 				UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
 				if (cell == nil) {
-					cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:Cid];
-					cell.accessoryType = UITableViewCellAccessoryNone;
-					//cell.textLabel.text = @"";
-					if (adMobView_) {
-						[cell.contentView addSubview:adMobView_];
-					}
+					UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
+					[nib instantiateWithOwner:self options:nil];
 				}
 				return cell;
-			}
-		}*/
-		
-		if (iRow==1)
-		{	// Dropbox  "esuslogo101409"
-			static NSString *Cid = @"E2listDropbox"; // .storyboard定義名
-			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
-			if (cell == nil) {
-				UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
-				[nib instantiateWithOwner:self options:nil];
-			}
-			return cell;
+			}	break;
+				
+			case 2: {	// Ad余白
+				static NSString *Cid = @"E2listBasic";  //== Class名
+				UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
+				if (cell == nil) {
+					UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
+					[nib instantiateWithOwner:self options:nil];
+					//cell.accessoryType = UITableViewCellAccessoryNone;
+					//cell.showsReorderControl = NO; // Move禁止
+					//cell.selectionStyle = UITableViewCellSelectionStyleNone; // 選択時ハイライトなし
+				}
+				cell.textLabel.text = @"";
+				return cell;
+			}	break;
 		}
 	}
     return nil;

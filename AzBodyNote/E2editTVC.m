@@ -13,6 +13,8 @@
 #import "E2editTVC.h"
 #import "E2editCellDial.h"
 #import "E2editCellNote.h"
+#import <Twitter/TWTweetComposeViewController.h>
+
 
 #define ALERT_TAG_DeleteE2		901
 
@@ -204,13 +206,34 @@
 	[self.tableView reloadData];
 }
 
+- (void)actionTweet:(NSString*)message
+{
+	NSLog(@"actionTweet: message=%@", message);
+	TWTweetComposeViewController *tweetVC = [[TWTweetComposeViewController alloc] init];
+    [tweetVC setInitialText:message];
+    //[tweetVC addImage: [UIImage imageNamed:@"Icon57"]];
+    [tweetVC addURL:[NSURL URLWithString: NSLocalizedString(@"Tweet URL",nil)]];
+    [self presentModalViewController:tweetVC animated:YES];
+	
+    tweetVC.completionHandler = ^(TWTweetComposeViewControllerResult res) {
+        if (res == TWTweetComposeViewControllerResultDone) {
+            NSLog(@"Tweet done");
+			GA_TRACK_EVENT(@"E2edit",@"Tweet",@"Done", 0);
+        } else if (res == TWTweetComposeViewControllerResultCancelled) {
+            NSLog(@"Tweet cancel");
+			GA_TRACK_EVENT(@"E2edit",@"Tweet",@"Cancel", 0);
+        }
+		[self dismissModalViewControllerAnimated:YES]; //これが無いと固まる
+	};
+}
+
 - (void)actionSave
 {
 	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
 
 	if (editMode_==0) { // AddNewのとき
 		appDelegate_.app_e2record_count = [mocFunc_ e2record_count];
-		if (appDelegate_.app_is_unlock==NO) {
+	/*	if (appDelegate_.app_is_unlock==NO) {
 			if (50 < appDelegate_.app_e2record_count) {
 				// 告知
 				alertBox(	NSLocalizedString(@"Trial Limit",nil), 
@@ -221,7 +244,7 @@
 				//	return;  // Cancel しかできない
 				//}
 			}
-		}
+		}*/
 	}
 	
 	if (kvsGoal_) {
@@ -250,7 +273,49 @@
 		
 		// Save & Commit
 		[mocFunc_ commit];
-
+		
+		// Tweet
+		NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+		if ([userDefaults boolForKey:GUD_bTweet]) {
+			// Tweet メッセージ作成
+			NSString *zTweet = NSLocalizedString(@"Tweet head",nil);
+			if (moE2edit_.nBpHi_mmHg) {
+				zTweet = [zTweet stringByAppendingFormat:@"[%@ %@/%@:%@] ",
+						  NSLocalizedString(@"Tweet Bp",nil),
+						  strValue([moE2edit_.nBpHi_mmHg integerValue], 0),
+						  strValue([moE2edit_.nBpLo_mmHg integerValue], 0),
+						  strValue([moE2edit_.nPulse_bpm integerValue], 0)];
+			}
+			if (moE2edit_.nWeight_10Kg) {
+				zTweet = [zTweet stringByAppendingFormat:@"[%@ %@] ",
+						  NSLocalizedString(@"List_Weight",nil),
+						  strValue([moE2edit_.nWeight_10Kg integerValue], 1)];
+			}
+			if (moE2edit_.nTemp_10c) {
+				zTweet = [zTweet stringByAppendingFormat:@"[%@ %@] ",
+						  NSLocalizedString(@"List_Temp",nil),
+						  strValue([moE2edit_.nTemp_10c integerValue], 1)];
+			}
+			if (moE2edit_.nPedometer) {
+				zTweet = [zTweet stringByAppendingFormat:@"[%@ %@] ",
+						  NSLocalizedString(@"List_Pedo",nil),
+						  strValue([moE2edit_.nPedometer integerValue], 0)];
+			}
+			if (moE2edit_.nBodyFat_10p) {
+				zTweet = [zTweet stringByAppendingFormat:@"[%@ %@] ",
+						  NSLocalizedString(@"List_BodyFat",nil),
+						  strValue([moE2edit_.nBodyFat_10p integerValue], 1)];
+			}
+			if (moE2edit_.nSkMuscle_10p) {
+				zTweet = [zTweet stringByAppendingFormat:@"[%@ %@] ",
+						  NSLocalizedString(@"List_SkMuscle",nil),
+						  strValue([moE2edit_.nSkMuscle_10p integerValue], 1)];
+			}
+			zTweet = [zTweet stringByAppendingString: NSLocalizedString(@"Tweet foot",nil)];
+			//
+			[self actionTweet: zTweet];
+		}
+		
 		if (editMode_==1) { // Edit mode
 			// moE2edit_ ＜＜　Edit mode だから = nil ダメ！
 			[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
@@ -441,6 +506,7 @@
 				GA_TRACK_PAGE(@"E2edit-Edit");
 			} else {
 				moE2edit_ = [mocFunc_ insertAutoEntity:E2_ENTITYNAME]; // 新規追加
+				// 初期値セット
 				[self actionClear];
 				GA_TRACK_PAGE(@"E2edit-AddNew");
 			}
@@ -670,7 +736,7 @@
 
 - (E2editCellNote *)cellNote:(UITableView *)tableView
 {
-	static NSString *Cid = @"E2editCellNote";  //== Class名
+	static NSString *Cid = @"E2editCellNote";  //== Class名に一致させること
 	E2editCellNote *cell = (E2editCellNote*)[tableView dequeueReusableCellWithIdentifier:Cid];
 	if (cell == nil) {
 		UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
@@ -684,7 +750,7 @@
 
 - (E2editCellDial *)cellDial:(UITableView *)tableView
 {
-	static NSString *Cid = @"E2editCellDial";  //== Class名
+	static NSString *Cid = @"E2editCellDial";  //== Class名に一致させること
 	E2editCellDial *cell = (E2editCellDial*)[tableView dequeueReusableCellWithIdentifier:Cid];
 	if (cell == nil) {
 		UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
@@ -697,6 +763,19 @@
 	return cell;
 }
 
+- (E2editCellTweet *)cellTweet:(UITableView *)tableView
+{
+	static NSString *Cid = @"E2editCellTweet";  //== Class名に一致させること
+	E2editCellTweet *cell = (E2editCellTweet*)[tableView dequeueReusableCellWithIdentifier:Cid];
+	if (cell == nil) {
+		UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
+		[nib instantiateWithOwner:self options:nil];
+		cell = (E2editCellTweet*)[tableView dequeueReusableCellWithIdentifier:Cid];
+		assert(cell);
+	}
+	return cell;
+}
+
 - (UITableViewCell *)cellBlank:(UITableView *)tableView
 {	// 余白セル
 	static NSString *Cid = @"CellBlank";
@@ -704,6 +783,7 @@
 	if (cell == nil) {
 		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:Cid];// autorelease];
 		cell.accessoryType = UITableViewCellAccessoryNone;
+		cell.userInteractionEnabled = NO; // 操作なし
 	}
 	return cell;
 }
@@ -859,7 +939,16 @@
 			[cell drawRect:cell.frame]; // コンテンツ描画
 			return cell;
 		}	break;
-}
+			
+		case 10: 
+			if (editMode_==0) { // AddNew
+				E2editCellTweet *cell = [self cellTweet:tableView];
+				[cell drawRect:cell.frame]; // コンテンツ描画
+				return cell;
+			}
+			break;
+	}
+	// 余白部
 	return [self cellBlank:tableView];
 }
 

@@ -118,6 +118,7 @@
 							@"YES",			GUD_Calc_RoundBankers,		// YES=偶数丸め  NO=四捨五入
 							@"NO",			GUD_bPaid,								// YES=PAID
 							@"NO",			GUD_bUnlock,							// YES=Unlock
+							@"NO",			GUD_bTweet,							// YES=新規保存後ツイート
 							 nil];
 	[userDefaults registerDefaults:dicDef];	// 未定義のKeyのみ更新される
 	[userDefaults synchronize]; // plistへ書き出す
@@ -821,8 +822,15 @@
 }
 
 - (void)adWhirlDidReceiveAd:(AdWhirlView *)adWhirlView
-{	// 広告を受信したタイミングでなにかアクションを起こしたい場合
+{	// 広告を受信したとき
 	NSLog(@"AdWhirl - adWhirlDidReceiveAd");
+	adWhirlView.alpha = 1;
+}
+
+- (void)adWhirlDidFailToReceiveAd:(AdWhirlView *)adWhirlView usingBackup:(BOOL)yesOrNo
+{	// 広告が無いとき
+	NSLog(@"AdWhirl - adWhirlDidFailToReceiveAd");
+	adWhirlView.alpha = 0;
 }
 
 - (void)performEventAppBank:(AdWhirlView *)adWhirlView 
@@ -832,14 +840,13 @@
 		[adWhirlView replaceBannerViewWith:mNendView];
 	}
 }
-
 - (void)nadViewDidFinishLoad:(NADView *)adView
 {
 	NSLog(@"AppBank nend - nadViewDidFinishLoad");
 }
 
 - (void)performEventMedibaAd:(AdWhirlView *)adWhirlView 
-{
+{	// Mediba Ad
 	NSLog(@"AdWhirl - performEventMedibaAd");
 	if (mMedibaAd) { // これにより ja 以外は、MedibaAd をパスする
 		[adWhirlView replaceBannerViewWith:mMedibaAd.view];

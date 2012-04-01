@@ -21,7 +21,9 @@
 	IBOutlet UILabel			*ibLbWeight;
 	IBOutlet UILabel			*ibLbTemp;
 	IBOutlet UILabel			*ibLbNote1;
-	//IBOutlet UILabel			*ibLbNote2;
+	IBOutlet UILabel			*ibLbPedo;
+	IBOutlet UILabel			*ibLbBodyFat;
+	IBOutlet UILabel			*ibLbSkMuscle;
 }
 @synthesize moE2node = moE2node_;
 //@synthesize ibLbBpHi, ibLbBpLo, ibLbDate, ibLbPuls, ibLbWeight, ibLbTemp;
@@ -43,28 +45,6 @@
     [super setSelected:selected animated:animated];
 
     // Configure the view for the selected state
-}
-
-- (NSString *)strValue:(NSInteger)val dec:(NSInteger)dec
-{
-	if (val <= 0) return nil;
-	
-	if (dec<=0) {
-		return [NSString stringWithFormat:@"%d", val];
-	} else {
-		NSInteger iPow = (NSInteger)pow(10, dec); //= 10 ^ mValueDec;
-		NSInteger iInt = val / iPow;
-		NSInteger iDec = val - iInt * iPow;
-		if (iDec<=0) {
-			switch (dec) {
-				case 1: return [NSString stringWithFormat:@"%ld.0", iInt]; break;
-				case 2: return [NSString stringWithFormat:@"%ld.00", iInt]; break;
-				default:return [NSString stringWithFormat:@"%ld", iInt]; break;
-			}
-		} else {
-			return [NSString stringWithFormat:@"%ld.%ld", iInt, iDec];
-		}
-	}
 }
 
 - (void)drawRect:(CGRect)rect
@@ -92,11 +72,15 @@
 		
 		//NSLog(@"--- moE2node_.sNote2=%@", moE2node_.sNote2);
 
-		ibLbBpHi.text = [self strValue:[moE2node_.nBpHi_mmHg integerValue] dec:0]; 
-		ibLbBpLo.text = [self strValue:[moE2node_.nBpLo_mmHg integerValue] dec:0];
-		ibLbPuls.text = [self strValue:[moE2node_.nPulse_bpm integerValue] dec:0];
-		ibLbWeight.text = [self strValue:[moE2node_.nWeight_10Kg integerValue] dec:1];
-		ibLbTemp.text = [self strValue:[moE2node_.nTemp_10c integerValue] dec:1];
+		ibLbBpHi.text = strValue([moE2node_.nBpHi_mmHg integerValue], 0); 
+		ibLbBpLo.text = strValue([moE2node_.nBpLo_mmHg integerValue], 0); 
+		ibLbPuls.text = strValue([moE2node_.nPulse_bpm integerValue], 0); 
+		ibLbWeight.text = strValue([moE2node_.nWeight_10Kg integerValue], 1); 
+		ibLbTemp.text = strValue([moE2node_.nTemp_10c integerValue], 1); 
+		ibLbPedo.text = strValue([moE2node_.nPedometer integerValue], 0); 
+		ibLbBodyFat.text = strValue([moE2node_.nBodyFat_10p integerValue] , 1); 
+		ibLbSkMuscle.text = strValue([moE2node_.nSkMuscle_10p integerValue], 1); 
+		
 		//ibLbNote1.text = moE2node_.sNote1;
 		//ibLbNote2.text = moE2node_.sNote2;
 		if (0<[moE2node_.sNote1 length]) {
@@ -119,11 +103,15 @@
 		//E2listTVC:viewWillAppear:にて処理// [kvs synchronize]; // iCloud最新同期（取得）
 
 		ibLbDate.text = @"The GOAL";  //NSLocalizedString(@"TheGoal",nil);
-		ibLbBpHi.text = [self strValue:[[kvs objectForKey:Goal_nBpHi_mmHg] integerValue] dec:0]; 
-		ibLbBpLo.text = [self strValue:[[kvs objectForKey:Goal_nBpLo_mmHg] integerValue] dec:0];
-		ibLbPuls.text = [self strValue:[[kvs objectForKey:Goal_nPulse_bpm] integerValue] dec:0];
-		ibLbWeight.text = [self strValue:[[kvs objectForKey:Goal_nWeight_10Kg] integerValue] dec:1];
-		ibLbTemp.text = [self strValue:[[kvs objectForKey:Goal_nTemp_10c] integerValue] dec:1];
+		ibLbBpHi.text = strValue([[kvs objectForKey:Goal_nBpHi_mmHg] integerValue], 0); 
+		ibLbBpLo.text = strValue([[kvs objectForKey:Goal_nBpLo_mmHg] integerValue], 0); 
+		ibLbPuls.text = strValue([[kvs objectForKey:Goal_nPulse_bpm] integerValue], 0); 
+		ibLbWeight.text = strValue([[kvs objectForKey:Goal_nWeight_10Kg] integerValue], 1); 
+		ibLbTemp.text = strValue([[kvs objectForKey:Goal_nTemp_10c] integerValue], 1); 
+		ibLbPedo.text = strValue([[kvs objectForKey:Goal_nPedometer] integerValue], 0); 
+		ibLbBodyFat.text = strValue([[kvs objectForKey:Goal_nBodyFat_10p] integerValue], 1); 
+		ibLbSkMuscle.text = strValue([[kvs objectForKey:Goal_nSkMuscle_10p] integerValue], 1);
+		
 		//ibLbNote1.text = [kvs objectForKey:Goal_sNote1];
 		//ibLbNote2.text = [kvs objectForKey:Goal_sNote2];
 		if (0<[toNil([kvs objectForKey:Goal_sNote1]) length]) {

@@ -121,15 +121,16 @@
 	//[calc release];
 }
 
-- (IBAction)ibBuNone:(UIButton *)button
+- (IBAction)ibBuClear:(UIButton *)button
 {
-	NSLog(@"ibBuNone");
+	NSLog(@"ibBuClear");
 	[mDial setDial:valuePrev_  animated:YES];
 	mValue = (-1); // None
 	[self refreshValue];
 	
-	if ([[Re2record_ valueForKey:RzKey_] integerValue] != mValue) {
-		[Re2record_ setValue:[NSNumber numberWithInteger:mValue] forKey:RzKey_];
+	if ([Re2record_ valueForKey:RzKey_] != nil) {  // nil 
+		//[Re2record_ setValue:[NSNumber numberWithInteger:mValue] forKey:RzKey_];
+		[Re2record_ setValue:nil forKey:RzKey_];
 		if ([delegate_ respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
 			[delegate_ editUpdate];
 		}

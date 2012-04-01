@@ -45,6 +45,7 @@
 #define GUD_bUnlock								@"GUD_bUnlock"
 #define GUD_Calc_Method					@"GUD_Calc_Method"		// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
 #define GUD_Calc_RoundBankers			@"GUD_Calc_RoundBankers"
+#define GUD_bTweet								@"GUD_bTweet"
 
 // iCloud-KVS UserDefault ------------------------------------- Settings
 // Goal_nBpHi_mmHg 関係は、"MocEntity.h" にて定義
@@ -54,6 +55,7 @@
 void alertBox( NSString *zTitle, NSString *zMsg, NSString *zButton );
 id toNSNull( id obj );
 id toNil( id obj );
+NSString *strValue( NSInteger val,  NSInteger dec );
 
 
 
