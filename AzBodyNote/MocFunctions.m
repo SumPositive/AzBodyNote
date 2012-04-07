@@ -8,7 +8,7 @@
 
 //#import "SFHFKeychainUtils.h"
 #import "Global.h"
-#import "AzBodyNoteAppDelegate.h"
+#import "AppDelegate.h"
 #import "MocEntity.h"
 #import "MocFunctions.h"
 

@@ -8,7 +8,7 @@
 
 #import "Global.h"
 #import "DropboxVC.h"
-#import "AzBodyNoteAppDelegate.h"
+#import "AppDelegate.h"
 
 #define TAG_ACTION_Save			109
 #define TAG_ACTION_Retrieve		118
@@ -249,7 +249,7 @@
 {	// ファイル読み込み成功
     NSLog(@"File loaded into path: %@", localPath); //== [apd tmpFilePath]
 	// File Load
-	AzBodyNoteAppDelegate* apd = (AzBodyNoteAppDelegate*)[[UIApplication sharedApplication] delegate];
+	AppDelegate* apd = (AppDelegate*)[[UIApplication sharedApplication] delegate];
 	NSString *zErr = [apd tmpFileLoad];
 	if (zErr) { // tmpフォルダの一時ファイル[apd tmpFilePath]から読み込む
 		// NG
@@ -492,7 +492,7 @@ replacementString:(NSString *)string
 			NSLog(@"TAG_ACTION_Save: filename=%@", filename);
 			[self alertIndicatorOn:NSLocalizedString(@"Dropbox Communicating", nil)];
 			// File Save
-			AzBodyNoteAppDelegate* apd = (AzBodyNoteAppDelegate*)[[UIApplication sharedApplication] delegate];
+			AppDelegate* apd = (AppDelegate*)[[UIApplication sharedApplication] delegate];
 			NSString *zErr = [apd tmpFileSave];
 			if (zErr) { // tmpフォルダの一時ファイル[apd tmpFilePath]に書き出す
 				// NG
@@ -512,7 +512,7 @@ replacementString:(NSString *)string
 			if (mDidSelectRowAtIndexPath && mDidSelectRowAtIndexPath.row < [mMetadatas count]) {
 				DBMetadata *dbm = [mMetadatas objectAtIndex:mDidSelectRowAtIndexPath.row];
 				if (dbm) {
-					AzBodyNoteAppDelegate* apd = (AzBodyNoteAppDelegate*)[[UIApplication sharedApplication] delegate];
+					AppDelegate* apd = (AppDelegate*)[[UIApplication sharedApplication] delegate];
 					[self alertIndicatorOn:NSLocalizedString(@"Dropbox Communicating", nil)];
 					NSLog(@"dbm.path=%@ --> [apd tmpFilePath]=%@", dbm.path, [apd tmpFilePath]);
 					[[self restClient] loadFile:dbm.path intoPath:[apd tmpFilePath]]; // DownLoad開始 ---> delagate loadedFile:

@@ -7,7 +7,7 @@
 //
 
 #import "Global.h"
-#import "AzBodyNoteAppDelegate.h"
+#import "AppDelegate.h"
 #import "MocEntity.h"
 #import "MocFunctions.h"
 #import "E2listTVC.h"
@@ -36,7 +36,7 @@
 	IBOutlet UILabel				*ibLbBodyFat;
 	IBOutlet UILabel				*ibLbSkMuscle;
 	
-	AzBodyNoteAppDelegate		*appDelegate_;
+	AppDelegate		*appDelegate_;
 	MocFunctions							*mocFunc_;
 	NSIndexPath							*indexPathEdit_;
 	NSIndexPath							*indexPathDelete_;
@@ -94,7 +94,7 @@
 	[super viewDidLoad];
 
 	if (!appDelegate_) {
-		appDelegate_ = (AzBodyNoteAppDelegate*)[[UIApplication sharedApplication] delegate];
+		appDelegate_ = (AppDelegate*)[[UIApplication sharedApplication] delegate];
 	}
 	assert(appDelegate_);
 	
@@ -216,6 +216,7 @@
 {
     [super viewWillAppear:animated];
 	GA_TRACK_PAGE(@"E2listTVC");
+	appDelegate_.app_is_AdShow = YES; //これは広告表示可能なViewである。 viewWillAppear:以降で定義すること
 	
 	if (indexPathEdit_) { // E2editTVC:から戻ったとき、
 		@try {	// 範囲オーバーで落ちる可能性があるため。　＜＜最終行を削除したとき。
@@ -256,12 +257,12 @@
 {
 	[super viewDidAppear:animated];
 	
-	if (appDelegate_.pAdWhirlView) {
+	if (appDelegate_.adWhirlView) {
 		[UIView beginAnimations:nil context:NULL];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
 		[UIView setAnimationDuration:1.2];
-		appDelegate_.pAdWhirlView.frame = CGRectMake(0, 480-49-50, 320, 50);  // GAD_SIZE_320x50
-		appDelegate_.pAdWhirlView.alpha = 1;	// 表示する
+		appDelegate_.adWhirlView.frame = CGRectMake(0, 480-49-50, 320, 50);  // GAD_SIZE_320x50
+		appDelegate_.adWhirlView.alpha = 1;	// 表示する
 		[UIView commitAnimations];
 	}
 }
@@ -275,8 +276,8 @@
 
 - (void)viewDidDisappear:(BOOL)animated
 {	// 非表示になった後に呼び出される
-	if (appDelegate_.pAdWhirlView) {
-		appDelegate_.pAdWhirlView.alpha = 0;
+	if (appDelegate_.adWhirlView) {
+		appDelegate_.adWhirlView.alpha = 0;
 	}
     [super viewDidDisappear:animated];
 }
@@ -534,7 +535,7 @@
 	{	// Functions
 		indexPathEdit_ = nil; // Editモード解除
 		if (indexPath.row==1) {	// Dropbox
-			AzBodyNoteAppDelegate *appDelegate = (AzBodyNoteAppDelegate*)[[UIApplication sharedApplication] delegate];
+			AppDelegate *appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
 			[appDelegate dropboxView];
 		}
 	}

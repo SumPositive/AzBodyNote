@@ -13,7 +13,7 @@
 
 
 @interface InformationVC : UIViewController <MFMailComposeViewControllerDelegate, UIAlertViewDelegate,
-														SKProductsRequestDelegate>	// <SKPaymentTransactionObserver>は、AzBodyNoteAppDelegateに実装
+														SKProductsRequestDelegate>	// <SKPaymentTransactionObserver>は、AppDelegateに実装
 
 - (IBAction)ibBuGoBlog:(UIButton *)button;
 - (IBAction)ibBuPostMail:(UIButton *)button;

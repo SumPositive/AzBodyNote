@@ -1,5 +1,5 @@
 //
-//  AzBodyNoteAppDelegate.h
+//  AppDelegate.h
 //	AzBodyNote
 //
 //  Created by Sum Positive on 2011/10/01.
@@ -9,8 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "MocFunctions.h"
 
-#import <StoreKit/StoreKit.h>
-#define STORE_PRODUCTID_UNLOCK		@"com.azukid.AzBodyNote.Unlock"		// In-App Purchase ProductIdentifier
+//#import <StoreKit/StoreKit.h>
 
 #import <iAd/iAd.h>
 #import "AdWhirlView.h"
@@ -20,21 +19,36 @@
 #import "NADView.h"  //AppBank nend
 
 
-@interface AzBodyNoteAppDelegate : NSObject <UIApplicationDelegate, SKPaymentTransactionObserver,
-															AdWhirlDelegate, NADViewDelegate, ADBannerViewDelegate>
+@interface AppDelegate : NSObject <UIApplicationDelegate, AdWhirlDelegate, NADViewDelegate, ADBannerViewDelegate>
+{
+@private
+	NSManagedObjectModel				*moModel_;
+	NSPersistentStoreCoordinator		*persistentStoreCoordinator_;
+	NSManagedObjectContext				*managedObjectContext_;
+	
+	UIAlertView									*alertProgress_;
+	UIActivityIndicatorView				*alertIndicator_;
+	BOOL											mAzukiUnlock;	// YES=購入意思ありと見なしてUnlockする
+	
+	//AdWhirlView							*mAdWhirlView;
+	NADView										*mNendView;
+	MasManagerViewController		*mMedibaAd; 
+}
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) IBOutlet UITabBarController *tabBarController;
 
 @property (nonatomic, retain, readonly) NSManagedObjectContext			*managedObjectContext;
 @property (nonatomic, retain, readonly) MocFunctions		*mocBase;
-@property (nonatomic, retain, readonly) AdWhirlView			*pAdWhirlView;
+@property (nonatomic, retain, readonly) AdWhirlView			*adWhirlView;
 
 // app_ Global paramaters
 @property (nonatomic, assign) BOOL			app_is_sponsor;				// In App Purchese = 広告なし ＆ 制限解除
 @property (nonatomic, assign) BOOL			app_is_unlock;				// 制限解除
 @property (nonatomic, assign) NSInteger	app_e2record_count;		// Trial制限に使用。　 コメント投稿情報に表示。
+@property (nonatomic, assign) BOOL			app_is_AdShow;				// YES=現在広告可能なViewである
 
+@property (nonatomic, assign, readonly) BOOL	app_is_iPad;	// YES=iPad
 
 
 - (void)alertProgressOn:(NSString*)zTitle;

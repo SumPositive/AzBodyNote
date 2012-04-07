@@ -9,7 +9,7 @@
 #import "Global.h"
 #import "GraphVC.h"
 #import "GraphView.h"
-#import "AzBodyNoteAppDelegate.h"
+#import "AppDelegate.h"
 #import "MocEntity.h"
 #import "MocFunctions.h"
 
@@ -19,7 +19,7 @@
 	IBOutlet UIScrollView		*ibScrollView;
 	IBOutlet GraphView			*ibGraphView;
 	
-	AzBodyNoteAppDelegate		*appDelegate_;
+	AppDelegate		*appDelegate_;
 	MocFunctions							*mocFunc_;
 	
 	NSUInteger								uiActivePage_;
@@ -66,7 +66,7 @@
     [super viewDidLoad];
 	self.title = NSLocalizedString(@"TabGraph",nil);
 
-	appDelegate_ = (AzBodyNoteAppDelegate*)[[UIApplication sharedApplication] delegate];
+	appDelegate_ = (AppDelegate*)[[UIApplication sharedApplication] delegate];
 	assert(appDelegate_);
 	mocFunc_ = appDelegate_.mocBase; // Read Only
 	assert(mocFunc_);
@@ -138,7 +138,9 @@
 	if (iCount < 2) iCount = 2; // 1だとスクロール出来なくなる
 	//                     (                 左余白                 ) + (               レコード               ) + (                 右余白                 ); 
 	rc.size.width = (fWhalf - RECORD_WIDTH/2) + (RECORD_WIDTH * iCount) + (fWhalf - RECORD_WIDTH/2);
-	ibScrollView.contentSize = rc.size;
+	
+	ibScrollView.contentSize = CGSizeMake(rc.size.width, rc.size.height*3.0); //[0.9]上下3ページ
+	
 	rc.origin.x = (fWhalf - RECORD_WIDTH/2) - (RECORD_WIDTH * iOverLeft);  // 左余白
 	rc.size.width = RECORD_WIDTH * (iCount + iOverLeft + iOverRight + 1);	// +1はGOAL列
 	ibGraphView.frame = rc;
@@ -194,15 +196,15 @@
 - (void)viewWillAppear:(BOOL)animated 
 {
     [super viewWillAppear:animated];
+	GA_TRACK_PAGE(@"GraphVC");
+	appDelegate_.app_is_AdShow = NO; //これは広告表示しないViewである。 viewWillAppear:以降で定義すること
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
-	GA_TRACK_PAGE(@"GraphVC");
 	uiActivePageMax_ = 999; // この時点で最終ページは不明
 	[self graphViewPage:0 animated:YES];
-
 	// 最初、GOALを画面中央に表示する
 	//ibScrollView.contentOffset = CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);  
 }
@@ -217,8 +219,27 @@
 {
     // Return YES for supported orientations
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
+	//return YES; //[0.9]ヨコにすると「血圧の日変動分布」グラフ表示する
+}
+/*
+- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+	if (UIInterfaceOrientationIsPortrait(toInterfaceOrientation)) { // ロールグラフ
+		uiActivePageMax_ = 999; // この時点で最終ページは不明
+		[self graphViewPage:0 animated:YES];
+		// 最初、GOALを画面中央に表示する
+		//ibScrollView.contentOffset = CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);  
+	}
+	else {	// 「血圧の日変動分布」グラフ
+		
+	}
 }
 
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+	
+}
+*/
 
 #pragma mark - iCloud
 - (void)refreshAllViews:(NSNotification*)note 

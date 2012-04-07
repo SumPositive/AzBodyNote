@@ -7,7 +7,7 @@
 //
 
 #import "Global.h"
-#import "AzBodyNoteAppDelegate.h"
+#import "AppDelegate.h"
 #import "MocEntity.h"
 #import "E2editTVC.h"
 #import "E2editCellNote.h"

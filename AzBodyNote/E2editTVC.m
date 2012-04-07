@@ -7,7 +7,7 @@
 //
 
 #import "Global.h"
-#import "AzBodyNoteAppDelegate.h"
+#import "AppDelegate.h"
 #import "MocEntity.h"
 #import "MocFunctions.h"
 #import "E2editTVC.h"
@@ -20,7 +20,7 @@
 
 @implementation E2editTVC
 {
-	AzBodyNoteAppDelegate		*appDelegate_;
+	AppDelegate		*appDelegate_;
 	MocFunctions				*mocFunc_;
 	
 	//BOOL			bAddNew_;  >>>>>>>>>  editMode_==0
@@ -183,7 +183,7 @@
 }
 
 - (void)actionClear
-{
+{	// 直前値なければ初期値をセットする
 	assert(editMode_==0);
 	assert(moE2edit_);
 	assert(kvsGoal_==nil);
@@ -280,7 +280,7 @@
 			// Tweet メッセージ作成
 			NSString *zTweet = NSLocalizedString(@"Tweet head",nil);
 			if (moE2edit_.nBpHi_mmHg) {
-				zTweet = [zTweet stringByAppendingFormat:@"[%@ %@/%@:%@] ",
+				zTweet = [zTweet stringByAppendingFormat:@"[%@ %@/%@/%@] ",
 						  NSLocalizedString(@"Tweet Bp",nil),
 						  strValue([moE2edit_.nBpHi_mmHg integerValue], 0),
 						  strValue([moE2edit_.nBpLo_mmHg integerValue], 0),
@@ -364,7 +364,7 @@
     [super viewDidLoad];
 
 	if (!appDelegate_) {
-		appDelegate_ = (AzBodyNoteAppDelegate*)[[UIApplication sharedApplication] delegate];
+		appDelegate_ = (AppDelegate*)[[UIApplication sharedApplication] delegate];
 	}
 	assert(appDelegate_);
 	
@@ -483,12 +483,13 @@
 	 [[aTab objectAtIndex:0] setTitle: NSLocalizedString(@"TabAdd",nil)];
 	 [[aTab objectAtIndex:1] setTitle: NSLocalizedString(@"TabList",nil)];
 	 [[aTab objectAtIndex:2] setTitle: NSLocalizedString(@"TabGraph",nil)];
-	 [[aTab objectAtIndex:3] setTitle: NSLocalizedString(@"TabInfo",nil)];
+	 [[aTab objectAtIndex:3] setTitle: NSLocalizedString(@"TabSettings",nil)];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+	appDelegate_.app_is_AdShow = YES; //これは広告表示可能なViewである。 viewWillAppear:以降で定義すること
 	
 	if (bEditDate_) {
 		// 日付修正から戻ったとき
@@ -503,16 +504,17 @@
 			if (0 < [e2recs count]) {
 				NSLog(@"AddNew: *** E2_nYearMM <= 200000 *** [e2recs count]=%d", (int)[e2recs count]);
 				moE2edit_ = [e2recs objectAtIndex:0]; // AddNew途中のレコードを復帰させる
-				GA_TRACK_PAGE(@"E2edit-Edit");
-			} else {
+				GA_TRACK_PAGE(@"E2edit-AddEdit");
+				[self refreshDateTime:nil]; // 未保存ならば最新日時にする
+				[self setE2recordPrev];		// .dateTime より前の値を初期値としてセットする
+			}
+			else {
 				moE2edit_ = [mocFunc_ insertAutoEntity:E2_ENTITYNAME]; // 新規追加
+				GA_TRACK_PAGE(@"E2edit-AddNew");
 				// 初期値セット
 				[self actionClear];
-				GA_TRACK_PAGE(@"E2edit-AddNew");
 			}
 		}
-		//self.view.alpha = 0; //AddNewのときだけディゾルブ
-		[self refreshDateTime:nil]; // 未保存ならば最新日時にする
 	}
 	else if (kvsGoal_==nil) {
 		[self setE2recordPrev];
@@ -524,16 +526,16 @@
 {
 	[super viewDidAppear:animated];
 
-	if (appDelegate_.pAdWhirlView) {
+	if (appDelegate_.adWhirlView) {
 		[UIView beginAnimations:nil context:NULL];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
 		[UIView setAnimationDuration:1.2];
 		if (editMode_) {
-			appDelegate_.pAdWhirlView.frame = CGRectMake(0, 480-50, 320, 50);  // GAD_SIZE_320x50
+			appDelegate_.adWhirlView.frame = CGRectMake(0, 480-50, 320, 50);  // GAD_SIZE_320x50
 		} else {
-			appDelegate_.pAdWhirlView.frame = CGRectMake(0, 480-49-50, 320, 50);  // GAD_SIZE_320x50
+			appDelegate_.adWhirlView.frame = CGRectMake(0, 480-49-50, 320, 50);  // GAD_SIZE_320x50
 		}
-		appDelegate_.pAdWhirlView.alpha = 1;	// 表示する
+		appDelegate_.adWhirlView.alpha = 1;	// 表示する
 		[UIView commitAnimations];
 	}
 	
@@ -612,8 +614,8 @@
 
 - (void)viewDidDisappear:(BOOL)animated
 {	// 非表示になった後に呼び出される
-	if (appDelegate_.pAdWhirlView) {
-		appDelegate_.pAdWhirlView.alpha = 0;
+	if (appDelegate_.adWhirlView) {
+		appDelegate_.adWhirlView.alpha = 0;
 	}
     [super viewDidDisappear:animated];
 }

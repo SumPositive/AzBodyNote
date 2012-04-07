@@ -1,5 +1,5 @@
 //
-//  AzBodyNoteAppDelegate.m
+//  AppDelegate.m
 //	AzBodyNote
 //
 //  Created by Sum Positive on 2011/10/01.
@@ -7,7 +7,7 @@
 //
 
 #import "Global.h"
-#import "AzBodyNoteAppDelegate.h"
+#import "AppDelegate.h"
 #import "MocFunctions.h"
 #import "E2editTVC.h"
 #import "E2listTVC.h"
@@ -19,33 +19,20 @@
 
 #define CoreData_iCloud_SYNC		NO	// YES or NO
 
-//@interface AzBodyNoteAppDelegate (PrivateMethods)
+//@interface AppDelegate (PrivateMethods)
 //- (NSManagedObjectContext *)managedObjectContext;
 //@end
 
-@implementation AzBodyNoteAppDelegate
-{
-@private
-	NSManagedObjectModel				*moModel_;
-	NSPersistentStoreCoordinator		*persistentStoreCoordinator_;
-	NSManagedObjectContext				*managedObjectContext_;
-
-	UIAlertView						*alertProgress_;
-	UIActivityIndicatorView	*alertIndicator_;
-	BOOL								mAzukiUnlock;	// YES=購入意思ありと見なしてUnlockする
-
-	//AdWhirlView							*mAdWhirlView;
-	NADView									*mNendView;
-	MasManagerViewController	*mMedibaAd; 
-}
-
-@synthesize window = window_;
-@synthesize mocBase;
-@synthesize tabBarController = pTabBarController_;
-@synthesize pAdWhirlView = pAdWhirlView_;
-@synthesize app_is_sponsor = app_is_sponsor_;
-@synthesize app_is_unlock = mApp_is_unlock;
-@synthesize app_e2record_count = app_e2record_count_;
+@implementation AppDelegate
+@synthesize window = __window;
+@synthesize mocBase = __mocBase;
+@synthesize tabBarController = __tabBarController;
+@synthesize adWhirlView = __pAdWhirlView;
+@synthesize app_is_sponsor = __app_is_sponsor;
+@synthesize app_is_unlock = __app_is_unlock;
+@synthesize app_e2record_count = __app_e2record_count;
+@synthesize app_is_AdShow = __app_is_AdShow;
+@synthesize app_is_iPad = __app_is_iPad;
 
 /*
 - (void)saveContext
@@ -104,6 +91,8 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {	// Override point for customization after application launch.
 	GA_INIT_TRACKER(@"UA-30305032-4", 10, nil);	//-4:Condition
+	GA_TRACK_EVENT(@"Device", @"model", [[UIDevice currentDevice] model], 0);
+	GA_TRACK_EVENT(@"Device", @"systemVersion", [[UIDevice currentDevice] systemVersion], 0);
 
 	mAzukiUnlock = NO;	// YES=購入意思ありと見なしてUnlockする
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -124,12 +113,12 @@
 	[userDefaults synchronize]; // plistへ書き出す
 
 	// 画面表示に関係する Option Setting を取得する
-	app_is_sponsor_ = [userDefaults boolForKey:GUD_bPaid];
-	mApp_is_unlock = [userDefaults boolForKey:GUD_bUnlock];
-
+	__app_is_sponsor = [userDefaults boolForKey:GUD_bPaid];
+	__app_is_unlock = [userDefaults boolForKey:GUD_bUnlock];
+	
 	// Moc初期化
-	if (mocBase==nil) {
-		mocBase = [[MocFunctions alloc] initWithMoc:[self	 managedObjectContext]]; //iCloud同期に使用される
+	if (__mocBase==nil) {
+		__mocBase = [[MocFunctions alloc] initWithMoc:[self	 managedObjectContext]]; //iCloud同期に使用される
 	}
 	// TabBar画面毎にMOCを生成して個別にrollbackしたかったが、MOC間の変更反映が面倒だったので単一に戻した。
 	
@@ -159,18 +148,25 @@
 		[kvs setObject:[NSNumber numberWithInt:E2_nSkMuscle_INIT] forKey:Goal_nSkMuscle_10p];
 		[kvs synchronize];
 	}
-	if (app_is_sponsor_==NO) {
-		app_is_sponsor_ = [kvs boolForKey:GUD_bPaid];
+	if (__app_is_sponsor==NO) {
+		__app_is_sponsor = [kvs boolForKey:GUD_bPaid];
 	}
-	//if (mApp_is_unlock==NO) {
-	//	mApp_is_unlock = [kvs boolForKey:GUD_bUnlock];  KVSには保存しない
-	//}
-	if (app_is_sponsor_ && mApp_is_unlock==NO) {
-		mApp_is_unlock = YES;
+	
+	if (__app_is_sponsor && __app_is_unlock==NO) {
+		__app_is_unlock = YES;
 		[userDefaults setBool:YES forKey:GUD_bUnlock];
 		//[kvs setBool:YES forKey:GUD_bUnlock];  KVSには保存しない ＜＜再インスト時にリセットさせるため
 	}
 
+	//-------------------------------------------------デバイス、ＯＳ確認
+	if ([[[UIDevice currentDevice] systemVersion] compare:@"5.0"]==NSOrderedAscending) { // ＜ "5.0"
+		// iOS5.0より前
+		alertBox(@"! STOP !", @"Need more iOS 5.0", nil);
+		exit(0);
+	}
+	__app_is_iPad = [[[UIDevice currentDevice] model] hasPrefix:@"iPad"];	// iPad
+
+	
 #ifdef DEBUGxxxxxxxx
 	// DEBUG : 購入テストするため、強制的にFreeモードにする。
 	gud_bPaid_ = NO;
@@ -187,15 +183,15 @@
 							 root:kDBRootAppFolder]; // either kDBRootAppFolder or kDBRootDropbox
 	[DBSession setSharedSession:dbSession];
 
-	if (app_is_sponsor_==NO) {
+	if (__app_is_sponsor==NO) {
 		//CGRect rcAd = CGRectMake(0, self.view.frame.size.height-28-50, 320, 50);  // GAD_SIZE_320x50
 		//--------------------------------------------------------------------------------------------------------- AdWirl
-		if (pAdWhirlView_==nil) {
-			pAdWhirlView_ = [AdWhirlView requestAdWhirlViewWithDelegate:self];
-			pAdWhirlView_.frame = CGRectMake(0, 0, 320, 50);
+		if (__pAdWhirlView==nil) {
+			__pAdWhirlView = [AdWhirlView requestAdWhirlViewWithDelegate:self];
+			__pAdWhirlView.frame = CGRectMake(0, 0, 320, 50);
 			//[pTabBarController_.view addSubview:pAdWhirlView_];
 			//[self.window addSubview:pAdWhirlView_];
-			[self.window.rootViewController.view addSubview:pAdWhirlView_];
+			[__window.rootViewController.view addSubview:__pAdWhirlView];
 		}
 		
 		if ([NSLocalizedString(@"Country2code",nil) isEqualToString:@"ja"])
@@ -206,14 +202,14 @@
 				//[nadview setNendID:@"apiKeyを入れてね" spotID:@"広告枠IDを入れてね"];
 				[mNendView setNendID:@"f905d0b348963ffc8834ac59465cfd9488ee646e" spotID:@"6949"]; // Condition
 				[mNendView setDelegate:self];
-				[mNendView setRootViewController:pTabBarController_];
+				[mNendView setRootViewController:__tabBarController];
 				[mNendView load:nil];
 			}
 			if (mMedibaAd==nil) {	// Mediba Ad
 				mMedibaAd = [[MasManagerViewController alloc] init];
 				//[self.view addSubview:pMedibaAd_.view];
 				[mMedibaAd setPosition:kMasMVPosition_bottom];
-				mMedibaAd.view.frame = pAdWhirlView_.bounds; //これが無ければ変にスクロールする
+				mMedibaAd.view.frame = __pAdWhirlView.bounds; //これが無ければ変にスクロールする
 				mMedibaAd.auID = @"165123";  // Condition
 				[mMedibaAd loadRequest];
 			}
@@ -265,12 +261,12 @@
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
-	[[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
+	//[[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
-	[[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+	//[[SKPaymentQueue defaultQueue] addTransactionObserver:self];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
@@ -296,9 +292,9 @@
 		mMedibaAd.delegate = nil;
 		mMedibaAd = nil;
 	}
-	if (pAdWhirlView_) {
-		pAdWhirlView_.delegate = nil;
-		pAdWhirlView_ = nil;
+	if (__pAdWhirlView) {
+		__pAdWhirlView.delegate = nil;
+		__pAdWhirlView = nil;
 	}
 }
 
@@ -320,7 +316,7 @@
 		DropboxVC *vc = [[DropboxVC alloc] initWithNibName:@"DropboxVC" bundle:nil];
 		vc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
 		vc.delegate = self;
-		[self.window.rootViewController presentModalViewController:vc animated:YES];
+		[__window.rootViewController presentModalViewController:vc animated:YES];
 	}
 	else {
 		// Dropbox 未認証
@@ -350,7 +346,7 @@
 	// Sort条件
 	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
 	NSArray *sortDesc = [NSArray arrayWithObjects: sort1,nil]; // 日付降順：Limit抽出に使用
-	NSArray *aE2records = [mocBase select: E2_ENTITYNAME
+	NSArray *aE2records = [__mocBase select: E2_ENTITYNAME
 									limit: 0
 								   offset: 0
 									where: [NSPredicate predicateWithFormat:E2_nYearMM @" > 200000"] // 未保存を除外する
@@ -381,7 +377,7 @@
 	for (E2record *e2 in aE2records) {
 		//NSLog(@"----- e2=%@", e2);
 		@autoreleasepool {
-			NSDictionary *dic = [mocBase dictionaryObject:e2];
+			NSDictionary *dic = [__mocBase dictionaryObject:e2];
 			if (dic) {
 				//NSLog(@"----- ----- dic=%@", dic);
 				[maE2 addObject:dic];
@@ -453,23 +449,23 @@
 	//---------------------------------------------------------------------------------- 
 
 	// E2record 全クリア
-	[mocBase deleteAllCoreData];
+	[__mocBase deleteAllCoreData];
 	// E2record 生成
 	for (NSDictionary *dict in ary)
 	{
 		NSString *zClass = [dict objectForKey:@"#class"];
 
 		if ([zClass isEqualToString:E2_ENTITYNAME]) {
-			[mocBase insertNewObjectForDictionary:dict];
+			[__mocBase insertNewObjectForDictionary:dict];
 		}
 		//else if ([zClass isEqualToString:@"E1body"]) {
 		//	[mocBase insertNewObjectForDictionary:dict];
 		//}
 	}
 	// コミット
-	[mocBase commit];
+	[__mocBase commit];
 	// E2 件数
-	app_e2record_count_ = [mocBase e2record_count];
+	__app_e2record_count = [__mocBase e2record_count];
 	// リフレッシュ通知
     NSNotification* refreshNotification = [NSNotification notificationWithName:NFM_REFRESH_ALL_VIEWS
 																		object:self  userInfo:nil];
@@ -677,18 +673,15 @@
 }
 
 
+/*
 #pragma mark - StoreKit <SKPaymentTransactionObserver>
 - (void)unlockCompleate
 {
 	// Unlock
-	mApp_is_unlock = YES;
+	__app_is_unlock = YES;
 	// UserDefへ記録する （iOS5未満のため）
 	[[NSUserDefaults standardUserDefaults] setBool:YES forKey:GUD_bUnlock];
 	[[NSUserDefaults standardUserDefaults] synchronize];
-	/*// iCloud-KVS に記録する
-	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	[kvs setBool:YES forKey:GUD_bUnlock];　KVSには保存しない ＜＜再インスト時にリセットさせるため
-	[kvs synchronize];*/
 	// 再フィッチ＆画面リフレッシュ通知
 	[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFETCH_ALL_DATA
 														object:self userInfo:nil];
@@ -702,7 +695,7 @@
 	[self alertProgressOff];
 	if ([tran.payment.productIdentifier isEqualToString:STORE_PRODUCTID_UNLOCK]) {
 		// Sponsor
-		app_is_sponsor_ = YES;
+		__app_is_sponsor = YES;
 		// UserDefへ記録する （iOS5未満のため）
 		[[NSUserDefaults standardUserDefaults] setBool:YES forKey:GUD_bPaid];
 		[[NSUserDefaults standardUserDefaults] synchronize];
@@ -807,6 +800,7 @@
 {	// 全てのリストア処理が終了
 	NSLog(@"paymentQueueRestoreCompletedTransactionsFinished: ");
 }
+*/
 
 
 #pragma mark - Ads <AdWhirlDelegate>
@@ -818,13 +812,17 @@
 - (UIViewController *)viewControllerForPresentingModalView
 {	//return UIWindow.rootViewController;
 	NSLog(@"AdWhirl - viewControllerForPresentingModalView");
-    return self.window.rootViewController;
+    return __window.rootViewController;
 }
 
 - (void)adWhirlDidReceiveAd:(AdWhirlView *)adWhirlView
 {	// 広告を受信したとき
 	NSLog(@"AdWhirl - adWhirlDidReceiveAd");
-	adWhirlView.alpha = 1;
+	if (__app_is_sponsor==NO && __app_is_AdShow) {	// 無償 ＆ 広告表示可能
+		adWhirlView.alpha = 1;	// (0)AddEdit (1)List
+	} else {
+		adWhirlView.alpha = 0;	// (2)Graph (3)Information
+	}
 }
 
 - (void)adWhirlDidFailToReceiveAd:(AdWhirlView *)adWhirlView usingBackup:(BOOL)yesOrNo

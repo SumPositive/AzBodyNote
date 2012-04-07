@@ -7,7 +7,7 @@
 //
 
 #import "Global.h"
-#import "AzBodyNoteAppDelegate.h"		// <SKPaymentTransactionObserver>
+#import "AppDelegate.h"		// <SKPaymentTransactionObserver>
 #import "InformationVC.h"
 #import "UIDevice-Hardware.h"
 
@@ -18,7 +18,7 @@
 
 @implementation InformationVC
 {
-	AzBodyNoteAppDelegate		*appDelegate_;
+	AppDelegate		*appDelegate_;
 
 	IBOutlet UILabel			*ibLbTitle;
 	IBOutlet UILabel			*ibLbVersion;
@@ -28,9 +28,9 @@
 	IBOutlet UIButton		*ibBuPostMail;
 	IBOutlet UIButton		*ibBuPaid;
 	
-	SKProductsRequest		*mProductRequest;
-	SKProduct						*productUnlock_;
-	UIActivityIndicatorView	*mProductIndicator;
+	//SKProductsRequest		*mProductRequest;
+	//SKProduct						*productUnlock_;
+	//UIActivityIndicatorView	*mProductIndicator;
 }
 
 
@@ -61,7 +61,7 @@
     [super viewDidLoad];
 
 	if (appDelegate_==nil) {
-		appDelegate_ = (AzBodyNoteAppDelegate*)[[UIApplication sharedApplication] delegate];
+		appDelegate_ = (AppDelegate*)[[UIApplication sharedApplication] delegate];
 	}
 	// インジケータ開始 ＜＜＜ここで一回表示しなければ、インジケータ位置が定まらない（原因不明のため対処療法）
 //	[appDelegate_  alertProgressOn: NSLocalizedString(@"Please wait",nil)];
@@ -87,11 +87,13 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+	GA_TRACK_PAGE(@"InformationVC");
+	appDelegate_.app_is_AdShow = NO; //これは広告表示しないViewである。 viewWillAppear:以降で定義すること
 	// インジケータ終了
 //	[appDelegate_	alertProgressOff];
 	self.view.alpha = 0.3;
 	
-	// PAID 広告＆制限解除
+/*	// PAID 広告＆制限解除
 	ibBuPaid.hidden = YES;
 	if (mProductRequest) {
 		[mProductRequest cancel];			// 中断
@@ -115,13 +117,12 @@
 			mProductRequest.delegate = self;		//viewDidUnloadにて、cancel, nil している。さもなくば落ちる
 			[mProductRequest start];
 		}
-	}
+	}*/
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-	GA_TRACK_PAGE(@"InformationVC");
 
 	if (self.view.alpha != 1) { //AddNewのときだけディゾルブ
 		// アニメ準備
@@ -144,10 +145,10 @@
 
 - (void)viewDidUnload		//＜＜実験では、呼ばれなかった！
 {
-	[mProductIndicator stopAnimating];
+	//[mProductIndicator stopAnimating];
     [super viewDidUnload];
 }
-
+/*
 - (void)dealloc 
 {	// 必ず最後に呼ばれる
 	[mProductIndicator stopAnimating], mProductRequest = nil;
@@ -156,7 +157,7 @@
 		[mProductRequest cancel];			// 中断
 		mProductRequest.delegate = nil;  // これないと、通信中に閉じると落ちる
 	}
-}
+}*/
 
 - (IBAction)ibBuOK:(UIButton *)button
 {
@@ -199,7 +200,7 @@
 	[alert show];
 	//[alert autorelease];
 }
-
+/*
 - (IBAction)ibBuPaid:(UIButton *)button
 {
 	if (appDelegate_.app_is_sponsor) {	// 購入済み
@@ -215,7 +216,7 @@
 										  otherButtonTitles: NSLocalizedString(@"SK Paid next",nil), nil];
 	alert.tag = ALERT_PAID;
 	[alert show];
-}
+}*/
 
 
 #pragma mark - <delegate>
@@ -276,9 +277,9 @@
 			//[picker release];
 		}	break;
 			
-		case ALERT_PAID:
+/*		case ALERT_PAID:
 		{
-			// アドオン購入処理開始　　　　　　　<SKPaymentTransactionObserver>は、AzBodyNoteAppDelegateに実装
+			// アドオン購入処理開始　　　　　　　<SKPaymentTransactionObserver>は、AppDelegateに実装
 			assert(appDelegate_);
 			if (productUnlock_) {
 				[[SKPaymentQueue defaultQueue] addTransactionObserver: appDelegate_];
@@ -286,7 +287,7 @@
 				SKPayment *payment = [SKPayment paymentWithProduct:productUnlock_];
 				[[SKPaymentQueue defaultQueue] addPayment:payment];
 			}
-		} break;
+		} break;*/
 	}
 }
 
@@ -328,7 +329,7 @@
 	[self dismissModalViewControllerAnimated:YES];
 }
 
-
+/*
 #pragma mark - <SKProductsRequestDelegate>
 - (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response
 {	// 商品情報を取得して購入ボタン表示などを整える
@@ -347,7 +348,7 @@
 		//NSLog(@"productsRequest: product: [%@] [%@]", product.localizedTitle, product.localizedDescription);
 		break; // 1つだけだから
 	}	
-}
+}*/
 
 
 @end

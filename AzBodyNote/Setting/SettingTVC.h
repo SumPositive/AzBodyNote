@@ -2,8 +2,8 @@
 //  SettingTVC.h
 //  AzBodyNote
 //
-//  Created by Sum Positive on 11/10/02.
-//  Copyright 2011 Sum Positive. All rights reserved.
+//  Created by 松山 masa on 12/04/07.
+//  Copyright (c) 2012年 __MyCompanyName__. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
