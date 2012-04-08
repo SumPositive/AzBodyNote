@@ -6,27 +6,10 @@
 //  Copyright (c) 2011 Azukid. All rights reserved.
 //
 
-#import "Global.h"
 #import "GraphVC.h"
-#import "GraphView.h"
-#import "AppDelegate.h"
-#import "MocEntity.h"
-#import "MocFunctions.h"
 
 
 @implementation GraphVC
-{
-	IBOutlet UIScrollView		*ibScrollView;
-	IBOutlet GraphView			*ibGraphView;
-	
-	AppDelegate		*appDelegate_;
-	MocFunctions							*mocFunc_;
-	
-	NSUInteger								uiActivePage_;
-	NSUInteger								uiActivePageMax_;
-	UIActivityIndicatorView			*actIndicator_;
-	CGPoint									pointNext_;
-}
 
 /*** XIB利用時には呼ばれません。
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -66,12 +49,12 @@
     [super viewDidLoad];
 	self.title = NSLocalizedString(@"TabGraph",nil);
 
-	appDelegate_ = (AppDelegate*)[[UIApplication sharedApplication] delegate];
-	assert(appDelegate_);
-	mocFunc_ = appDelegate_.mocBase; // Read Only
-	assert(mocFunc_);
+	mAppDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+	assert(mAppDelegate);
+	mMocFunc = mAppDelegate.mocBase; // Read Only
+	assert(mMocFunc);
 	
-	if (appDelegate_.app_is_unlock==NO) {
+	if (mAppDelegate.app_is_unlock==NO) {
 		uiActivePageMax_ = 0; // 0ページ制限
 	}
 
@@ -117,7 +100,7 @@
 		iOffset -= iOverRight;
 	}
 
-	NSArray *e2recs = [mocFunc_ select: E2_ENTITYNAME
+	NSArray *e2recs = [mMocFunc select: E2_ENTITYNAME
 									limit: iOverLeft + GRAPH_PAGE_LIMIT + iOverRight
 									offset: iOffset
 									where: [NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"] // 未保存を除外する
@@ -197,7 +180,7 @@
 {
     [super viewWillAppear:animated];
 	GA_TRACK_PAGE(@"GraphVC");
-	appDelegate_.app_is_AdShow = NO; //これは広告表示しないViewである。 viewWillAppear:以降で定義すること
+	mAppDelegate.app_is_AdShow = NO; //これは広告表示しないViewである。 viewWillAppear:以降で定義すること
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -257,7 +240,7 @@
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {	// スクロール中に呼ばれる
 	//NSLog(@"scrollViewDidScroll: .contentOffset.x=%f", scrollView.contentOffset.x);
-	if (appDelegate_.app_is_unlock) {
+	if (mAppDelegate.app_is_unlock) {
 		if (scrollView.contentOffset.x < -70) {
 			// PREV（過去）ページへ
 			if (uiActivePage_ < uiActivePageMax_) {
@@ -289,7 +272,7 @@
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {	// スクロール終了時（指を離した時）に呼ばれる
 	NSLog(@"scrollViewDidEndDragging: .contentOffset.x=%f  decelerate=%d", scrollView.contentOffset.x, decelerate);
-	if (appDelegate_.app_is_unlock) {
+	if (mAppDelegate.app_is_unlock) {
 		if (scrollView.contentOffset.x < -70) {
 			// PREV（過去）ページへ
 			if (uiActivePage_ < uiActivePageMax_) {

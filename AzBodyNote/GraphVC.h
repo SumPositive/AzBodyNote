@@ -7,6 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Global.h"
+#import "AppDelegate.h"
+#import "MocEntity.h"
+#import "MocFunctions.h"
+#import "GraphView.h"
 
 #ifdef DEBUGxxx
 #define GRAPH_PAGE_LIMIT			10		// < iOverlay
@@ -23,6 +28,17 @@
 	IBOutlet UILabel				*ibLbPuls;
 	IBOutlet UILabel				*ibLbWeight;
 	IBOutlet UILabel				*ibLbTemp;
+	IBOutlet UIScrollView		*ibScrollView;
+	IBOutlet GraphView			*ibGraphView;
+
+@private
+	AppDelegate					*mAppDelegate;
+	MocFunctions					*mMocFunc;
+	
+	NSUInteger								uiActivePage_;
+	NSUInteger								uiActivePageMax_;
+	UIActivityIndicatorView			*actIndicator_;
+	CGPoint									pointNext_;
 }
 
 @end

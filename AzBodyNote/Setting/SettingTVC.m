@@ -6,28 +6,29 @@
 //  Copyright (c) 2012年 __MyCompanyName__. All rights reserved.
 //
 
-#import "Global.h"
 #import "SettingTVC.h"
-#import "SettCellSwitch.h"
-#import "SettCellLogin.h"
-#import "InformationVC.h"
+//#import "SettCellSwitch.h"
+#import "SettCellGoogleLogin.h"
+#import "AZAboutThisVC.h"
 #import "AZStoreTVC.h"
 
 
 #define STORE_PRODUCTID_UNLOCK		@"com.azukid.AzBodyNote.Unlock"		// In-App Purchase ProductIdentifier
 
 
-@interface SettingTVC ()
-
+@interface SettingTVC (Private)
 @end
 
 @implementation SettingTVC
 
-- (id)initWithStyle:(UITableViewStyle)style
+
+- (id)initWithStyle:(UITableViewStyle)style;
 {
-    self = [super initWithStyle:style];
+    self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
         // Custom initialization
+		mAppDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+		assert(mAppDelegate);
     }
     return self;
 }
@@ -35,19 +36,22 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+	self.title = NSLocalizedString(@"TabSettings",nil);
+}
 
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
- 
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+	GA_TRACK_PAGE(@"SettingTVC");
+	mAppDelegate.app_is_AdShow = NO; //これは広告表示可能なViewである。 viewWillAppear:以降で定義すること
+	if (mAppDelegate.adWhirlView) {
+		mAppDelegate.adWhirlView.alpha = 0;
+	}
 }
 
 - (void)viewDidUnload
 {
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -71,63 +75,74 @@
 	}
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	switch (indexPath.section*100 + indexPath.row) 
+	{
+		case 0: return  55;	// Tweet
+		case 1: return  88;	// Google Login
+	}
+    return 44; // Default
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	static NSString *idCellSubtitle = @"CellStyleSubtitle";
-	static NSString *idCellSwitch = @"SettCellSwitch";  //== Identifire に一致させること
+	static NSString *sysCellSubtitle = @"sysCellSubtitle"; //システム既定セル
 
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     
 	switch (indexPath.section*100 + indexPath.row) 
 	{
 		case 0: {	// Tweet
-			SettCellSwitch *cell = (SettCellSwitch*)[tableView dequeueReusableCellWithIdentifier:idCellSwitch];
+			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
 			if (cell == nil) {
-				UINib *nib = [UINib nibWithNibName:idCellSwitch   bundle:nil];
-				[nib instantiateWithOwner:self options:nil];
-				cell = (SettCellSwitch*)[tableView dequeueReusableCellWithIdentifier:idCellSwitch];
-				assert(cell);
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 			}
-			cell.tag = TAG_SettCellSwitch_Tweet;
 			cell.textLabel.text = NSLocalizedString(@"SettTweet",nil);
 			cell.detailTextLabel.text = NSLocalizedString(@"SettTweet detail",nil);
-			[cell.ibSwitch setOn: [userDefaults boolForKey:GUD_bTweet]];
+			if ([userDefaults boolForKey:GUD_bTweet]) {
+				cell.accessoryType = UITableViewCellAccessoryCheckmark;
+			} else {
+				cell.accessoryType = UITableViewCellAccessoryNone;
+			}
 			return cell;
 		}	break;
 			
-		case 2: {	// Test
-			SettCellSwitch *cell = (SettCellSwitch*)[tableView dequeueReusableCellWithIdentifier:idCellSwitch];
+		case 1: {	// Google Login
+			static NSString *cid = @"SettCellGoogleLogin";  //== Identifire に一致させること
+			SettCellGoogleLogin *cell = (SettCellGoogleLogin*)[tableView dequeueReusableCellWithIdentifier:cid];
 			if (cell == nil) {
-				UINib *nib = [UINib nibWithNibName:idCellSwitch   bundle:nil];
+				UINib *nib = [UINib nibWithNibName:cid   bundle:nil];
 				[nib instantiateWithOwner:self options:nil];
-				cell = (SettCellSwitch*)[tableView dequeueReusableCellWithIdentifier:idCellSwitch];
+				cell = (SettCellGoogleLogin*)[tableView dequeueReusableCellWithIdentifier:cid];
 				assert(cell);
 			}
-			cell.tag = TAG_SettCellSwitch_Test;
-			cell.textLabel.text = NSLocalizedString(@"SettTest",nil);
-			cell.detailTextLabel.text = NSLocalizedString(@"SettTest detail",nil);
-			[cell.ibSwitch setOn: ![userDefaults boolForKey:GUD_bTweet]];
 			return cell;
 		}	break;
 			
 		case 100: {	// このアプリについて
-			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:idCellSubtitle];
+			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
 			if (cell == nil) {
-				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:idCellSubtitle];
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 			}
+			//cell.imageView.image = [UIImage imageNamed:@"Icon57"];
+			//cell.imageView.contentMode = UIViewContentModeScaleAspectFit;
+			//cell.imageView.frame = CGRectMake(0, 0, 32, 32);
+			cell.textLabel.text = NSLocalizedString(@"AZAboutThis",nil);
+			cell.detailTextLabel.text = nil;
 			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-			cell.textLabel.text = NSLocalizedString(@"SettInformation",nil);
 			return cell;
 		}	break;
 
 		case 101: {	// あずき商店
-			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:idCellSubtitle];
+			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
 			if (cell == nil) {
-				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:idCellSubtitle];
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 			}
+			cell.imageView.image = [UIImage imageNamed:@"Icon-Store-32"];
+			cell.textLabel.text = NSLocalizedString(@"AZStore",nil);
+			cell.detailTextLabel.text = NSLocalizedString(@"AZStore detail",nil);
 			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-			cell.textLabel.text = NSLocalizedString(@"SettAppStore",nil);
-			cell.detailTextLabel.text = NSLocalizedString(@"SettAppStore detail",nil);
 			return cell;
 		}	break;
 	}
@@ -156,16 +171,35 @@
 	
 	switch (indexPath.section*100 + indexPath.row) 
 	{
+		case 0: {  // Tweet
+			NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+			UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+			if ([userDefaults boolForKey:GUD_bTweet]) {
+				[userDefaults setBool: NO forKey:GUD_bTweet];
+				cell.accessoryType = UITableViewCellAccessoryNone;
+			} else {
+				[userDefaults setBool: YES forKey:GUD_bTweet];
+				cell.accessoryType = UITableViewCellAccessoryCheckmark;
+			}
+			[userDefaults synchronize];
+		} break;
+			
 		case 100: {	// このアプリについて
-			// InformationVC
+			AZAboutThisVC *vc = [[AZAboutThisVC alloc] init];
+			vc.ppImgIcon = [UIImage imageNamed:@"Icon57"];
+			vc.ppProductTitle = NSLocalizedString(@"Product Title",nil);
+			vc.ppProductSubtitle = @"Condition (.azc)";
+			vc.ppSupportSite = @"condition.azukid.com";
+			vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
+			[self.navigationController pushViewController:vc animated:YES];
 		}	break;
 			
 		case 101: {	// あずき商店
 			AZStoreTVC *vc = [[AZStoreTVC alloc] init];
-			[vc setTitle:NSLocalizedString(@"SettTest",nil)];
 			// 商品IDリスト
 			NSSet *pids = [NSSet setWithObjects:STORE_PRODUCTID_UNLOCK, nil]; // 商品が複数ある場合は列記
-			[vc setProductIDs:pids];  //商品一覧リクエスト開始
+			[vc setProductIDs:pids];
+			vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
 			[self.navigationController pushViewController:vc animated:YES];
 		}	break;
 	}

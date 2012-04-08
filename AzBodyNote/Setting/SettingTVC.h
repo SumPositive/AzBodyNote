@@ -7,7 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Global.h"
+#import "AppDelegate.h"
+
 
 @interface SettingTVC : UITableViewController
-
+{
+	
+@private
+	AppDelegate					*mAppDelegate;
+}
 @end

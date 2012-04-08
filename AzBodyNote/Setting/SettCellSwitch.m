@@ -13,13 +13,19 @@
 @synthesize ibSwitch;
 
 
-- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
-{
-    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
-    if (self) {
-        // Initialization code
-    }
-    return self;
+/***通らない
+ - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+ {
+ self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+ if (self) {
+ // Initialization code
+ }
+ return self;
+ }*/
+
+- (void)drawRect:(CGRect)rect
+{	// ここは初期化時に1度だけ通る
+
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated

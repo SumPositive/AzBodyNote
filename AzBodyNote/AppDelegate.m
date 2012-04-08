@@ -202,7 +202,7 @@
 				//[nadview setNendID:@"apiKeyを入れてね" spotID:@"広告枠IDを入れてね"];
 				[mNendView setNendID:@"f905d0b348963ffc8834ac59465cfd9488ee646e" spotID:@"6949"]; // Condition
 				[mNendView setDelegate:self];
-				[mNendView setRootViewController:__tabBarController];
+				[mNendView setRootViewController:__window.rootViewController];
 				[mNendView load:nil];
 			}
 			if (mMedibaAd==nil) {	// Mediba Ad
@@ -834,8 +834,10 @@
 - (void)performEventAppBank:(AdWhirlView *)adWhirlView 
 {	// AppBank nend
 	NSLog(@"AdWhirl - performEventAppBank");
-	if (mNendView) {
+	if (mNendView && __app_is_AdShow) {
 		[adWhirlView replaceBannerViewWith:mNendView];
+	} else {
+		[adWhirlView setAlpha:0];
 	}
 }
 - (void)nadViewDidFinishLoad:(NADView *)adView
@@ -846,8 +848,10 @@
 - (void)performEventMedibaAd:(AdWhirlView *)adWhirlView 
 {	// Mediba Ad
 	NSLog(@"AdWhirl - performEventMedibaAd");
-	if (mMedibaAd) { // これにより ja 以外は、MedibaAd をパスする
+	if (mMedibaAd && __app_is_AdShow) { // これにより ja 以外は、MedibaAd をパスする
 		[adWhirlView replaceBannerViewWith:mMedibaAd.view];
+	} else {
+		[adWhirlView setAlpha:0];
 	}
 }
 
