@@ -187,8 +187,8 @@
 		case 100: {	// このアプリについて
 			AZAboutThisVC *vc = [[AZAboutThisVC alloc] init];
 			vc.ppImgIcon = [UIImage imageNamed:@"Icon57"];
-			vc.ppProductTitle = NSLocalizedString(@"Product Title",nil);
-			vc.ppProductSubtitle = @"Condition (.azc)";
+			vc.ppProductTitle = @"Condition";	// 世界共通名称
+			vc.ppProductSubtitle = NSLocalizedString(@"Product Title",nil); // ローカル名称
 			vc.ppSupportSite = @"condition.azukid.com";
 			vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
 			[self.navigationController pushViewController:vc animated:YES];
