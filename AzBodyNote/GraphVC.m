@@ -47,6 +47,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+	GA_TRACK_PAGE(@"GraphVC");
+
 	self.title = NSLocalizedString(@"TabGraph",nil);
 
 	mAppDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
@@ -179,8 +181,12 @@
 - (void)viewWillAppear:(BOOL)animated 
 {
     [super viewWillAppear:animated];
-	GA_TRACK_PAGE(@"GraphVC");
+
 	mAppDelegate.app_is_AdShow = NO; //これは広告表示しないViewである。 viewWillAppear:以降で定義すること
+	if (mAppDelegate.adWhirlView) {	// Ad OFF
+		//mAppDelegate.adWhirlView.frame = CGRectMake(0, self.view.frame.size.height+100, 320, 50);  //下へ隠す
+		mAppDelegate.adWhirlView.hidden = YES;
+	}
 }
 
 - (void)viewDidAppear:(BOOL)animated

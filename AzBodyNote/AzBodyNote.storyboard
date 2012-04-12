@@ -125,14 +125,14 @@
                                     <outlet property="ibSwitch" destination="rDw-Ma-E0k" id="v6f-XA-7gc"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SettCellGoogleLogin" rowHeight="88" id="cB1-uG-Nvv" customClass="SettCellGoogleLogin">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SettCellGSpread" rowHeight="88" id="cB1-uG-Nvv" customClass="SettCellGSpread">
                                 <rect key="frame" x="0.0" y="107" width="320" height="89"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                     <rect key="frame" x="10" y="0.0" width="300" height="87"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="SettCellGoogleLogin" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="c01-zT-0TK">
+                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="SettCellGSpread" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="c01-zT-0TK">
                                             <rect key="frame" x="5" y="11" width="187" height="28"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="20"/>
@@ -810,8 +810,8 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                 <relationship kind="action" name="ibSegTypeChange:" candidateClass="UISegmentedControl"/>
             </relationships>
         </class>
-        <class className="SettCellGoogleLogin" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/SettCellGoogleLogin.h"/>
+        <class className="SettCellGSpread" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/SettCellGSpread.h"/>
             <relationships>
                 <relationship kind="outlet" name="ibLbDetail" candidateClass="UILabel"/>
                 <relationship kind="outlet" name="ibLbTitle" candidateClass="UILabel"/>

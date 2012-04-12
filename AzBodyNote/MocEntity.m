@@ -26,6 +26,8 @@
 @dynamic bCaution;
 @dynamic dateTime;
 @dynamic nYearMM;
+@dynamic sEventID;
+@dynamic sGSpreadID;
 @dynamic sNote1;
 @dynamic sNote2;
 @dynamic sEquipment;

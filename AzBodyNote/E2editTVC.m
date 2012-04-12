@@ -274,46 +274,87 @@
 		// Save & Commit
 		[mocFunc_ commit];
 		
+		// TweetおよびEvent用の本文作成
+		NSString *zBody = @"";
+		if (moE2edit_.nBpHi_mmHg) {
+			zBody = [zBody stringByAppendingFormat:@"(%@ %@) ",
+					  NSLocalizedString(@"Event BpHi",nil),
+					  strValue([moE2edit_.nBpHi_mmHg integerValue], 0)];
+		}
+		if (moE2edit_.nBpLo_mmHg) {
+			zBody = [zBody stringByAppendingFormat:@"(%@ %@) ",
+					 NSLocalizedString(@"Event BpLo",nil),
+					 strValue([moE2edit_.nBpLo_mmHg integerValue], 0)];
+		}
+		if (moE2edit_.nPulse_bpm) {
+			zBody = [zBody stringByAppendingFormat:@"(%@ %@) ",
+					 NSLocalizedString(@"Event Puls",nil),
+					 strValue([moE2edit_.nPulse_bpm integerValue], 0)];
+		}
+		if (moE2edit_.nWeight_10Kg) {
+			zBody = [zBody stringByAppendingFormat:@"(%@ %@) ",
+					  NSLocalizedString(@"Event Weight",nil),
+					  strValue([moE2edit_.nWeight_10Kg integerValue], 1)];
+		}
+		if (moE2edit_.nTemp_10c) {
+			zBody = [zBody stringByAppendingFormat:@"(%@ %@) ",
+					  NSLocalizedString(@"Event Temp",nil),
+					  strValue([moE2edit_.nTemp_10c integerValue], 1)];
+		}
+		if (moE2edit_.nPedometer) {
+			zBody = [zBody stringByAppendingFormat:@"(%@ %@) ",
+					  NSLocalizedString(@"Event Pedo",nil),
+					  strValue([moE2edit_.nPedometer integerValue], 0)];
+		}
+		if (moE2edit_.nBodyFat_10p) {
+			zBody = [zBody stringByAppendingFormat:@"(%@ %@) ",
+					  NSLocalizedString(@"Event BodyFat",nil),
+					  strValue([moE2edit_.nBodyFat_10p integerValue], 1)];
+		}
+		if (moE2edit_.nSkMuscle_10p) {
+			zBody = [zBody stringByAppendingFormat:@"(%@ %@) ",
+					  NSLocalizedString(@"Event SkMuscle",nil),
+					  strValue([moE2edit_.nSkMuscle_10p integerValue], 1)];
+		}
+		NSLog(@"actionSave: zBody={%@}", zBody);
+		
 		// Tweet
-		NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+/*		NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 		if ([userDefaults boolForKey:GUD_bTweet]) {
 			// Tweet メッセージ作成
 			NSString *zTweet = NSLocalizedString(@"Tweet head",nil);
-			if (moE2edit_.nBpHi_mmHg) {
-				zTweet = [zTweet stringByAppendingFormat:@"[%@ %@/%@/%@] ",
-						  NSLocalizedString(@"Tweet Bp",nil),
-						  strValue([moE2edit_.nBpHi_mmHg integerValue], 0),
-						  strValue([moE2edit_.nBpLo_mmHg integerValue], 0),
-						  strValue([moE2edit_.nPulse_bpm integerValue], 0)];
-			}
-			if (moE2edit_.nWeight_10Kg) {
-				zTweet = [zTweet stringByAppendingFormat:@"[%@ %@] ",
-						  NSLocalizedString(@"List_Weight",nil),
-						  strValue([moE2edit_.nWeight_10Kg integerValue], 1)];
-			}
-			if (moE2edit_.nTemp_10c) {
-				zTweet = [zTweet stringByAppendingFormat:@"[%@ %@] ",
-						  NSLocalizedString(@"List_Temp",nil),
-						  strValue([moE2edit_.nTemp_10c integerValue], 1)];
-			}
-			if (moE2edit_.nPedometer) {
-				zTweet = [zTweet stringByAppendingFormat:@"[%@ %@] ",
-						  NSLocalizedString(@"List_Pedo",nil),
-						  strValue([moE2edit_.nPedometer integerValue], 0)];
-			}
-			if (moE2edit_.nBodyFat_10p) {
-				zTweet = [zTweet stringByAppendingFormat:@"[%@ %@] ",
-						  NSLocalizedString(@"List_BodyFat",nil),
-						  strValue([moE2edit_.nBodyFat_10p integerValue], 1)];
-			}
-			if (moE2edit_.nSkMuscle_10p) {
-				zTweet = [zTweet stringByAppendingFormat:@"[%@ %@] ",
-						  NSLocalizedString(@"List_SkMuscle",nil),
-						  strValue([moE2edit_.nSkMuscle_10p integerValue], 1)];
-			}
+			zTweet = [zTweet stringByAppendingString: zBody];
 			zTweet = [zTweet stringByAppendingString: NSLocalizedString(@"Tweet foot",nil)];
-			//
 			[self actionTweet: zTweet];
+		}*/
+		
+		if (appDelegate_.eventStore) {
+			EKEvent *event = nil;
+			if (10<[moE2edit_.sEventID length]) {	// 既存につき更新する
+				// ID検索  見つからなければ nil
+				event = [appDelegate_.eventStore eventWithIdentifier:moE2edit_.sEventID];
+			}
+			if (event==nil) {	
+				// 新規
+				event = [EKEvent eventWithEventStore:appDelegate_.eventStore];
+			}
+			event.title = NSLocalizedString(@"Event Title",nil);
+			event.location = moE2edit_.sEquipment;
+			event.startDate = moE2edit_.dateTime;
+			event.endDate = moE2edit_.dateTime;
+			event.notes = zBody;
+			// 即保存する
+			NSError *error;
+			//削除 [appDelegate_.eventStore removeEvent:event span:EKSpanThisEvent error:&error];
+			[appDelegate_.eventStore saveEvent:event span:EKSpanThisEvent error:&error]; // 保存
+			if (error) {
+				GA_TRACK_EVENT_ERROR([error description],0);
+				NSLog(@"saveEvent: error={%@}", [error localizedDescription]);
+			} else {
+				NSLog(@"eventIdentifier={%@}", event.eventIdentifier);
+				moE2edit_.sEventID = event.eventIdentifier;
+				[mocFunc_ commit];
+			}
 		}
 		
 		if (editMode_==1) { // Edit mode
@@ -327,6 +368,7 @@
 		}
 	}
 }
+
 
 - (void)actionCancel
 {	// Edit mode ONLY
@@ -526,7 +568,7 @@
 {
 	[super viewDidAppear:animated];
 
-	if (appDelegate_.adWhirlView) {
+	if (appDelegate_.adWhirlView) {	// Ad ON
 		[UIView beginAnimations:nil context:NULL];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
 		[UIView setAnimationDuration:1.2];
@@ -535,7 +577,7 @@
 		} else {
 			appDelegate_.adWhirlView.frame = CGRectMake(0, 480-49-50, 320, 50);  // GAD_SIZE_320x50
 		}
-		appDelegate_.adWhirlView.alpha = 1;	// 表示する
+		appDelegate_.adWhirlView.hidden = NO;
 		[UIView commitAnimations];
 	}
 	
@@ -611,15 +653,12 @@
 
     [super viewWillDisappear:animated];
 }
-
+/*
 - (void)viewDidDisappear:(BOOL)animated
 {	// 非表示になった後に呼び出される
-	if (appDelegate_.adWhirlView) {
-		appDelegate_.adWhirlView.alpha = 0;
-	}
     [super viewDidDisappear:animated];
 }
-
+*/
 - (void)didReceiveMemoryWarning
 {
     // Releases the view if it doesn't have a superview.
@@ -672,7 +711,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {	// Return the number of rows in the section.
-	return 10 + 2;  // +1:末尾の余白セル
+	return 10 + 1;  // +1:末尾の余白セル
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -765,6 +804,7 @@
 	return cell;
 }
 
+/*
 - (E2editCellTweet *)cellTweet:(UITableView *)tableView
 {
 	static NSString *Cid = @"E2editCellTweet";  //== Class名に一致させること
@@ -777,6 +817,7 @@
 	}
 	return cell;
 }
+*/
 
 - (UITableViewCell *)cellBlank:(UITableView *)tableView
 {	// 余白セル
@@ -942,13 +983,13 @@
 			return cell;
 		}	break;
 			
-		case 10: 
+/*		case 10: 
 			if (editMode_==0) { // AddNew
 				E2editCellTweet *cell = [self cellTweet:tableView];
 				[cell drawRect:cell.frame]; // コンテンツ描画
 				return cell;
 			}
-			break;
+			break;*/
 	}
 	// 余白部
 	return [self cellBlank:tableView];
@@ -1065,74 +1106,6 @@
 		}	break;
 	}
 }
-
-
-
-#ifdef xxxxxxxxxxxxxxxxxxxxx
-#pragma mark - iAd <ADBannerViewDelegate>
-
-// iAd取得できたときに呼ばれる　⇒　表示する
-- (void)bannerViewDidLoadAd:(ADBannerView *)banner
-{
-	//if (banner.frame.origin.y < self.view.frame.size.height) return; // 既に表示中
-	if (banner.alpha==1) return; // 既に表示中
-	NSLog(@"iAd - DidReceive");
-	
-	[UIView beginAnimations:nil context:NULL];
-	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-	[UIView setAnimationDuration:2.0];
-	
-	banner.alpha = 1;				// iAd優先
-	adMobView_.alpha = 0;
-	
-	[UIView commitAnimations];
-}
-
-// iAd取得できなかったときに呼ばれる　⇒　非表示にする
-- (void)bannerView:(ADBannerView *)banner didFailToReceiveAdWithError:(NSError *)error
-{
-	//if (self.view.frame.size.height <= banner.frame.origin.y) return; // 既に隠れている
-	if (banner.alpha==0) return; // 既に隠れている
-	NSLog(@"iAd - FailToReceive　Error:%@", [error localizedDescription]);
-	
-	[UIView beginAnimations:nil context:NULL];
-	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-	[UIView setAnimationDuration:2.0];
-	
-	banner.alpha = 0;
-	adMobView_.alpha = adMobView_.tag;
-	
-	[UIView commitAnimations];
-}
-
-
-#pragma mark - AdMob <GADBannerViewDelegate>
-
-- (void)adViewDidReceiveAd:(GADBannerView *)bannerView 
-{	// AdMob 広告あり
-	adMobView_.tag = 1;
-	if (adMobView_.alpha==1 OR iAdBanner_.alpha==1) return; // 既に非表示 または iAd表示中
-	NSLog(@"AdMob - DidReceive");
-	// iAd非表示ならば、AdMob表示する
-	[UIView beginAnimations:nil context:NULL];
-	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-	[UIView setAnimationDuration:2.0];
-	adMobView_.alpha = 1;
-	[UIView commitAnimations];
-}
-
-- (void)adView:(GADBannerView *)bannerView didFailToReceiveAdWithError:(GADRequestError *)error 
-{	// AdMob 広告なし
-	adMobView_.tag = 0;
-	if (adMobView_.alpha==0) return; // 既に非表示
-	NSLog(@"AdMob - FailToReceive　Error:%@", [error localizedDescription]);
-	[UIView beginAnimations:nil context:NULL];
-	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-	[UIView setAnimationDuration:2.0];
-	adMobView_.alpha = 0;
-	[UIView commitAnimations];
-}
-#endif
 
 
 @end

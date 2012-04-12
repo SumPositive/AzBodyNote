@@ -8,12 +8,39 @@
 
 #import <UIKit/UIKit.h>
 #import <CoreData/CoreData.h>
+
+#import "Global.h"
+#import "AppDelegate.h"
+#import "MocEntity.h"
+#import "MocFunctions.h"
 #import "E2listCell.h"
-//#import "GADBannerView.h"
 
 
-@interface E2listTVC : UITableViewController <UITableViewDelegate, UITableViewDataSource, 
-												NSFetchedResultsControllerDelegate>
+@interface E2listTVC : UITableViewController <UITableViewDelegate, UITableViewDataSource, NSFetchedResultsControllerDelegate>
+{
+	IBOutlet UILabel				*ibLbDate;
+	IBOutlet UILabel				*ibLbTime;
+	IBOutlet UILabel				*ibLbBpHi;
+	IBOutlet UILabel				*ibLbBpLo;
+	IBOutlet UILabel				*ibLbPuls;
+	IBOutlet UILabel				*ibLbWeight;
+	IBOutlet UILabel				*ibLbTemp;
+	//IBOutlet UILabel				*ibLbNote1;
+	IBOutlet UILabel				*ibLbPedo;
+	IBOutlet UILabel				*ibLbBodyFat;
+	IBOutlet UILabel				*ibLbSkMuscle;
+	
+	AppDelegate					*appDelegate_;
+	MocFunctions					*mocFunc_;
+	NSIndexPath					*indexPathEdit_;
+	NSIndexPath					*indexPathDelete_;
+	
+	//GADBannerView		*adMobView_;
+	NSUInteger						e2offset_;
+	UILabel							*lbPagePrev_;
+	UILabel							*lbPageNext_;
+	//BOOL								mbGoal;
+}
 
 @property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
 

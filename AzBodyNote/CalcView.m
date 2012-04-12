@@ -207,6 +207,7 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 			
 		default:
 			NSLog(@"ERROR");
+			GA_TRACK_EVENT_ERROR(@"default?",0);
 			return;
 	}
 	
@@ -516,10 +517,12 @@ int levelOperator( NSString *zOpe )  // 演算子の優先順位
 	}
 	@catch (NSException * errEx) {
 		NSLog(@"Calc: error %@ : %@\n", [errEx name], [errEx reason]);
+		GA_TRACK_EVENT_ERROR([errEx name],0);
 		decAns = nil;
 	}
 	@catch (NSString *errMsg) {
 		NSLog(@"Calc: error=%@", errMsg);
+		GA_TRACK_EVENT_ERROR(errMsg,0);
 		decAns = nil;
 	}
 	return decAns;

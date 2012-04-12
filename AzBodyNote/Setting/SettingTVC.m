@@ -7,9 +7,8 @@
 //
 
 #import "SettingTVC.h"
-//#import "SettCellSwitch.h"
-#import "SettCellGoogleLogin.h"
-#import "AZAboutThisVC.h"
+#import "SettCellGSpread.h"
+#import "AZAboutVC.h"
 #import "AZStoreTVC.h"
 
 
@@ -29,6 +28,7 @@
         // Custom initialization
 		mAppDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
 		assert(mAppDelegate);
+		GA_TRACK_PAGE(@"SettingTVC");
     }
     return self;
 }
@@ -39,13 +39,23 @@
 	self.title = NSLocalizedString(@"TabSettings",nil);
 }
 
-- (void)viewWillAppear:(BOOL)animated
+- (void)viewDidAppear:(BOOL)animated
 {
-    [super viewWillAppear:animated];
-	GA_TRACK_PAGE(@"SettingTVC");
-	mAppDelegate.app_is_AdShow = NO; //これは広告表示可能なViewである。 viewWillAppear:以降で定義すること
-	if (mAppDelegate.adWhirlView) {
-		mAppDelegate.adWhirlView.alpha = 0;
+	[super viewDidAppear:animated];
+	
+	mAppDelegate.app_is_AdShow = NO; //これは広告表示しないViewである。 viewWillAppear:以降で定義すること
+	if (mAppDelegate.adWhirlView) {	// Ad ON
+		[UIView beginAnimations:nil context:NULL];
+		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+		[UIView setAnimationDuration:1.2];
+		mAppDelegate.adWhirlView.frame = CGRectMake(0, 700, 320, 50);  // GAD_SIZE_320x50
+		mAppDelegate.adWhirlView.hidden = YES;
+		[UIView commitAnimations];
+
+		if (mAppDelegate.app_is_sponsor) {
+			// あずき商店にて Non-Ad を購入した直後。Ad停止＆破棄する
+			[mAppDelegate adDealloc];
+		}
 	}
 }
 
@@ -69,7 +79,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {	// Return the number of rows in the section.
 	if (section==0) {
-		return 2;
+		return 4;
 	} else {
 		return 2;
 	}
@@ -80,7 +90,9 @@
 	switch (indexPath.section*100 + indexPath.row) 
 	{
 		case 0: return  55;	// Tweet
-		case 1: return  88;	// Google Login
+		case 1: return  55;	// Goal
+		case 2: return  55;	// Calender
+		case 3: return  88;	// GSpread
 	}
     return 44; // Default
 }
@@ -108,13 +120,45 @@
 			return cell;
 		}	break;
 			
-		case 1: {	// Google Login
-			static NSString *cid = @"SettCellGoogleLogin";  //== Identifire に一致させること
-			SettCellGoogleLogin *cell = (SettCellGoogleLogin*)[tableView dequeueReusableCellWithIdentifier:cid];
+		case 1: {	// Goal
+			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
+			if (cell == nil) {
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
+			}
+			cell.textLabel.text = NSLocalizedString(@"SettGoal",nil);
+			cell.detailTextLabel.text = NSLocalizedString(@"SettGoal detail",nil);
+			cell.detailTextLabel.adjustsFontSizeToFitWidth = YES;
+			cell.detailTextLabel.minimumFontSize = 10;
+			if ([userDefaults boolForKey:GUD_bGoal]) {
+				cell.accessoryType = UITableViewCellAccessoryCheckmark;
+			} else {
+				cell.accessoryType = UITableViewCellAccessoryNone;
+			}
+			return cell;
+		}	break;
+			
+		case 2: {	// Calender
+			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
+			if (cell == nil) {
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
+			}
+			cell.textLabel.text = NSLocalizedString(@"SettCalender",nil);
+			cell.detailTextLabel.text = NSLocalizedString(@"SettCalender detail",nil);
+			if ([userDefaults boolForKey:GUD_bCalender]) {
+				cell.accessoryType = UITableViewCellAccessoryCheckmark;
+			} else {
+				cell.accessoryType = UITableViewCellAccessoryNone;
+			}
+			return cell;
+		}	break;
+			
+		case 3: {	// GSpread
+			static NSString *cid = @"SettCellGSpread";  //== Identifire に一致させること
+			SettCellGSpread *cell = (SettCellGSpread*)[tableView dequeueReusableCellWithIdentifier:cid];
 			if (cell == nil) {
 				UINib *nib = [UINib nibWithNibName:cid   bundle:nil];
 				[nib instantiateWithOwner:self options:nil];
-				cell = (SettCellGoogleLogin*)[tableView dequeueReusableCellWithIdentifier:cid];
+				cell = (SettCellGSpread*)[tableView dequeueReusableCellWithIdentifier:cid];
 				assert(cell);
 			}
 			return cell;
@@ -128,7 +172,7 @@
 			//cell.imageView.image = [UIImage imageNamed:@"Icon57"];
 			//cell.imageView.contentMode = UIViewContentModeScaleAspectFit;
 			//cell.imageView.frame = CGRectMake(0, 0, 32, 32);
-			cell.textLabel.text = NSLocalizedString(@"AZAboutThis",nil);
+			cell.textLabel.text = NSLocalizedString(@"AZAbout",nil);
 			cell.detailTextLabel.text = nil;
 			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 			return cell;
@@ -184,8 +228,34 @@
 			[userDefaults synchronize];
 		} break;
 			
+		case 1: {  // Goal
+			NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+			UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+			if ([userDefaults boolForKey:GUD_bGoal]) {
+				[userDefaults setBool: NO forKey:GUD_bGoal];
+				cell.accessoryType = UITableViewCellAccessoryNone;
+			} else {
+				[userDefaults setBool: YES forKey:GUD_bGoal];
+				cell.accessoryType = UITableViewCellAccessoryCheckmark;
+			}
+			[userDefaults synchronize];
+		} break;
+			
+		case 2: {  // Calender
+			NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+			UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+			if ([userDefaults boolForKey:GUD_bCalender]) {
+				[userDefaults setBool: NO forKey:GUD_bCalender];
+				cell.accessoryType = UITableViewCellAccessoryNone;
+			} else {
+				[userDefaults setBool: YES forKey:GUD_bCalender];
+				cell.accessoryType = UITableViewCellAccessoryCheckmark;
+			}
+			[userDefaults synchronize];
+		} break;
+			
 		case 100: {	// このアプリについて
-			AZAboutThisVC *vc = [[AZAboutThisVC alloc] init];
+			AZAboutVC *vc = [[AZAboutVC alloc] init];
 			vc.ppImgIcon = [UIImage imageNamed:@"Icon57"];
 			vc.ppProductTitle = @"Condition";	// 世界共通名称
 			vc.ppProductSubtitle = NSLocalizedString(@"Product Title",nil); // ローカル名称

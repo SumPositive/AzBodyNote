@@ -35,6 +35,8 @@
 @property (nonatomic, retain) NSString		*bCaution;			// BOOL　YES=注意
 @property (nonatomic, retain) NSDate			*dateTime;			// NSDate型ならば定義名のPrefix(先頭)を"date"にする！JSON変換のため
 @property (nonatomic, retain) NSNumber   *nYearMM;			// セクション表示のため「年月」を記録
+@property (nonatomic, retain) NSString		*sEventID;			// カレンダー
+@property (nonatomic, retain) NSString		*sGSpreadID;		// Google Spread
 @property (nonatomic, retain) NSString		*sNote1;
 @property (nonatomic, retain) NSString		*sNote2;
 @property (nonatomic, retain) NSString		*sEquipment;		// 場所や測定装置

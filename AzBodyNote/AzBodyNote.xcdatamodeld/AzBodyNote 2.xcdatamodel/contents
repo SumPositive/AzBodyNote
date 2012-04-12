@@ -21,11 +21,13 @@
         <attribute name="nWeight_10Kg" optional="YES" attributeType="Integer 32" maxValueString="2000"/>
         <attribute name="nYearMM" optional="YES" attributeType="Integer 32" maxValueString="299912" syncable="YES"/>
         <attribute name="sEquipment" optional="YES" attributeType="String"/>
+        <attribute name="sEventID" optional="YES" attributeType="String"/>
+        <attribute name="sGSpreadID" optional="YES" attributeType="String"/>
         <attribute name="sNote1" optional="YES" attributeType="String"/>
         <attribute name="sNote2" optional="YES" attributeType="String"/>
     </entity>
     <elements>
         <element name="E1body" positionX="-92" positionY="231" width="128" height="150"/>
-        <element name="E2record" positionX="117" positionY="195" width="128" height="210"/>
+        <element name="E2record" positionX="117" positionY="195" width="128" height="285"/>
     </elements>
 </model>

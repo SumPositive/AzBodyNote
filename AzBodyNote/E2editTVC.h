@@ -16,7 +16,8 @@
 
 
 @interface E2editTVC : UITableViewController 
-			<UITableViewDelegate, NSFetchedResultsControllerDelegate, EditDateDelegate>
+			<UITableViewDelegate, NSFetchedResultsControllerDelegate, 
+				EditDateDelegate>
 
 @property (nonatomic, assign) NSInteger	editMode;		//==0:AddNew,  1:Edit,  2:Goal Edit
 @property (nonatomic, retain) E2record		*moE2edit;

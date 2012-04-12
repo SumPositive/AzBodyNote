@@ -27,6 +27,9 @@
 #define GUD_Calc_Method					@"GUD_Calc_Method"		// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
 #define GUD_Calc_RoundBankers			@"GUD_Calc_RoundBankers"
 #define GUD_bTweet								@"GUD_bTweet"
+#define GUD_bGoal									@"GUD_bGoal"
+#define GUD_bCalender							@"GUD_bCalender"
+#define GUD_bGSpread							@"GUD_bGSpread"
 
 // iCloud-KVS UserDefault ------------------------------------- Settings
 // Goal_nBpHi_mmHg 関係は、"MocEntity.h" にて定義

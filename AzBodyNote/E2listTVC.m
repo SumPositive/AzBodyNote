@@ -6,10 +6,6 @@
 //  Copyright 2011 Sum Positive. All rights reserved.
 //
 
-#import "Global.h"
-#import "AppDelegate.h"
-#import "MocEntity.h"
-#import "MocFunctions.h"
 #import "E2listTVC.h"
 #import "E2editTVC.h"
 
@@ -23,29 +19,6 @@
 @end
 
 @implementation E2listTVC
-{
-	IBOutlet UILabel				*ibLbDate;
-	IBOutlet UILabel				*ibLbTime;
-	IBOutlet UILabel				*ibLbBpHi;
-	IBOutlet UILabel				*ibLbBpLo;
-	IBOutlet UILabel				*ibLbPuls;
-	IBOutlet UILabel				*ibLbWeight;
-	IBOutlet UILabel				*ibLbTemp;
-	//IBOutlet UILabel				*ibLbNote1;
-	IBOutlet UILabel				*ibLbPedo;
-	IBOutlet UILabel				*ibLbBodyFat;
-	IBOutlet UILabel				*ibLbSkMuscle;
-	
-	AppDelegate		*appDelegate_;
-	MocFunctions							*mocFunc_;
-	NSIndexPath							*indexPathEdit_;
-	NSIndexPath							*indexPathDelete_;
-
-	//GADBannerView		*adMobView_;
-	NSUInteger				e2offset_;
-	UILabel					*lbPagePrev_;
-	UILabel					*lbPageNext_;
-}
 @synthesize fetchedResultsController = frc_;
 
 
@@ -78,6 +51,7 @@
 		 abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. If it is not possible to recover from the error, display an alert panel that instructs the user to quit the application by pressing the Home button.
 		 */
 		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+		GA_TRACK_EVENT_ERROR([error description],0);
 		abort();
 	}		
     
@@ -92,6 +66,7 @@
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
+	GA_TRACK_PAGE(@"E2listTVC");
 
 	if (!appDelegate_) {
 		appDelegate_ = (AppDelegate*)[[UIApplication sharedApplication] delegate];
@@ -215,9 +190,11 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-	GA_TRACK_PAGE(@"E2listTVC");
 	appDelegate_.app_is_AdShow = YES; //これは広告表示可能なViewである。 viewWillAppear:以降で定義すること
-	
+
+	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	//mbGoal = [userDefaults boolForKey:GUD_bGoal];
+
 	if (indexPathEdit_) { // E2editTVC:から戻ったとき、
 		@try {	// 範囲オーバーで落ちる可能性があるため。　＜＜最終行を削除したとき。
 			NSLog(@"viewWillAppear: indexPathEdit_=%@", indexPathEdit_);
@@ -227,6 +204,7 @@
 		@catch (NSException *exception) {
 			// 最終行を削除したとき
 			NSLog(@"LOGIC ERROR!!! - indexPathEdit_.row=%ld", (long)indexPathEdit_.row);
+			GA_TRACK_EVENT_ERROR(@"LOGIC ERROR!!! - indexPathEdit_.row OVER",0);
 			//assert(NO);
 		}
 		@finally {
@@ -235,7 +213,7 @@
 	}
 	else { 
 		// 最終行を表示する
-		@try {	// 範囲オーバーで落ちる可能性があるため。
+		@try {	// 範囲オーバーで落ちる可能性があるため。 
 			NSIndexPath* ipGoal = [NSIndexPath indexPathForRow:0 inSection: [[self.fetchedResultsController sections] count]];
 			// GOAL! 行へ
 			[self.tableView scrollToRowAtIndexPath: ipGoal
@@ -248,6 +226,7 @@
 		}
 		@catch (NSException *exception) {
 			NSLog(@"LOGIC ERROR!!! - 最終行");
+			GA_TRACK_EVENT_ERROR(@"LOGIC ERROR!!! - LINE OVER",0);
 			assert(NO);
 		}
 	}
@@ -257,12 +236,12 @@
 {
 	[super viewDidAppear:animated];
 	
-	if (appDelegate_.adWhirlView) {
+	if (appDelegate_.adWhirlView) {	// Ad ON
 		[UIView beginAnimations:nil context:NULL];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
 		[UIView setAnimationDuration:1.2];
 		appDelegate_.adWhirlView.frame = CGRectMake(0, 480-49-50, 320, 50);  // GAD_SIZE_320x50
-		appDelegate_.adWhirlView.alpha = 1;	// 表示する
+		appDelegate_.adWhirlView.hidden = NO;
 		[UIView commitAnimations];
 	}
 }
@@ -273,15 +252,12 @@
 	[super viewWillDisappear:animated];
 }
 */
-
+/*
 - (void)viewDidDisappear:(BOOL)animated
 {	// 非表示になった後に呼び出される
-	if (appDelegate_.adWhirlView) {
-		appDelegate_.adWhirlView.alpha = 0;
-	}
     [super viewDidDisappear:animated];
 }
-
+*/
 /*
  // Override to allow orientations other than the default portrait orientation.
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
@@ -353,9 +329,9 @@
 	}
 	// GOALセクション
 	if (appDelegate_.app_is_sponsor) {
-		return  2;	// Goal + Dropbox
+		return 2;
 	} else {
-		return  3;	// Goal + Dropbox + Ad余白
+		return 3; // Goal + Dropbox + Ad
 	}
 }
 
@@ -600,6 +576,7 @@
 	if (![aFrc performFetch:&error])
 	{
 	    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+		GA_TRACK_EVENT_ERROR([error description],0);
 	    abort();
 	}
 	

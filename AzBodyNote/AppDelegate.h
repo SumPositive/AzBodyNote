@@ -7,11 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <eventkit/EventKit.h>
+
 #import "MocFunctions.h"
-
-//#import <StoreKit/StoreKit.h>
-
-#import <iAd/iAd.h>
 #import "AdWhirlView.h"
 #import "AdWhirlDelegateProtocol.h"
 #define GAD_SIZE_320x50     CGSizeMake(320, 50)
@@ -19,7 +17,7 @@
 #import "NADView.h"  //AppBank nend
 
 
-@interface AppDelegate : NSObject <UIApplicationDelegate, AdWhirlDelegate, NADViewDelegate, ADBannerViewDelegate>
+@interface AppDelegate : NSObject <UIApplicationDelegate, AdWhirlDelegate, NADViewDelegate>
 {
 @private
 	NSManagedObjectModel				*moModel_;
@@ -41,6 +39,7 @@
 @property (nonatomic, retain, readonly) NSManagedObjectContext			*managedObjectContext;
 @property (nonatomic, retain, readonly) MocFunctions		*mocBase;
 @property (nonatomic, retain, readonly) AdWhirlView			*adWhirlView;
+@property (nonatomic, retain, readonly) EKEventStore		*eventStore;
 
 // app_ Global paramaters
 @property (nonatomic, assign) BOOL			app_is_sponsor;				// In App Purchese = 広告なし ＆ 制限解除
@@ -60,5 +59,6 @@
 - (NSString*)tmpFileLoad;
 
 - (NSString *)applicationDocumentsDirectory;
+- (void)adDealloc;
 
 @end

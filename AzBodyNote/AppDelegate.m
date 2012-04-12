@@ -33,6 +33,7 @@
 @synthesize app_e2record_count = __app_e2record_count;
 @synthesize app_is_AdShow = __app_is_AdShow;
 @synthesize app_is_iPad = __app_is_iPad;
+@synthesize eventStore = __eventStore;
 
 /*
 - (void)saveContext
@@ -108,6 +109,9 @@
 							@"NO",			GUD_bPaid,								// YES=PAID
 							@"NO",			GUD_bUnlock,							// YES=Unlock
 							@"NO",			GUD_bTweet,							// YES=新規保存後ツイート
+							@"YES",			GUD_bGoal,								// YES=GOAL表示する
+							@"NO",			GUD_bCalender,						// YES=カレンダーへ記録
+							@"NO",			GUD_bGSpread,						// YES=Googleスプレッドへ記録
 							 nil];
 	[userDefaults registerDefaults:dicDef];	// 未定義のKeyのみ更新される
 	[userDefaults synchronize]; // plistへ書き出す
@@ -215,6 +219,17 @@
 			}
 		}
 	}
+	
+	if (__eventStore==nil) {
+		__eventStore = [[EKEventStore alloc] init];
+
+		NSLog(@"[__eventStore calendars]={%@}", [__eventStore calendars]);
+		NSLog(@"[__eventStore defaultCalendarForNewEvents]={%@}",
+			  [__eventStore defaultCalendarForNewEvents]);
+		NSLog(@"[[__eventStore defaultCalendarForNewEvents] calendarIdentifier]={%@}",
+			  [[__eventStore defaultCalendarForNewEvents] calendarIdentifier]);
+	}
+	
     return YES;
 }
 /*
@@ -282,7 +297,7 @@
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)dealloc
+- (void)adDealloc
 {
 	if (mNendView) {
 		mNendView.delegate = nil;
@@ -296,6 +311,12 @@
 		__pAdWhirlView.delegate = nil;
 		__pAdWhirlView = nil;
 	}
+}
+
+- (void)dealloc
+{
+	[self adDealloc];
+	__eventStore = nil;
 }
 
 
@@ -386,11 +407,12 @@
 	}
 
 	// NSArray --> JSON
-	SBJSON	*js = [SBJSON new];
+	DBJSON	*js = [DBJSON new];
 	NSError *err = nil;
 	NSString *zJson = [js stringWithObject:maE2 error:&err];
 	if (err) {
 		NSLog(@"tmpFileSave: SBJSON: stringWithObject: (err=%@) zJson=%@", [err description], zJson);
+		GA_TRACK_EVENT_ERROR([err description],0);
 		return [err description];
 	}
 	NSLog(@"tmpFileSave: zJson=%@", zJson);
@@ -399,6 +421,7 @@
 	[zJson writeToFile:[self tmpFilePath] atomically:YES encoding:NSUTF8StringEncoding error:&err];
 	if (err) {
 		NSLog(@"tmpFileSave: writeToFile: (err=%@)", [err description]);
+		GA_TRACK_EVENT_ERROR([err description],0);
 		return [err description];
 	}
 	return nil;
@@ -411,14 +434,16 @@
 	NSString *zJson = [NSString stringWithContentsOfFile:[self tmpFilePath] encoding:NSUTF8StringEncoding error:&err];
 	if (err OR zJson==nil) {
 		NSLog(@"tmpFileLoad: stringWithContentsOfFile: (err=%@)", [err description]);
+		GA_TRACK_EVENT_ERROR([err description],0);
 		return [err description];
 	}
 	NSLog(@"tmpFileLoad: zJson=%@", zJson);
 	// JSON --> NSArray
-	SBJSON	*js = [SBJSON new];
+	DBJSON	*js = [DBJSON new];
 	NSArray *ary = [js objectWithString:zJson error:&err];
 	if (err) {
 		NSLog(@"tmpFileLoad: SBJSON: objectWithString: (err=%@) zJson=%@", [err description], zJson);
+		GA_TRACK_EVENT_ERROR([err description],0);
 		return [err description];
 	}
 	NSLog(@"tmpFileLoad: ary=%@", ary);
@@ -583,6 +608,7 @@
 			if (![psc addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeUrl options:options error:&error]) 
 			{
 				NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+				GA_TRACK_EVENT_ERROR([error description],0);
 				abort();
 			}
 			[psc unlock];
@@ -609,6 +635,7 @@
 														configuration:nil  URL:storeUrl  options:options  error:&error])
 		{
 			NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+			GA_TRACK_EVENT_ERROR([error description],0);
 			abort();
 		}
 	}
@@ -818,17 +845,20 @@
 - (void)adWhirlDidReceiveAd:(AdWhirlView *)adWhirlView
 {	// 広告を受信したとき
 	NSLog(@"AdWhirl - adWhirlDidReceiveAd");
-	if (__app_is_sponsor==NO && __app_is_AdShow) {	// 無償 ＆ 広告表示可能
-		adWhirlView.alpha = 1;	// (0)AddEdit (1)List
+/*	if (__app_is_sponsor==NO && __app_is_AdShow) {	// 無償 ＆ 広告表示可能
+		//adWhirlView.alpha = 1;	// (0)AddEdit (1)List
+		adWhirlView.hidden = NO;
 	} else {
-		adWhirlView.alpha = 0;	// (2)Graph (3)Information
-	}
+		//adWhirlView.alpha = 0;	// (2)Graph (3)Information
+		adWhirlView.hidden = YES;
+	}*/
 }
 
 - (void)adWhirlDidFailToReceiveAd:(AdWhirlView *)adWhirlView usingBackup:(BOOL)yesOrNo
 {	// 広告が無いとき
 	NSLog(@"AdWhirl - adWhirlDidFailToReceiveAd");
-	adWhirlView.alpha = 0;
+	//adWhirlView.alpha = 0;
+	//adWhirlView.hidden = YES;
 }
 
 - (void)performEventAppBank:(AdWhirlView *)adWhirlView 
@@ -836,8 +866,6 @@
 	NSLog(@"AdWhirl - performEventAppBank");
 	if (mNendView && __app_is_AdShow) {
 		[adWhirlView replaceBannerViewWith:mNendView];
-	} else {
-		[adWhirlView setAlpha:0];
 	}
 }
 - (void)nadViewDidFinishLoad:(NADView *)adView
@@ -850,8 +878,6 @@
 	NSLog(@"AdWhirl - performEventMedibaAd");
 	if (mMedibaAd && __app_is_AdShow) { // これにより ja 以外は、MedibaAd をパスする
 		[adWhirlView replaceBannerViewWith:mMedibaAd.view];
-	} else {
-		[adWhirlView setAlpha:0];
 	}
 }
 
