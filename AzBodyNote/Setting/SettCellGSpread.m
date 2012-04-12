@@ -1,17 +1,15 @@
 //
-//  SettCellGoogleLogin.m
+//  SettCellGSpread.m
 //  AzBodyNote
 //
 //  Created by 松山 masa on 12/04/07.
 //  Copyright (c) 2012年 __MyCompanyName__. All rights reserved.
 //
 
-#import "SettCellGoogleLogin.h"
+#import "SettCellGSpread.h"
 #import "SFHFKeychainUtils.h"
 
-@implementation SettCellGoogleLogin
-//@synthesize ibLbTitle, ibLbDetail, ibTfId, ibTfPw;
-
+@implementation SettCellGSpread
 
 /***通らない
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
@@ -25,8 +23,8 @@
 
 - (void)drawRect:(CGRect)rect
 {	// ここは初期化時に1度だけ通る
-	ibLbTitle.text = NSLocalizedString(@"SettGoogle",nil);
-	ibLbDetail.text = NSLocalizedString(@"SettGoogle detail",nil);
+	ibLbTitle.text = NSLocalizedString(@"SettCellGSpread",nil);
+	ibLbDetail.text = NSLocalizedString(@"SettCellGSpread detail",nil);
 	ibTfId.delegate = self;		//<UITextFieldDelegate>
 	ibTfPw.delegate = self;	//<UITextFieldDelegate>
 }
@@ -39,7 +37,7 @@
 }
 
 #define GKC_ServiceName		@"AzCondition"
-#define GKC_UserName				@"GoogleLoginName"
+#define GKC_UserName				@"GSpreadLoginName"
 
 #pragma make - <UITextFieldDelegate>
 - (BOOL)textFieldShouldReturn:(UITextField *)sender 
@@ -53,11 +51,14 @@
 			NSError *error; // nilを渡すと異常終了するので注意
 			[SFHFKeychainUtils deleteItemForUsername:GKC_UserName
 									  andServiceName:GKC_ServiceName error:&error];
+			if (error) {
+				GA_TRACK_EVENT_ERROR([error description],0);
+			}
 			sender.text = @"";
 			[sender resignFirstResponder];
 			ibTfPw.text = @"";
 			//[self.tableView reloadData];  // cell表示更新のため
-			alertBox(NSLocalizedString(@"Google ID delete",nil), nil, @"OK");
+			alertBox(NSLocalizedString(@"SettCellGSpread ID delete",nil), nil, @"OK");
 			return YES;
 		}
 		// ID KeyChainに保存する
@@ -66,6 +67,9 @@
 							 andPassword: sender.text
 						  forServiceName:GKC_ServiceName 
 						  updateExisting:YES error:&error];
+		if (error) {
+			GA_TRACK_EVENT_ERROR([error description],0);
+		}
 		ibTfPw.text = @"";
 		//ibTfPw.hidden = NO;
 		[ibTfPw becomeFirstResponder];
@@ -78,9 +82,12 @@
 			NSError *error; // nilを渡すと異常終了するので注意
 			[SFHFKeychainUtils deleteItemForUsername:GKC_UserName
 									  andServiceName:GKC_ServiceName error:&error];
+			if (error) {
+				GA_TRACK_EVENT_ERROR([error description],0);
+			}
 			sender.text = @"";
 			//[self.tableView reloadData];  // cell表示更新のため
-			alertBox(NSLocalizedString(@"Google PW delete",nil), nil, @"OK");
+			alertBox(NSLocalizedString(@"SettCellGSpread PW delete",nil), nil, @"OK");
 			return YES;
 		}
 		if (0 < [ibTfId.text length] && 0 < [sender.text length]) {
