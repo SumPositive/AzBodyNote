@@ -13,6 +13,11 @@
 #import "MocFunctions.h"
 #import "GraphView.h"
 
+#import "GViewDate.h"
+#import "GViewBp.h"
+#import "GViewPuls.h"
+
+
 #ifdef DEBUGxxx
 #define GRAPH_PAGE_LIMIT			10		// < iOverlay
 #else
@@ -20,16 +25,20 @@
 #endif
 
 #define RECORD_WIDTH				44.0		// 1レコード分の幅
+#define GRAPH_H_GAP			5.0		// グラフの最大および最小の極限余白
+#define SEPARATE_HEIGHT	3.0		// 区切り線の高さ
+
 
 @interface GraphVC : UIViewController <UIScrollViewDelegate>
 {
-	IBOutlet UILabel				*ibLbBpHi;
+/*	IBOutlet UILabel				*ibLbBpHi;
 	IBOutlet UILabel				*ibLbBpLo;
 	IBOutlet UILabel				*ibLbPuls;
 	IBOutlet UILabel				*ibLbWeight;
 	IBOutlet UILabel				*ibLbTemp;
+ */
 	IBOutlet UIScrollView		*ibScrollView;
-	IBOutlet GraphView			*ibGraphView;
+	//IBOutlet GraphView			*ibGraphView;
 
 @private
 	AppDelegate					*mAppDelegate;
@@ -39,6 +48,15 @@
 	NSUInteger								uiActivePageMax_;
 	UIActivityIndicatorView			*actIndicator_;
 	CGPoint									pointNext_;
+	
+	GViewDate						*mGvDate;
+	GViewBp							*mGvBp;
+	GViewPuls						*mGvPuls;
+	GViewPuls						*mGvTemp;
+	GViewPuls						*mGvWeight;
+	GViewPuls						*mGvPedo;
+	GViewPuls						*mGvFat;
+	GViewPuls						*mGvSk;
 }
 
 @end

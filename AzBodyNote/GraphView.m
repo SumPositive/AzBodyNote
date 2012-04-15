@@ -17,14 +17,7 @@
 
 
 @implementation GraphView
-{
-	IBOutlet UISegmentedControl	*ibSegType;
-
-	BOOL			bDrowRect_;
-}
 @synthesize RaE2records = aE2records_;
-//@synthesize iOverLeft = iOverLeft_;
-//@synthesize iOverRight = iOverRight_;
 
 
 - (id)initWithFrame:(CGRect)frame
@@ -108,7 +101,13 @@
 	CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 0.8); // 折れ線の色
 #ifdef YES
 	// 折れ線
-	CGContextAddLines(cgc, points, count);	
+	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	if ([userDefaults boolForKey:GUD_bGoal]) {
+		CGContextAddLines(cgc, points, count);	
+	} else {
+		// Goalを結ばない  [0]を除き[1]から描画する
+		CGContextAddLines(cgc, &points[1], count-1);	
+	}
 #else
 	// スプライン曲線
 #endif
@@ -603,12 +602,13 @@
 	// CoreGraphicsの原点が左下なので原点を合わせる
 	CGContextTranslateCTM(cgc, 0, rect.size.height);
 	CGContextScaleCTM(cgc, 1.0, -1.0);
+	//　全域クリア
+	CGContextSetRGBFillColor (cgc, 0.67, 0.67, 0.67, 1.0); // スクロール領域外と同じグレー
+	CGContextFillRect(cgc, self.bounds);
 	
-	/*NG* 縮小されてしまう不具合あり
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{ // 非同期処理
-		[self graphDraw:cgc];
-	});
-	 */
+	//1// 血圧
+	
+
 	[self graphDraw:cgc];
 }
 

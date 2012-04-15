@@ -12,6 +12,12 @@
 #define SEPARATE_HEIGHT	3.0		// 区切り線の高さ
 
 @interface GraphView : UIView
+{
+	IBOutlet UISegmentedControl	*ibSegType;
+
+@private
+	BOOL			bDrowRect_;
+}
 
 @property (nonatomic, retain) NSArray	*RaE2records;
 //@property (nonatomic, assign) NSInteger	iOverLeft;		// スクロール範囲外（左側）に表示するレコード数

@@ -15,16 +15,9 @@
                         <rect key="frame" x="0.0" y="20" width="320" height="411"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" directionalLockEnabled="YES" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" id="WwL-HN-1Ng">
+                            <scrollView clipsSubviews="YES" contentMode="scaleToFill" directionalLockEnabled="YES" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" id="WwL-HN-1Ng">
                                 <rect key="frame" x="0.0" y="3" width="320" height="408"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <subviews>
-                                    <view contentMode="scaleToFill" id="EhJ-zG-YVb" customClass="GraphView">
-                                        <rect key="frame" x="33" y="20" width="249" height="377"/>
-                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                    </view>
-                                </subviews>
                             </scrollView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="GraphDrum.png" id="HSy-0I-XRk">
                                 <rect key="frame" x="0.0" y="1" width="320" height="410"/>
@@ -34,41 +27,6 @@
                                 <rect key="frame" x="190" y="35" width="96" height="51"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" name="Zapfino" family="Zapfino" pointSize="14"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.40000000000000013" contentMode="left" text="BpHi" lineBreakMode="tailTruncation" minimumFontSize="10" id="f9h-H4-WxH">
-                                <rect key="frame" x="210" y="92" width="84" height="22"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" name="HiraMinProN-W6" family="Hiragino Mincho ProN" pointSize="14"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.40000000000000013" contentMode="left" text="BpLo" lineBreakMode="tailTruncation" minimumFontSize="10" id="wWJ-be-Hk6">
-                                <rect key="frame" x="210" y="169" width="84" height="22"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" name="HiraMinProN-W6" family="Hiragino Mincho ProN" pointSize="14"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.40000000000000013" contentMode="left" text="Puls" lineBreakMode="tailTruncation" minimumFontSize="10" id="X6y-4Y-N9h">
-                                <rect key="frame" x="210" y="228" width="84" height="22"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" name="HiraMinProN-W6" family="Hiragino Mincho ProN" pointSize="14"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.40000000000000013" contentMode="left" text="Weight" lineBreakMode="tailTruncation" minimumFontSize="10" id="On8-t6-Isn">
-                                <rect key="frame" x="210" y="300" width="84" height="22"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" name="HiraMinProN-W6" family="Hiragino Mincho ProN" pointSize="14"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.40000000000000013" contentMode="left" text="Temp" lineBreakMode="tailTruncation" minimumFontSize="10" id="4iO-Ze-AQt">
-                                <rect key="frame" x="210" y="373" width="84" height="22"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" name="HiraMinProN-W6" family="Hiragino Mincho ProN" pointSize="14"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -82,12 +40,6 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="Graph" image="Tab32-Graph.png" id="LCl-bO-Aa5"/>
                     <connections>
-                        <outlet property="ibGraphView" destination="EhJ-zG-YVb" id="fE5-IE-AAS"/>
-                        <outlet property="ibLbBpHi" destination="f9h-H4-WxH" id="YHj-TJ-idm"/>
-                        <outlet property="ibLbBpLo" destination="wWJ-be-Hk6" id="BlK-wM-rwH"/>
-                        <outlet property="ibLbPuls" destination="X6y-4Y-N9h" id="CQg-pq-fvj"/>
-                        <outlet property="ibLbTemp" destination="4iO-Ze-AQt" id="0Cb-4V-4yz"/>
-                        <outlet property="ibLbWeight" destination="On8-t6-Isn" id="3et-52-yUP"/>
                         <outlet property="ibScrollView" destination="WwL-HN-1Ng" id="ZGL-wP-0cG"/>
                     </connections>
                 </viewController>
@@ -784,6 +736,18 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         </class>
         <class className="E2listTVC" superclassName="UITableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/E2listTVC.h"/>
+            <relationships>
+                <relationship kind="outlet" name="ibLbBodyFat" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbBpHi" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbBpLo" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbDate" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbPedo" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbPuls" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbSkMuscle" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbTemp" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbTime" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="ibLbWeight" candidateClass="UILabel"/>
+            </relationships>
         </class>
         <class className="EditDateVC" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/EditDateVC.h"/>
@@ -795,19 +759,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         <class className="GraphVC" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/GraphVC.h"/>
             <relationships>
-                <relationship kind="outlet" name="ibGraphView" candidateClass="GraphView"/>
-                <relationship kind="outlet" name="ibLbBpHi" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbBpLo" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbPuls" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbTemp" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbWeight" candidateClass="UILabel"/>
                 <relationship kind="outlet" name="ibScrollView" candidateClass="UIScrollView"/>
-            </relationships>
-        </class>
-        <class className="GraphView" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/GraphView.h"/>
-            <relationships>
-                <relationship kind="action" name="ibSegTypeChange:" candidateClass="UISegmentedControl"/>
             </relationships>
         </class>
         <class className="SettCellGSpread" superclassName="UITableViewCell">
