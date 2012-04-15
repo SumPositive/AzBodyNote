@@ -19,28 +19,6 @@
 #define ALERT_TAG_DeleteE2		901
 
 @implementation E2editTVC
-{
-	AppDelegate		*appDelegate_;
-	MocFunctions				*mocFunc_;
-	
-	//BOOL			bAddNew_;  >>>>>>>>>  editMode_==0
-	BOOL			bEditDate_;
-	float				fADBannerY_;	//iAd表示位置のY座標
-	
-	NSInteger	iPrevBpHi_;
-	NSInteger	iPrevBpLo_;
-	NSInteger	iPrevPuls_;
-	NSInteger	iPrevWeight_;
-	NSInteger	iPrevTemp_;
-	NSInteger	iPrevPedometer_;
-	NSInteger	iPrevBodyFat_;
-	NSInteger	iPrevSkMuscle_;
-	UIButton		*buDelete_;		// Edit時のみ使用
-	NSUbiquitousKeyValueStore *kvsGoal_;
-
-	//ADBannerView		*iAdBanner_;
-	//GADBannerView		*adMobView_;
-}
 @synthesize editMode = editMode_;
 @synthesize moE2edit = moE2edit_;
 
@@ -212,7 +190,7 @@
 	TWTweetComposeViewController *tweetVC = [[TWTweetComposeViewController alloc] init];
     [tweetVC setInitialText:message];
     //[tweetVC addImage: [UIImage imageNamed:@"Icon57"]];
-    [tweetVC addURL:[NSURL URLWithString: NSLocalizedString(@"Tweet URL",nil)]];
+    //廃案//[tweetVC addURL:[NSURL URLWithString: NSLocalizedString(@"Tweet URL",nil)]];
     [self presentModalViewController:tweetVC animated:YES];
 	
     tweetVC.completionHandler = ^(TWTweetComposeViewControllerResult res) {
@@ -233,18 +211,6 @@
 
 	if (editMode_==0) { // AddNewのとき
 		appDelegate_.app_e2record_count = [mocFunc_ e2record_count];
-	/*	if (appDelegate_.app_is_unlock==NO) {
-			if (50 < appDelegate_.app_e2record_count) {
-				// 告知
-				alertBox(	NSLocalizedString(@"Trial Limit",nil), 
-								NSLocalizedString(@"Trial Limit msg",nil), 
-								NSLocalizedString(@"Roger",nil));
-				//if (55 < appDelegate_.app_e2record_count) {
-				//	// 禁止
-				//	return;  // Cancel しかできない
-				//}
-			}
-		}*/
 	}
 	
 	if (kvsGoal_) {
@@ -275,60 +241,82 @@
 		[mocFunc_ commit];
 		
 		// TweetおよびEvent用の本文作成
-		NSString *zBody = @"";
-		if (moE2edit_.nBpHi_mmHg) {
-			zBody = [zBody stringByAppendingFormat:@"(%@ %@) ",
-					  NSLocalizedString(@"Event BpHi",nil),
-					  strValue([moE2edit_.nBpHi_mmHg integerValue], 0)];
-		}
-		if (moE2edit_.nBpLo_mmHg) {
-			zBody = [zBody stringByAppendingFormat:@"(%@ %@) ",
-					 NSLocalizedString(@"Event BpLo",nil),
-					 strValue([moE2edit_.nBpLo_mmHg integerValue], 0)];
+		NSString *zTweet = NSLocalizedString(@"Event Title",nil);
+		if (moE2edit_.nBpHi_mmHg OR moE2edit_.nBpLo_mmHg) {
+			zTweet = [zTweet stringByAppendingFormat:@"\n(%@ %@-%@) ", 
+					  NSLocalizedString(@"Event Bp",nil),
+					  strValue([moE2edit_.nBpHi_mmHg integerValue], 0),
+					  strValue([moE2edit_.nBpLo_mmHg integerValue], 0)];
 		}
 		if (moE2edit_.nPulse_bpm) {
-			zBody = [zBody stringByAppendingFormat:@"(%@ %@) ",
-					 NSLocalizedString(@"Event Puls",nil),
-					 strValue([moE2edit_.nPulse_bpm integerValue], 0)];
+			zTweet = [zTweet stringByAppendingFormat:@"\n(%@ %@) ", 
+					  NSLocalizedString(@"Event Puls",nil),
+					  strValue([moE2edit_.nPulse_bpm integerValue], 0)];
 		}
 		if (moE2edit_.nWeight_10Kg) {
-			zBody = [zBody stringByAppendingFormat:@"(%@ %@) ",
+			zTweet = [zTweet stringByAppendingFormat:@"\n(%@ %@) ", 
 					  NSLocalizedString(@"Event Weight",nil),
 					  strValue([moE2edit_.nWeight_10Kg integerValue], 1)];
 		}
 		if (moE2edit_.nTemp_10c) {
-			zBody = [zBody stringByAppendingFormat:@"(%@ %@) ",
+			zTweet = [zTweet stringByAppendingFormat:@"\n(%@ %@) ", 
 					  NSLocalizedString(@"Event Temp",nil),
 					  strValue([moE2edit_.nTemp_10c integerValue], 1)];
 		}
 		if (moE2edit_.nPedometer) {
-			zBody = [zBody stringByAppendingFormat:@"(%@ %@) ",
+			zTweet = [zTweet stringByAppendingFormat:@"\n(%@ %@) ", 
 					  NSLocalizedString(@"Event Pedo",nil),
 					  strValue([moE2edit_.nPedometer integerValue], 0)];
 		}
 		if (moE2edit_.nBodyFat_10p) {
-			zBody = [zBody stringByAppendingFormat:@"(%@ %@) ",
+			zTweet = [zTweet stringByAppendingFormat:@"\n(%@ %@) ", 
 					  NSLocalizedString(@"Event BodyFat",nil),
 					  strValue([moE2edit_.nBodyFat_10p integerValue], 1)];
 		}
 		if (moE2edit_.nSkMuscle_10p) {
-			zBody = [zBody stringByAppendingFormat:@"(%@ %@) ",
+			zTweet = [zTweet stringByAppendingFormat:@"\n(%@ %@) ", 
 					  NSLocalizedString(@"Event SkMuscle",nil),
 					  strValue([moE2edit_.nSkMuscle_10p integerValue], 1)];
 		}
-		NSLog(@"actionSave: zBody={%@}", zBody);
+		if (0<[moE2edit_.sNote1 length]) {
+			zTweet = [zTweet stringByAppendingFormat:@"\n(%@ %@) ", 
+					  NSLocalizedString(@"Event Note1",nil),
+					  moE2edit_.sNote1];
+		}
+		if (0<[moE2edit_.sNote2 length]) {
+			zTweet = [zTweet stringByAppendingFormat:@"\n(%@ %@) ", 
+					  NSLocalizedString(@"Event Note2",nil),
+					  moE2edit_.sNote2];
+		}
+		NSLog(@"actionSave: zTweet={%@}", zTweet);
 		
+		NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 		// Tweet
-/*		NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 		if ([userDefaults boolForKey:GUD_bTweet]) {
 			// Tweet メッセージ作成
-			NSString *zTweet = NSLocalizedString(@"Tweet head",nil);
-			zTweet = [zTweet stringByAppendingString: zBody];
-			zTweet = [zTweet stringByAppendingString: NSLocalizedString(@"Tweet foot",nil)];
-			[self actionTweet: zTweet];
-		}*/
+			NSString *zz = zTweet;
+			if (editMode_==0) { // AddNewのとき
+				// 新規 「なう」
+				zz = [zz stringByAppendingString: NSLocalizedString(@"Tweet Now",nil)];
+			} else {
+				// 修正
+				NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
+				[fmt setCalendar:calendar];
+				if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) 
+				{ // 「書式」で変わる。　「言語」でない
+					[fmt setDateFormat:@"yyyy年M月d日 EE  HH:mm"];
+				}
+				else {
+					[fmt setDateFormat:@"EE, MMM d, yyyy  HH:mm"];
+				}
+				zz = [zz stringByAppendingFormat:@"\n(%@ %@) ", 
+					  NSLocalizedString(@"Tweet Modify",nil), 
+					  [fmt stringFromDate:moE2edit_.dateTime]];
+			}
+			[self actionTweet: zz];
+		}
 		
-		if (appDelegate_.eventStore) {
+		if (appDelegate_.eventStore && mEKCalendar) {
 			EKEvent *event = nil;
 			if (10<[moE2edit_.sEventID length]) {	// 既存につき更新する
 				// ID検索  見つからなければ nil
@@ -338,12 +326,14 @@
 				// 新規
 				event = [EKEvent eventWithEventStore:appDelegate_.eventStore];
 			}
-			event.title = NSLocalizedString(@"Event Title",nil);
+			event.title = zTweet;
 			event.location = moE2edit_.sEquipment;
 			event.startDate = moE2edit_.dateTime;
 			event.endDate = moE2edit_.dateTime;
-			event.notes = zBody;
-			// 即保存する
+			//event.notes = zCalender;
+			// イベントが関連付けられるカレンダーを設定
+			[event setCalendar:mEKCalendar];
+			// イベントをカレンダーデータベースに保存
 			NSError *error;
 			//削除 [appDelegate_.eventStore removeEvent:event span:EKSpanThisEvent error:&error];
 			[appDelegate_.eventStore saveEvent:event span:EKSpanThisEvent error:&error]; // 保存
@@ -560,6 +550,15 @@
 	}
 	else if (kvsGoal_==nil) {
 		[self setE2recordPrev];
+	}
+	
+	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	if ([userDefaults objectForKey:GUD_CalendarID]) {
+		mEKCalendar = [appDelegate_.eventStore 
+			   calendarWithIdentifier: [userDefaults objectForKey:GUD_CalendarID]];
+		NSLog(@"E2editTVC: mEKCalendar={%@}", mEKCalendar);
+	} else {
+		mEKCalendar = nil;
 	}
 }
 

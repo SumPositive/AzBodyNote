@@ -222,12 +222,7 @@
 	
 	if (__eventStore==nil) {
 		__eventStore = [[EKEventStore alloc] init];
-
-		NSLog(@"[__eventStore calendars]={%@}", [__eventStore calendars]);
-		NSLog(@"[__eventStore defaultCalendarForNewEvents]={%@}",
-			  [__eventStore defaultCalendarForNewEvents]);
-		NSLog(@"[[__eventStore defaultCalendarForNewEvents] calendarIdentifier]={%@}",
-			  [[__eventStore defaultCalendarForNewEvents] calendarIdentifier]);
+		//NSLog(@"[__eventStore calendars]={%@}", [__eventStore calendars]);
 	}
 	
     return YES;

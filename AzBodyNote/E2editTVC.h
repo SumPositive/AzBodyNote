@@ -18,6 +18,27 @@
 @interface E2editTVC : UITableViewController 
 			<UITableViewDelegate, NSFetchedResultsControllerDelegate, 
 				EditDateDelegate>
+{
+	AppDelegate		*appDelegate_;
+	MocFunctions				*mocFunc_;
+	
+	//BOOL			bAddNew_;  >>>>>>>>>  editMode_==0
+	BOOL			bEditDate_;
+	float				fADBannerY_;	//iAd表示位置のY座標
+	
+	NSInteger	iPrevBpHi_;
+	NSInteger	iPrevBpLo_;
+	NSInteger	iPrevPuls_;
+	NSInteger	iPrevWeight_;
+	NSInteger	iPrevTemp_;
+	NSInteger	iPrevPedometer_;
+	NSInteger	iPrevBodyFat_;
+	NSInteger	iPrevSkMuscle_;
+	UIButton		*buDelete_;		// Edit時のみ使用
+	NSUbiquitousKeyValueStore *kvsGoal_;
+	
+	EKCalendar	*mEKCalendar;
+}
 
 @property (nonatomic, assign) NSInteger	editMode;		//==0:AddNew,  1:Edit,  2:Goal Edit
 @property (nonatomic, retain) E2record		*moE2edit;

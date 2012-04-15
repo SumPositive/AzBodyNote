@@ -10,6 +10,7 @@
 #import "SettCellGSpread.h"
 #import "AZAboutVC.h"
 #import "AZStoreTVC.h"
+#import "AZCalendarSelect.h"
 
 
 #define STORE_PRODUCTID_UNLOCK		@"com.azukid.AzBodyNote.Unlock"		// In-App Purchase ProductIdentifier
@@ -37,6 +38,12 @@
 {
     [super viewDidLoad];
 	self.title = NSLocalizedString(@"TabSettings",nil);
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+	[self.tableView reloadData];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -79,7 +86,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {	// Return the number of rows in the section.
 	if (section==0) {
-		return 4;
+		return 3;
 	} else {
 		return 2;
 	}
@@ -105,22 +112,7 @@
     
 	switch (indexPath.section*100 + indexPath.row) 
 	{
-		case 0: {	// Tweet
-			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
-			if (cell == nil) {
-				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
-			}
-			cell.textLabel.text = NSLocalizedString(@"SettTweet",nil);
-			cell.detailTextLabel.text = NSLocalizedString(@"SettTweet detail",nil);
-			if ([userDefaults boolForKey:GUD_bTweet]) {
-				cell.accessoryType = UITableViewCellAccessoryCheckmark;
-			} else {
-				cell.accessoryType = UITableViewCellAccessoryNone;
-			}
-			return cell;
-		}	break;
-			
-		case 1: {	// Goal
+		case 0: {	// Goal
 			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
 			if (cell == nil) {
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
@@ -137,18 +129,38 @@
 			return cell;
 		}	break;
 			
+		case 1: {	// Tweet
+			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
+			if (cell == nil) {
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
+			}
+			cell.textLabel.text = NSLocalizedString(@"SettTweet",nil);
+			cell.detailTextLabel.text = NSLocalizedString(@"SettTweet detail",nil);
+			if ([userDefaults boolForKey:GUD_bTweet]) {
+				cell.accessoryType = UITableViewCellAccessoryCheckmark;
+			} else {
+				cell.accessoryType = UITableViewCellAccessoryNone;
+			}
+			return cell;
+		}	break;
+			
 		case 2: {	// Calender
 			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
 			if (cell == nil) {
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 			}
-			cell.textLabel.text = NSLocalizedString(@"SettCalender",nil);
-			cell.detailTextLabel.text = NSLocalizedString(@"SettCalender detail",nil);
-			if ([userDefaults boolForKey:GUD_bCalender]) {
-				cell.accessoryType = UITableViewCellAccessoryCheckmark;
+			NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+			if ([userDefaults objectForKey:GUD_CalendarID]) {
+				cell.textLabel.text = [NSString stringWithFormat:@"%@: %@",
+									   NSLocalizedString(@"SettCalender",nil), 
+									   [userDefaults objectForKey:GUD_CalendarTitle]];
 			} else {
-				cell.accessoryType = UITableViewCellAccessoryNone;
+				cell.textLabel.text = [NSString stringWithFormat:@"%@: %@",
+									   NSLocalizedString(@"SettCalender",nil), 
+									   NSLocalizedString(@"AZCalendarSelect NON",nil)];
 			}
+			cell.detailTextLabel.text = NSLocalizedString(@"SettCalender detail",nil);
+			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 			return cell;
 		}	break;
 			
@@ -215,20 +227,7 @@
 	
 	switch (indexPath.section*100 + indexPath.row) 
 	{
-		case 0: {  // Tweet
-			NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-			UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-			if ([userDefaults boolForKey:GUD_bTweet]) {
-				[userDefaults setBool: NO forKey:GUD_bTweet];
-				cell.accessoryType = UITableViewCellAccessoryNone;
-			} else {
-				[userDefaults setBool: YES forKey:GUD_bTweet];
-				cell.accessoryType = UITableViewCellAccessoryCheckmark;
-			}
-			[userDefaults synchronize];
-		} break;
-			
-		case 1: {  // Goal
+		case 0: {  // Goal
 			NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 			UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
 			if ([userDefaults boolForKey:GUD_bGoal]) {
@@ -241,17 +240,23 @@
 			[userDefaults synchronize];
 		} break;
 			
-		case 2: {  // Calender
+		case 1: {  // Tweet
 			NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 			UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-			if ([userDefaults boolForKey:GUD_bCalender]) {
-				[userDefaults setBool: NO forKey:GUD_bCalender];
+			if ([userDefaults boolForKey:GUD_bTweet]) {
+				[userDefaults setBool: NO forKey:GUD_bTweet];
 				cell.accessoryType = UITableViewCellAccessoryNone;
 			} else {
-				[userDefaults setBool: YES forKey:GUD_bCalender];
+				[userDefaults setBool: YES forKey:GUD_bTweet];
 				cell.accessoryType = UITableViewCellAccessoryCheckmark;
 			}
 			[userDefaults synchronize];
+		} break;
+			
+		case 2: {  // Calender
+			AZCalendarSelect *vc = [[AZCalendarSelect alloc] init];
+			vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
+			[self.navigationController pushViewController:vc animated:YES];
 		} break;
 			
 		case 100: {	// このアプリについて
@@ -259,7 +264,8 @@
 			vc.ppImgIcon = [UIImage imageNamed:@"Icon57"];
 			vc.ppProductTitle = @"Condition";	// 世界共通名称
 			vc.ppProductSubtitle = NSLocalizedString(@"Product Title",nil); // ローカル名称
-			vc.ppSupportSite = @"condition.azukid.com";
+			vc.ppProductYear = @"2011";	// Copyright初年度
+			vc.ppSupportSite = @"http://condition.azukid.com";
 			vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
 			[self.navigationController pushViewController:vc animated:YES];
 		}	break;

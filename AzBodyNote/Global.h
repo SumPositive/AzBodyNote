@@ -30,6 +30,9 @@
 #define GUD_bGoal									@"GUD_bGoal"
 #define GUD_bCalender							@"GUD_bCalender"
 #define GUD_bGSpread							@"GUD_bGSpread"
+#define GUD_CalendarID						@"GUD_CalendarID"
+#define GUD_CalendarTitle					@"GUD_CalendarTitle"
+
 
 // iCloud-KVS UserDefault ------------------------------------- Settings
 // Goal_nBpHi_mmHg 関係は、"MocEntity.h" にて定義
