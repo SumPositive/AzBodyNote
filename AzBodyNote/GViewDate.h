@@ -11,5 +11,6 @@
 @interface GViewDate : UIView
 
 @property (nonatomic, retain) NSArray	*ppE2records;
+//@property (nonatomic, assign) NSUInteger		ppSectionHeight;
 
 @end

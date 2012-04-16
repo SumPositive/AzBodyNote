@@ -6,15 +6,7 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "Global.h"
-#import "AppDelegate.h"
-#import "MocEntity.h"
-#import "MocFunctions.h"
 #import "E2editTVC.h"
-#import "E2editCellDial.h"
-#import "E2editCellNote.h"
-#import <Twitter/TWTweetComposeViewController.h>
-
 
 #define ALERT_TAG_DeleteE2		901
 

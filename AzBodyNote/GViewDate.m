@@ -11,6 +11,7 @@
 
 @implementation GViewDate
 @synthesize ppE2records = __E2records;
+//@synthesize ppSectionHeight = __SectionHeight;
 
 
 - (id)initWithFrame:(CGRect)frame
@@ -86,8 +87,7 @@
 		if (val < 1000000) {
 			//cc = [[NSString stringWithString:NSLocalizedString(@"TheGoal",nil)] UTF8String]; ＜＜日本語NG
 			cc = [[NSString stringWithString:@"GOAL"] UTF8String];
-			CGContextShowTextAtPoint (cgc, po.x-15, po.y+14, cc, strlen(cc)); //P.1
-			CGContextShowTextAtPoint (cgc, po.x-15, po.y+14+self.bounds.size.height, cc, strlen(cc)); //P.2
+			CGContextShowTextAtPoint (cgc, po.x-15, po.y+14, cc, strlen(cc));
 		}
 		else {
 			int iMonth = val / 1000000;
@@ -100,11 +100,9 @@
 			
 			cc = [[NSString stringWithFormat:@"%d/%d", iMonth, iDay] UTF8String];
 			CGContextShowTextAtPoint (cgc, po.x-15, po.y+20, cc, strlen(cc));
-			CGContextShowTextAtPoint (cgc, po.x-15, po.y+20+self.bounds.size.height, cc, strlen(cc));
 			
 			cc = [[NSString stringWithFormat:@"%02d:%02d", iHour, iMinute] UTF8String];
 			CGContextShowTextAtPoint (cgc, po.x-15, po.y+8, cc, strlen(cc));
-			CGContextShowTextAtPoint (cgc, po.x-15, po.y+8+self.bounds.size.height, cc, strlen(cc));
 		}
 	}
 }

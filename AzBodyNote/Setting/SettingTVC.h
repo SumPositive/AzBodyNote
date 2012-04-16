@@ -9,6 +9,10 @@
 #import <UIKit/UIKit.h>
 #import "Global.h"
 #import "AppDelegate.h"
+#import "SettCellGSpread.h"
+#import "AZAboutVC.h"
+#import "AZStoreTVC.h"
+#import "AZCalendarSelect.h"
 
 
 @interface SettingTVC : UITableViewController

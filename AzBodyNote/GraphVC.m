@@ -66,16 +66,9 @@
 												 name:NFM_REFRESH_ALL_VIEWS 
 											   object:[[UIApplication sharedApplication] delegate]];
 	
-/*	// ibLbBpHi.backgroundColor = self.view.backgroundColor とする。スクロール範囲外になったとき見えなくするため
-	ibLbBpHi.text = NSLocalizedString(@"BpHi Name",nil);		
-	ibLbBpLo.text = NSLocalizedString(@"BpLo Name",nil);
-	ibLbPuls.text = NSLocalizedString(@"Pulse Name",nil);
-	ibLbWeight.text = NSLocalizedString(@"Weight Name",nil);
-	ibLbTemp.text = NSLocalizedString(@"Temp Name",nil);
-*/
-	
 	ibScrollView.delegate = self; // <UIScrollViewDelegate>
 	ibScrollView.directionalLockEnabled = YES;
+	ibScrollView.pagingEnabled = YES;
 	
 	if (actIndicator_==nil) {
 		actIndicator_ = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
@@ -85,9 +78,21 @@
 	}
 }
 
-- (void)graphViewPage:(NSUInteger)page section:(NSUInteger)section
+- (void)labelGraphRect:(CGRect)rect  text:(NSString*)text
 {
-	NSLog(@"graphViewPage: page=%d  section=%d", page, section);
+	UILabel *lb = [[UILabel alloc] initWithFrame:CGRectMake(rect.origin.x+rect.size.width-30, rect.origin.y+3, 100,20)];
+	lb.text = text;
+	lb.backgroundColor = [UIColor clearColor];
+	lb.textColor = [UIColor grayColor];
+	lb.font = [UIFont systemFontOfSize:16];
+	lb.adjustsFontSizeToFitWidth = YES;
+	lb.minimumFontSize = 10;
+	[ibScrollView addSubview:lb];
+}
+
+- (void)graphViewPage:(NSUInteger)page //section:(NSUInteger)section
+{
+	//NSLog(@"graphViewPage: page=%d  section=%d", page, section);
 	if (uiActivePageMax_ < page) return;
 
 	// Sort条件
@@ -143,163 +148,145 @@
 	// rc = 原点左上
 	CGFloat fHeight = ibScrollView.bounds.size.height - 3 - 15;  // 上下の余白を除いた有効な高さ
 	CGRect rcgv = rc;
+	//-------------------------------------------------------------------上段
+	rcgv.origin.y = 10;
 	//------------------------------------------------------日付
-	rcgv.origin.y = (rc.size.height * section) + 3;
 	rcgv.size.height = fHeight * 1/8;
 	if (mGvDate==nil) {
 		mGvDate = [[GViewDate alloc] initWithFrame: rcgv]; // 日付専用
 		mGvDate.ppE2records = e2recs;
+		//mGvDate.ppSectionHeight = ibScrollView.bounds.size.height; //下段を描くため
 		[ibScrollView addSubview:mGvDate];
 	} else {
 		mGvDate.ppE2records = e2recs;
 		[mGvDate setNeedsDisplay]; //drawRect:が呼び出される
 	}
 	
-	if (section==0) {
-		//------------------------------------------------------血圧
-		rcgv.origin.y += rcgv.size.height;
-		rcgv.size.height = fHeight * 3/8;
-		if (mGvBp==nil) {
-			mGvBp = [[GViewBp alloc] initWithFrame: rcgv]; // 血圧専用
-			mGvBp.ppE2records = e2recs;
-			[ibScrollView addSubview:mGvBp];
-			//
-			UILabel *lb = [[UILabel alloc] initWithFrame:CGRectMake(rcgv.size.width - 100, rcgv.origin.y + (rcgv.size.height/2), 100, 25)];
-			lb.text = NSLocalizedString(@"BpHi Name",nil);
-			[self.view addSubview:lb];
-			[ibScrollView bringSubviewToFront:lb];
-		} else {
-			mGvBp.ppE2records = e2recs;
-			[mGvBp setNeedsDisplay]; //drawRect:が呼び出される
-		}
-		//------------------------------------------------------脈拍
-		rcgv.origin.y += rcgv.size.height;
-		rcgv.size.height = fHeight * 2/8;
-		if (mGvPuls==nil) {
-			mGvPuls = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
-			mGvPuls.ppE2records = e2recs;
-			mGvPuls.ppEntityKey = E2_nPulse_bpm;
-			mGvPuls.ppGoalKey = Goal_nPulse_bpm;
-			mGvPuls.ppDec = 0;
-			mGvPuls.ppMin = E2_nPuls_MIN;
-			mGvPuls.ppMax = E2_nPuls_MAX;
-			[ibScrollView addSubview:mGvPuls];
-			//
-			UILabel *lb = [[UILabel alloc] initWithFrame:CGRectMake(rcgv.size.width - 100, rcgv.origin.y + (rcgv.size.height/2), 100, 25)];
-			lb.text = NSLocalizedString(@"Puls Name",nil);
-			[self.view addSubview:lb];
-			[ibScrollView bringSubviewToFront:lb];
-		} else {
-			mGvPuls.ppE2records = e2recs;
-			[mGvPuls setNeedsDisplay]; //drawRect:が呼び出される
-		}
-		//------------------------------------------------------体温
-		rcgv.origin.y += rcgv.size.height;
-		rcgv.size.height = fHeight * 2/8;
-		if (mGvTemp==nil) {
-			mGvTemp = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
-			mGvTemp.ppE2records = e2recs;
-			mGvTemp.ppEntityKey = E2_nTemp_10c;
-			mGvTemp.ppGoalKey = Goal_nTemp_10c;
-			mGvTemp.ppDec = 1;
-			mGvTemp.ppMin = E2_nTemp_MIN;
-			mGvTemp.ppMax = E2_nTemp_MAX;
-			[ibScrollView addSubview:mGvTemp];
-			//
-			UILabel *lb = [[UILabel alloc] initWithFrame:CGRectMake(rcgv.size.width - 100, rcgv.origin.y + (rcgv.size.height/2), 100, 25)];
-			lb.text = NSLocalizedString(@"Temp Name",nil);
-			[self.view addSubview:lb];
-			[ibScrollView bringSubviewToFront:lb];
-		} else {
-			mGvTemp.ppE2records = e2recs;
-			[mGvTemp setNeedsDisplay]; //drawRect:が呼び出される
-		}
+	//------------------------------------------------------血圧
+	rcgv.origin.y += rcgv.size.height;
+	rcgv.size.height = fHeight * 3/8;
+	if (mGvBp==nil) {
+		mGvBp = [[GViewBp alloc] initWithFrame: rcgv]; // 血圧専用
+		mGvBp.ppE2records = e2recs;
+		[ibScrollView addSubview:mGvBp];
+		[self labelGraphRect:rcgv  text:NSLocalizedString(@"BpHi Name",nil)];
+	} else {
+		mGvBp.ppE2records = e2recs;
+		[mGvBp setNeedsDisplay]; //drawRect:が呼び出される
 	}
-	else if (section==1) {
-		//------------------------------------------------------体重
-		rcgv.origin.y += rcgv.size.height;
-		rcgv.size.height = fHeight * 2/8;
-		if (mGvWeight==nil) {
-			mGvWeight = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
-			mGvWeight.ppE2records = e2recs;
-			mGvWeight.ppEntityKey = E2_nWeight_10Kg;
-			mGvWeight.ppGoalKey = Goal_nWeight_10Kg;
-			mGvWeight.ppDec = 1;
-			mGvWeight.ppMin = E2_nWeight_MIN;
-			mGvWeight.ppMax = E2_nWeight_MAX;
-			[ibScrollView addSubview:mGvWeight];
-			//
-			UILabel *lb = [[UILabel alloc] initWithFrame:CGRectMake(rcgv.size.width - 100, rcgv.origin.y + (rcgv.size.height/2), 100, 25)];
-			lb.text = NSLocalizedString(@"Weight Name",nil);
-			[self.view addSubview:lb];
-			[ibScrollView bringSubviewToFront:lb];
-		} else {
-			mGvWeight.ppE2records = e2recs;
-			[mGvWeight setNeedsDisplay]; //drawRect:が呼び出される
-		}
-		//------------------------------------------------------歩数
-		rcgv.origin.y += rcgv.size.height;
-		rcgv.size.height = fHeight * 1.8/8;
-		if (mGvPedo==nil) {
-			mGvPedo = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
-			mGvPedo.ppE2records = e2recs;
-			mGvPedo.ppEntityKey = E2_nWeight_10Kg;
-			mGvPedo.ppGoalKey = Goal_nWeight_10Kg;
-			mGvPedo.ppDec = 0;
-			mGvPedo.ppMin = E2_nWeight_MIN;
-			mGvPedo.ppMax = E2_nWeight_MAX;
-			[ibScrollView addSubview:mGvPedo];
-			//
-			UILabel *lb = [[UILabel alloc] initWithFrame:CGRectMake(rcgv.size.width - 100, rcgv.origin.y + (rcgv.size.height/2), 100, 25)];
-			lb.text = NSLocalizedString(@"Pedo Name",nil);
-			[self.view addSubview:lb];
-			[ibScrollView bringSubviewToFront:lb];
-		} else {
-			mGvPedo.ppE2records = e2recs;
-			[mGvPedo setNeedsDisplay]; //drawRect:が呼び出される
-		}
-		//------------------------------------------------------体脂肪率
-		rcgv.origin.y += rcgv.size.height;
-		rcgv.size.height = fHeight * 1.6/8;
-		if (mGvFat==nil) {
-			mGvFat = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
-			mGvFat.ppE2records = e2recs;
-			mGvFat.ppEntityKey = E2_nBodyFat_10p;
-			mGvFat.ppGoalKey = Goal_nBodyFat_10p;
-			mGvFat.ppDec = 1;
-			mGvFat.ppMin = E2_nBodyFat_MIN;
-			mGvFat.ppMax = E2_nBodyFat_MAX;
-			[ibScrollView addSubview:mGvFat];
-			//
-			UILabel *lb = [[UILabel alloc] initWithFrame:CGRectMake(rcgv.size.width - 100, rcgv.origin.y + (rcgv.size.height/2), 100, 25)];
-			lb.text = NSLocalizedString(@"BodyFat Name",nil);
-			[self.view addSubview:lb];
-			[ibScrollView bringSubviewToFront:lb];
-		} else {
-			mGvFat.ppE2records = e2recs;
-			[mGvFat setNeedsDisplay]; //drawRect:が呼び出される
-		}
-		//------------------------------------------------------骨格筋率
-		rcgv.origin.y += rcgv.size.height;
-		rcgv.size.height = fHeight * 1.6/8;
-		if (mGvSk==nil) {
-			mGvSk = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
-			mGvSk.ppE2records = e2recs;
-			mGvSk.ppEntityKey = E2_nSkMuscle_10p;
-			mGvSk.ppGoalKey = Goal_nSkMuscle_10p;
-			mGvSk.ppDec = 1;
-			mGvSk.ppMin = E2_nSkMuscle_MIN;
-			mGvSk.ppMax = E2_nSkMuscle_MAX;
-			[ibScrollView addSubview:mGvSk];
-			//
-			UILabel *lb = [[UILabel alloc] initWithFrame:CGRectMake(rcgv.size.width - 100, rcgv.origin.y + (rcgv.size.height/2), 100, 25)];
-			lb.text = NSLocalizedString(@"SkMuscle Name",nil);
-			[self.view addSubview:lb];
-			[ibScrollView bringSubviewToFront:lb];
-		} else {
-			mGvSk.ppE2records = e2recs;
-			[mGvSk setNeedsDisplay]; //drawRect:が呼び出される
-		}
+	//------------------------------------------------------脈拍
+	rcgv.origin.y += rcgv.size.height;
+	rcgv.size.height = fHeight * 2/8;
+	if (mGvPuls==nil) {
+		mGvPuls = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
+		mGvPuls.ppE2records = e2recs;
+		mGvPuls.ppEntityKey = E2_nPulse_bpm;
+		mGvPuls.ppGoalKey = Goal_nPulse_bpm;
+		mGvPuls.ppDec = 0;
+		mGvPuls.ppMin = E2_nPuls_MIN;
+		mGvPuls.ppMax = E2_nPuls_MAX;
+		[ibScrollView addSubview:mGvPuls];
+		[self labelGraphRect:rcgv  text:NSLocalizedString(@"Puls Name",nil)];
+	} else {
+		mGvPuls.ppE2records = e2recs;
+		[mGvPuls setNeedsDisplay]; //drawRect:が呼び出される
+	}
+	//------------------------------------------------------体温
+	rcgv.origin.y += rcgv.size.height;
+	rcgv.size.height = fHeight * 2/8;
+	if (mGvTemp==nil) {
+		mGvTemp = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
+		mGvTemp.ppE2records = e2recs;
+		mGvTemp.ppEntityKey = E2_nTemp_10c;
+		mGvTemp.ppGoalKey = Goal_nTemp_10c;
+		mGvTemp.ppDec = 1;
+		mGvTemp.ppMin = E2_nTemp_MIN;
+		mGvTemp.ppMax = E2_nTemp_MAX;
+		[ibScrollView addSubview:mGvTemp];
+		[self labelGraphRect:rcgv  text:NSLocalizedString(@"Temp Name",nil)];
+	} else {
+		mGvTemp.ppE2records = e2recs;
+		[mGvTemp setNeedsDisplay]; //drawRect:が呼び出される
+	}
+	//-------------------------------------------------------------------下段
+	rcgv.origin.y = rc.size.height + 10;
+	//------------------------------------------------------日付
+	rcgv.size.height = fHeight * 1/8;
+	if (mGvDate2==nil) {
+		mGvDate2 = [[GViewDate alloc] initWithFrame: rcgv]; // 日付専用
+		mGvDate2.ppE2records = e2recs;
+		[ibScrollView addSubview:mGvDate2];
+	} else {
+		mGvDate2.ppE2records = e2recs;
+		[mGvDate2 setNeedsDisplay]; //drawRect:が呼び出される
+	}
+	//------------------------------------------------------体重
+	rcgv.origin.y += rcgv.size.height;
+	rcgv.size.height = fHeight * 2/8;	// 体重高さ
+	if (mGvWeight==nil) {
+		mGvWeight = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
+		mGvWeight.ppE2records = e2recs;
+		mGvWeight.ppEntityKey = E2_nWeight_10Kg;
+		mGvWeight.ppGoalKey = Goal_nWeight_10Kg;
+		mGvWeight.ppDec = 1;
+		mGvWeight.ppMin = E2_nWeight_MIN;
+		mGvWeight.ppMax = E2_nWeight_MAX;
+		[ibScrollView addSubview:mGvWeight];
+		[self labelGraphRect:rcgv  text:NSLocalizedString(@"Weight Name",nil)];
+	} else {
+		mGvWeight.ppE2records = e2recs;
+		[mGvWeight setNeedsDisplay]; //drawRect:が呼び出される
+	}
+	//------------------------------------------------------歩数
+	rcgv.origin.y += rcgv.size.height;
+	rcgv.size.height = fHeight * 1.8/8;
+	if (mGvPedo==nil) {
+		mGvPedo = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
+		mGvPedo.ppE2records = e2recs;
+		mGvPedo.ppEntityKey = E2_nPedometer;
+		mGvPedo.ppGoalKey = Goal_nPedometer;
+		mGvPedo.ppDec = 0;
+		mGvPedo.ppMin = E2_nPedometer_MIN;
+		mGvPedo.ppMax = E2_nPedometer_MAX;
+		[ibScrollView addSubview:mGvPedo];
+		[self labelGraphRect:rcgv  text:NSLocalizedString(@"Pedo Name",nil)];
+	} else {
+		mGvPedo.ppE2records = e2recs;
+		[mGvPedo setNeedsDisplay]; //drawRect:が呼び出される
+	}
+	//------------------------------------------------------体脂肪率
+	rcgv.origin.y += rcgv.size.height;
+	rcgv.size.height = fHeight * 1.6/8;
+	if (mGvFat==nil) {
+		mGvFat = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
+		mGvFat.ppE2records = e2recs;
+		mGvFat.ppEntityKey = E2_nBodyFat_10p;
+		mGvFat.ppGoalKey = Goal_nBodyFat_10p;
+		mGvFat.ppDec = 1;
+		mGvFat.ppMin = E2_nBodyFat_MIN;
+		mGvFat.ppMax = E2_nBodyFat_MAX;
+		[ibScrollView addSubview:mGvFat];
+		[self labelGraphRect:rcgv  text:NSLocalizedString(@"BodyFat Name",nil)];
+	} else {
+		mGvFat.ppE2records = e2recs;
+		[mGvFat setNeedsDisplay]; //drawRect:が呼び出される
+	}
+	//------------------------------------------------------骨格筋率
+	rcgv.origin.y += rcgv.size.height;
+	rcgv.size.height = fHeight * 1.6/8;
+	if (mGvSk==nil) {
+		mGvSk = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
+		mGvSk.ppE2records = e2recs;
+		mGvSk.ppEntityKey = E2_nSkMuscle_10p;
+		mGvSk.ppGoalKey = Goal_nSkMuscle_10p;
+		mGvSk.ppDec = 1;
+		mGvSk.ppMin = E2_nSkMuscle_MIN;
+		mGvSk.ppMax = E2_nSkMuscle_MAX;
+		[ibScrollView addSubview:mGvSk];
+		[self labelGraphRect:rcgv  text:NSLocalizedString(@"SkMuscle Name",nil)];
+	} else {
+		mGvSk.ppE2records = e2recs;
+		[mGvSk setNeedsDisplay]; //drawRect:が呼び出される
 	}
 
 	//-------------------------------------------
@@ -321,7 +308,7 @@
 	ibScrollView.contentOffset = pointNext_;
 }
 
-- (void)graphViewPage:(NSUInteger)page section:(NSUInteger)section animated:(BOOL)animated
+- (void)graphViewPage:(NSUInteger)page animated:(BOOL)animated
 {
 	if (animated) {
 		// アニメ準備
@@ -333,7 +320,7 @@
 		[UIView setAnimationDidStopSelector:@selector(animation_after)]; //アニメーション終了後に呼び出す＜＜setAnimationDelegate必要
 	}
 	// アニメ終了状態
-	[self graphViewPage:page section:section];// この中で、uiActivePage_が更新される
+	[self graphViewPage:page];// この中で、uiActivePage_が更新される
 
 	if (animated) {
 		// アニメ実行
@@ -359,7 +346,7 @@
 {
 	[super viewDidAppear:animated];
 	uiActivePageMax_ = 999; // この時点で最終ページは不明
-	[self graphViewPage:0  section:0  animated:YES];
+	[self graphViewPage:0  animated:YES];
 	// 最初、GOALを画面中央に表示する
 	//ibScrollView.contentOffset = CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);  
 }
@@ -411,7 +398,41 @@
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {	// スクロール中に呼ばれる
-	//NSLog(@"scrollViewDidScroll: .contentOffset.x=%f", scrollView.contentOffset.x);
+	//NSLog(@"scrollViewDidScroll: .contentOffset.x=%f  .y=%f", scrollView.contentOffset.x, scrollView.contentOffset.y);
+	
+/*	static int iPage = 0;
+	if (iPage==0) {
+		if (100 < scrollView.contentOffset.y) {
+			scrollView.contentOffset = CGPointMake(scrollView.contentOffset.x, scrollView.bounds.size.height);
+			iPage = 1;
+			return;
+		}
+		else if (scrollView.contentOffset.y != 0) {
+			scrollView.contentOffset = CGPointMake(scrollView.contentOffset.x, 0);
+			return;
+		}
+	} else {
+		if (scrollView.contentOffset.y < scrollView.bounds.size.height-100) {
+			scrollView.contentOffset = CGPointMake(scrollView.contentOffset.x, 0);
+			iPage = 0;
+			return;
+		}
+		else if (scrollView.contentOffset.y != scrollView.bounds.size.height) {
+			scrollView.contentOffset = CGPointMake(scrollView.contentOffset.x, scrollView.bounds.size.height);
+			return;
+		}
+	}*/
+
+/*	static CGFloat fx = 0;
+	if (fx != scrollView.contentOffset.x) {
+		fx = scrollView.contentOffset.x;
+		scrollView.pagingEnabled = NO; // ヨコはフリー
+	} else {
+		scrollView.pagingEnabled = YES; // タテはページング
+		//ページング復活によりヨコもグリッドされてしまうが、しょうがない？
+		//scrollView.contentOffset = CGPointMake(fx, scrollView.contentOffset.y);
+	}*/
+	
 	if (mAppDelegate.app_is_unlock) {
 		if (scrollView.contentOffset.x < -70) {
 			// PREV（過去）ページへ
@@ -443,12 +464,18 @@
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {	// スクロール終了時（指を離した時）に呼ばれる
-	NSLog(@"scrollViewDidEndDragging: .contentOffset.x=%f  .y=%f  decelerate=%d", 
-		  scrollView.contentOffset.x, scrollView.contentOffset.y, decelerate);
-	
+	NSLog(@"scrollViewDidEndDragging: .contentOffset.x=%f  .y=%f / height=%f", 
+		  scrollView.contentOffset.x, scrollView.contentOffset.y, scrollView.frame.size.height);
+
+/*	static NSUInteger staticSection = 0;
 	NSUInteger iSection = (scrollView.contentOffset.y / scrollView.frame.size.height);
 	assert(iSection==0 OR iSection==1);
-	
+	if (staticSection != iSection) {
+		[self graphViewPage:uiActivePage_  section:iSection  animated:YES];
+		staticSection = iSection;
+	}
+	else */
+
 	if (mAppDelegate.app_is_unlock) {
 		if (scrollView.contentOffset.x < -70) {
 			// PREV（過去）ページへ
@@ -457,7 +484,7 @@
 				// 画面左側にインジケータ表示
 				//[actIndicator_ setFrame:CGRectMake(80, ibScrollView.frame.size.height/2-25, 50, 50)];
 				//[actIndicator_ startAnimating];
-				[self graphViewPage:uiActivePage_ + 1  section:iSection  animated:YES];
+				[self graphViewPage:uiActivePage_ + 1  animated:YES];
 			}
 		}
 		else if (scrollView.contentSize.width - ibScrollView.bounds.size.width + 70 < scrollView.contentOffset.x) {
@@ -467,7 +494,7 @@
 				// 画面右側にインジケータ表示
 				//[actIndicator_ setFrame:CGRectMake(ibScrollView.contentSize.width-80-50, ibScrollView.frame.size.height/2-25, 50, 50)];
 				//[actIndicator_ startAnimating];
-				[self graphViewPage:uiActivePage_ - 1 section:iSection  animated:YES];
+				[self graphViewPage:uiActivePage_ - 1 animated:YES];
 			}
 		}
 	/*	else {

@@ -50,6 +50,7 @@
 	CGPoint									pointNext_;
 	
 	GViewDate						*mGvDate;
+	GViewDate						*mGvDate2;
 	GViewBp							*mGvBp;
 	GViewPuls						*mGvPuls;
 	GViewPuls						*mGvTemp;

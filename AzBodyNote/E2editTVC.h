@@ -8,11 +8,16 @@
 
 #import <UIKit/UIKit.h>
 //#import <iAd/iAd.h>
+
+#import "Global.h"
+#import "AppDelegate.h"
 #import "MocEntity.h"
-#import "EditDateVC.h"
-#import "E2editCellNote.h"
+#import "MocFunctions.h"
 #import "E2editCellDial.h"
+#import "E2editCellNote.h"
+#import "EditDateVC.h"
 #import "E2editCellTweet.h"
+#import <Twitter/TWTweetComposeViewController.h>
 
 
 @interface E2editTVC : UITableViewController 

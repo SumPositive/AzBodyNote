@@ -128,6 +128,27 @@
 	//　全域クリア
 	CGContextSetRGBFillColor (cgc, 0.67, 0.67, 0.67, 1.0); // スクロール領域外と同じグレー
 	CGContextFillRect(cgc, self.bounds);
+/*	// 全域グラデーション
+	CGFloat locations[2] = {0.0, 1.0};
+	CGColorSpaceRef  colorspace = CGColorSpaceCreateDeviceRGB();
+	// グラデーションの色（今回は 2 地点分）を CGColorRef を格納した CFArrayRef 配列で用意します。
+	CGColorRef colors[2];
+	colors[0] = self.backgroundColor.CGColor;
+	colors[1] = [[UIColor colorWithRed:1.0 green:1.0 blue:0.745 alpha:1.0] CGColor];
+	CFArrayRef colors_buffer = CFArrayCreate(kCFAllocatorDefault, (__bridge void **)colors, 2, &kCFTypeArrayCallBacks);
+	
+	// グラデーションの描画に必要な情報を揃えます。
+	// 描画の開始地点と終了地点は、ここではそれぞれ、UIView の左上と右下（斜めのグラデーション）に指定しています
+	CGGradientRef gradient = CGGradientCreateWithColors(colorspace, colors_buffer, locations);
+	CGPoint startPoint = rect.origin;
+	CGPoint endPoint = CGPointMake(rect.origin.x + rect.size.width, rect.origin.y + rect.size.height);
+	// グラデーションをキャンバスに描画します。
+	CGContextDrawLinearGradient(cgc, gradient, startPoint, endPoint, 0);
+	// 使い終わった CF オブジェクトを解放します。
+	CGGradientRelease(gradient);
+	CGColorSpaceRelease(colorspace);
+	CFRelease(colors_buffer); 
+ */
 	
 	CGFloat fYstep;
 	CGPoint po;

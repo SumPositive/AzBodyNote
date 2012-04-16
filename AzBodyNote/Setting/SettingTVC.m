@@ -7,10 +7,6 @@
 //
 
 #import "SettingTVC.h"
-#import "SettCellGSpread.h"
-#import "AZAboutVC.h"
-#import "AZStoreTVC.h"
-#import "AZCalendarSelect.h"
 
 
 #define STORE_PRODUCTID_UNLOCK		@"com.azukid.AzBodyNote.Unlock"		// In-App Purchase ProductIdentifier
@@ -27,8 +23,7 @@
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
         // Custom initialization
-		mAppDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
-		assert(mAppDelegate);
+		//NG//mAppDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
 		GA_TRACK_PAGE(@"SettingTVC");
     }
     return self;
@@ -36,6 +31,11 @@
 
 - (void)viewDidLoad
 {
+	if (mAppDelegate==nil) {		// initWithStyleではダメ(nil)だった。
+		mAppDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+	}
+	assert(mAppDelegate);
+
     [super viewDidLoad];
 	self.title = NSLocalizedString(@"TabSettings",nil);
 }
@@ -44,33 +44,29 @@
 {
     [super viewWillAppear:animated];
 	[self.tableView reloadData];
-}
 
-- (void)viewDidAppear:(BOOL)animated
-{
-	[super viewDidAppear:animated];
-	
 	mAppDelegate.app_is_AdShow = NO; //これは広告表示しないViewである。 viewWillAppear:以降で定義すること
 	if (mAppDelegate.adWhirlView) {	// Ad ON
-		[UIView beginAnimations:nil context:NULL];
-		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-		[UIView setAnimationDuration:1.2];
 		mAppDelegate.adWhirlView.frame = CGRectMake(0, 700, 320, 50);  // GAD_SIZE_320x50
 		mAppDelegate.adWhirlView.hidden = YES;
-		[UIView commitAnimations];
-
+		
 		if (mAppDelegate.app_is_sponsor) {
 			// あずき商店にて Non-Ad を購入した直後。Ad停止＆破棄する
 			[mAppDelegate adDealloc];
 		}
 	}
 }
+/*
+- (void)viewDidAppear:(BOOL)animated
+{
+	[super viewDidAppear:animated];
+}
 
 - (void)viewDidUnload
 {
     [super viewDidUnload];
 }
-
+*/
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
