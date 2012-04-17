@@ -5,7 +5,7 @@ Consensus on use】
 【Security Alert】
  This app does not encrypt the information.
 　Personal or confidential information, please do not fill.
-  (Password is stored encrypted)
+  (The password is stored encrypted key chain by iOS to safely)
 
 【Privacy policy】
 Azukid officials and author of this app does not collect personally identifiable information.
@@ -21,10 +21,5 @@ Each Web service has been confirmed not to generate and communicate personally i
 The following Web service, the login information has been encrypted communication.
 ・Google - GData　-　http://www.google.com/intl/ja/policies/privacy/
 ・Dropbox - http://www.dropbox.com/dmca#privacy
-
-（詳細：AzukiSoftが使用する認証キー「鍵」について）
-　デバイスMACアドレスにユーザ名やアプリ名などを混ぜてハッシュ化（不可逆変換）した文字列を鍵として使用することがあります。
-　ユーザがこの鍵を提示すれば持ち主である証明になりますが、この鍵からユーザを見つけることはできません。
-　名前や住所などの持ち主情報が全く含まれない鍵です。指紋も付きません。
 
 2012-04-01 Azukid +++ Sum Positive +++
