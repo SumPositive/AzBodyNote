@@ -131,7 +131,11 @@
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 			}
 			cell.textLabel.text = NSLocalizedString(@"SettTweet",nil);
-			cell.detailTextLabel.text = NSLocalizedString(@"SettTweet detail",nil);
+			if (mAppDelegate.app_is_sponsor) {
+				cell.detailTextLabel.text = NSLocalizedString(@"SettTweet detail",nil);
+			} else {
+				cell.detailTextLabel.text = NSLocalizedString(@"SettTweet detail FREE",nil);
+			}
 			if ([userDefaults boolForKey:GUD_bTweet]) {
 				cell.accessoryType = UITableViewCellAccessoryCheckmark;
 			} else {
@@ -180,7 +184,7 @@
 			//cell.imageView.image = [UIImage imageNamed:@"Icon57"];
 			//cell.imageView.contentMode = UIViewContentModeScaleAspectFit;
 			//cell.imageView.frame = CGRectMake(0, 0, 32, 32);
-			cell.textLabel.text = NSLocalizedString(@"AZAbout",nil);
+			cell.textLabel.text = AZClassLocalizedString(@"AZAbout",nil);
 			cell.detailTextLabel.text = nil;
 			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 			return cell;
@@ -192,8 +196,8 @@
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 			}
 			cell.imageView.image = [UIImage imageNamed:@"Icon-Store-32"];
-			cell.textLabel.text = NSLocalizedString(@"AZStore",nil);
-			cell.detailTextLabel.text = NSLocalizedString(@"AZStore detail",nil);
+			cell.textLabel.text = AZClassLocalizedString(@"AZStore",nil);
+			cell.detailTextLabel.text = AZClassLocalizedString(@"AZStore detail",nil);
 			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 			return cell;
 		}	break;

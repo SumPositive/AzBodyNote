@@ -182,7 +182,9 @@
 	TWTweetComposeViewController *tweetVC = [[TWTweetComposeViewController alloc] init];
     [tweetVC setInitialText:message];
     //[tweetVC addImage: [UIImage imageNamed:@"Icon57"]];
-    //廃案//[tweetVC addURL:[NSURL URLWithString: NSLocalizedString(@"Tweet URL",nil)]];
+	if (appDelegate_.app_is_sponsor==NO) {
+		[tweetVC addURL:[NSURL URLWithString: NSLocalizedString(@"Tweet URL",nil)]];
+	}
     [self presentModalViewController:tweetVC animated:YES];
 	
     tweetVC.completionHandler = ^(TWTweetComposeViewControllerResult res) {
@@ -559,7 +561,7 @@
 {
 	[super viewDidAppear:animated];
 
-	if (appDelegate_.adWhirlView) {	// Ad ON
+	if (appDelegate_.app_is_sponsor==NO  &&  appDelegate_.adWhirlView) {	// Ad ON
 		[UIView beginAnimations:nil context:NULL];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
 		[UIView setAnimationDuration:1.2];
