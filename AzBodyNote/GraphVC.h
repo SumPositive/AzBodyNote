@@ -48,10 +48,12 @@
 	NSUInteger								uiActivePageMax_;
 	UIActivityIndicatorView			*actIndicator_;
 	CGPoint									pointNext_;
+	NSArray							*mPanelGraphs;
 	
 	GViewDate						*mGvDate;
-	GViewDate						*mGvDate2;
-	GViewBp							*mGvBp;
+	//GViewDate						*mGvDate2;
+	GViewPuls						*mGvBpHi;
+	GViewPuls						*mGvBpLo;
 	GViewPuls						*mGvPuls;
 	GViewPuls						*mGvTemp;
 	GViewPuls						*mGvWeight;

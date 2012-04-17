@@ -842,14 +842,14 @@
 			iPanel *= (-1); // 正にする
 		}
 		switch (iPanel) {
-			case 0: {
+			case AzConditionNote: {
 				E2editCellNote *cell = [self cellNote:tableView];
 				cell.Re2record = moE2edit_;
 				[cell drawRect:cell.frame]; // コンテンツ描画
 				return cell;
 			}	break;
 				
-			case 1: {
+			case AzConditionBpHi: {
 				E2editCellDial *cell = [self cellDial:tableView];
 				cell.ibLbName.text = NSLocalizedString(@"BpHi Name",nil);
 				cell.ibLbDetail.text = NSLocalizedString(@"BpHi Detail",nil);
@@ -866,7 +866,7 @@
 				return cell;
 			}	break;
 				
-			case 2: {
+			case AzConditionBpLo: {
 				E2editCellDial *cell = [self cellDial:tableView];
 				cell.ibLbName.text = NSLocalizedString(@"BpLo Name",nil);
 				cell.ibLbDetail.text = NSLocalizedString(@"BpLo Detail",nil);
@@ -883,7 +883,7 @@
 				return cell;
 			}	break;
 				
-			case 3: {
+			case AzConditionPuls: {
 				E2editCellDial *cell = [self cellDial:tableView];
 				cell.ibLbName.text = NSLocalizedString(@"Pulse Name",nil);
 				cell.ibLbDetail.text = NSLocalizedString(@"Pulse Detail",nil);
@@ -900,7 +900,7 @@
 				return cell;
 			}	break;
 				
-			case 4: {
+			case AzConditionWeight: {
 				E2editCellDial *cell = [self cellDial:tableView];
 				cell.ibLbName.text = NSLocalizedString(@"Weight Name",nil);
 				cell.ibLbDetail.text = NSLocalizedString(@"Weight Detail",nil);
@@ -917,7 +917,7 @@
 				return cell;
 			}	break;
 				
-			case 5: {
+			case AzConditionTemp: {
 				E2editCellDial *cell = [self cellDial:tableView];
 				cell.ibLbName.text = NSLocalizedString(@"Temp Name",nil);
 				cell.ibLbDetail.text = NSLocalizedString(@"Temp Detail",nil);
@@ -934,7 +934,7 @@
 				return cell;
 			}	break;
 				
-			case 6: {
+			case AzConditionPedo: {
 				E2editCellDial *cell = [self cellDial:tableView];
 				cell.ibLbName.text = NSLocalizedString(@"Pedometer Name",nil);
 				cell.ibLbDetail.text = NSLocalizedString(@"Pedometer Detail",nil);
@@ -951,7 +951,7 @@
 				return cell;
 			}	break;
 				
-			case 7: {
+			case AzConditionFat: {
 				E2editCellDial *cell = [self cellDial:tableView];
 				cell.ibLbName.text = NSLocalizedString(@"BodyFat Name",nil);
 				cell.ibLbDetail.text = NSLocalizedString(@"BodyFat Detail",nil);
@@ -968,7 +968,7 @@
 				return cell;
 			}	break;
 				
-			case 8: {
+			case AzConditionSkm: {
 				E2editCellDial *cell = [self cellDial:tableView];
 				cell.ibLbName.text = NSLocalizedString(@"SkMuscle Name",nil);
 				cell.ibLbDetail.text = NSLocalizedString(@"SkMuscle Detail",nil);
