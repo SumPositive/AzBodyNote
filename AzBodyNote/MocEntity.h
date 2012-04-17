@@ -8,6 +8,8 @@
 #import <Foundation/Foundation.h>
 //#import "AZManagedObject.h"
 
+
+
 #define AzDataModelVersion			0
 /*
 //---------------------------------------------------------------------------------------E1

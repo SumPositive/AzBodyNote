@@ -20,6 +20,20 @@
 #define NFM_REFETCH_ALL_DATA			@"RefetchAllDatabaseData"
 #define NFM_AppDidBecomeActive			@"AppDidBecomeActive"
 
+// typedef
+enum {
+    AzConditionNote		= 0,
+    AzConditionBpHi		= 1,
+    AzConditionBpLo	= 2,
+    AzConditionPuls		= 3,
+    AzConditionTemp	= 4,
+    AzConditionWeight	= 5,
+    AzConditionPedo		= 6,
+    AzConditionFat		= 7,
+    AzConditionSkm		= 8,
+    AzConditionCount	= 9 //End count
+};
+typedef NSUInteger AzConditionItems;
 
 // UserDefault ------------------------------------- Settings		【注意】リリース後は変更厳禁！
 #define GUD_bPaid									@"GUD_bPaid"					// KVSにも記録する
@@ -32,6 +46,7 @@
 #define GUD_bGSpread							@"GUD_bGSpread"
 #define GUD_CalendarID						@"GUD_CalendarID"
 #define GUD_CalendarTitle					@"GUD_CalendarTitle"
+#define GUD_SettPanels						@"GUD_SettPanels"	//UserDef保存につき変更禁止 NSArrey型 
 
 
 // iCloud-KVS UserDefault ------------------------------------- Settings

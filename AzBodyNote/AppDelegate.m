@@ -114,6 +114,22 @@
 							@"NO",			GUD_bGSpread,						// YES=Googleスプレッドへ記録
 							 nil];
 	[userDefaults registerDefaults:dicDef];	// 未定義のKeyのみ更新される
+	
+	if ([userDefaults objectForKey:GUD_SettPanels]==nil) 
+	{	// 測定パネル順序設定の初期値
+		NSArray *aPanels = [[NSArray alloc] initWithObjects:
+				   [NSNumber numberWithInteger: AzConditionNote],
+				   [NSNumber numberWithInteger: AzConditionBpHi		* (-1)],		//*(-1):Graph表示する
+				   [NSNumber numberWithInteger: AzConditionBpLo		* (-1)],
+				   [NSNumber numberWithInteger: AzConditionPuls			* (-1)],
+				   [NSNumber numberWithInteger: AzConditionTemp		* (-1)],
+				   [NSNumber numberWithInteger: AzConditionWeight	* (-1)],
+				   [NSNumber numberWithInteger: AzConditionPedo],
+				   [NSNumber numberWithInteger: AzConditionFat],
+				   [NSNumber numberWithInteger: AzConditionSkm],
+				   nil];
+		[userDefaults setObject:aPanels forKey:GUD_SettPanels];
+	}
 	[userDefaults synchronize]; // plistへ書き出す
 
 	// 画面表示に関係する Option Setting を取得する

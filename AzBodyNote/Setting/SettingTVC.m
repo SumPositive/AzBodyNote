@@ -82,7 +82,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {	// Return the number of rows in the section.
 	if (section==0) {
-		return 3;
+		return 4;
 	} else {
 		return 2;
 	}
@@ -92,10 +92,11 @@
 {
 	switch (indexPath.section*100 + indexPath.row) 
 	{
-		case 0: return  55;	// Tweet
-		case 1: return  55;	// Goal
-		case 2: return  55;	// Calender
-		case 3: return  88;	// GSpread
+		case 0:	// Tweet
+		case 1:	// Goal
+		case 2:	// Calender
+		case 3:	// Panels Graphs
+			return  55;
 	}
     return 44; // Default
 }
@@ -164,7 +165,18 @@
 			return cell;
 		}	break;
 			
-		case 3: {	// GSpread
+		case 3: {	// SettPanelTVC
+			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
+			if (cell == nil) {
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
+			}
+			cell.textLabel.text = NSLocalizedString(@"SettPanel",nil);
+			cell.detailTextLabel.text = NSLocalizedString(@"SettPanel detail",nil);
+			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+			return cell;
+		}	break;
+
+	/*	case 9: {	// GSpread
 			static NSString *cid = @"SettCellGSpread";  //== Identifire に一致させること
 			SettCellGSpread *cell = (SettCellGSpread*)[tableView dequeueReusableCellWithIdentifier:cid];
 			if (cell == nil) {
@@ -174,7 +186,7 @@
 				assert(cell);
 			}
 			return cell;
-		}	break;
+		}	break;*/
 			
 		case 100: {	// このアプリについて
 			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
@@ -253,12 +265,18 @@
 			[userDefaults synchronize];
 		} break;
 			
-		case 2: {  // Calender
+		case 2: {  // AZCalendarSelect
 			AZCalendarSelect *vc = [[AZCalendarSelect alloc] init];
 			vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
 			[self.navigationController pushViewController:vc animated:YES];
 		} break;
 			
+		case 3: {  // SettPanelTVC
+			SettPanelTVC *vc = [[SettPanelTVC alloc] init];
+			vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
+			[self.navigationController pushViewController:vc animated:YES];
+		} break;
+
 		case 100: {	// このアプリについて
 			AZAboutVC *vc = [[AZAboutVC alloc] init];
 			vc.ppImgIcon = [UIImage imageNamed:@"Icon57"];

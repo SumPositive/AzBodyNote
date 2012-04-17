@@ -13,6 +13,7 @@
 #import "AZAboutVC.h"
 #import "AZStoreTVC.h"
 #import "AZCalendarSelect.h"
+#import "SettPanelTVC.h"
 
 
 @interface SettingTVC : UITableViewController

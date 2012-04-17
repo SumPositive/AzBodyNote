@@ -6,8 +6,6 @@
 //  Copyright (c) 2012年 __MyCompanyName__. All rights reserved.
 //
 
-#import "Global.h"
-#import "AppDelegate.h"
 #import "AZCalendarSelect.h"
 
 

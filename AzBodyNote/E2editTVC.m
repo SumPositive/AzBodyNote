@@ -517,6 +517,19 @@
     [super viewWillAppear:animated];
 	appDelegate_.app_is_AdShow = YES; //これは広告表示可能なViewである。 viewWillAppear:以降で定義すること
 	
+	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	// カレンダー設定
+	if ([userDefaults objectForKey:GUD_CalendarID]) {
+		mEKCalendar = [appDelegate_.eventStore 
+					   calendarWithIdentifier: [userDefaults objectForKey:GUD_CalendarID]];
+		NSLog(@"E2editTVC: mEKCalendar={%@}", mEKCalendar);
+	} else {
+		mEKCalendar = nil;
+	}
+	// パネル順序読み込み
+	mPanels = [userDefaults objectForKey:GUD_SettPanels];
+
+	
 	if (bEditDate_) {
 		// 日付修正から戻ったとき
 		bEditDate_ = NO;
@@ -544,15 +557,6 @@
 	}
 	else if (kvsGoal_==nil) {
 		[self setE2recordPrev];
-	}
-	
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	if ([userDefaults objectForKey:GUD_CalendarID]) {
-		mEKCalendar = [appDelegate_.eventStore 
-			   calendarWithIdentifier: [userDefaults objectForKey:GUD_CalendarID]];
-		NSLog(@"E2editTVC: mEKCalendar={%@}", mEKCalendar);
-	} else {
-		mEKCalendar = nil;
 	}
 }
 
@@ -704,7 +708,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {	// Return the number of rows in the section.
-	return 10 + 1;  // +1:末尾の余白セル
+	return [mPanels count] + 2;  // +1:日時　　+1:末尾の余白セル
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -827,162 +831,160 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     assert(indexPath.section==0);
-	switch (indexPath.row) {
-		case 0: {
-			UITableViewCell *cell = [self cellDate:tableView];
-			return cell;
-		}	break;
-			
-		case 1: {
-			E2editCellNote *cell = [self cellNote:tableView];
-			cell.Re2record = moE2edit_;
-			[cell drawRect:cell.frame]; // コンテンツ描画
-			return cell;
-		}	break;
-			
-		case 2: {
-			E2editCellDial *cell = [self cellDial:tableView];
-			cell.ibLbName.text = NSLocalizedString(@"BpHi Name",nil);
-			cell.ibLbDetail.text = NSLocalizedString(@"BpHi Detail",nil);
-			cell.ibLbUnit.text = @"mmHg";
-			cell.Re2record = moE2edit_;
-			cell.RzKey = E2_nBpHi_mmHg;
-			cell.mValueMin = E2_nBpHi_MIN;
-			cell.mValueMax = E2_nBpHi_MAX;
-			cell.mValueDec = 0;
-			cell.mDialStep = 1;
-			cell.mStepperStep = 1;
-			cell.mValuePrev = iPrevBpHi_;
-			[cell drawRect:cell.frame]; // コンテンツ描画
-			return cell;
-		}	break;
-
-		case 3: {
-			E2editCellDial *cell = [self cellDial:tableView];
-			cell.ibLbName.text = NSLocalizedString(@"BpLo Name",nil);
-			cell.ibLbDetail.text = NSLocalizedString(@"BpLo Detail",nil);
-			cell.ibLbUnit.text = @"mmHg";
-			cell.Re2record = moE2edit_;
-			cell.RzKey = E2_nBpLo_mmHg;
-			cell.mValueMin = E2_nBpLo_MIN;
-			cell.mValueMax = E2_nBpLo_MAX;
-			cell.mValueDec = 0;
-			cell.mDialStep = 1;
-			cell.mStepperStep = 1;
-			cell.mValuePrev = iPrevBpLo_;
-			[cell drawRect:cell.frame]; // コンテンツ描画
-			return cell;
-		}	break;
-
-		case 4: {
-			E2editCellDial *cell = [self cellDial:tableView];
-			cell.ibLbName.text = NSLocalizedString(@"Pulse Name",nil);
-			cell.ibLbDetail.text = NSLocalizedString(@"Pulse Detail",nil);
-			cell.ibLbUnit.text = NSLocalizedString(@"Pulse unit",nil);
-			cell.Re2record = moE2edit_;
-			cell.RzKey = E2_nPulse_bpm;
-			cell.mValueMin = E2_nPuls_MIN;
-			cell.mValueMax = E2_nPuls_MAX;
-			cell.mValueDec = 0;
-			cell.mDialStep = 1;
-			cell.mStepperStep = 1;
-			cell.mValuePrev = iPrevPuls_;
-			[cell drawRect:cell.frame]; // コンテンツ描画
-			return cell;
-		}	break;
-
-		case 5: {
-			E2editCellDial *cell = [self cellDial:tableView];
-			cell.ibLbName.text = NSLocalizedString(@"Weight Name",nil);
-			cell.ibLbDetail.text = NSLocalizedString(@"Weight Detail",nil);
-			cell.ibLbUnit.text = @"Kg";
-			cell.Re2record = moE2edit_;
-			cell.RzKey = E2_nWeight_10Kg;
-			cell.mValueMin = E2_nWeight_MIN;
-			cell.mValueMax = E2_nWeight_MAX;
-			cell.mValueDec = 1;
-			cell.mDialStep = 1;
-			cell.mStepperStep = 1;
-			cell.mValuePrev = iPrevWeight_;
-			[cell drawRect:cell.frame]; // コンテンツ描画
-			return cell;
-		}	break;
-			
-		case 6: {
-			E2editCellDial *cell = [self cellDial:tableView];
-			cell.ibLbName.text = NSLocalizedString(@"Temp Name",nil);
-			cell.ibLbDetail.text = NSLocalizedString(@"Temp Detail",nil);
-			cell.ibLbUnit.text = @"℃";
-			cell.Re2record = moE2edit_;
-			cell.RzKey = E2_nTemp_10c;
-			cell.mValueMin = E2_nTemp_MIN;
-			cell.mValueMax = E2_nTemp_MAX;
-			cell.mValueDec = 1;
-			cell.mDialStep = 1;
-			cell.mStepperStep = 1;
-			cell.mValuePrev = iPrevTemp_;
-			[cell drawRect:cell.frame]; // コンテンツ描画
-			return cell;
-		}	break;
-			
-		case 7: {
-			E2editCellDial *cell = [self cellDial:tableView];
-			cell.ibLbName.text = NSLocalizedString(@"Pedometer Name",nil);
-			cell.ibLbDetail.text = NSLocalizedString(@"Pedometer Detail",nil);
-			cell.ibLbUnit.text = NSLocalizedString(@"Pedometer Unit",nil);
-			cell.Re2record = moE2edit_;
-			cell.RzKey = E2_nPedometer;
-			cell.mValueMin = E2_nPedometer_MIN;
-			cell.mValueMax = E2_nPedometer_MAX;
-			cell.mValueDec = 0;
-			cell.mDialStep = 10;
-			cell.mStepperStep = 1;
-			cell.mValuePrev = iPrevPedometer_;
-			[cell drawRect:cell.frame]; // コンテンツ描画
-			return cell;
-		}	break;
-			
-		case 8: {
-			E2editCellDial *cell = [self cellDial:tableView];
-			cell.ibLbName.text = NSLocalizedString(@"BodyFat Name",nil);
-			cell.ibLbDetail.text = NSLocalizedString(@"BodyFat Detail",nil);
-			cell.ibLbUnit.text = @"％";
-			cell.Re2record = moE2edit_;
-			cell.RzKey = E2_nBodyFat_10p;
-			cell.mValueMin = E2_nBodyFat_MIN;
-			cell.mValueMax = E2_nBodyFat_MAX;
-			cell.mValueDec = 1;
-			cell.mDialStep = 1;
-			cell.mStepperStep = 1;
-			cell.mValuePrev = iPrevBodyFat_;
-			[cell drawRect:cell.frame]; // コンテンツ描画
-			return cell;
-		}	break;
-			
-		case 9: {
-			E2editCellDial *cell = [self cellDial:tableView];
-			cell.ibLbName.text = NSLocalizedString(@"SkMuscle Name",nil);
-			cell.ibLbDetail.text = NSLocalizedString(@"SkMuscle Detail",nil);
-			cell.ibLbUnit.text = @"％";
-			cell.Re2record = moE2edit_;
-			cell.RzKey = E2_nSkMuscle_10p;
-			cell.mValueMin = E2_nSkMuscle_MIN;
-			cell.mValueMax = E2_nSkMuscle_MAX;
-			cell.mValueDec = 1;
-			cell.mDialStep = 1;
-			cell.mStepperStep = 1;
-			cell.mValuePrev = iPrevSkMuscle_;
-			[cell drawRect:cell.frame]; // コンテンツ描画
-			return cell;
-		}	break;
-			
-/*		case 10: 
-			if (editMode_==0) { // AddNew
-				E2editCellTweet *cell = [self cellTweet:tableView];
+	if (indexPath.row==0) {
+		UITableViewCell *cell = [self cellDate:tableView];
+		return cell;
+	}
+	else if (1<=indexPath.row && indexPath.row<=[mPanels count]) 
+	{	// 測定パネル順序に従ってセル表示する
+		NSInteger iPanel = [[mPanels objectAtIndex:indexPath.row-1] integerValue];
+		if (iPanel < 0) { // 負ならばグラフ表示ON
+			iPanel *= (-1); // 正にする
+		}
+		switch (iPanel) {
+			case 0: {
+				E2editCellNote *cell = [self cellNote:tableView];
+				cell.Re2record = moE2edit_;
 				[cell drawRect:cell.frame]; // コンテンツ描画
 				return cell;
-			}
-			break;*/
+			}	break;
+				
+			case 1: {
+				E2editCellDial *cell = [self cellDial:tableView];
+				cell.ibLbName.text = NSLocalizedString(@"BpHi Name",nil);
+				cell.ibLbDetail.text = NSLocalizedString(@"BpHi Detail",nil);
+				cell.ibLbUnit.text = @"mmHg";
+				cell.Re2record = moE2edit_;
+				cell.RzKey = E2_nBpHi_mmHg;
+				cell.mValueMin = E2_nBpHi_MIN;
+				cell.mValueMax = E2_nBpHi_MAX;
+				cell.mValueDec = 0;
+				cell.mDialStep = 1;
+				cell.mStepperStep = 1;
+				cell.mValuePrev = iPrevBpHi_;
+				[cell drawRect:cell.frame]; // コンテンツ描画
+				return cell;
+			}	break;
+				
+			case 2: {
+				E2editCellDial *cell = [self cellDial:tableView];
+				cell.ibLbName.text = NSLocalizedString(@"BpLo Name",nil);
+				cell.ibLbDetail.text = NSLocalizedString(@"BpLo Detail",nil);
+				cell.ibLbUnit.text = @"mmHg";
+				cell.Re2record = moE2edit_;
+				cell.RzKey = E2_nBpLo_mmHg;
+				cell.mValueMin = E2_nBpLo_MIN;
+				cell.mValueMax = E2_nBpLo_MAX;
+				cell.mValueDec = 0;
+				cell.mDialStep = 1;
+				cell.mStepperStep = 1;
+				cell.mValuePrev = iPrevBpLo_;
+				[cell drawRect:cell.frame]; // コンテンツ描画
+				return cell;
+			}	break;
+				
+			case 3: {
+				E2editCellDial *cell = [self cellDial:tableView];
+				cell.ibLbName.text = NSLocalizedString(@"Pulse Name",nil);
+				cell.ibLbDetail.text = NSLocalizedString(@"Pulse Detail",nil);
+				cell.ibLbUnit.text = NSLocalizedString(@"Pulse unit",nil);
+				cell.Re2record = moE2edit_;
+				cell.RzKey = E2_nPulse_bpm;
+				cell.mValueMin = E2_nPuls_MIN;
+				cell.mValueMax = E2_nPuls_MAX;
+				cell.mValueDec = 0;
+				cell.mDialStep = 1;
+				cell.mStepperStep = 1;
+				cell.mValuePrev = iPrevPuls_;
+				[cell drawRect:cell.frame]; // コンテンツ描画
+				return cell;
+			}	break;
+				
+			case 4: {
+				E2editCellDial *cell = [self cellDial:tableView];
+				cell.ibLbName.text = NSLocalizedString(@"Weight Name",nil);
+				cell.ibLbDetail.text = NSLocalizedString(@"Weight Detail",nil);
+				cell.ibLbUnit.text = @"Kg";
+				cell.Re2record = moE2edit_;
+				cell.RzKey = E2_nWeight_10Kg;
+				cell.mValueMin = E2_nWeight_MIN;
+				cell.mValueMax = E2_nWeight_MAX;
+				cell.mValueDec = 1;
+				cell.mDialStep = 1;
+				cell.mStepperStep = 1;
+				cell.mValuePrev = iPrevWeight_;
+				[cell drawRect:cell.frame]; // コンテンツ描画
+				return cell;
+			}	break;
+				
+			case 5: {
+				E2editCellDial *cell = [self cellDial:tableView];
+				cell.ibLbName.text = NSLocalizedString(@"Temp Name",nil);
+				cell.ibLbDetail.text = NSLocalizedString(@"Temp Detail",nil);
+				cell.ibLbUnit.text = @"℃";
+				cell.Re2record = moE2edit_;
+				cell.RzKey = E2_nTemp_10c;
+				cell.mValueMin = E2_nTemp_MIN;
+				cell.mValueMax = E2_nTemp_MAX;
+				cell.mValueDec = 1;
+				cell.mDialStep = 1;
+				cell.mStepperStep = 1;
+				cell.mValuePrev = iPrevTemp_;
+				[cell drawRect:cell.frame]; // コンテンツ描画
+				return cell;
+			}	break;
+				
+			case 6: {
+				E2editCellDial *cell = [self cellDial:tableView];
+				cell.ibLbName.text = NSLocalizedString(@"Pedometer Name",nil);
+				cell.ibLbDetail.text = NSLocalizedString(@"Pedometer Detail",nil);
+				cell.ibLbUnit.text = NSLocalizedString(@"Pedometer Unit",nil);
+				cell.Re2record = moE2edit_;
+				cell.RzKey = E2_nPedometer;
+				cell.mValueMin = E2_nPedometer_MIN;
+				cell.mValueMax = E2_nPedometer_MAX;
+				cell.mValueDec = 0;
+				cell.mDialStep = 10;
+				cell.mStepperStep = 1;
+				cell.mValuePrev = iPrevPedometer_;
+				[cell drawRect:cell.frame]; // コンテンツ描画
+				return cell;
+			}	break;
+				
+			case 7: {
+				E2editCellDial *cell = [self cellDial:tableView];
+				cell.ibLbName.text = NSLocalizedString(@"BodyFat Name",nil);
+				cell.ibLbDetail.text = NSLocalizedString(@"BodyFat Detail",nil);
+				cell.ibLbUnit.text = @"％";
+				cell.Re2record = moE2edit_;
+				cell.RzKey = E2_nBodyFat_10p;
+				cell.mValueMin = E2_nBodyFat_MIN;
+				cell.mValueMax = E2_nBodyFat_MAX;
+				cell.mValueDec = 1;
+				cell.mDialStep = 1;
+				cell.mStepperStep = 1;
+				cell.mValuePrev = iPrevBodyFat_;
+				[cell drawRect:cell.frame]; // コンテンツ描画
+				return cell;
+			}	break;
+				
+			case 8: {
+				E2editCellDial *cell = [self cellDial:tableView];
+				cell.ibLbName.text = NSLocalizedString(@"SkMuscle Name",nil);
+				cell.ibLbDetail.text = NSLocalizedString(@"SkMuscle Detail",nil);
+				cell.ibLbUnit.text = @"％";
+				cell.Re2record = moE2edit_;
+				cell.RzKey = E2_nSkMuscle_10p;
+				cell.mValueMin = E2_nSkMuscle_MIN;
+				cell.mValueMax = E2_nSkMuscle_MAX;
+				cell.mValueDec = 1;
+				cell.mDialStep = 1;
+				cell.mStepperStep = 1;
+				cell.mValuePrev = iPrevSkMuscle_;
+				[cell drawRect:cell.frame]; // コンテンツ描画
+				return cell;
+			}	break;
+		}
 	}
 	// 余白部
 	return [self cellBlank:tableView];

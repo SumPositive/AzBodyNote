@@ -43,6 +43,7 @@
 	NSUbiquitousKeyValueStore *kvsGoal_;
 	
 	EKCalendar	*mEKCalendar;
+	NSArray		*mPanels;
 }
 
 @property (nonatomic, assign) NSInteger	editMode;		//==0:AddNew,  1:Edit,  2:Goal Edit
