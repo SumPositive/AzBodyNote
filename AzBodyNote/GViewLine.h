@@ -1,5 +1,5 @@
 //
-//  GViewPuls.h
+//  GViewLine.h
 //  AzBodyNote
 //
 //  Created by 松山 masa on 12/04/15.
@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <QuartzCore/QuartzCore.h>
 
-@interface GViewPuls : UIView
+@interface GViewLine : UIView
 
 @property (nonatomic, retain) NSArray		*ppE2records;
 @property (nonatomic, retain) NSString		*ppEntityKey;

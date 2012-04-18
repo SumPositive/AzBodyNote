@@ -12,10 +12,8 @@
 #import "MocEntity.h"
 #import "MocFunctions.h"
 #import "GraphView.h"
-
 #import "GViewDate.h"
-#import "GViewBp.h"
-#import "GViewPuls.h"
+#import "GViewLine.h"
 
 
 #ifdef DEBUGxxx
@@ -52,14 +50,14 @@
 	
 	GViewDate						*mGvDate;
 	//GViewDate						*mGvDate2;
-	GViewPuls						*mGvBpHi;
-	GViewPuls						*mGvBpLo;
-	GViewPuls						*mGvPuls;
-	GViewPuls						*mGvTemp;
-	GViewPuls						*mGvWeight;
-	GViewPuls						*mGvPedo;
-	GViewPuls						*mGvFat;
-	GViewPuls						*mGvSk;
+	GViewLine						*mGvBpHi;
+	GViewLine						*mGvBpLo;
+	GViewLine						*mGvPuls;
+	GViewLine						*mGvTemp;
+	GViewLine						*mGvWeight;
+	GViewLine						*mGvPedo;
+	GViewLine						*mGvFat;
+	GViewLine						*mGvSk;
 }
 
 @end

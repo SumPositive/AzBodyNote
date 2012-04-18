@@ -69,10 +69,22 @@
 	CGContextScaleCTM(cgc, 1.0, -1.0);
 	//　全域クリア
 	CGContextSetRGBFillColor (cgc, 0.67, 0.67, 0.67, 1.0); // スクロール領域外と同じグレー
-	CGContextFillRect(cgc, self.bounds);
+	CGContextFillRect(cgc, rect);
+	// 領域の下線
+	CGRect rc = rect; //self.bounds;
+	rc.origin.y = 1;  //rc.size.height - 3;
+	rc.size.height = 2;
+	CGContextSetRGBFillColor (cgc, 0.75, 0.75, 0.75, 1.0);
+	CGContextFillRect(cgc, rc);
+	
 	//文字列の設定
-	CGContextSetTextDrawingMode (cgc, kCGTextFillStroke);
-	CGContextSelectFont (cgc, "Helvetica", 12.0, kCGEncodingMacRoman); // ＜＜日本語NG
+	CGContextSetTextDrawingMode (cgc, kCGTextFill);  //kCGTextFillStroke
+	// "Helvetica"OK   "Optima"NG
+	CGContextSelectFont (cgc, "Helvetica", 12.0, kCGEncodingMacRoman); // ＜＜日本語NG 
+	// 文字列 カラー設定(0.0-1.0でRGBAを指定する)
+	//CGContextSetRGBStrokeColor(cgc, 151.0/255, 80.0/255, 77.0/255, 1.0); //文字の色
+	//CGContextSetRGBFillColor (cgc, 151.0/255, 80.0/255, 77.0/255, 1.0);
+	CGContextSetRGBFillColor (cgc, 151.0/295, 80.0/295, 77.0/295, 1.0);
 
 	for (int iNo=0; iNo < arrayNo; iNo++) 
 	{
@@ -80,14 +92,12 @@
 		// 数値
 		long val = valuesArray[ iNo ];
 		//NSLog(@"graphDrawDate: [ %d ]=%ld=(%.2f, %.2f)", iNo, val, po.x, po.y);
-		// 文字列 カラー設定(0.0-1.0でRGBAを指定する)
-		CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 1.0);
-		CGContextSetRGBFillColor (cgc, 0, 0, 0, 1.0);
+		
 		const char *cc;
 		if (val < 1000000) {
 			//cc = [[NSString stringWithString:NSLocalizedString(@"TheGoal",nil)] UTF8String]; ＜＜日本語NG
 			cc = [[NSString stringWithString:@"GOAL"] UTF8String];
-			CGContextShowTextAtPoint (cgc, po.x-15, po.y+14, cc, strlen(cc));
+			CGContextShowTextAtPoint (cgc, po.x-15, po.y+6, cc, strlen(cc));
 		}
 		else {
 			int iMonth = val / 1000000;
@@ -99,10 +109,10 @@
 			int iMinute = val;
 			
 			cc = [[NSString stringWithFormat:@"%d/%d", iMonth, iDay] UTF8String];
-			CGContextShowTextAtPoint (cgc, po.x-15, po.y+20, cc, strlen(cc));
+			CGContextShowTextAtPoint (cgc, po.x-15, po.y+12, cc, strlen(cc));
 			
 			cc = [[NSString stringWithFormat:@"%02d:%02d", iHour, iMinute] UTF8String];
-			CGContextShowTextAtPoint (cgc, po.x-15, po.y+8, cc, strlen(cc));
+			CGContextShowTextAtPoint (cgc, po.x-15, po.y+0, cc, strlen(cc));
 		}
 	}
 }

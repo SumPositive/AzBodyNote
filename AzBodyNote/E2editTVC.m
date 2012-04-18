@@ -450,22 +450,6 @@
 													 initWithTitle:NSLocalizedString(@"Cancel",nil)
 													 style:UIBarButtonItemStyleBordered 
 													 target:self action:@selector(actionCancel)];
-			
-			if (!buDelete_) { // [Delete]ボタンを 余白セルに置く
-				buDelete_ = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-				[buDelete_ setTitle:NSLocalizedString(@"Delete E2",nil) forState:UIControlStateNormal];
-				[buDelete_ setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
-				[buDelete_ addTarget:self action:@selector(actionDelete:) forControlEvents:UIControlEventTouchUpInside];
-				
-				NSIndexPath* indexPath = [NSIndexPath indexPathForRow:10 inSection:0];
-				CGRect rc = [self.tableView rectForRowAtIndexPath:indexPath];
-				rc.size.width /= 2;
-				rc.origin.x = rc.size.width / 2;
-				rc.origin.y += 10;  //((rc.size.height - 30) / 2);
-				rc.size.height = 30;
-				buDelete_.frame = rc;
-				[self.tableView addSubview:buDelete_];
-			}
 		}	break;
 
 		case 2: //-------------------------------------------------------------------- Goal Edit
@@ -534,7 +518,7 @@
 		// 日付修正から戻ったとき
 		bEditDate_ = NO;
 	}
-	else if (editMode_==0) {
+	else if (editMode_==0) {	// AddNew
 		if (moE2edit_==nil) {
 			//
 			NSArray *e2recs = [mocFunc_ select: E2_ENTITYNAME		 limit: 0	offset: 0
@@ -553,6 +537,28 @@
 				// 初期値セット
 				[self actionClear];
 			}
+		}
+	}
+	else if (editMode_==1) {	// Modify
+		if (!buDelete_) { // [Delete]ボタンを 余白セルに置く
+			buDelete_ = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+			[buDelete_ setTitle:NSLocalizedString(@"Delete E2",nil) forState:UIControlStateNormal];
+			[buDelete_ setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+			[buDelete_ addTarget:self action:@selector(actionDelete:) forControlEvents:UIControlEventTouchUpInside];
+			NSIndexPath* indexPath;
+			@try {
+				indexPath = [NSIndexPath indexPathForRow:[mPanels count]+1 inSection:0]; //【注意】
+			}
+			@catch (NSException *exception) {
+				NSLog(@"***ERROR*** indexPathForRow: NN 測定項目の増減による影響に注意");
+			}
+			CGRect rc = [self.tableView rectForRowAtIndexPath:indexPath];
+			rc.size.width /= 2;
+			rc.origin.x = rc.size.width / 2;
+			rc.origin.y += 10;  //((rc.size.height - 30) / 2);
+			rc.size.height = 30;
+			buDelete_.frame = rc;
+			[self.tableView addSubview:buDelete_];
 		}
 	}
 	else if (kvsGoal_==nil) {
@@ -936,9 +942,9 @@
 				
 			case AzConditionPedo: {
 				E2editCellDial *cell = [self cellDial:tableView];
-				cell.ibLbName.text = NSLocalizedString(@"Pedometer Name",nil);
-				cell.ibLbDetail.text = NSLocalizedString(@"Pedometer Detail",nil);
-				cell.ibLbUnit.text = NSLocalizedString(@"Pedometer Unit",nil);
+				cell.ibLbName.text = NSLocalizedString(@"Pedo Name",nil);
+				cell.ibLbDetail.text = NSLocalizedString(@"Pedo Detail",nil);
+				cell.ibLbUnit.text = NSLocalizedString(@"Pedo Unit",nil);
 				cell.Re2record = moE2edit_;
 				cell.RzKey = E2_nPedometer;
 				cell.mValueMin = E2_nPedometer_MIN;

@@ -80,11 +80,12 @@
 
 - (void)labelGraphRect:(CGRect)rect  text:(NSString*)text
 {
-	UILabel *lb = [[UILabel alloc] initWithFrame:CGRectMake(rect.origin.x+rect.size.width-30, rect.origin.y+3, 100,20)];
+	UILabel *lb = [[UILabel alloc] initWithFrame:CGRectMake(rect.origin.x+rect.size.width, 
+															rect.origin.y+rect.size.height-22, 100,16)];
 	lb.text = text;
 	lb.backgroundColor = [UIColor clearColor];
-	lb.textColor = [UIColor grayColor];
-	lb.font = [UIFont systemFontOfSize:16];
+	lb.textColor = [UIColor darkGrayColor];
+	lb.font = [UIFont systemFontOfSize:14];
 	lb.adjustsFontSizeToFitWidth = YES;
 	lb.minimumFontSize = 10;
 	[ibScrollView addSubview:lb];
@@ -140,7 +141,7 @@
 	// rc = 原点左上
 	CGRect rcgv = rc;
 	//------------------------------------------------------日付
-	rcgv.origin.y = 18;
+	rcgv.origin.y = 10;
 	rcgv.size.height = 35;
 	if (mGvDate==nil) {
 		mGvDate = [[GViewDate alloc] initWithFrame: rcgv]; // 日付専用
@@ -153,7 +154,7 @@
 	}
 	//------------------------------------------------------ グラフ
 	rcgv.origin.y += rcgv.size.height;
-	CGFloat fHeight = ibScrollView.bounds.size.height - rcgv.origin.y - 10;  // 日付と下の余白を除く
+	CGFloat fHeight = ibScrollView.bounds.size.height - rcgv.origin.y - 8;  // 日付と下の余白を除く
 	NSInteger iPs = [mPanelGraphs count];
 	assert(0<iPs);
 	fHeight /= iPs;	// 1パネルあたりの高さ
@@ -165,7 +166,7 @@
 		{
 			case AzConditionBpHi:
 				if (mGvBpHi==nil) {
-					mGvBpHi = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
+					mGvBpHi = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvBpHi.ppE2records = e2recs;
 					mGvBpHi.ppEntityKey = E2_nBpHi_mmHg;
 					mGvBpHi.ppGoalKey = Goal_nBpHi_mmHg;
@@ -182,7 +183,7 @@
 				break;
 			case AzConditionBpLo:
 				if (mGvBpLo==nil) {
-					mGvBpLo = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
+					mGvBpLo = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvBpLo.ppE2records = e2recs;
 					mGvBpLo.ppEntityKey = E2_nBpLo_mmHg;
 					mGvBpLo.ppGoalKey = Goal_nBpLo_mmHg;
@@ -199,7 +200,7 @@
 				break;
 			case AzConditionPuls:
 				if (mGvPuls==nil) {
-					mGvPuls = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
+					mGvPuls = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvPuls.ppE2records = e2recs;
 					mGvPuls.ppEntityKey = E2_nPulse_bpm;
 					mGvPuls.ppGoalKey = Goal_nPulse_bpm;
@@ -207,7 +208,7 @@
 					mGvPuls.ppMin = E2_nPuls_MIN;
 					mGvPuls.ppMax = E2_nPuls_MAX;
 					[ibScrollView addSubview:mGvPuls];
-					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Puls Name",nil)];
+					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Pulse Name",nil)];
 				} else {
 					mGvPuls.ppE2records = e2recs;
 					[mGvBpHi setFrame:rcgv];
@@ -217,7 +218,7 @@
 
 			case AzConditionWeight:		//------------------------------------------------------体重
 				if (mGvWeight==nil) {
-					mGvWeight = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
+					mGvWeight = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvWeight.ppE2records = e2recs;
 					mGvWeight.ppEntityKey = E2_nWeight_10Kg;
 					mGvWeight.ppGoalKey = Goal_nWeight_10Kg;
@@ -235,7 +236,7 @@
 				
 			case AzConditionTemp:			//------------------------------------------------------体温
 				if (mGvTemp==nil) {
-					mGvTemp = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
+					mGvTemp = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvTemp.ppE2records = e2recs;
 					mGvTemp.ppEntityKey = E2_nTemp_10c;
 					mGvTemp.ppGoalKey = Goal_nTemp_10c;
@@ -253,7 +254,7 @@
 				
 			case AzConditionPedo:		//------------------------------------------------------歩数
 				if (mGvPedo==nil) {
-					mGvPedo = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
+					mGvPedo = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvPedo.ppE2records = e2recs;
 					mGvPedo.ppEntityKey = E2_nPedometer;
 					mGvPedo.ppGoalKey = Goal_nPedometer;
@@ -271,7 +272,7 @@
 				
 			case AzConditionFat:			//------------------------------------------------------体脂肪率
 				if (mGvFat==nil) {
-					mGvFat = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
+					mGvFat = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvFat.ppE2records = e2recs;
 					mGvFat.ppEntityKey = E2_nBodyFat_10p;
 					mGvFat.ppGoalKey = Goal_nBodyFat_10p;
@@ -289,7 +290,7 @@
 				
 			case AzConditionSkm:			//------------------------------------------------------骨格筋率
 				if (mGvSk==nil) {
-					mGvSk = [[GViewPuls alloc] initWithFrame: rcgv]; // 1値汎用
+					mGvSk = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvSk.ppE2records = e2recs;
 					mGvSk.ppEntityKey = E2_nSkMuscle_10p;
 					mGvSk.ppGoalKey = Goal_nSkMuscle_10p;
@@ -374,29 +375,6 @@
 			[mua addObject:num];
 		}
 	}
-	if (mPanelGraphs && ![mPanelGraphs isEqualToArray:mua]) {
-		// 変化ありにつき、クリアする
-		mGvBpHi = nil;
-		mGvBpLo = nil;
-		mGvPuls = nil;
-		mGvTemp = nil;
-		mGvWeight = nil;
-		mGvPedo = nil;
-		mGvFat = nil;
-		mGvSk = nil;
-		NSLog(@"ibScrollView.subviews={%@}", ibScrollView.subviews);
-		for (id  sv in ibScrollView.subviews) {
-			if ([sv isMemberOfClass:[UILabel class]]) {
-				UILabel *lb = sv;
-				[lb removeFromSuperview];
-			}
-			else if ([sv isMemberOfClass:[GViewPuls class]]) {
-				GViewPuls *gv = sv;
-				[gv removeFromSuperview];
-			}
-		}
-		NSLog(@"ibScrollView.subviews={%@}", ibScrollView.subviews);
-	}
 	mPanelGraphs = [NSArray arrayWithArray:mua]; //グラフON(-)のパネルだけ
 }
 
@@ -416,18 +394,13 @@
 	//ibScrollView.contentOffset = CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);  
 }
 
-- (void)viewDidUnload
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [super viewDidUnload];
-}
-
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 	//return YES; //[0.9]ヨコにすると「血圧の日変動分布」グラフ表示する
 }
+
 /*
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
@@ -447,6 +420,43 @@
 	
 }
 */
+
+- (void)viewDidDisappear:(BOOL)animated
+{	// Called after the view was dismissed, covered or otherwise hidden. Default does nothing
+	// クリアする
+	mGvDate = nil;
+	mGvBpHi = nil;
+	mGvBpLo = nil;
+	mGvPuls = nil;
+	mGvTemp = nil;
+	mGvWeight = nil;
+	mGvPedo = nil;
+	mGvFat = nil;
+	mGvSk = nil;
+	NSLog(@"ibScrollView.subviews={%@}", ibScrollView.subviews);
+	for (id  sv in ibScrollView.subviews) {
+		if ([sv isMemberOfClass:[UILabel class]]) {
+			UILabel *lb = sv;
+			[lb removeFromSuperview];
+		}
+		else if ([sv isMemberOfClass:[GViewLine class]]) {
+			GViewLine *gv = sv;
+			[gv removeFromSuperview];
+		}
+		else if ([sv isMemberOfClass:[GViewDate class]]) {
+			GViewDate *gv = sv;
+			[gv removeFromSuperview];
+		}
+	}
+	NSLog(@"ibScrollView.subviews={%@}", ibScrollView.subviews);
+}
+
+- (void)viewDidUnload
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [super viewDidUnload];
+}
+
 
 #pragma mark - iCloud
 - (void)refreshAllViews:(NSNotification*)note 

@@ -47,7 +47,7 @@
 }
 
 @property (nonatomic, assign) NSInteger	editMode;		//==0:AddNew,  1:Edit,  2:Goal Edit
-@property (nonatomic, retain) E2record		*moE2edit;
+@property (nonatomic, strong) E2record		*moE2edit;
 
 // <delegate>
 //- (void)buttonSave:(BOOL)pop;

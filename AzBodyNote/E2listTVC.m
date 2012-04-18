@@ -19,7 +19,7 @@
 @end
 
 @implementation E2listTVC
-@synthesize fetchedResultsController = frc_;
+@synthesize fetchedResultsController = __fetchedRc;
 
 
 #pragma mark - iCloud
@@ -214,7 +214,7 @@
 	else { 
 		// 最終行を表示する
 		@try {	// 範囲オーバーで落ちる可能性があるため。 
-			NSIndexPath* ipGoal = [NSIndexPath indexPathForRow:0 inSection: [[self.fetchedResultsController sections] count]];
+			NSIndexPath* ipGoal = [NSIndexPath indexPathForRow:0 inSection: [[__fetchedRc sections] count]];
 			// GOAL! 行へ
 			[self.tableView scrollToRowAtIndexPath: ipGoal
 								  atScrollPosition:UITableViewScrollPositionMiddle animated:NO];  // 実機検証結果:NO
@@ -302,7 +302,7 @@
 	{
 		case ALERT_TAG_DeleteE2: {	// この記録を削除する
 			if (indexPathDelete_) {
-				[mocFunc_ deleteEntity:[self.fetchedResultsController objectAtIndexPath:indexPathDelete_]];
+				[mocFunc_ deleteEntity:[__fetchedRc objectAtIndexPath:indexPathDelete_]];
 				[mocFunc_ commit];
 				indexPathDelete_ = nil;
 			}
@@ -317,14 +317,14 @@
 // Customize the number of sections in the table view.
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-	return [[self.fetchedResultsController sections] count] + 1;	//+1:GOAL
+	return [[__fetchedRc sections] count] + 1;	//+1:GOAL
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-	if (section < [[self.fetchedResultsController sections] count]) 
+	if (section < [[__fetchedRc sections] count]) 
 	{ // 明細セクション
-		id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:section];
+		id <NSFetchedResultsSectionInfo> sectionInfo = [[__fetchedRc sections] objectAtIndex:section];
 		return [sectionInfo numberOfObjects];
 	}
 	// GOALセクション
@@ -337,9 +337,9 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {	// セクション ヘッダ
-	if (section < [[self.fetchedResultsController sections] count])
+	if (section < [[__fetchedRc sections] count])
 	{ // 明細セクション
-		NSInteger iYearMM = [[[[self.fetchedResultsController sections] objectAtIndex:section] name] integerValue];
+		NSInteger iYearMM = [[[[__fetchedRc sections] objectAtIndex:section] name] integerValue];
 		NSInteger iYear = iYearMM / 100;
 		
 		if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) 
@@ -376,7 +376,7 @@
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	if (indexPath.section < [[self.fetchedResultsController sections] count]) 
+	if (indexPath.section < [[__fetchedRc sections] count]) 
 	{ // 明細セクション
 		static NSString *Cid = @"E2listCell";  //== Class名
 		E2listCell *cell = (E2listCell*)[tableView dequeueReusableCellWithIdentifier:Cid];
@@ -434,7 +434,7 @@
 {
 	//NSLog(@"configureCell: indexPath=%@", indexPath);
 	if (indexPath) {
-		cell.moE2node = (E2record*)[self.fetchedResultsController objectAtIndexPath:indexPath];
+		cell.moE2node = (E2record*)[__fetchedRc objectAtIndexPath:indexPath];
 	} else {
 		cell.moE2node = nil; // GOAL!
 	}
@@ -444,7 +444,7 @@
 // Override to support conditional editing of the table view.
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {	// Return NO if you do not want the specified item to be editable.
-	if (indexPath.section < [[self.fetchedResultsController sections] count]) 
+	if (indexPath.section < [[__fetchedRc sections] count]) 
 	{ // 明細セクション
 		return YES;	// フリックDelete許可
 	}
@@ -486,13 +486,16 @@
 	{
 		// Assume self.view is the table view
 		NSIndexPath *path = [self.tableView indexPathForSelectedRow];//選択中のセル位置
-		//NSLog(@"prepareForSegue: path=%@", path);
+		NSLog(@"prepareForSegue: path={%@}", path);
 		E2editTVC *editVc = [segue destinationViewController];
 		editVc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
-		if (path.section < [[self.fetchedResultsController sections] count]) 
+		if (path.section < [[__fetchedRc sections] count]) 
 		{ // 明細セクション
+			//NSLog(@"prepareForSegue: __fetchedRc={%@}", __fetchedRc);
+			//NSLog(@"prepareForSegue: [__fetchedRc sections]={%@}", [__fetchedRc sections]);
+			//NSLog(@"prepareForSegue: [__fetchedRc objectAtIndexPath:path]={%@}", [__fetchedRc objectAtIndexPath:path]);
 			editVc.editMode = 1;		//Edit
-			editVc.moE2edit = (E2record *)[self.fetchedResultsController objectAtIndexPath:path];
+			editVc.moE2edit = (E2record *)[__fetchedRc objectAtIndexPath:path];
 		} else {
 			editVc.editMode = 2;		//GOAL Edit
 			editVc.moE2edit = nil;	//GOAL
@@ -507,7 +510,7 @@
 	// Storyboard導入により、prepareForSegue:が、ここよりも「先に」呼び出されることに留意。
 	// E2editTVC:遷移は、prepareForSegue:にて処理している。
 	
-	if ([[self.fetchedResultsController sections] count] <= indexPath.section) 
+	if ([[__fetchedRc sections] count] <= indexPath.section) 
 	{	// Functions
 		indexPathEdit_ = nil; // Editモード解除
 		if (indexPath.row==1) {	// Dropbox
@@ -525,9 +528,9 @@
 
 - (NSFetchedResultsController *)fetchedResultsController
 {	// データ抽出コントローラを生成する
-    if (frc_)
+    if (__fetchedRc)
     {	// 既に生成済み
-        return frc_;
+        return __fetchedRc;
     }
     
     /*
@@ -580,7 +583,7 @@
 	    abort();
 	}
 	
-    self.fetchedResultsController = aFrc; //retain
+    __fetchedRc = aFrc; //retain
     //[aFrc release];
     //[fetchRequest release];
     return aFrc;

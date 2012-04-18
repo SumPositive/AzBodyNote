@@ -1,5 +1,5 @@
 //
-//  GViewPuls.m
+//  GViewLine.m
 //  AzBodyNote
 //
 //  Created by 松山 masa on 12/04/15.
@@ -9,10 +9,10 @@
 #import "Global.h"
 #import "MocEntity.h"
 #import "GraphVC.h"
-#import "GViewPuls.h"
+#import "GViewLine.h"
 
 
-@implementation GViewPuls
+@implementation GViewLine
 @synthesize ppE2records = __E2records;
 @synthesize ppEntityKey = __EntityKey;
 @synthesize ppGoalKey = __GoalKey;
@@ -54,7 +54,7 @@
 	CGContextStrokePath(cgc);
 	
 	//文字列の設定
-	CGContextSetTextDrawingMode (cgc, kCGTextFillStroke);
+	CGContextSetTextDrawingMode (cgc, kCGTextFill);
 	CGContextSelectFont (cgc, "Helvetica", 12.0, kCGEncodingMacRoman);
 	CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 1.0);	// 文字の色
 	// グラフ ストロークカラー設定(0.0-1.0でRGBAを指定する)
@@ -101,6 +101,15 @@
 		return;
 	}
 	//NSLog(@"__E2records=%@", __E2records);
+
+/*	// グラデーション
+	CAGradientLayer *pageGradient = [CAGradientLayer layer];
+    pageGradient.frame = rect;
+	id c1 = (id)[UIColor colorWithRed:151/255 green:80/255 blue:77/255 alpha:0.3].CGColor;  //端色
+	id c2 = (id)[UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:0.3].CGColor;		//中央色
+    pageGradient.colors = [NSArray arrayWithObjects: c1, c2, c2, c2, c1, nil];
+    [self.layer insertSublayer:pageGradient atIndex:0]; //一番下に追加
+*/
 	
 	//--------------------------------------------------------------------------------------- iCloud KVS GOAL!
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
@@ -124,31 +133,16 @@
 	CGContextRef cgc = UIGraphicsGetCurrentContext();
 	// CoreGraphicsの原点が左下なので原点を合わせる
 	CGContextTranslateCTM(cgc, 0, rect.size.height);
-	CGContextScaleCTM(cgc, 1.0, -1.0);
+	CGContextScaleCTM(cgc, 1.0, -1.0);	//Y座標(-1)反転
 	//　全域クリア
 	CGContextSetRGBFillColor (cgc, 0.67, 0.67, 0.67, 1.0); // スクロール領域外と同じグレー
-	CGContextFillRect(cgc, self.bounds);
-/*	// 全域グラデーション
-	CGFloat locations[2] = {0.0, 1.0};
-	CGColorSpaceRef  colorspace = CGColorSpaceCreateDeviceRGB();
-	// グラデーションの色（今回は 2 地点分）を CGColorRef を格納した CFArrayRef 配列で用意します。
-	CGColorRef colors[2];
-	colors[0] = self.backgroundColor.CGColor;
-	colors[1] = [[UIColor colorWithRed:1.0 green:1.0 blue:0.745 alpha:1.0] CGColor];
-	CFArrayRef colors_buffer = CFArrayCreate(kCFAllocatorDefault, (__bridge void **)colors, 2, &kCFTypeArrayCallBacks);
-	
-	// グラデーションの描画に必要な情報を揃えます。
-	// 描画の開始地点と終了地点は、ここではそれぞれ、UIView の左上と右下（斜めのグラデーション）に指定しています
-	CGGradientRef gradient = CGGradientCreateWithColors(colorspace, colors_buffer, locations);
-	CGPoint startPoint = rect.origin;
-	CGPoint endPoint = CGPointMake(rect.origin.x + rect.size.width, rect.origin.y + rect.size.height);
-	// グラデーションをキャンバスに描画します。
-	CGContextDrawLinearGradient(cgc, gradient, startPoint, endPoint, 0);
-	// 使い終わった CF オブジェクトを解放します。
-	CGGradientRelease(gradient);
-	CGColorSpaceRelease(colorspace);
-	CFRelease(colors_buffer); 
- */
+	CGContextFillRect(cgc, rect);
+	// 領域の下線
+	CGRect rc = rect; //self.bounds;
+	rc.origin.y = 1;  //rc.size.height - 3;
+	rc.size.height = 2;
+	CGContextSetRGBFillColor (cgc, 0.75, 0.75, 0.75, 1.0);
+	CGContextFillRect(cgc, rc);
 	
 	CGFloat fYstep;
 	CGPoint po;

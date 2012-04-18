@@ -115,7 +115,8 @@
 	switch (item) {
 		case AzConditionNote:
 			cell.textLabel.text = NSLocalizedString(@"SettPanel Note",nil);
-			cell.userInteractionEnabled = NO; // 操作なし
+			//cell.userInteractionEnabled = NO; //NG//Moveできない
+			cell.selectionStyle = UITableViewCellSelectionStyleNone; // 選択時ハイライトなし
 			break;
 		case AzConditionBpHi:
 			cell.textLabel.text = NSLocalizedString(@"SettPanel BpHi",nil);

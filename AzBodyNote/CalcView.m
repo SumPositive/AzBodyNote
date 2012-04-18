@@ -678,17 +678,6 @@ int levelOperator( NSString *zOpe )  // 演算子の優先順位
 				case 17: bu.tag=2; [bu setTitle:@"×" forState:UIControlStateNormal]; break;
 				case 18: bu.tag=2; [bu setTitle:@"-" forState:UIControlStateNormal]; break;
 				case 19: bu.tag=2; [bu setTitle:@"+" forState:UIControlStateNormal]; break;
-
-		/*		case 20: bu.tag=2; [bu setTitle:@"(" forState:UIControlStateNormal]; break;
-				case 21: bu.tag=2; [bu setTitle:@")" forState:UIControlStateNormal]; break;
-				case 22: bu.tag=7; 
-					[bu setTitle:NSLocalizedString(@"Calc NoTax",nil) forState:UIControlStateNormal]; 
-					bu.titleLabel.font = [UIFont boldSystemFontOfSize:18]; 
-					break;
-				case 23: bu.tag=8; 
-					[bu setTitle:NSLocalizedString(@"Calc InTax",nil) forState:UIControlStateNormal]; 
-					bu.titleLabel.font = [UIFont boldSystemFontOfSize:18]; 
-					break; */
 			}
 			
 			if (1 < bu.tag)	bu.alpha = 0.8;
