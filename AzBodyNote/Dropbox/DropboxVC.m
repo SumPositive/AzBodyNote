@@ -77,18 +77,32 @@
 		return;
 	}
 	
-	//NSUserDefaults *userDef = [NSUserDefaults standardUserDefaults];
-	//[userDef setObject:filename  forKey:USER_FILENAME_KEY];
-	//[userDef synchronize];
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	[kvs setObject: toNSNull(filename) forKey:USER_FILENAME_KEY];
 	[kvs synchronize]; // iCloud最新同期（取得）
-
-	UIActionSheet *as = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Dropbox Are you sure", nil) 
+	
+	// 上書き確認
+	mOverWriteRev = nil;
+	for (DBMetadata *dbm in  mMetadatas) {
+		if ([filename  isEqualToString:[dbm.filename stringByDeletingPathExtension]]) {  // 拡張子を除く
+			mOverWriteRev = dbm.rev;  // OverWrite Revision
+			break;
+		}
+	}
+	
+	NSString *destructiveButtonTitle = nil;
+	NSString *otherButtonTitle = nil;
+	if (mOverWriteRev) {
+		destructiveButtonTitle = NSLocalizedString(@"Dropbox OverWrite", nil); // 上書き保存　＜＜ overWriteRev_を使ってアップロード
+		otherButtonTitle = NSLocalizedString(@"Dropbox Sequential", nil); // 連番を付けて保存
+	} else {
+		otherButtonTitle = NSLocalizedString(@"Dropbox Save", nil); // 新規保存
+	}
+	UIActionSheet *as = [[UIActionSheet alloc] initWithTitle: filename  //NSLocalizedString(@"Dropbox Are you sure", nil) 
 													delegate:self 
-										   cancelButtonTitle:NSLocalizedString(@"Cancel", nil) 
-									  destructiveButtonTitle:nil 
-											otherButtonTitles:NSLocalizedString(@"Dropbox Save", nil), nil];
+										   cancelButtonTitle: NSLocalizedString(@"Cancel", nil) 
+									  destructiveButtonTitle: destructiveButtonTitle
+										   otherButtonTitles: otherButtonTitle, nil];
 	as.tag = TAG_ACTION_Save;
 	[as showInView:self.view];
 	[ibTfName resignFirstResponder]; // キーボードを隠す
@@ -195,6 +209,8 @@
 
 - (void)restClient:(DBRestClient *)client loadedMetadata:(DBMetadata *)metadata 
 {	// メタデータ読み込み成功
+	mOverWriteRev = nil;
+	
     if (metadata.isDirectory) {
 #ifdef DEBUG
         NSLog(@"Folder '%@' contains:", metadata.path);
@@ -321,31 +337,7 @@
 	}
     return 0;
 }
-/*
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
-	switch (section) {
-		case 1:
-			return NSLocalizedString(@"Dropbox Save", nil);
-		case 2:
-			return NSLocalizedString(@"Dropbox Load", nil);
-	}
-	return nil;
-}
 
-- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
-{
-	switch (section) {
-		case 0:
-			return NSLocalizedString(@"Dropbox", nil);
-		case 1:
-			return NSLocalizedString(@"Dropbox", nil);
-		case 2:
-			return @"(C) 2011 Azukid";
-	}
-	return nil;
-}
-*/
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *CellIdentifier = @"Cell";
@@ -361,6 +353,7 @@
 			if (0 < [mMetadatas count]) {
 				DBMetadata *dbm = [mMetadatas objectAtIndex:indexPath.row];
 				cell.textLabel.text = [dbm.filename stringByDeletingPathExtension]; // 拡張子を除く
+				//日時表示予定// dbm.lastModifiedDate
 			} else {
 				cell.textLabel.text = NSLocalizedString(@"Dropbox NoFile", nil);
 			}
@@ -491,21 +484,33 @@ replacementString:(NSString *)string
 			filename = [filename stringByAppendingPathExtension:DBOX_EXTENSION]; // 改めて拡張子を付ける
 			NSLog(@"TAG_ACTION_Save: filename=%@", filename);
 			[self alertIndicatorOn:NSLocalizedString(@"Dropbox Communicating", nil)];
-			// File Save
-			AppDelegate* apd = (AppDelegate*)[[UIApplication sharedApplication] delegate];
-			NSString *zErr = [apd tmpFileSave];
-			if (zErr) { // tmpフォルダの一時ファイル[apd tmpFilePath]に書き出す
-				// NG
-				UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Dropbox SaveErr", nil)
-															  message:zErr
-															 delegate:nil
-													cancelButtonTitle:nil
-													otherButtonTitles:NSLocalizedString(@"Roger", nil), nil];
-				[alv	show];
-			} else {
-				// Upload
-				[[self restClient] uploadFile:filename toPath:@"/" withParentRev:nil fromPath:[apd tmpFilePath]];
+			if (buttonIndex != actionSheet.destructiveButtonIndex) { // otherbutton
+				// < Overwrite > しない！
+				mOverWriteRev = nil; // 連番を付けて保存
 			}
+			dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+			dispatch_async(queue, ^{		// 非同期マルチスレッド処理
+				// ファイルへ書き出す
+				AppDelegate* apd = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+				NSString *zErr = [apd tmpFileSave];
+				
+				dispatch_async(dispatch_get_main_queue(), ^{	// 終了後の処理
+					if (zErr==nil) {
+						// Upload開始		// mOverWriteRev=nil ならば連番付加追記
+						[[self restClient] uploadFile:filename toPath:@"/" withParentRev:mOverWriteRev fromPath:[apd tmpFilePath]];
+					}
+					else {
+						[self alertIndicatorOff];	// 進捗サインOFF
+						// NG
+						UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Dropbox SaveErr", nil)
+																	  message:zErr
+																	 delegate:nil
+															cancelButtonTitle:nil
+															otherButtonTitles:NSLocalizedString(@"Roger", nil), nil];
+						[alv	show];
+					}
+				});
+			});
 		} break;
 			
 		case TAG_ACTION_Retrieve:		// リストア

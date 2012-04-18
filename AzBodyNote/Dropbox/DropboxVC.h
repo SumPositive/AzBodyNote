@@ -31,8 +31,7 @@ UITextFieldDelegate, DBRestClientDelegate, UIActionSheetDelegate>
 	UIActivityIndicatorView	*mActivityIndicator;
 	UIAlertView						*mAlert;
 	NSIndexPath					*mDidSelectRowAtIndexPath;
-	//BOOL						bPad;
-	//NSString					*mRootPath;
+	NSString							*mOverWriteRev;
 }
 
 @property (nonatomic, strong) id					delegate;
