@@ -35,7 +35,7 @@
 {
 	//assert(count <= GRAPH_PAGE_LIMIT + );
 	// グラフ ストロークカラー設定(0.0-1.0でRGBAを指定する)
-	CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 0.8); // 折れ線の色
+	CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 0.9); // 折れ線の色
 #ifdef YES
 	// 折れ線
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -49,6 +49,27 @@
 	// スプライン曲線
 #endif
 	CGContextStrokePath(cgc);
+	
+	// 移動平均スプライン曲線
+	CGPoint	splineArray[GRAPH_PAGE_LIMIT+20+1];
+	int splineCnt = 0;
+	int iCnt = 5;
+	int iNo;
+	for (iNo=1; iNo < count - iCnt; iNo++) 
+	{
+		CGFloat fy = 0.0;
+		for (int ii=0; ii<iCnt; ii++)
+		{
+			fy += points[ iNo+ii ].y;
+		}
+		splineArray[splineCnt++] = CGPointMake(points[iNo].x, (fy / (CGFloat)iCnt)); //過去iCnt個の平均値
+	}	
+	if (2<iNo) {
+		//CGContextAddCurveToPoint
+		CGContextSetRGBStrokeColor(cgc, 1, 1, 1, 0.7); // 折れ線の色
+		CGContextAddLines(cgc, splineArray, iNo-1);	
+		CGContextStrokePath(cgc);
+	}
 	
 	//文字列の設定
 	CGContextSetTextDrawingMode (cgc, kCGTextFill);

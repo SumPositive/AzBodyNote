@@ -27,7 +27,7 @@
 @synthesize mocBase = __mocBase;
 @synthesize tabBarController = __tabBarController;
 @synthesize adWhirlView = __pAdWhirlView;
-@synthesize app_is_sponsor = __app_is_sponsor;
+//@synthesize app_is_sponsor = __app_is_sponsor;
 @synthesize app_is_unlock = __app_is_unlock;
 @synthesize app_e2record_count = __app_e2record_count;
 @synthesize app_is_AdShow = __app_is_AdShow;
@@ -105,8 +105,7 @@
 	NSDictionary *dicDef = [[NSDictionary alloc] initWithObjectsAndKeys: // 直後にreleaseしている
 							@"0",				GUD_Calc_Method,					// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
 							@"YES",			GUD_Calc_RoundBankers,		// YES=偶数丸め  NO=四捨五入
-							@"NO",			GUD_bPaid,								// YES=PAID
-							@"NO",			GUD_bUnlock,							// YES=Unlock
+							@"NO",			STORE_PRODUCTID_UNLOCK,		// YES=AppStore In-App Purchase ProductIdentifier
 							@"NO",			GUD_bTweet,							// YES=新規保存後ツイート
 							@"YES",			GUD_bGoal,								// YES=GOAL表示する
 							@"NO",			GUD_bCalender,						// YES=カレンダーへ記録
@@ -129,11 +128,21 @@
 				   nil];
 		[userDefaults setObject:aPanels forKey:GUD_SettPanels];
 	}
-	[userDefaults synchronize]; // plistへ書き出す
 
 	// 画面表示に関係する Option Setting を取得する
-	__app_is_sponsor = [userDefaults boolForKey:GUD_bPaid];
-	__app_is_unlock = [userDefaults boolForKey:GUD_bUnlock];
+	//__app_is_sponsor = [userDefaults boolForKey:STORE_PRODUCTID_UNLOCK]; //GUD_bPaid
+	__app_is_unlock = [userDefaults boolForKey:STORE_PRODUCTID_UNLOCK];  //GUD_bUnlock
+
+	//[0.8]以前に対応するため
+	if (__app_is_unlock==NO) {
+		__app_is_unlock = [userDefaults boolForKey:@"GUD_bPaid"];  //[0.8]以前の定義
+		if (__app_is_unlock==NO) {
+			__app_is_unlock = [userDefaults boolForKey:@"GUD_bUnlock"];  //[0.8]以前の定義
+		}
+		// UDへ登録
+		[userDefaults setBool:__app_is_unlock forKey:STORE_PRODUCTID_UNLOCK];
+	}
+	[userDefaults synchronize]; // plistへ書き出す
 	
 	// Moc初期化
 	if (__mocBase==nil) {
@@ -148,7 +157,7 @@
 		exit(0);
 	}
 	//app_is_iPad_ = [[[UIDevice currentDevice] model] hasPrefix:@"iPad"];	// iPad
-	//NSLog(@"app_is_iPad_=%d,  app_is_Ad_=%d,  app_is_sponsor_=%d", app_is_iPad_, app_is_Ad_, app_is_sponsor_);
+	//NSLog(@"app_is_iPad_=%d,  app_is_Ad_=%d,  __app_is_unlock=%d", app_is_iPad_, app_is_Ad_, __app_is_unlock);
 
 	//  iCloud KVS 
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
@@ -167,14 +176,20 @@
 		[kvs setObject:[NSNumber numberWithInt:E2_nSkMuscle_INIT] forKey:Goal_nSkMuscle_10p];
 		[kvs synchronize];
 	}
-	if (__app_is_sponsor==NO) {
-		__app_is_sponsor = [kvs boolForKey:GUD_bPaid];
-	}
-	
-	if (__app_is_sponsor && __app_is_unlock==NO) {
-		__app_is_unlock = YES;
-		[userDefaults setBool:YES forKey:GUD_bUnlock];
-		//[kvs setBool:YES forKey:GUD_bUnlock];  KVSには保存しない ＜＜再インスト時にリセットさせるため
+	if (__app_is_unlock==NO) {
+		__app_is_unlock = [kvs boolForKey:STORE_PRODUCTID_UNLOCK];
+		//[0.8]以前に対応するため
+		if (__app_is_unlock==NO) {
+			__app_is_unlock = [kvs boolForKey:@"GUD_bPaid"];  //[0.8]以前の定義
+			if (__app_is_unlock==NO) {
+				__app_is_unlock = [kvs boolForKey:@"GUD_bUnlock"];  //[0.8]以前の定義
+			}
+		}
+		if (__app_is_unlock) {	// UDへ登録
+			[userDefaults setBool:YES forKey:STORE_PRODUCTID_UNLOCK];
+			[userDefaults synchronize]; // plistへ書き出す
+			//[kvs setBool:YES forKey:STORE_PRODUCTID_UNLOCK];  KVSには保存しない ＜＜再インスト時にリセットさせるため
+		}
 	}
 
 	//-------------------------------------------------デバイス、ＯＳ確認
@@ -202,7 +217,7 @@
 							 root:kDBRootAppFolder]; // either kDBRootAppFolder or kDBRootDropbox
 	[DBSession setSharedSession:dbSession];
 
-	if (__app_is_sponsor==NO) {
+	if (__app_is_unlock==NO) {
 		//CGRect rcAd = CGRectMake(0, self.view.frame.size.height-28-50, 320, 50);  // GAD_SIZE_320x50
 		//--------------------------------------------------------------------------------------------------------- AdWirl
 		if (__pAdWhirlView==nil) {
@@ -727,13 +742,6 @@
 - (void)adWhirlDidReceiveAd:(AdWhirlView *)adWhirlView
 {	// 広告を受信したとき
 	NSLog(@"AdWhirl - adWhirlDidReceiveAd");
-/*	if (__app_is_sponsor==NO && __app_is_AdShow) {	// 無償 ＆ 広告表示可能
-		//adWhirlView.alpha = 1;	// (0)AddEdit (1)List
-		adWhirlView.hidden = NO;
-	} else {
-		//adWhirlView.alpha = 0;	// (2)Graph (3)Information
-		adWhirlView.hidden = YES;
-	}*/
 }
 
 - (void)adWhirlDidFailToReceiveAd:(AdWhirlView *)adWhirlView usingBackup:(BOOL)yesOrNo

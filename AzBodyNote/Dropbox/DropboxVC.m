@@ -279,6 +279,10 @@
 													cancelButtonTitle:nil
 													otherButtonTitles:NSLocalizedString(@"Roger", nil), nil];
 				[alv	show];
+				// NFM_REFETCH_ALL_DATA 通知
+				NSNotification* refreshNotification = [NSNotification notificationWithName:NFM_REFETCH_ALL_DATA
+																					object:self  userInfo:nil];
+				[[NSNotificationCenter defaultCenter] postNotification:refreshNotification];
 			}
 			else {
 				// NG

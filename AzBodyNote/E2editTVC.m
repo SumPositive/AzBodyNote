@@ -183,7 +183,7 @@
 	TWTweetComposeViewController *tweetVC = [[TWTweetComposeViewController alloc] init];
     [tweetVC setInitialText:message];
     //[tweetVC addImage: [UIImage imageNamed:@"Icon57"]];
-	if (appDelegate_.app_is_sponsor==NO) {
+	if (appDelegate_.app_is_unlock==NO) {
 		[tweetVC addURL:[NSURL URLWithString: NSLocalizedString(@"Tweet URL",nil)]];
 	}
     [self presentModalViewController:tweetVC animated:YES];
@@ -435,7 +435,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self 
 											 selector:@selector(refreshAllViews:) 
 												 name:NFM_REFRESH_ALL_VIEWS
-											   object:[[UIApplication sharedApplication] delegate]];
+											   object:nil];
 
 	// iCloud KVS 変更通知を受け取る
 	[[NSNotificationCenter defaultCenter] addObserver:self
@@ -533,6 +533,8 @@
 	appDelegate_.app_is_AdShow = YES; //これは広告表示可能なViewである。 viewWillAppear:以降で定義すること
 	
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	appDelegate_.app_is_unlock = [userDefaults boolForKey:STORE_PRODUCTID_UNLOCK];
+
 	// カレンダー設定
 	if ([userDefaults objectForKey:GUD_CalendarID]) {
 		mEKCalendar = [appDelegate_.eventStore 
@@ -602,7 +604,7 @@
 {
 	[super viewDidAppear:animated];
 
-	if (appDelegate_.app_is_sponsor==NO  &&  appDelegate_.adWhirlView) {	// Ad ON
+	if (appDelegate_.app_is_unlock==NO  &&  appDelegate_.adWhirlView) {	// Ad ON
 		[UIView beginAnimations:nil context:NULL];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
 		[UIView setAnimationDuration:1.2];
@@ -724,12 +726,15 @@
 
 - (void)refreshAllViews:(NSNotification*)note 
 {	// iCloud-CoreData に変更があれば呼び出される
-	if ([appDelegate_ app_is_sponsor]==NO) {
+	if ([appDelegate_ app_is_unlock]==NO) {
 		NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 		[kvs synchronize]; // 最新同期
-		appDelegate_.app_is_sponsor = [kvs boolForKey:GUD_bPaid];
-		if (appDelegate_.app_is_sponsor && appDelegate_.app_is_unlock==NO) {
+		if ([kvs boolForKey:STORE_PRODUCTID_UNLOCK] && appDelegate_.app_is_unlock==NO) {
 			appDelegate_.app_is_unlock = YES;
+			// UDへ登録
+			NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+			[userDefaults setBool:appDelegate_.app_is_unlock  forKey:STORE_PRODUCTID_UNLOCK];
+			[userDefaults synchronize];
 		}
 	}
 	[self.tableView reloadData];

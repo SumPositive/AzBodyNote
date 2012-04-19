@@ -8,8 +8,6 @@
 #import "SettingTVC.h"
 
 
-#define STORE_PRODUCTID_UNLOCK		@"com.azukid.AzBodyNote.Unlock"		// In-App Purchase ProductIdentifier
-
 
 @interface SettingTVC (Private)
 @end
@@ -49,7 +47,7 @@
 		mAppDelegate.adWhirlView.frame = CGRectMake(0, 700, 320, 50);  // GAD_SIZE_320x50
 		mAppDelegate.adWhirlView.hidden = YES;
 		
-		if (mAppDelegate.app_is_sponsor) {
+		if (mAppDelegate.app_is_unlock) {
 			// あずき商店にて Non-Ad を購入した直後。Ad停止＆破棄する
 			[mAppDelegate adDealloc];
 		}
@@ -131,7 +129,7 @@
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 			}
 			cell.textLabel.text = NSLocalizedString(@"SettTweet",nil);
-			if (mAppDelegate.app_is_sponsor) {
+			if (mAppDelegate.app_is_unlock) {
 				cell.detailTextLabel.text = NSLocalizedString(@"SettTweet detail",nil);
 			} else {
 				cell.detailTextLabel.text = NSLocalizedString(@"SettTweet detail FREE",nil);
@@ -298,5 +296,18 @@
 	}
 }
 
+
+#pragma mark - <AZStoreDelegate>
+- (void)azStorePurchesed:(NSString*)productID
+{	//既に呼び出し元にて、[userDefaults setBool:YES  forKey:productID]　登録済み
+	GA_TRACK_EVENT(@"AZStore", @"azStorePurchesed", productID,1);
+	if ([productID isEqualToString:STORE_PRODUCTID_UNLOCK]) {
+		mAppDelegate.app_is_unlock = YES; //購入済み
+	}
+	// NFM_REFRESH_ALL_VIEWS 通知
+	NSNotification* refreshNotification = [NSNotification notificationWithName:NFM_REFRESH_ALL_VIEWS
+																		object:self  userInfo:nil];
+	[[NSNotificationCenter defaultCenter] postNotification:refreshNotification];
+}
 
 @end

@@ -25,19 +25,18 @@
 
 - (void)refreshAllViews:(NSNotification*)note 
 {	// iCloud-CoreData に変更があれば呼び出される
-    if (note) {
-		//  iCloud KVS 
-		if ([appDelegate_ app_is_sponsor]==NO) {
-			NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-			[kvs synchronize]; // 最新同期
-			appDelegate_.app_is_sponsor = [kvs boolForKey:GUD_bPaid];
-			if (appDelegate_.app_is_sponsor && appDelegate_.app_is_unlock==NO) {
-				appDelegate_.app_is_unlock = YES;
-			}
+	if ([appDelegate_ app_is_unlock]==NO) {
+		NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+		[kvs synchronize]; // 最新同期
+		if ([kvs boolForKey:STORE_PRODUCTID_UNLOCK] && appDelegate_.app_is_unlock==NO) {
+			appDelegate_.app_is_unlock = YES;
+			// UDへ登録
+			NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+			[userDefaults setBool:appDelegate_.app_is_unlock  forKey:STORE_PRODUCTID_UNLOCK];
+			[userDefaults synchronize];
 		}
-		//[self viewWillAppear:NO];
-		[self.tableView reloadData];
-    }
+	}
+	[self.tableView reloadData];
 }
 
 - (void)reloadFetchedResults:(NSNotification*)note 
@@ -53,10 +52,7 @@
 		GA_TRACK_EVENT_ERROR([error description],0);
 		abort();
 	}		
-    
-    if (note) {
-        [self.tableView reloadData];
-    }
+	[self.tableView reloadData];
 }
 
 
@@ -117,73 +113,25 @@
 	}
 	[self.tableView addSubview:lbPagePrev_];
 
+	// 再読み込み
     [self reloadFetchedResults:nil];
 	
 	// observe the app delegate telling us when it's finished asynchronously setting up the persistent store
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadFetchedResults:) 
 												 name:NFM_REFETCH_ALL_DATA
-											   object:[[UIApplication sharedApplication] delegate]];
+											   object:nil];
 	
 	// listen to our app delegates notification that we might want to refresh our detail view
     [[NSNotificationCenter defaultCenter] addObserver:self 
 											 selector:@selector(refreshAllViews:) 
 												 name:NFM_REFRESH_ALL_VIEWS 
-											   object:[[UIApplication sharedApplication] delegate]];
+											   object:nil];
 	
 	// iCloud KVS 変更通知を受け取る
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(refreshAllViews:) 
 												 name:NSUbiquitousKeyValueStoreDidChangeExternallyNotification 
 											   object:nil];
-	
-/*** UserDef方式にした。
-	//---------------------------------------------------------------------------------------------------------
-	// didFinishLaunchingWithOptions:では、早すぎるためか落ちるため、ここに実装してた。
-	// E2 目標(The GOAL)固有レコードが無ければ追加する
-	NSArray *arFetch = [mocFunc_ select:E2_ENTITYNAME
-										limit:0		//=0:無制限  ＜＜ 1にすると結果は0件になるのでダメ
-										offset:0
-										where:[NSPredicate predicateWithFormat: E2_dateTime @" == %@", [MocFunctions dateGoal]]
-										sort:nil];
-	if ([arFetch count] <= 0) { // 無いので追加する
-		E2record *moE2goal = [mocFunc_ insertAutoEntity:E2_ENTITYNAME];
-		// 固有日付をセット
-		moE2goal.dateTime = [MocFunctions dateGoal];
-		moE2goal.nYearMM = [NSNumber numberWithInteger: E2_nYearMM_GOAL];	// 主に、こちらで比較チェックする
-		NSLog(@"moE2goal.dateTime=%@  .nYearMM=%@", moE2goal.dateTime, moE2goal.nYearMM);
-		// 目標の初期値　⇒ GOALの値がAddNewの初期値になる
-		moE2goal.nBpHi_mmHg = [NSNumber numberWithInteger: E2_nBpHi_INIT];
-		moE2goal.nBpLo_mmHg = [NSNumber numberWithInteger: E2_nBpLo_INIT];
-		moE2goal.nPulse_bpm = [NSNumber numberWithInteger: E2_nPuls_INIT];
-		moE2goal.nWeight_10Kg = [NSNumber numberWithInteger: E2_nWeight_INIT];
-		moE2goal.nTemp_10c = [NSNumber numberWithInteger: E2_nTemp_INIT];
-		// Save & Commit
-		[mocFunc_ commit];
-	}
-	else if (1 < [arFetch count]) { // 2以上あるので削除する
-		for (E2record *e2 in arFetch) {
-			------------??????????????????????
-			[mocFunc_ deleteEntity:e2];
-		}
-		// Save & Commit
-		[mocFunc_ commit];
-	}
-*/
-	
-/*	//--------------------------------------------------------------------------------------------------------- AdMob
-	if (appDelegate_.app_is_sponsor==NO && adMobView_==nil) {
-		adMobView_ = [[GADBannerView alloc]
-					  initWithFrame:CGRectMake(0, 0,			// TableCell用
-											   GAD_SIZE_320x50.width,
-											   GAD_SIZE_320x50.height)];
-		adMobView_.delegate = self;		// Unload時に nil セットして解除すること。
-		adMobView_.rootViewController = self.navigationController;
-		adMobView_.adUnitID = AdMobID_BodyNote;
-		GADRequest *request = [GADRequest request];
-		[adMobView_ loadRequest:request];
-		adMobView_.tag = 0;
-		adMobView_.alpha = 0;
-	}*/
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -191,9 +139,10 @@
     [super viewWillAppear:animated];
 	appDelegate_.app_is_AdShow = YES; //これは広告表示可能なViewである。 viewWillAppear:以降で定義すること
 
-	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	//mbGoal = [userDefaults boolForKey:GUD_bGoal];
+	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	appDelegate_.app_is_unlock = [userDefaults boolForKey:STORE_PRODUCTID_UNLOCK];
 
+	// 表示行調整
 	if (indexPathEdit_) { // E2editTVC:から戻ったとき、
 		@try {	// 範囲オーバーで落ちる可能性があるため。　＜＜最終行を削除したとき。
 			NSLog(@"viewWillAppear: indexPathEdit_=%@", indexPathEdit_);
@@ -327,7 +276,7 @@
 		return [sectionInfo numberOfObjects];
 	}
 	// GOALセクション
-	if (appDelegate_.app_is_sponsor) {
+	if (appDelegate_.app_is_unlock) {
 		return 2;
 	} else {
 		return 3; // Goal + Dropbox + Ad
@@ -682,46 +631,5 @@
 		}
 	}
 }
-/*
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
-{	// スクロール終了時（指を離した時）に呼ばれる
-	//NSLog(@"scrollViewDidEndDragging: .contentOffset.y=%f  decelerate=%d", scrollView.contentOffset.y, decelerate);
-	if (appDelegate_.gud_bPaid) {
-		if (scrollView.contentOffset.y < -50) {
-			// 前ページへ
-			//e2offset_ += LIST_PAGE_LIMIT;
-			//[self.tableView reloadData];
-		}
-	}
-}
-*/
-
-/*
-#pragma mark - AdMob <GADBannerViewDelegate>
-- (void)adViewDidReceiveAd:(GADBannerView *)bannerView 
-{	// AdMob 広告あり
-	adMobView_.tag = 1;
-	if (adMobView_.alpha==1) return; // 既に表示
-	NSLog(@"E2list: AdMob - DidReceive");
-	// 非表示ならば、表示する
-	[UIView beginAnimations:nil context:NULL];
-	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-	[UIView setAnimationDuration:2.0];
-	adMobView_.alpha = 1;
-	[UIView commitAnimations];
-}
-
-- (void)adView:(GADBannerView *)bannerView didFailToReceiveAdWithError:(GADRequestError *)error 
-{	// AdMob 広告なし
-	adMobView_.tag = 0;
-	if (adMobView_.alpha==0) return; // 既に非表示
-	NSLog(@"E2list: AdMob - FailToReceive　Error:%@", [error localizedDescription]);
-	[UIView beginAnimations:nil context:NULL];
-	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-	[UIView setAnimationDuration:2.0];
-	adMobView_.alpha = 0;
-	[UIView commitAnimations];
-}
- */
 
 @end

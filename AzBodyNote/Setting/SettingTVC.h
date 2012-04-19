@@ -15,7 +15,7 @@
 #import "SettPanelTVC.h"
 
 
-@interface SettingTVC : UITableViewController
+@interface SettingTVC : UITableViewController <AZStoreDelegate>
 {
 @private
 	AppDelegate					*mAppDelegate;

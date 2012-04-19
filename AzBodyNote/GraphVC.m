@@ -63,7 +63,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self 
 											 selector:@selector(refreshAllViews:) 
 												 name:NFM_REFRESH_ALL_VIEWS 
-											   object:[[UIApplication sharedApplication] delegate]];
+											   object:nil];
 	
 	ibScrollView.delegate = self; // <UIScrollViewDelegate>
 	ibScrollView.directionalLockEnabled = YES;
@@ -99,8 +99,8 @@
 	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
 	NSArray *sortDesc = [NSArray arrayWithObjects: sort1,nil]; // 日付降順：Limit抽出に使用
 	
-	NSInteger iOverLeft = 3;  // iPad対応時に調整が必要
-	NSInteger iOverRight = 2;  // GOAL列が常に+1される
+	NSInteger iOverLeft = 1;  // iPad対応時に調整が必要
+	NSInteger iOverRight = 0;  // GOAL列が常に+1される
 	NSInteger iOffset = (GRAPH_PAGE_LIMIT * page);
 
 	if (page==0) {
@@ -193,8 +193,8 @@
 					[self labelGraphRect:rcgv  text:NSLocalizedString(@"BpLo Name",nil)];
 				} else {
 					mGvBpLo.ppE2records = e2recs;
-					[mGvBpHi setFrame:rcgv];
-					[mGvBpHi setNeedsDisplay]; //drawRect:が呼び出される
+					[mGvBpLo setFrame:rcgv];
+					[mGvBpLo setNeedsDisplay]; //drawRect:が呼び出される
 				}
 				break;
 			case AzConditionPuls:
@@ -210,8 +210,8 @@
 					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Pulse Name",nil)];
 				} else {
 					mGvPuls.ppE2records = e2recs;
-					[mGvBpHi setFrame:rcgv];
-					[mGvBpHi setNeedsDisplay]; //drawRect:が呼び出される
+					[mGvPuls setFrame:rcgv];
+					[mGvPuls setNeedsDisplay]; //drawRect:が呼び出される
 				}
 				break;
 
@@ -228,8 +228,8 @@
 					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Weight Name",nil)];
 				} else {
 					mGvWeight.ppE2records = e2recs;
-					[mGvBpHi setFrame:rcgv];
-					[mGvBpHi setNeedsDisplay]; //drawRect:が呼び出される
+					[mGvWeight setFrame:rcgv];
+					[mGvWeight setNeedsDisplay]; //drawRect:が呼び出される
 				}
 				break;
 				
@@ -246,8 +246,8 @@
 					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Temp Name",nil)];
 				} else {
 					mGvTemp.ppE2records = e2recs;
-					[mGvBpHi setFrame:rcgv];
-					[mGvBpHi setNeedsDisplay]; //drawRect:が呼び出される
+					[mGvTemp setFrame:rcgv];
+					[mGvTemp setNeedsDisplay]; //drawRect:が呼び出される
 				}
 				break;
 				
@@ -264,8 +264,8 @@
 					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Pedo Name",nil)];
 				} else {
 					mGvPedo.ppE2records = e2recs;
-					[mGvBpHi setFrame:rcgv];
-					[mGvBpHi setNeedsDisplay]; //drawRect:が呼び出される
+					[mGvPedo setFrame:rcgv];
+					[mGvPedo setNeedsDisplay]; //drawRect:が呼び出される
 				}
 				break;
 				
@@ -282,8 +282,8 @@
 					[self labelGraphRect:rcgv  text:NSLocalizedString(@"BodyFat Name",nil)];
 				} else {
 					mGvFat.ppE2records = e2recs;
-					[mGvBpHi setFrame:rcgv];
-					[mGvBpHi setNeedsDisplay]; //drawRect:が呼び出される
+					[mGvFat setFrame:rcgv];
+					[mGvFat setNeedsDisplay]; //drawRect:が呼び出される
 				}
 				break;
 				
@@ -300,8 +300,8 @@
 					[self labelGraphRect:rcgv  text:NSLocalizedString(@"SkMuscle Name",nil)];
 				} else {
 					mGvSk.ppE2records = e2recs;
-					[mGvBpHi setFrame:rcgv];
-					[mGvBpHi setNeedsDisplay]; //drawRect:が呼び出される
+					[mGvSk setFrame:rcgv];
+					[mGvSk setNeedsDisplay]; //drawRect:が呼び出される
 				}
 				break;
 				
@@ -504,17 +504,14 @@
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {	// スクロール終了時（指を離した時）に呼ばれる
-	NSLog(@"scrollViewDidEndDragging: .contentOffset.x=%f  .y=%f / height=%f", 
-		  scrollView.contentOffset.x, scrollView.contentOffset.y, scrollView.frame.size.height);
+	//NSLog(@"scrollViewDidEndDragging: .contentOffset.x=%f  .y=%f / height=%f", 
+	//	  scrollView.contentOffset.x, scrollView.contentOffset.y, scrollView.frame.size.height);
 
 	if (mAppDelegate.app_is_unlock) {
 		if (scrollView.contentOffset.x < -70) {
 			// PREV（過去）ページへ
 			if (uiActivePage_ < uiActivePageMax_) {
 				NSLog(@"scrollViewDidEndDragging: PREV uiActivePage_=%d + 1", uiActivePage_);
-				// 画面左側にインジケータ表示
-				//[actIndicator_ setFrame:CGRectMake(80, ibScrollView.frame.size.height/2-25, 50, 50)];
-				//[actIndicator_ startAnimating];
 				[self graphViewPage:uiActivePage_ + 1  animated:YES];
 			}
 		}
@@ -522,16 +519,9 @@
 			// NEXT（未来）ページへ
 			if (0 < uiActivePage_) {
 				NSLog(@"scrollViewDidEndDragging: NEXT uiActivePage_=%d - 1", uiActivePage_);
-				// 画面右側にインジケータ表示
-				//[actIndicator_ setFrame:CGRectMake(ibScrollView.contentSize.width-80-50, ibScrollView.frame.size.height/2-25, 50, 50)];
-				//[actIndicator_ startAnimating];
 				[self graphViewPage:uiActivePage_ - 1 animated:YES];
 			}
 		}
-	/*	else {
-			NSLog(@"scrollViewDidEndDragging: scrollView.contentSize.width=%f  scrollView.contentSize.width=%f", 
-												scrollView.contentSize.width, scrollView.contentSize.width);
-		}*/
 	}
 }
 
