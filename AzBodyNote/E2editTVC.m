@@ -156,6 +156,7 @@
 	assert(editMode_==0);
 	assert(moE2edit_);
 	assert(kvsGoal_==nil);
+	GA_TRACK_METHOD
 
 	moE2edit_.dateTime = [NSDate date];
 	moE2edit_.nYearMM = [NSNumber numberWithInteger:196300]; // < 200000 : 未確定（AddNew途中）
@@ -177,6 +178,7 @@
 
 - (void)actionTweet:(NSString*)message
 {
+	GA_TRACK_METHOD
 	NSLog(@"actionTweet: message=%@", message);
 	TWTweetComposeViewController *tweetVC = [[TWTweetComposeViewController alloc] init];
     [tweetVC setInitialText:message];
@@ -255,33 +257,6 @@
 	}
 	NSLog(@"actionSave: zTweet={%@}", zTweet);
 	
-	// Twitter Export
-	if ([userDefaults boolForKey:GUD_bTweet]) {
-		// Tweet メッセージ作成
-		NSString *zz = zTweet;
-		if (editMode_==0) { // AddNewのとき
-			// 新規 「なう」
-			zz = [zz stringByAppendingString: NSLocalizedString(@"Tweet Now",nil)];
-		} else {
-			// 修正
-			// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
-			NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-			NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
-			[fmt setCalendar:calendar];
-			if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) 
-			{ // 「書式」で変わる。　「言語」でない
-				[fmt setDateFormat:@"yyyy年M月d日 EE  HH:mm"];
-			}
-			else {
-				[fmt setDateFormat:@"EE, MMM d, yyyy  HH:mm"];
-			}
-			zz = [zz stringByAppendingFormat:@"\n(%@ %@) ", 
-				  NSLocalizedString(@"Tweet Modify",nil), 
-				  [fmt stringFromDate:moE2edit_.dateTime]];
-		}
-		[self actionTweet: zz];
-	}
-	
 	// Calendar Export
 	if (appDelegate_.eventStore && mEKCalendar) {
 		EKEvent *event = nil;
@@ -328,10 +303,38 @@
 			[mocFunc_ commit];
 		}
 	}
+	
+	// Twitter Export
+	if ([userDefaults boolForKey:GUD_bTweet]) {
+		// Tweet メッセージ作成
+		NSString *zz = zTweet;
+		if (editMode_==0) { // AddNewのとき
+			// 新規 「なう」
+			zz = [zz stringByAppendingString: NSLocalizedString(@"Tweet Now",nil)];
+		} else {
+			// 修正
+			// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
+			NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+			NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
+			[fmt setCalendar:calendar];
+			if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) 
+			{ // 「書式」で変わる。　「言語」でない
+				[fmt setDateFormat:@"yyyy年M月d日 EE  HH:mm"];
+			}
+			else {
+				[fmt setDateFormat:@"EE, MMM d, yyyy  HH:mm"];
+			}
+			zz = [zz stringByAppendingFormat:@"\n(%@ %@) ", 
+				  NSLocalizedString(@"Tweet Modify",nil), 
+				  [fmt stringFromDate:moE2edit_.dateTime]];
+		}
+		[self actionTweet: zz];
+	}
 }
 
 - (void)actionSave
 {
+	GA_TRACK_METHOD
 	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
 
 	if (editMode_==0) { // AddNewのとき
@@ -396,6 +399,7 @@
 - (void)actionDelete:(UIButton *)button
 {
 	if (kvsGoal_) return;
+	GA_TRACK_METHOD
 	
 	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Delete E2",nil)
 													message: nil
@@ -1128,6 +1132,28 @@
 	switch (alertView.tag) 
 	{
 		case ALERT_TAG_DeleteE2: {	// この記録を削除する
+			if (10<[moE2edit_.sEventID length]) {
+				// カレンダー削除する
+				if (appDelegate_.eventStore && mEKCalendar) {
+					EKEvent *event = nil;
+					// ID検索  見つからなければ nil
+					event = [appDelegate_.eventStore eventWithIdentifier:moE2edit_.sEventID];
+					if (event) {	
+						// イベントが関連付けられるカレンダーを設定
+						[event setCalendar:mEKCalendar];
+						NSError *error;
+						// イベントをカレンダーから削除する
+						[appDelegate_.eventStore removeEvent:event span:EKSpanThisEvent error:&error];
+						if (error) {
+							GA_TRACK_EVENT_ERROR(@"removeEvent: error",0);
+							NSLog(@"removeEvent: error={%@}", [error localizedDescription]);
+						}
+					} else {
+						GA_TRACK_EVENT_ERROR(@"removeEvent: event=nil",0);
+					}
+				}
+			}
+			// 削除
 			[mocFunc_ deleteEntity:moE2edit_];
 			[mocFunc_ commit];
 			[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る

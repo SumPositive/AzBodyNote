@@ -64,6 +64,7 @@
 
 - (IBAction)ibBuSave:(UIButton *)button
 {
+	GA_TRACK_METHOD
 	NSString *filename = [ibTfName.text stringByDeletingPathExtension]; // 拡張子を除く
 	if ([filename length] < 3) {
 		UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Dropbox NameLeast", nil) 
@@ -107,6 +108,7 @@
 
 - (IBAction)ibSegSort:(UISegmentedControl *)segment
 {
+	GA_TRACK_METHOD
 	[self alertIndicatorOn:NSLocalizedString(@"Dropbox Communicating", nil)];
 	[[self restClient] loadMetadata:@"/"];
 }
@@ -412,6 +414,7 @@
 {
 	if (0<=indexPath.row && indexPath.row<[mMetadatas count]) 
 	{
+		GA_TRACK_METHOD
 		//[mDidSelectRowAtIndexPath release], 
 		mDidSelectRowAtIndexPath = nil;
 		DBMetadata *dbm = [mMetadatas objectAtIndex:indexPath.row];
