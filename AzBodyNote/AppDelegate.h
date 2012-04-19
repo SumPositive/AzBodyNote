@@ -9,12 +9,15 @@
 #import <UIKit/UIKit.h>
 #import <eventkit/EventKit.h>
 
-#import "MocFunctions.h"
 #import "AdWhirlView.h"
 #import "AdWhirlDelegateProtocol.h"
 #define GAD_SIZE_320x50     CGSizeMake(320, 50)
 #import "MasManagerViewController.h"
 #import "NADView.h"  //AppBank nend
+
+#import "Global.h"
+#import "MocEntity.h"
+#import "MocFunctions.h"
 
 
 @interface AppDelegate : NSObject <UIApplicationDelegate, AdWhirlDelegate, NADViewDelegate>
@@ -33,13 +36,13 @@
 	MasManagerViewController		*mMedibaAd; 
 }
 
-@property (nonatomic, retain) IBOutlet UIWindow *window;
-@property (nonatomic, retain) IBOutlet UITabBarController *tabBarController;
+@property (nonatomic, strong) IBOutlet UIWindow *window;
+@property (nonatomic, strong) IBOutlet UITabBarController *tabBarController;
 
-@property (nonatomic, retain, readonly) NSManagedObjectContext			*managedObjectContext;
-@property (nonatomic, retain, readonly) MocFunctions		*mocBase;
-@property (nonatomic, retain, readonly) AdWhirlView			*adWhirlView;
-@property (nonatomic, retain, readonly) EKEventStore		*eventStore;
+@property (nonatomic, strong, readonly) NSManagedObjectContext	*managedObjectContext;
+@property (nonatomic, strong, readonly) MocFunctions							*mocBase;
+@property (nonatomic, strong, readonly) AdWhirlView							*adWhirlView;
+@property (nonatomic, strong, readonly) EKEventStore							*eventStore;
 
 // app_ Global paramaters
 @property (nonatomic, assign) BOOL			app_is_sponsor;				// In App Purchese = 広告なし ＆ 制限解除

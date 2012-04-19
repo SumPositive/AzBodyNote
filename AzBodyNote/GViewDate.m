@@ -5,13 +5,11 @@
 //  Created by 松山 masa on 12/04/15.
 //  Copyright (c) 2012年 __MyCompanyName__. All rights reserved.
 //
-
 #import "GViewDate.h"
 #import "GraphVC.h"
 
 @implementation GViewDate
 @synthesize ppE2records = __E2records;
-//@synthesize ppSectionHeight = __SectionHeight;
 
 
 - (id)initWithFrame:(CGRect)frame

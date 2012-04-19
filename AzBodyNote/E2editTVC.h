@@ -8,24 +8,23 @@
 
 #import <UIKit/UIKit.h>
 //#import <iAd/iAd.h>
+#import <Twitter/TWTweetComposeViewController.h>
+//#import <DropboxSDK/JSON.h>
 
-#import "Global.h"
 #import "AppDelegate.h"
-#import "MocEntity.h"
-#import "MocFunctions.h"
+#import "EditDateVC.h"
 #import "E2editCellDial.h"
 #import "E2editCellNote.h"
-#import "EditDateVC.h"
 #import "E2editCellTweet.h"
-#import <Twitter/TWTweetComposeViewController.h>
 
 
 @interface E2editTVC : UITableViewController 
 			<UITableViewDelegate, NSFetchedResultsControllerDelegate, 
 				EditDateDelegate>
 {
-	AppDelegate		*appDelegate_;
-	MocFunctions				*mocFunc_;
+@private
+	AppDelegate			*appDelegate_;
+	MocFunctions			*mocFunc_;
 	
 	//BOOL			bAddNew_;  >>>>>>>>>  editMode_==0
 	BOOL			bEditDate_;

@@ -7,13 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Global.h"
+
 #import "AppDelegate.h"
 
 
 @interface SettPanelTVC : UITableViewController
 {
-
 @private
 	AppDelegate					*mAppDelegate;
 	NSMutableArray				*mPanels;

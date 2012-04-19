@@ -5,8 +5,6 @@
 //  Created by Sum Positive on 2011/10/01.
 //  Copyright 2011 Sum Positive@Azukid.com. All rights reserved.
 //
-
-#import "Global.h"
 #import "CalcView.h"
 
 
@@ -45,29 +43,6 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 @end
 
 @implementation CalcView
-{
-	NSString							*title_;		// [AC]で表示するため
-	NSDecimalNumber 		*answer_;	// 結果
-
-	double						mMin;
-	double						mMax;
-	int							mDecimal;		// 小数桁数
-
-	id								delegate_;
-	
-	UIView				*mSubView;
-	NSDecimalNumberHandler	*mBehaviorDefault;	// 通貨既定の丸め処理
-	NSDecimalNumberHandler	*mBehaviorCalc;		// 計算途中の丸め処理
-	
-	UILabel				*lbAnswer_;	// 結果表示
-	UILabel				*lbFormula_;	// 計算式表示
-
-	NSInteger			mRoundingScale;
-	BOOL					mIsShow;
-	int						mFunc;		// (0)Non (-4)+ (-5)- (-6)* (-7)/
-	CGRect				mRectHide;		// 表示定位置
-	CGRect				mRectShow;	// 隠れ位置
-}
 
 
 #pragma mark - Action

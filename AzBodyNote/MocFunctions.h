@@ -3,14 +3,19 @@
 //	AzBodyNote
 //
 //  Created by Sum Positive on 2011/10/01.
-//  Copyright 2011 Sum Positive@Azukid.com. All rights reserved.
+//  Copyright 2011 Sum Positive @Azukid.com. All rights reserved.
 //
 //  マルチＭＯＣ対応のため、インスタンスメソッドにした。
 
 #import <Foundation/Foundation.h>
+
+//#import "AppDelegate.h" この.hがAppDelegate.hに#importされるため不適切
+#import "Global.h"
 #import "MocEntity.h"
 
-@interface MocFunctions : NSObject {
+
+@interface MocFunctions : NSObject 
+{
 @private
 	NSManagedObjectContext		*moc_;
 }

@@ -10,6 +10,9 @@
 #import <DropboxSDK/DropboxSDK.h>
 #import <DropboxSDK/JSON.h>
 
+#import "AppDelegate.h"
+
+
 #define DBOX_KEY					@"qq4oke7nx6f8ivj"
 #define DBOX_SECRET			@"dq48qqerkqz9sen"
 #define DBOX_EXTENSION		@"condition"		//@"Condition"

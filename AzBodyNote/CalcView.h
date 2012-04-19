@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
+#import "Global.h"
+
+
 #define HEIGHT_TATE			300		// タテのときの高さ
 #define HEIGHT_YOKO			220		// ヨコのときの高さ
 #define GOLDENPER				1.618	// 黄金比
@@ -17,6 +20,30 @@
 
 
 @interface CalcView : UIView //<UITextFieldDelegate>
+{
+@private
+	NSString							*title_;		// [AC]で表示するため
+	NSDecimalNumber 		*answer_;	// 結果
+	
+	double						mMin;
+	double						mMax;
+	int							mDecimal;		// 小数桁数
+	
+	id								delegate_;
+	
+	UIView				*mSubView;
+	NSDecimalNumberHandler	*mBehaviorDefault;	// 通貨既定の丸め処理
+	NSDecimalNumberHandler	*mBehaviorCalc;		// 計算途中の丸め処理
+	
+	UILabel				*lbAnswer_;	// 結果表示
+	UILabel				*lbFormula_;	// 計算式表示
+	
+	NSInteger			mRoundingScale;
+	BOOL					mIsShow;
+	int						mFunc;		// (0)Non (-4)+ (-5)- (-6)* (-7)/
+	CGRect				mRectHide;		// 表示定位置
+	CGRect				mRectShow;	// 隠れ位置
+}
 
 // 公開メソッド
 //- (id)initWithTitle:(NSString*)title  min:(double)min  max:(double)max  decimal:(int)decimal  

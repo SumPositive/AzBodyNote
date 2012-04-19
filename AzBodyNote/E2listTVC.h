@@ -7,13 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <CoreData/CoreData.h>
+//#import <CoreData/CoreData.h>
 
-#import "Global.h"
 #import "AppDelegate.h"
-#import "MocEntity.h"
-#import "MocFunctions.h"
 #import "E2listCell.h"
+#import "E2editTVC.h"
 
 
 @interface E2listTVC : UITableViewController <UITableViewDelegate, UITableViewDataSource, NSFetchedResultsControllerDelegate>
@@ -30,6 +28,7 @@
 	IBOutlet UILabel				*ibLbBodyFat;
 	IBOutlet UILabel				*ibLbSkMuscle;
 	
+@private
 	AppDelegate					*appDelegate_;
 	MocFunctions					*mocFunc_;
 	NSIndexPath					*indexPathEdit_;

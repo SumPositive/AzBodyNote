@@ -7,8 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Global.h"
 
 @interface E2editCellTweet : UITableViewCell
+{
+	IBOutlet UILabel				*ibLbTweet;
+	IBOutlet UISwitch			*ibSwTweet;
+}
 
 //@property (nonatomic, unsafe_unretained) id		delegate;
 

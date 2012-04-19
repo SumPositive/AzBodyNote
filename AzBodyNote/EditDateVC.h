@@ -7,6 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+
+#import "Global.h"
 #import "MocEntity.h"
 
 

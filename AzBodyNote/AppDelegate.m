@@ -5,17 +5,16 @@
 //  Created by Sum Positive on 2011/10/01.
 //  Copyright 2011 Sum Positive@Azukid.com. All rights reserved.
 //
+#ifdef DEBUG
+#import <stdlib.h>		//これをAppDelegate.h 側へ入れるとAppDelegate name 未定義エラー発生した。
+#endif
 
-#import "Global.h"
 #import "AppDelegate.h"
-#import "MocFunctions.h"
+
 #import "E2editTVC.h"
 #import "E2listTVC.h"
 #import "DropboxVC.h"
 
-#ifdef DEBUG
-#import <stdlib.h>
-#endif
 
 #define CoreData_iCloud_SYNC		NO	// YES or NO
 
@@ -399,12 +398,13 @@
 						  toNSNull([kvs objectForKey:Goal_sEquipment]),			Goal_sEquipment,
 						  toNSNull([kvs objectForKey:Goal_sNote1]),					Goal_sNote1,
 						  toNSNull([kvs objectForKey:Goal_sNote2]),					Goal_sNote2,
+						  //----------[0.9]以下追加
 						  toNSNull([kvs objectForKey:Goal_nPedometer]),			Goal_nPedometer,
 						  toNSNull([kvs objectForKey:Goal_nBodyFat_10p]),		Goal_nBodyFat_10p,
 						  toNSNull([kvs objectForKey:Goal_nSkMuscle_10p]),	Goal_nSkMuscle_10p,
 						  //---------------------------------------------------------------------------------- 
 						  nil];
-	[maE2 addObject:dict];
+	[maE2 addObject:dict];	// #class = "Header"
 	// E2record
 	for (E2record *e2 in aE2records) {
 		//NSLog(@"----- e2=%@", e2);
@@ -412,7 +412,7 @@
 			NSDictionary *dic = [__mocBase dictionaryObject:e2];
 			if (dic) {
 				//NSLog(@"----- ----- dic=%@", dic);
-				[maE2 addObject:dic];
+				[maE2 addObject:dic];	// #class = "E2record"
 			}
 		}
 	}
@@ -478,6 +478,7 @@
 	[kvs setObject: toNSNull([dict objectForKey:Goal_sEquipment])			forKey:Goal_sEquipment];
 	[kvs setObject: toNSNull([dict objectForKey:Goal_sNote1])					forKey:Goal_sNote1];
 	[kvs setObject: toNSNull([dict objectForKey:Goal_sNote2])					forKey:Goal_sNote2];
+	//----------[0.9]以下追加
 	[kvs setObject: toNSNull([dict objectForKey:Goal_nPedometer])			forKey:Goal_nPedometer];
 	[kvs setObject: toNSNull([dict objectForKey:Goal_nBodyFat_10p])		forKey:Goal_nBodyFat_10p];
 	[kvs setObject: toNSNull([dict objectForKey:Goal_nSkMuscle_10p])	forKey:Goal_nSkMuscle_10p];

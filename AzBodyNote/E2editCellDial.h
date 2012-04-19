@@ -7,10 +7,24 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "MocEntity.h"
 #import "AZDial.h"
 
+#import "AppDelegate.h"
+#import "E2editTVC.h"
+#import "CalcView.h"
+
 @interface E2editCellDial : UITableViewCell <AZDialDelegate>
+{
+	IBOutlet UILabel			*ibLbName;
+	IBOutlet UILabel			*ibLbDetail;
+	IBOutlet UILabel			*ibLbUnit;
+	IBOutlet UILabel			*ibLbValue;
+
+@private
+	NSInteger		mSliderBase;
+	NSInteger		mValue;
+	AZDial				*mDial;
+}
 
 @property (nonatomic, unsafe_unretained) id						delegate;
 @property (nonatomic, unsafe_unretained) UIView				*viewParent;

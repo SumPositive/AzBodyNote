@@ -5,15 +5,9 @@
 //  Created by Sum Positive on 11/10/02.
 //  Copyright 2011 Azukid. All rights reserved.
 //
-
-#import "Global.h"
 #import "E2editCellTweet.h"
 
 @implementation E2editCellTweet
-{
-	IBOutlet UILabel				*ibLbTweet;
-	IBOutlet UISwitch			*ibSwTweet;
-}
 
 //- (void)switchTweet:(UISwitch *)sw
 - (IBAction)ibSwTweetChange:(id)sender

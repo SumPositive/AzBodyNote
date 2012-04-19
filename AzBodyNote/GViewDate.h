@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
+#import "Global.h"
+
+
 @interface GViewDate : UIView
 
 @property (nonatomic, retain) NSArray	*ppE2records;

@@ -8,13 +8,12 @@
 
 #import <UIKit/UIKit.h>
 #import <eventkit/EventKit.h>
-#import "Global.h"
+
 #import "AppDelegate.h"
 
 
 @interface AZCalendarSelect : UITableViewController
 {
-
 @private
 	AppDelegate					*mAppDelegate;
 	EKEventStore					*mEventStore;

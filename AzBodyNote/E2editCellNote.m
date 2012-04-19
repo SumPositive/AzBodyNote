@@ -5,25 +5,12 @@
 //  Created by Sum Positive on 11/10/02.
 //  Copyright 2011 Azukid. All rights reserved.
 //
-
-#import "Global.h"
-#import "AppDelegate.h"
-#import "MocEntity.h"
-#import "E2editTVC.h"
 #import "E2editCellNote.h"
 
+
 @implementation E2editCellNote
-{
-	//__unsafe_unretained id						delegate;
-	//__strong E2record			*Re2record;
-	
-	IBOutlet UITextField		*ibTfNote1;
-	IBOutlet UITextField		*ibTfNote2;
-}
 @synthesize delegate = delegate_;
 @synthesize Re2record = e2record_;
-//@synthesize ibTfNote1, ibTfNote2;
-
 
 
 - (void)drawRect:(CGRect)rect

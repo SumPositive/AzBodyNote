@@ -5,9 +5,8 @@
 //  Created by Sum Positive on 2011/10/01.
 //  Copyright 2011 Sum Positive. All rights reserved.
 //
-
 #import "E2listTVC.h"
-#import "E2editTVC.h"
+
 
 #define ALERT_TAG_DeleteE2		901
 

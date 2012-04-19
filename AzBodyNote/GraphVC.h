@@ -7,11 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Global.h"
+
 #import "AppDelegate.h"
-#import "MocEntity.h"
-#import "MocFunctions.h"
-#import "GraphView.h"
 #import "GViewDate.h"
 #import "GViewLine.h"
 
@@ -29,14 +26,7 @@
 
 @interface GraphVC : UIViewController <UIScrollViewDelegate>
 {
-/*	IBOutlet UILabel				*ibLbBpHi;
-	IBOutlet UILabel				*ibLbBpLo;
-	IBOutlet UILabel				*ibLbPuls;
-	IBOutlet UILabel				*ibLbWeight;
-	IBOutlet UILabel				*ibLbTemp;
- */
 	IBOutlet UIScrollView		*ibScrollView;
-	//IBOutlet GraphView			*ibGraphView;
 
 @private
 	AppDelegate					*mAppDelegate;
@@ -46,10 +36,9 @@
 	NSUInteger								uiActivePageMax_;
 	UIActivityIndicatorView			*actIndicator_;
 	CGPoint									pointNext_;
-	NSArray							*mPanelGraphs;
+	NSArray									*mPanelGraphs;
 	
 	GViewDate						*mGvDate;
-	//GViewDate						*mGvDate2;
 	GViewLine						*mGvBpHi;
 	GViewLine						*mGvBpLo;
 	GViewLine						*mGvPuls;

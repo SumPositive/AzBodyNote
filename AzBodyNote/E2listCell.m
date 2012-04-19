@@ -1,30 +1,14 @@
 //
-//  E2recordCell.m
+//  E2listCell.m
 //  AzBodyNote
 //
 //  Created by 松山 和正 on 11/10/01.
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
-
-#import "Global.h"
 #import "E2listCell.h"
-#import "E2listTVC.h"
+
 
 @implementation E2listCell
-{
-	//__strong E2record		*Re2node_;
-	
-	IBOutlet UILabel			*ibLbDate;
-	IBOutlet UILabel			*ibLbBpHi;
-	IBOutlet UILabel			*ibLbBpLo;
-	IBOutlet UILabel			*ibLbPuls;
-	IBOutlet UILabel			*ibLbWeight;
-	IBOutlet UILabel			*ibLbTemp;
-	IBOutlet UILabel			*ibLbNote1;
-	IBOutlet UILabel			*ibLbPedo;
-	IBOutlet UILabel			*ibLbBodyFat;
-	IBOutlet UILabel			*ibLbSkMuscle;
-}
 @synthesize moE2node = moE2node_;
 //@synthesize ibLbBpHi, ibLbBpLo, ibLbDate, ibLbPuls, ibLbWeight, ibLbTemp;
 

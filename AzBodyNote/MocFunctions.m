@@ -3,13 +3,8 @@
 //	AzBodyNote
 //
 //  Created by Sum Positive on 2011/10/01.
-//  Copyright 2011 Sum Positive@Azukid.com. All rights reserved.
+//  Copyright 2011 Sum Positive @Azukid.com. All rights reserved.
 //
-
-//#import "SFHFKeychainUtils.h"
-#import "Global.h"
-#import "AppDelegate.h"
-#import "MocEntity.h"
 #import "MocFunctions.h"
 
 
@@ -302,8 +297,14 @@ static NSDate *dateGoal_ = nil;
 - (NSManagedObject*)insertNewObjectForDictionary:(NSDictionary*)dict
 {
     NSString* class = [dict objectForKey:@"#class"];
-
-    NSManagedObject* newObject = [NSEntityDescription insertNewObjectForEntityForName:class inManagedObjectContext:moc_];
+	NSManagedObject* newObject;
+	@try {
+		newObject = [NSEntityDescription insertNewObjectForEntityForName:class inManagedObjectContext:moc_];
+	}
+	@catch (NSException *exception) {
+		NSLog(@"insertNewObjectForDictionary: No class={%@}", class);
+		return nil;
+	}
 	//NSLog(@"#class=%@,  newObject=%@", class, newObject);
 
     for (NSString* key in dict) 
@@ -351,7 +352,12 @@ static NSDate *dateGoal_ = nil;
             }***/
         }
         else {  // This is an attribute
-			[newObject setValue:value forKey:key];
+			@try {
+				[newObject setValue:value forKey:key];
+			}
+			@catch (NSException *exception) {
+				NSLog(@"insertNewObjectForDictionary: No key={%@}", key);
+			}
         }
     }
 	return newObject;

@@ -7,7 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <QuartzCore/QuartzCore.h>
+//#import <QuartzCore/QuartzCore.h>
+
+#import "Global.h"
+
 
 @interface GViewLine : UIView
 
