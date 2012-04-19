@@ -21,7 +21,7 @@
 	IBOutlet UILabel			*ibLbValue;
 
 @private
-	NSInteger		mSliderBase;
+	//NSInteger		mSliderBase;
 	NSInteger		mValue;
 	AZDial				*mDial;
 }

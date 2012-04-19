@@ -35,9 +35,9 @@
 	NSIndexPath					*indexPathDelete_;
 	
 	//GADBannerView		*adMobView_;
-	NSUInteger						e2offset_;
+	//NSUInteger						e2offset_;
 	UILabel							*lbPagePrev_;
-	UILabel							*lbPageNext_;
+	//UILabel							*lbPageNext_;
 	//BOOL								mbGoal;
 }
 

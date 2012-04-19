@@ -28,7 +28,7 @@
 	
 	//BOOL			bAddNew_;  >>>>>>>>>  editMode_==0
 	BOOL			bEditDate_;
-	float				fADBannerY_;	//iAd表示位置のY座標
+	//float				fADBannerY_;	//iAd表示位置のY座標
 	
 	NSInteger	iPrevBpHi_;
 	NSInteger	iPrevBpLo_;
