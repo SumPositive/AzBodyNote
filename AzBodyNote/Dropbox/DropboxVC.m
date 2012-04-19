@@ -262,28 +262,35 @@
 {	// ファイル読み込み成功
     NSLog(@"File loaded into path: %@", localPath); //== [apd tmpFilePath]
 	// File Load
-	AppDelegate* apd = (AppDelegate*)[[UIApplication sharedApplication] delegate];
-	NSString *zErr = [apd tmpFileLoad];
-	if (zErr) { // tmpフォルダの一時ファイル[apd tmpFilePath]から読み込む
-		// NG
-		UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Dropbox QuoteErr", nil)
-													  message:zErr
-													 delegate:nil
-											cancelButtonTitle:nil
-											otherButtonTitles:NSLocalizedString(@"Roger", nil), nil];
-		[alv	show];
-	} else {
-		// Done
-		UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Dropbox QuoteDone", nil)
-													  message:nil
-													 delegate:nil
-											cancelButtonTitle:nil
-											otherButtonTitles:NSLocalizedString(@"Roger", nil), nil];
-		[alv	show];
-	}
-	[self alertIndicatorOff];
-	// 閉じる
-	[self dismissModalViewControllerAnimated:YES];
+	dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+	dispatch_async(queue, ^{		// 非同期マルチスレッド処理
+		// ファイルを読み込む
+		AppDelegate* apd = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+		NSString *zErr = [apd tmpFileLoad];
+		
+		dispatch_async(dispatch_get_main_queue(), ^{	// 終了後の処理
+			if (zErr==nil) {
+				// Done
+				UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Dropbox QuoteDone", nil)
+															  message:nil
+															 delegate:nil
+													cancelButtonTitle:nil
+													otherButtonTitles:NSLocalizedString(@"Roger", nil), nil];
+				[alv	show];
+			}
+			else {
+				// NG
+				UIAlertView *alv = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Dropbox QuoteErr", nil)
+															  message:zErr
+															 delegate:nil
+													cancelButtonTitle:nil
+													otherButtonTitles:NSLocalizedString(@"Roger", nil), nil];
+				[alv	show];
+			}
+			[self alertIndicatorOff];	// 進捗サインOFF
+			[self dismissModalViewControllerAnimated:YES];	// 閉じる
+		});
+	});
 }
 
 - (void)restClient:(DBRestClient*)client loadFileFailedWithError:(NSError*)error 
