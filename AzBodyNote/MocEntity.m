@@ -24,6 +24,7 @@
 @implementation E2record
 @dynamic bCaution;
 @dynamic dateTime;
+@dynamic nDateOpt;
 @dynamic nYearMM;
 @dynamic sEventID;
 @dynamic sGSpreadID;

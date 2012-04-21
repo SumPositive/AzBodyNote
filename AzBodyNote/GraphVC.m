@@ -80,11 +80,12 @@
 - (void)labelGraphRect:(CGRect)rect  text:(NSString*)text
 {
 	UILabel *lb = [[UILabel alloc] initWithFrame:CGRectMake(rect.origin.x+rect.size.width, 
-															rect.origin.y+rect.size.height-22, 100,16)];
+															rect.origin.y+rect.size.height-36, 100,36)];
 	lb.text = text;
 	lb.backgroundColor = [UIColor clearColor];
 	lb.textColor = [UIColor darkGrayColor];
-	lb.font = [UIFont systemFontOfSize:14];
+	lb.font = [UIFont systemFontOfSize:12];
+	lb.numberOfLines = 2;
 	lb.adjustsFontSizeToFitWidth = YES;
 	lb.minimumFontSize = 10;
 	[ibScrollView addSubview:lb];
@@ -101,7 +102,7 @@
 	
 	NSInteger iOverLeft = 1;  // iPad対応時に調整が必要
 	NSInteger iOverRight = 0;  // GOAL列が常に+1される
-	NSInteger iOffset = (GRAPH_PAGE_LIMIT * page);
+	NSInteger iOffset = (GRAPH_PAGE_LIMIT * 3 * page);
 
 	if (page==0) {
 		iOverRight = 0;
@@ -141,7 +142,7 @@
 	CGRect rcgv = rc;
 	//------------------------------------------------------日付
 	rcgv.origin.y = 10;
-	rcgv.size.height = 35;
+	rcgv.size.height = 20;
 	if (mGvDate==nil) {
 		mGvDate = [[GViewDate alloc] initWithFrame: rcgv]; // 日付専用
 		mGvDate.ppE2records = e2recs;
@@ -173,7 +174,7 @@
 					mGvBpHi.ppMin = E2_nBpHi_MIN;
 					mGvBpHi.ppMax = E2_nBpHi_MAX;
 					[ibScrollView addSubview:mGvBpHi];
-					[self labelGraphRect:rcgv  text:NSLocalizedString(@"BpHi Name",nil)];
+					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph BpHi",nil)];
 				} else {
 					mGvBpHi.ppE2records = e2recs;
 					[mGvBpHi setFrame:rcgv];
@@ -190,7 +191,7 @@
 					mGvBpLo.ppMin = E2_nBpLo_MIN;
 					mGvBpLo.ppMax = E2_nBpLo_MAX;
 					[ibScrollView addSubview:mGvBpLo];
-					[self labelGraphRect:rcgv  text:NSLocalizedString(@"BpLo Name",nil)];
+					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph BpLo",nil)];
 				} else {
 					mGvBpLo.ppE2records = e2recs;
 					[mGvBpLo setFrame:rcgv];
@@ -207,7 +208,7 @@
 					mGvPuls.ppMin = E2_nPuls_MIN;
 					mGvPuls.ppMax = E2_nPuls_MAX;
 					[ibScrollView addSubview:mGvPuls];
-					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Pulse Name",nil)];
+					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph Pulse",nil)];
 				} else {
 					mGvPuls.ppE2records = e2recs;
 					[mGvPuls setFrame:rcgv];
@@ -225,7 +226,7 @@
 					mGvWeight.ppMin = E2_nWeight_MIN;
 					mGvWeight.ppMax = E2_nWeight_MAX;
 					[ibScrollView addSubview:mGvWeight];
-					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Weight Name",nil)];
+					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph Weight",nil)];
 				} else {
 					mGvWeight.ppE2records = e2recs;
 					[mGvWeight setFrame:rcgv];
@@ -243,7 +244,7 @@
 					mGvTemp.ppMin = E2_nTemp_MIN;
 					mGvTemp.ppMax = E2_nTemp_MAX;
 					[ibScrollView addSubview:mGvTemp];
-					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Temp Name",nil)];
+					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph Temp",nil)];
 				} else {
 					mGvTemp.ppE2records = e2recs;
 					[mGvTemp setFrame:rcgv];
@@ -261,7 +262,7 @@
 					mGvPedo.ppMin = E2_nPedometer_MIN;
 					mGvPedo.ppMax = E2_nPedometer_MAX;
 					[ibScrollView addSubview:mGvPedo];
-					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Pedo Name",nil)];
+					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph Pedo",nil)];
 				} else {
 					mGvPedo.ppE2records = e2recs;
 					[mGvPedo setFrame:rcgv];
@@ -279,7 +280,7 @@
 					mGvFat.ppMin = E2_nBodyFat_MIN;
 					mGvFat.ppMax = E2_nBodyFat_MAX;
 					[ibScrollView addSubview:mGvFat];
-					[self labelGraphRect:rcgv  text:NSLocalizedString(@"BodyFat Name",nil)];
+					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph Fat",nil)];
 				} else {
 					mGvFat.ppE2records = e2recs;
 					[mGvFat setFrame:rcgv];
@@ -297,7 +298,7 @@
 					mGvSk.ppMin = E2_nSkMuscle_MIN;
 					mGvSk.ppMax = E2_nSkMuscle_MAX;
 					[ibScrollView addSubview:mGvSk];
-					[self labelGraphRect:rcgv  text:NSLocalizedString(@"SkMuscle Name",nil)];
+					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph Skm",nil)];
 				} else {
 					mGvSk.ppE2records = e2recs;
 					[mGvSk setFrame:rcgv];

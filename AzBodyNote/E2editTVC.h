@@ -13,9 +13,9 @@
 
 #import "AppDelegate.h"
 #import "EditDateVC.h"
+#import "E2editCellDateOpt.h"
 #import "E2editCellDial.h"
 #import "E2editCellNote.h"
-#import "E2editCellTweet.h"
 
 
 @interface E2editTVC : UITableViewController 

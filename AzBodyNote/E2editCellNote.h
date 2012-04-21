@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "AppDelegate.h"
-#import "E2editTVC.h"
+#import "E2editTVC.h"	// editUpdate 更新通知のため
 
 @interface E2editCellNote : UITableViewCell <UITextFieldDelegate>
 {
@@ -16,7 +16,7 @@
 	IBOutlet UITextField		*ibTfNote2;
 }
 
-@property (nonatomic, unsafe_unretained) id		delegate;
+@property (nonatomic, unsafe_unretained) id		delegate;	// editUpdate 更新通知のため
 @property (nonatomic, retain) E2record				*Re2record;		// 結果を戻すため
 
 @end

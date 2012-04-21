@@ -19,6 +19,13 @@
 - (void)setE2recordPrev
 {	// .dateTime より前の値を初期値としてセットする
 	assert(moE2edit_);
+
+	NSDate *dateNow = moE2edit_.dateTime;	 // 現在編集中の日付
+	// 自動判定
+	moE2edit_.nDateOpt = [NSNumber numberWithInteger:[self integerDateOpt:dateNow]];
+	// セグメント表示更新
+	
+	
 	E2record	*e2prev;	// 直前のレコード
 	// Sort条件
 	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
@@ -26,7 +33,6 @@
 	//[sort1 release];
 	
 	// 直前のレコードを取得
-	NSDate *dateNow = moE2edit_.dateTime;	 // 現在編集中の日付
 	if (dateNow==nil) dateNow = [NSDate date];
 	
 	if (moE2edit_.nBpHi_mmHg==nil) {
@@ -149,6 +155,36 @@
 			iPrevSkMuscle_ = E2_nSkMuscle_INIT;
 		}
 	}
+}
+
+- (NSInteger)integerDateOpt:(NSDate *)date
+{
+	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+	NSDateComponents* comp = [calendar components: NSHourCalendarUnit  fromDate:date]; // Hourのみ
+	
+	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	if ([userDefaults objectForKey:GUD_DateOptWakeUp]) {	// 保存時に自動学習(記録更新)している
+		NSInteger iHour = [[userDefaults objectForKey:GUD_DateOptWakeUp] integerValue];
+		if (iHour-DateOpt_AroundHOUR < 0) {
+			iHour += DateOpt_AroundHOUR;
+			comp.hour += DateOpt_AroundHOUR;
+		}
+		if (iHour-DateOpt_AroundHOUR <= comp.hour && comp.hour < iHour+DateOpt_AroundHOUR) {
+			return 0;  // (0)起床後
+		}
+	}
+	if ([userDefaults objectForKey:GUD_DateOptForSleep]) {	// 保存時に自動学習(記録更新)している
+		NSInteger iHour = [[userDefaults objectForKey:GUD_DateOptForSleep] integerValue];
+		if (iHour-DateOpt_AroundHOUR < 0) {
+			iHour += DateOpt_AroundHOUR;
+			comp.hour += DateOpt_AroundHOUR;
+		}
+		if (iHour-DateOpt_AroundHOUR <= comp.hour && comp.hour < iHour+DateOpt_AroundHOUR) {
+			return 2;  // (2)就寝前
+		}
+	}
+	return 1; //(1)日中
 }
 
 - (void)actionClear
@@ -361,14 +397,24 @@
 		// データ整合処理
 		// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
 		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-		NSDateComponents* comp = [calendar components:NSYearCalendarUnit | NSMonthCalendarUnit
+		NSDateComponents* comp = [calendar components:NSYearCalendarUnit | NSMonthCalendarUnit | NSHourCalendarUnit
 											 fromDate:moE2edit_.dateTime];
 		moE2edit_.nYearMM = [NSNumber numberWithInteger:([comp year] * 100 + [comp month])];
-		
 		// Save & Commit
 		[mocFunc_ commit];
-		
-		// 
+
+		//自動学習(記録更新)する
+		NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+		switch ([moE2edit_.nDateOpt integerValue]) {
+			case 0: //起床後
+				[userDefaults setObject:[NSNumber numberWithInteger:comp.hour] forKey:GUD_DateOptWakeUp];
+				break;
+			case 2: //就寝前
+				[userDefaults setObject:[NSNumber numberWithInteger:comp.hour] forKey:GUD_DateOptForSleep];
+				break;
+		}
+		//[userDefaults synchronize];
+
 		[self syncExport];
 		
 		if (editMode_==1) { // Edit mode
@@ -719,6 +765,7 @@
 	if (editMode_==0 && moE2edit_) { // AddNew
 		if (self.navigationItem.rightBarButtonItem.enabled==NO) { // 未登録ならば最新日時にする
 			moE2edit_.dateTime = [NSDate date];
+			//moE2edit_.nDateOpt ここでは変更しない。
 			[self.tableView reloadData];
 		}
 	}
@@ -755,7 +802,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	if (indexPath.row==0) {
+	if (indexPath.row<=1) {
 		return 44; // DateTime
 	}
     return 88; // Default
@@ -811,6 +858,20 @@
 		cell.textLabel.text = [NSString stringWithFormat:@"%@   %@", NSLocalizedString(@"DateTime",nil), 
 							   [fmt stringFromDate:moE2edit_.dateTime]];
 	}
+	return cell;
+}
+
+- (E2editCellDateOpt *)cellDateOpt:(UITableView *)tableView
+{
+	static NSString *Cid = @"E2editCellDateOpt";  //== Class名に一致させること
+	E2editCellDateOpt *cell = (E2editCellDateOpt*)[tableView dequeueReusableCellWithIdentifier:Cid];
+	if (cell == nil) {
+		UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
+		[nib instantiateWithOwner:self options:nil];
+		cell = (E2editCellDateOpt*)[tableView dequeueReusableCellWithIdentifier:Cid];
+		assert(cell);
+	}
+	cell.delegate = self;
 	return cell;
 }
 
@@ -877,9 +938,16 @@
 		UITableViewCell *cell = [self cellDate:tableView];
 		return cell;
 	}
-	else if (1<=indexPath.row && indexPath.row<=[mPanels count]) 
+	else if (indexPath.row==1) {
+		E2editCellDateOpt *cell = [self cellDateOpt:tableView];
+		cell.ppE2record = moE2edit_;
+		//NG//[cell setNeedsDisplay]; // コンテンツ描画  drawRect:が呼ばれる
+		[cell drawRect:cell.frame]; // コンテンツ描画
+		return cell;
+	}
+	else if (2<=indexPath.row && indexPath.row<=[mPanels count]) 
 	{	// 測定パネル順序に従ってセル表示する
-		NSInteger iPanel = [[mPanels objectAtIndex:indexPath.row-1] integerValue];
+		NSInteger iPanel = [[mPanels objectAtIndex:indexPath.row-2] integerValue];
 		if (iPanel < 0) { // 負ならばグラフ表示ON
 			iPanel *= (-1); // 正にする
 		}
@@ -887,6 +955,7 @@
 			case AzConditionNote: {
 				E2editCellNote *cell = [self cellNote:tableView];
 				cell.Re2record = moE2edit_;
+				//NG//[cell setNeedsDisplay]; // コンテンツ描画  drawRect:が呼ばれる
 				[cell drawRect:cell.frame]; // コンテンツ描画
 				return cell;
 			}	break;

@@ -14,6 +14,7 @@
 
 @interface E2listCell : UITableViewCell
 {
+	IBOutlet UIImageView *ibIvDateOpt;
 	IBOutlet UILabel			*ibLbDate;
 	IBOutlet UILabel			*ibLbBpHi;
 	IBOutlet UILabel			*ibLbBpLo;

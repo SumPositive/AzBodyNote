@@ -47,11 +47,23 @@
 			// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
 			NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 			[fm setCalendar:calendar];
-			//[calendar release];
-			//[df setLocale:[NSLocale systemLocale]];これがあると曜日が表示されない。
 			[fm setDateFormat:@"dd  HH:mm"];
 			ibLbDate.text = [fm stringFromDate:moE2node_.dateTime];
-			//[fm release];
+			//
+			switch ([moE2node_.nDateOpt integerValue]) {
+				case 0: //起床後
+					ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-WakeUp"]; //H20xW24px
+					break;
+				case 1: //日中   ＜＜実際の天候を取得して表示したい。 地域情報が必要
+					ibIvDateOpt.image = nil;  //[UIImage imageNamed:@"Icon20-Daytime"];
+					break;
+				case 2: //就寝前
+					ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-ForSleep"];
+					break;
+				default:
+					ibIvDateOpt.image = nil;
+					break;
+			}
 		}
 		
 		//NSLog(@"--- moE2node_.sNote2=%@", moE2node_.sNote2);

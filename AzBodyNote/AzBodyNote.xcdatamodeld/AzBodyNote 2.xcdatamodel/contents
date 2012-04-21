@@ -14,6 +14,7 @@
         <attribute name="nBodyFat_10p" optional="YES" attributeType="Integer 16" maxValueString="1000" syncable="YES"/>
         <attribute name="nBpHi_mmHg" optional="YES" attributeType="Integer 16" maxValueString="300"/>
         <attribute name="nBpLo_mmHg" optional="YES" attributeType="Integer 16" maxValueString="200"/>
+        <attribute name="nDateOpt" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="2" defaultValueString="1"/>
         <attribute name="nPedometer" optional="YES" attributeType="Integer 32" maxValueString="99999" syncable="YES"/>
         <attribute name="nPulse_bpm" optional="YES" attributeType="Integer 16" maxValueString="200"/>
         <attribute name="nSkMuscle_10p" optional="YES" attributeType="Integer 16" maxValueString="1000" syncable="YES"/>

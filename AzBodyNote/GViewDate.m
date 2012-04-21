@@ -35,32 +35,43 @@
 	CGPoint po;
 	CGPoint	pointsArray[GRAPH_PAGE_LIMIT+20+1];
 	long			valuesArray[GRAPH_PAGE_LIMIT+20+1];
-	int			arrayNo;
 	CGFloat	fXgoal = self.bounds.size.width - RECORD_WIDTH/2;		// 最初、GOALを中央に表示する
 	//-------------------------------------------------------------------------------------- Date 描画
 	//システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
 	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-	unsigned unitFlags = NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit;
+	NSDateComponents* comp;
+	int iPrevMonth = 0, iPrevDay = 0;
+
 	po.x = fXgoal;
 	po.y = GRAPH_H_GAP;
 	pointsArray[0] = po;	// The GOAL
 	valuesArray[0] = 0;	// The GOAL
-	po.x -= RECORD_WIDTH;
-	arrayNo = 1;
+	NSInteger iVal = 0;
+	int	arrayCnt = 1;		//[0]Goal  [1]〜Record
 	for (E2record *e2 in __E2records) {
 		if (po.x <= 0) break;
-		if (e2.dateTime) {
-			pointsArray[ arrayNo ] = po;
-			NSDateComponents *comp = [calendar components:unitFlags fromDate:e2.dateTime];
-			valuesArray[ arrayNo ] = comp.month * 1000000 + comp.day * 10000 + comp.hour * 100 + comp.minute;
-			//NSLog(@"valuesArray[ %d ]=%ld", arrayNo, valuesArray[ arrayNo ]);
-			arrayNo++;
-			assert(arrayNo < GRAPH_PAGE_LIMIT+20+1);
+		if ([e2 valueForKey:E2_dateTime]) 
+		{
+			// 日次集計											月									日		
+			comp = [calendar components: NSMonthCalendarUnit | NSDayCalendarUnit
+							   fromDate:e2.dateTime];
+			if (iPrevMonth==0) {	// 最初1度だけ初期化
+				iPrevMonth = comp.month;
+				iPrevDay = comp.day;
+			}
+			else if (iPrevMonth != comp.month OR iPrevDay != comp.day) {
+				po.x -= RECORD_WIDTH;
+				pointsArray[ arrayCnt ] = po;
+				valuesArray[ arrayCnt ] = iVal;
+				arrayCnt++;
+				if (GRAPH_PAGE_LIMIT < arrayCnt) break; // OK
+				iPrevMonth = comp.month;
+				iPrevDay = comp.day;
+			}
 		}
-		po.x -= RECORD_WIDTH;
+		iVal = comp.month * 100 + comp.day;
 	}
-	//[self graphDrawDate:cgc count:arrayNo points:pointsArray values:valuesArray];	
-	
+	// 描画
 	CGContextRef cgc = UIGraphicsGetCurrentContext();
 	// CoreGraphicsの原点が左下なので原点を合わせる
 	CGContextTranslateCTM(cgc, 0, rect.size.height);
@@ -84,7 +95,7 @@
 	//CGContextSetRGBFillColor (cgc, 151.0/255, 80.0/255, 77.0/255, 1.0);
 	CGContextSetRGBFillColor (cgc, 151.0/295, 80.0/295, 77.0/295, 1.0);
 
-	for (int iNo=0; iNo < arrayNo; iNo++) 
+	for (int iNo=0; iNo < arrayCnt; iNo++) 
 	{
 		CGPoint po = pointsArray[ iNo ];
 		// 数値
@@ -92,25 +103,25 @@
 		//NSLog(@"graphDrawDate: [ %d ]=%ld=(%.2f, %.2f)", iNo, val, po.x, po.y);
 		
 		const char *cc;
-		if (val < 1000000) {
+		if (val < 100) {
 			//cc = [[NSString stringWithString:NSLocalizedString(@"TheGoal",nil)] UTF8String]; ＜＜日本語NG
 			cc = [[NSString stringWithString:@"GOAL"] UTF8String];
-			CGContextShowTextAtPoint (cgc, po.x-15, po.y+6, cc, strlen(cc));
+			CGContextShowTextAtPoint (cgc, po.x-15, po.y+1, cc, strlen(cc));
 		}
 		else {
-			int iMonth = val / 1000000;
-			val -= iMonth * 1000000;
-			int iDay = val / 10000;
-			val -= iDay * 10000;
-			int iHour = val / 100;
-			val -= iHour * 100;
-			int iMinute = val;
+			int iMonth = val / 100;
+			val -= iMonth * 100;
+			int iDay = val;
+			//val -= iDay * 10000;
+			//int iHour = val / 100;
+			//val -= iHour * 100;
+			//int iMinute = val;
 			
 			cc = [[NSString stringWithFormat:@"%d/%d", iMonth, iDay] UTF8String];
-			CGContextShowTextAtPoint (cgc, po.x-15, po.y+12, cc, strlen(cc));
+			CGContextShowTextAtPoint (cgc, po.x-15, po.y+1, cc, strlen(cc));
 			
-			cc = [[NSString stringWithFormat:@"%02d:%02d", iHour, iMinute] UTF8String];
-			CGContextShowTextAtPoint (cgc, po.x-15, po.y+0, cc, strlen(cc));
+			//cc = [[NSString stringWithFormat:@"%02d:%02d", iHour, iMinute] UTF8String];
+			//CGContextShowTextAtPoint (cgc, po.x-15, po.y+0, cc, strlen(cc));
 		}
 	}
 }
