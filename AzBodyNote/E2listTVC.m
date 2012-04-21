@@ -132,6 +132,12 @@
 											 selector:@selector(refreshAllViews:) 
 												 name:NSUbiquitousKeyValueStoreDidChangeExternallyNotification 
 											   object:nil];
+
+	// アクティブになったとき、「現在」日時更新する
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+											 selector:@selector(refreshAllViews:) 
+												 name:NFM_AppDidBecomeActive
+											   object:[[UIApplication sharedApplication] delegate]];
 }
 
 - (void)viewWillAppear:(BOOL)animated
