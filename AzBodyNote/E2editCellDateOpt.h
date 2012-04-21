@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "AppDelegate.h"
-#import "E2editTVC.h"		// editUpdate 更新通知のため
+#import "E2editTVC.h"		// delegateDateOptChange 更新通知のため
 
 
 @interface E2editCellDateOpt : UITableViewCell
@@ -19,7 +19,7 @@
 	NSArray							*mTitles;
 }
 
-@property (nonatomic, unsafe_unretained) id		delegate;		// editUpdate 更新通知のため
+@property (nonatomic, unsafe_unretained) id		delegate;		// delegateDateOptChange 更新通知のため
 @property (nonatomic, retain) E2record				*ppE2record;		// 結果を戻すため
 
 @end

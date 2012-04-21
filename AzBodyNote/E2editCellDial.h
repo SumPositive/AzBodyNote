@@ -26,7 +26,7 @@
 	AZDial				*mDial;
 }
 
-@property (nonatomic, unsafe_unretained) id			delegate;	// editUpdate 更新通知のため
+@property (nonatomic, unsafe_unretained) id			delegate;	// delegateEditChange 更新通知のため
 @property (nonatomic, unsafe_unretained) UIView				*viewParent;
 @property (nonatomic, strong) E2record			*Re2record;		// 結果を戻すため
 @property (nonatomic, strong) NSString			*RzKey;			// 結果を戻すため

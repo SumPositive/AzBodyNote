@@ -49,7 +49,7 @@
 @property (nonatomic, strong) E2record		*moE2edit;
 
 // <delegate>
-//- (void)buttonSave:(BOOL)pop;
-- (void)editUpdate;
+- (void)delegateEditChange;
+- (void)delegateDateOptChange;
 
 @end

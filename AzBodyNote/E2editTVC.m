@@ -16,15 +16,18 @@
 
 #pragma mark - IBAction
 
+- (void)setAutoDateOpt
+{	//.dateTimeに最適な.nDateOptをセットする
+	NSInteger iDateOpt = [self integerDateOpt: moE2edit_.dateTime];
+	moE2edit_.nDateOpt = [NSNumber numberWithInteger: iDateOpt];
+}
+
 - (void)setE2recordPrev
 {	// .dateTime より前の値を初期値としてセットする
 	assert(moE2edit_);
 
 	NSDate *dateNow = moE2edit_.dateTime;	 // 現在編集中の日付
-	// 自動判定
-	moE2edit_.nDateOpt = [NSNumber numberWithInteger:[self integerDateOpt:dateNow]];
-	// セグメント表示更新
-	
+	NSInteger iDateOpt = [moE2edit_.nDateOpt integerValue];
 	
 	E2record	*e2prev;	// 直前のレコード
 	// Sort条件
@@ -40,7 +43,8 @@
 									  where:[NSPredicate predicateWithFormat: 
 											 E2_nYearMM @" > 200000 AND " 
 											 E2_nBpHi_mmHg @" > 0 AND " 
-											 E2_dateTime @" < %@", dateNow]
+											 E2_dateTime @" < %@ AND "
+											 E2_nDateOpt @" = %ld", dateNow, (long)iDateOpt]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 		if ([arFetch count]==1) {
 			e2prev = [arFetch objectAtIndex:0];
@@ -56,7 +60,8 @@
 									  where:[NSPredicate predicateWithFormat: 
 											 E2_nYearMM @" > 200000 AND " 
 											 E2_nBpLo_mmHg @" > 0 AND " 
-											 E2_dateTime @" < %@", dateNow]
+											 E2_dateTime @" < %@ AND "
+											 E2_nDateOpt @" = %ld", dateNow, (long)iDateOpt]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 		if ([arFetch count]==1) {
 			e2prev = [arFetch objectAtIndex:0];
@@ -71,7 +76,8 @@
 									  where:[NSPredicate predicateWithFormat: 
 											 E2_nYearMM @" > 200000 AND " 
 											 E2_nPulse_bpm @" > 0 AND " 
-											 E2_dateTime @" < %@", dateNow]
+											 E2_dateTime @" < %@ AND "
+											 E2_nDateOpt @" = %ld", dateNow, (long)iDateOpt]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 		if ([arFetch count]==1) {
 			e2prev = [arFetch objectAtIndex:0];
@@ -101,7 +107,8 @@
 									  where:[NSPredicate predicateWithFormat: 
 											 E2_nYearMM @" > 200000 AND " 
 											 E2_nTemp_10c @" > 0 AND " 
-											 E2_dateTime @" < %@", dateNow]
+											 E2_dateTime @" < %@ AND "
+											 E2_nDateOpt @" = %ld", dateNow, (long)iDateOpt]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 		if ([arFetch count]==1) {
 			e2prev = [arFetch objectAtIndex:0];
@@ -206,7 +213,8 @@
 	moE2edit_.nPedometer = nil;
 	moE2edit_.nBodyFat_10p = nil;
 	moE2edit_.nSkMuscle_10p = nil;
-	[self setE2recordPrev];	// .dateTime より前の値を初期値としてセットする
+	[self setAutoDateOpt];	//.dateTimeに最適な.nDateOptをセットする
+	[self setE2recordPrev];	// 各項目毎にヌルならば、前の値を初期値としてセットする
 	
 	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
 	[self.tableView reloadData];
@@ -608,6 +616,7 @@
 				moE2edit_ = [e2recs objectAtIndex:0]; // AddNew途中のレコードを復帰させる
 				GA_TRACK_PAGE(@"E2edit-AddEdit");
 				[self refreshDateTime:nil]; // 未保存ならば最新日時にする
+				[self setAutoDateOpt];	//.dateTimeに最適な.nDateOptをセットする
 				[self setE2recordPrev];		// .dateTime より前の値を初期値としてセットする
 			}
 			else {
@@ -641,6 +650,7 @@
 		}
 	}
 	else if (kvsGoal_==nil) {
+		[self setAutoDateOpt];	//.dateTimeに最適な.nDateOptをセットする
 		[self setE2recordPrev];
 	}
 }
@@ -1185,29 +1195,29 @@
 	if (date) {
 		NSLog(@"editDateDone: date=%@", date);
 		moE2edit_.dateTime = date;
+		[self setAutoDateOpt];	//.dateTimeに最適な.nDateOptをセットする
 		[self setE2recordPrev]; // .dateTime より前の値を初期値としてセットする
 		[self.tableView reloadData];
 		self.navigationItem.rightBarButtonItem.enabled = YES; // 変更あればYESにする
 	}
 }
 
-#pragma mark - <delegate>
-/*
-- (void)buttonSave:(BOOL)pop
-{
-	static BOOL prev = NO;
-	if (pop) {
-		self.navigationItem.rightBarButtonItem.enabled = prev;
-	} else {
-		prev = self.navigationItem.rightBarButtonItem.enabled;
-		self.navigationItem.rightBarButtonItem.enabled = NO;
-	}
-}*/
 
-- (void)editUpdate
+#pragma mark - <delegate>
+- (void)delegateEditChange
 {
 	self.navigationItem.rightBarButtonItem.enabled = YES; // 変更あればYESにする
 	//NG//self.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
+}
+
+- (void)delegateDateOptChange
+{
+	if (editMode_) {
+		self.navigationItem.rightBarButtonItem.enabled = YES; // 変更
+	}
+	//.nDateOptを優先する
+	[self setE2recordPrev];	// 各項目毎にヌルならば、前の値を初期値としてセットする
+	[self.tableView reloadData];
 }
 
 - (void)alertView:(UIAlertView*)alertView clickedButtonAtIndex:(NSInteger)buttonIndex

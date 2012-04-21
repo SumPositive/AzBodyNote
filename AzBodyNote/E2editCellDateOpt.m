@@ -40,8 +40,8 @@
 	__E2record.nDateOpt = [NSNumber numberWithInteger:ibSegment.selectedSegmentIndex];
 	[self buttonDraw];
 
-	if ([__delegate respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
-		[__delegate editUpdate];  // 変更あり
+	if ([__delegate respondsToSelector:@selector(delegateDateOptChange)]) { // E2editTVC:<delegate>
+		[__delegate delegateDateOptChange];  // 変更あり
 	}
 }
 

@@ -58,14 +58,14 @@
 	// この時点で、textField.text は更新されていない。
 	if (textField==ibTfNote1 && ![e2record_.sNote1 isEqualToString:text]) {
 		e2record_.sNote1 = text;  //textField.text;
-		if ([delegate_ respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
-			[delegate_ editUpdate];  // 変更あり
+		if ([delegate_ respondsToSelector:@selector(delegateEditChange)]) { // E2editTVC:<delegate>
+			[delegate_ delegateEditChange];  // 変更あり
 		}
 	}
 	else if (textField==ibTfNote2 && ![e2record_.sNote2 isEqualToString:text]) {
 		e2record_.sNote2 = text;  //textField.text;
-		if ([delegate_ respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
-			[delegate_ editUpdate];  // 変更あり
+		if ([delegate_ respondsToSelector:@selector(delegateEditChange)]) { // E2editTVC:<delegate>
+			[delegate_ delegateEditChange];  // 変更あり
 		}
 	}
 	return YES;

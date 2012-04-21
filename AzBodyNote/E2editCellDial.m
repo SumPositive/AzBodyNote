@@ -104,8 +104,8 @@
 	if ([Re2record_ valueForKey:RzKey_] != nil) {  // nil 
 		//[Re2record_ setValue:[NSNumber numberWithInteger:mValue] forKey:RzKey_];
 		[Re2record_ setValue:nil forKey:RzKey_];
-		if ([delegate_ respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
-			[delegate_ editUpdate];
+		if ([delegate_ respondsToSelector:@selector(delegateEditChange)]) { // E2editTVC:<delegate>
+			[delegate_ delegateEditChange];
 		}
 	}
 }
@@ -174,8 +174,8 @@
 	if ([[Re2record_ valueForKey:RzKey_] integerValue] != mValue) {
 		[Re2record_ setValue:[NSNumber numberWithInteger:mValue] forKey:RzKey_];
 		
-		if ([delegate_ respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
-			[delegate_ editUpdate];
+		if ([delegate_ respondsToSelector:@selector(delegateEditChange)]) { // E2editTVC:<delegate>
+			[delegate_ delegateEditChange];
 		}
 	}
 }
@@ -197,8 +197,8 @@
 	
 	if ([[Re2record_ valueForKey:RzKey_] integerValue] != mValue) {
 		[Re2record_ setValue:[NSNumber numberWithInteger:mValue] forKey:RzKey_];
-		if ([delegate_ respondsToSelector:@selector(editUpdate)]) { // E2editTVC:<delegate>
-			[delegate_ editUpdate];
+		if ([delegate_ respondsToSelector:@selector(delegateEditChange)]) { // E2editTVC:<delegate>
+			[delegate_ delegateEditChange];
 		}
 	}
 }
