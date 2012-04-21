@@ -22,23 +22,64 @@
     self = [super initWithFrame:frame];
     if (self) {
         // Initialization code
+		// 丸め指定
+		if (mDecBehavior==nil) {
+			mDecBehavior = [[NSDecimalNumberHandler alloc]
+							initWithRoundingMode: NSRoundBankers		// 偶数丸め
+							scale: 0									// 丸めた後の桁数　　0=整数化
+							raiseOnExactness: YES			// 精度
+							raiseOnOverflow: YES				// オーバーフロー
+							raiseOnUnderflow: YES			// アンダーフロー
+							raiseOnDivideByZero: YES ];	// アンダーフロー
+		}
     }
     return self;
 }
 
+
+- (void)imageGraph:(CGContextRef)cgc center:(CGPoint)po  lineNo:(int)lineNo
+{
+	UIImage *img = nil;
+	switch (lineNo) {
+		case 1:	//Wake-up
+			img = [UIImage imageNamed:@"Icon20-WakeUp"];
+			break;
+		case 3:	//For-sleep
+			img = [UIImage imageNamed:@"Icon20-ForSleep"];
+			break;
+		default:
+			return;
+	}
+	CGRect rc = CGRectMake(po.x-img.size.width/2.0, po.y-img.size.height/2.0, 
+						   img.size.width, img.size.height);
+	CGContextDrawImage(cgc, rc, img.CGImage);
+}
 
 - (void)graphDraw:(CGContextRef)cgc 
 			count:(int)count
 		   points:(const CGPoint *)points  
 		   values:(const long *)values  
 		valueType:(int)valueType		// 0=Integer  1=Temp(999⇒99.9℃)　　2=Weight(999999g⇒999.99Kg)
-			   cR:(CGFloat)colRed
-			   cG:(CGFloat)colGreen
-			   cB:(CGFloat)colBlue
+		   lineNo:(int)lineNo
 {
 	//assert(count <= GRAPH_PAGE_LIMIT + );
-	CGContextSetRGBStrokeColor(cgc, colRed, colGreen, colBlue, 0.5); // Bp夜の折れ線の色
-#ifdef YES
+	CGFloat fColR, fColG, fColB, fAlpha;
+	CGFloat fXoffset = 0;
+	switch (lineNo) {
+		case 1:	//Wake-up
+			fColR=1, fColG=1, fColB=0, fAlpha=0.5; //Yellow
+			fXoffset = -10;
+			break;
+		case 3:	//For-sleep
+			fColR=0, fColG=0, fColB=0, fAlpha=0.5; //Black
+			fXoffset = +10;
+			break;
+		default:	//Active
+			fColR=0, fColG=0, fColB=1, fAlpha=0.5; //Blue
+			break;
+	}
+	CGContextSetRGBStrokeColor(cgc, fColR, fColG, fColB, fAlpha);
+
 	// 折れ線
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	if ([userDefaults boolForKey:GUD_bGoal]) {
@@ -47,9 +88,6 @@
 		// Goalを結ばない  [0]を除き[1]から描画する
 		CGContextAddLines(cgc, &points[1], count-1);	
 	}
-#else
-	// スプライン曲線
-#endif
 	CGContextStrokePath(cgc);
 	
 /*	// 移動平均スプライン曲線
@@ -77,20 +115,46 @@
 	//文字列の設定
 	CGContextSetTextDrawingMode (cgc, kCGTextFill);
 	CGContextSelectFont (cgc, "Helvetica", 12.0, kCGEncodingMacRoman);
-	CGContextSetRGBStrokeColor(cgc, colRed, colGreen, colBlue, 1.0);	// 文字の色
+	CGContextSetRGBStrokeColor(cgc, fColR, fColG, fColB, 1.0);	// 文字の色
 	// グラフ ストロークカラー設定(0.0-1.0でRGBAを指定する)
-	CGContextSetRGBFillColor (cgc, colRed, colGreen, colBlue, 1.0); // Black
-	// 記録プロット
-	for (int iNo=0; iNo < count; iNo++) 
-	{
-		CGPoint po = points[ iNo ];
-		if (iNo==0) {	//[0]Goal! 目標
-			//---------------------------------------------Goal! 目標ヨコ軸
-			CGContextSetRGBFillColor(cgc, 0.9, 0.9, 1, 0.2); // White
-			CGContextAddRect(cgc, CGRectMake(RECORD_WIDTH/2, po.y-6, po.x-RECORD_WIDTH/2, 12));
-			CGContextFillPath(cgc); // パスを塗り潰す
-			CGContextSetRGBFillColor (cgc, colRed, colGreen, colBlue, 1.0);
+	CGContextSetRGBFillColor (cgc, fColR, fColG, fColB, 1.0); // Black
+	//---------------------------------------------Goal!
+	CGPoint po = points[0];
+	if (lineNo==2) {
+		//目標ヨコ軸
+		CGContextSetRGBFillColor(cgc, 0.9, 0.9, 1, 0.2); // White
+		CGContextAddRect(cgc, CGRectMake(RECORD_WIDTH/2, po.y-6, po.x-RECORD_WIDTH/2, 12));
+		CGContextFillPath(cgc); // パスを塗り潰す
+		CGContextSetRGBFillColor (cgc, fColR, fColG, fColB, 1.0);
+		// 端点
+		CGContextFillEllipseInRect(cgc, CGRectMake(po.x-1.5, po.y-1.5, 3, 3));	//円Fill
+		// 数値
+		const char *cc;
+		switch (valueType) {
+			case 1:	// Temp(999⇒99.9℃)  // Weight(9999⇒999.9Kg)
+				cc = [[NSString stringWithFormat:@"%0.1f", (float)values[0] / 10.0] cStringUsingEncoding:NSMacOSRomanStringEncoding];
+				break;
+			default:
+				cc = [[NSString stringWithFormat:@"%ld", values[0]] UTF8String];
+				break;
 		}
+		if (po.y-13 <= 0) {	// 上側に表示
+			CGContextShowTextAtPoint (cgc, po.x-10, po.y+5, cc, strlen(cc));
+		} else {
+			CGContextShowTextAtPoint (cgc, po.x-10, po.y-13, cc, strlen(cc));
+		}
+	}
+	//---------------------------------------------朝夕アイコン表示
+	if (lineNo==1 OR lineNo==3) {
+		if (1<count && 0<values[1]) {
+			[self imageGraph:cgc center:points[1] lineNo:lineNo];
+		}
+	}
+	
+	//---------------------------------------------記録プロット
+	for (int iNo=1; iNo < count; iNo++) 
+	{
+		po = points[ iNo ];
 		// 端点
 		CGContextFillEllipseInRect(cgc, CGRectMake(po.x-1.5, po.y-1.5, 3, 3));	//円Fill
 		// 数値
@@ -101,17 +165,104 @@
 				break;
 			default:
 				cc = [[NSString stringWithFormat:@"%ld", values[ iNo ]] UTF8String];
-				//cc = [[NSString stringWithFormat:@"%ld", values[ iNo ]] cStringUsingEncoding:NSMacOSRomanStringEncoding];
 				break;
 		}
 		if (po.y-13 <= 0) {	// 上側に表示
-			CGContextShowTextAtPoint (cgc, po.x-10, po.y+5, cc, strlen(cc));
+			CGContextShowTextAtPoint (cgc, po.x-10+fXoffset, po.y+5, cc, strlen(cc));
 		} else {
-			CGContextShowTextAtPoint (cgc, po.x-10, po.y-13, cc, strlen(cc));
+			CGContextShowTextAtPoint (cgc, po.x-10+fXoffset, po.y-13, cc, strlen(cc));
 		}
 	}
 }
 
+- (NSInteger)integerAverage:(NSInteger)iValSum count:(NSInteger)iCnt
+{
+	assert(mDecBehavior);
+	NSNumber *nVal = [NSNumber numberWithInteger:iValSum];
+	NSDecimalNumber* decVal = [NSDecimalNumber decimalNumberWithDecimal:
+							   [nVal decimalValue]];
+	NSNumber *nCnt = [NSNumber numberWithInteger:iCnt];
+	NSDecimalNumber* decCnt = [NSDecimalNumber decimalNumberWithDecimal:
+							   [nCnt decimalValue]];
+	NSDecimalNumber* decAns = [decVal decimalNumberByDividingBy:decCnt
+												   withBehavior:mDecBehavior]; //÷
+	return (NSInteger)[decAns doubleValue];
+}
+
+NSInteger	mValMin, mValMax;
+NSInteger	mVal1, mValSum1, mValCnt1;
+NSInteger	mVal2, mValSum2, mValCnt2;
+NSInteger	mVal3, mValSum3, mValCnt3;
+long				mValues1[GRAPH_DAYS_MAX+20+1];
+long				mValues2[GRAPH_DAYS_MAX+20+1];
+long				mValues3[GRAPH_DAYS_MAX+20+1];
+int				mValuesCount;		//[0]Goal  [1]〜Record
+int				mValuesMode;		//(0)3本平均  (1)1本合計  (2)1本平均
+
+- (void)mValuesMake
+{
+	if (mValuesMode==1) {	//(1)合計
+		mVal1 = mValSum1;
+		mVal2 = mValSum2;
+		mVal3 = mValSum3;
+	}
+	else {				//(0)(2) 平均　（偶数丸め整数化）
+		if (0 < mValSum1 && 1 < mValCnt1) {
+			mVal1 = [self integerAverage:mValSum1 count:mValCnt1];
+		} else {
+			mVal1 = mValSum1;
+		}
+		
+		if (0 < mValSum2 && 1 < mValCnt2) {
+			mVal2 = [self integerAverage:mValSum2 count:mValCnt2];
+		} else {
+			mVal2 = mValSum2;
+		}
+		
+		if (0 < mValSum3 && 1 < mValCnt3) {
+			mVal3 = [self integerAverage:mValSum3 count:mValCnt3];
+		} else {
+			mVal3 = mValSum3;
+		}
+	}
+	
+	NSLog(@" 　　mValuesMake:  %ld/%d=%ld,  %ld/%d=%ld,  %ld/%d=%ld",
+		  (long)mValSum1, mValCnt1, (long)mVal1, 
+		  (long)mValSum2, mValCnt2, (long)mVal2,
+		  (long)mValSum3, mValCnt3, (long)mVal3);
+	
+	if (__Min<=mVal1 && mVal1<=__Max) {
+		if (mVal1 < mValMin) mValMin = mVal1;
+		if (mValMax < mVal1) mValMax = mVal1;
+		mValues1[ mValuesCount ] = mVal1;	// 各平均値、　　歩数は合計
+	} else {
+		mValues1[ mValuesCount ] = 0;
+	}
+	
+	if (__Min<=mVal2 && mVal2<=__Max) { // Bp夜のみ
+		if (mVal2 < mValMin) mValMin = mVal2;
+		if (mValMax < mVal2) mValMax = mVal2;
+		mValues2[ mValuesCount ] = mVal2;		//Bp夜の平均値
+	} else {
+		mValues2[ mValuesCount ] = 0;
+	}
+	
+	if (__Min<=mVal3 && mVal3<=__Max) {
+		if (mVal3 < mValMin) mValMin = mVal3;
+		if (mValMax < mVal3) mValMax = mVal3;
+		mValues3[ mValuesCount ] = mVal3;	// 各平均値、　　歩数は合計
+	} else {
+		mValues3[ mValuesCount ] = 0;
+	}
+	
+	mValuesCount++;
+	mValSum1 = 0;
+	mValSum2 = 0;
+	mValSum3 = 0;
+	mValCnt1 = 0;	//平均の母数
+	mValCnt2 = 0;	//平均の母数
+	mValCnt3 = 0;	//平均の母数
+}
 
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.
@@ -135,134 +286,92 @@
 	//--------------------------------------------------------------------------------------- iCloud KVS GOAL!
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	NSInteger iGoal = [[kvs objectForKey: __GoalKey] integerValue];  // NSNullならば "<null>"文字列となり数値化して0になる
-	NSInteger iBloodHour = [[kvs objectForKey: @"BloodHour"] integerValue];
-	if (iBloodHour <= 0) iBloodHour = 12;
 
-	int iMode = 0; // 既定モード： 平均
-	if ([__EntityKey isEqualToString:E2_nBpHi_mmHg] 
-		OR [__EntityKey isEqualToString:E2_nBpLo_mmHg]) {
-		iMode = 1; // 血圧モード： 朝夜別平均
+	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	mGraphDays = [[userDefaults objectForKey:GUD_SettGraphDays] integerValue];
+
+	mValuesMode = 0;  //DateOptモード： 3本値
+	if ([__EntityKey isEqualToString:E2_nPedometer]) {
+		mValuesMode = 1; // 合計
 	}
-	else if ([__EntityKey isEqualToString:E2_nPedometer]) {
-		iMode = 2; // 歩数モード： 合計
+	else if ([__EntityKey isEqualToString:E2_nWeight_10Kg] 
+		OR [__EntityKey isEqualToString:E2_nBodyFat_10p]
+		OR [__EntityKey isEqualToString:E2_nSkMuscle_10p]) {
+		mValuesMode = 2; // 平均
 	}
 		
 	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
 	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 	NSDateComponents* comp;
-	int iPrevMonth = 0, iPrevDay = 0, iHour;
+	int iPrevMonth = 0, iPrevDay = 0;
 
-	// 丸め指定
-	NSDecimalNumberHandler *decBehavior = [[NSDecimalNumberHandler alloc]
-										initWithRoundingMode: NSRoundBankers		// 偶数丸め
-										scale: 0									// 丸めた後の桁数　　0=整数化
-										raiseOnExactness: YES			// 精度
-										raiseOnOverflow: YES				// オーバーフロー
-										raiseOnUnderflow: YES			// アンダーフロー
-										raiseOnDivideByZero: YES ];	// アンダーフロー
-
-	//--------------------------------------------------------------------------集計
-	long			valuesArray[GRAPH_PAGE_LIMIT+20+1];
-	long			valuesArray2[GRAPH_PAGE_LIMIT+20+1];
-	NSInteger iMax = 0;
-	NSInteger iMin = 9999;
+	//--------------------------------------------------------------------------日次集計
 	if (__Min<=iGoal  &&  iGoal<=__Max) {
-		iMin = iGoal, iMax = iGoal;
-		valuesArray[0] = iGoal;
-		valuesArray2[0] = iGoal;
+		mValMin = iGoal;
+		mValMax = iGoal;
+		mValues1[0] = iGoal;
+		mValues2[0] = iGoal;
+		mValues3[0] = iGoal;
+	} else {
+		mValMax = 0;
+		mValMin = 9999;
+		mValues1[0] = 0;
+		mValues2[0] = 0;
+		mValues3[0] = 0;
 	}
 	
-	NSInteger  iVal, iValSum=0, iCnt=0;
-	NSInteger  iVal2, iValSum2=0, iCnt2=0;
-	int	arrayCnt = 1;		//[0]Goal  [1]〜Record
+	mValuesCount = 1;		//[0]Goal  [1]〜Record
 	for (E2record *e2 in __E2records) 
 	{
-		if ([e2 valueForKey:__EntityKey]) 
-		{
-			// 日次集計											月									日									時
-			comp = [calendar components: NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit
-							   fromDate:e2.dateTime];
-			if (iMode != 1) {
-				iHour = 0;
-			} else if (comp.hour < iBloodHour) {
-				iHour = 1; //朝
-			} else {
-				iHour = 2; //夜
-			}
-			if (iPrevMonth==0) {	// 最初1度だけ初期化
-				iPrevMonth = comp.month;
-				iPrevDay = comp.day;
-			}
-			else if (iPrevMonth != comp.month OR iPrevDay != comp.day) {
-				NSLog(@"%d/%d  arrayCnt=%d,  iValSum=%ld/%d, %ld/%d",
-					  iPrevMonth, iPrevDay, arrayCnt, (long)iValSum, iCnt, (long)iValSum2, iCnt2);
-				if (iMode != 2) {		//(2)歩数でない⇒歩数は合計のまま
-					if (0 < iValSum && 1 < iCnt) {
-						// 平均　（偶数丸め整数化）
-						NSNumber *nVal = [NSNumber numberWithInteger:iValSum];
-						NSDecimalNumber* decVal = [NSDecimalNumber decimalNumberWithDecimal:
-												   [nVal decimalValue]];
-						NSNumber *nCnt = [NSNumber numberWithInteger:iCnt];
-						NSDecimalNumber* decCnt = [NSDecimalNumber decimalNumberWithDecimal:
-												   [nCnt decimalValue]];
-						NSDecimalNumber* decAns = [decVal decimalNumberByDividingBy:decCnt
-																		  withBehavior:decBehavior]; //÷
-						iVal = (NSInteger)[decAns doubleValue];
-					} else {
-						iVal = iValSum;
-					}
-					
-					if (0 < iValSum2 && 1 < iCnt2) {
-						// 平均　（偶数丸め整数化）
-						NSNumber *nVal = [NSNumber numberWithInteger:iValSum2];
-						NSDecimalNumber* decVal = [NSDecimalNumber decimalNumberWithDecimal:
-													[nVal decimalValue]];
-						NSNumber *nCnt = [NSNumber numberWithInteger:iCnt2];
-						NSDecimalNumber* decCnt = [NSDecimalNumber decimalNumberWithDecimal:
-												   [nCnt decimalValue]];
-						NSDecimalNumber* decAns = [decVal decimalNumberByDividingBy:decCnt
-																			withBehavior:decBehavior]; //÷
-						iVal2 = (NSInteger)[decAns doubleValue];
-					} else {
-						iVal2 = iValSum2;
-					}
-				} else {
-					iVal = iValSum;
-					iVal2 = iValSum2;
+#ifdef DEBUG
+		// 日次集計											月									日									時
+		comp = [calendar components: NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit
+						   fromDate:e2.dateTime];
+		NSLog(@"<<<%d/%d : %d>>>[%ld]", comp.month, comp.day, comp.hour, (long)mValuesCount);
+#else
+		// 日次集計											月									日		
+		comp = [calendar components: NSMonthCalendarUnit | NSDayCalendarUnit
+						   fromDate:e2.dateTime];
+#endif
+		if (iPrevMonth==0) {	// 最初1度だけ初期化
+			iPrevMonth = comp.month;
+			iPrevDay = comp.day;
+		}
+		else if (iPrevMonth != comp.month OR iPrevDay != comp.day) {
+			NSLog(@"<<%d/%d>>  mValuesCount=%d", iPrevMonth, iPrevDay, mValuesCount);
+			iPrevMonth = comp.month;
+			iPrevDay = comp.day;
+			// 日付が変わったので、前日の集計処理する
+			[self mValuesMake];
+			if (mGraphDays < mValuesCount) break; // OK
+		}
+		// 合計
+		if ([e2 valueForKey:__EntityKey]) {
+			if (mValuesMode==0) {	// 3本：平均
+				switch ([e2.nDateOpt integerValue]) {
+					case 0: //Wake-up(1)
+						mValSum1 += [[e2 valueForKey:__EntityKey] integerValue];
+						mValCnt1++;	//平均の母数
+						break;
+					case 2: //For-sleep(3)
+						mValSum3 += [[e2 valueForKey:__EntityKey] integerValue];
+						mValCnt3++;	//平均の母数
+						break;
+					default: //Active(2)
+						mValSum2 += [[e2 valueForKey:__EntityKey] integerValue];
+						mValCnt2++;	//平均の母数
+						break;
 				}
-				NSLog(@"         -----> iVal=%ld, %ld / %d", (long)iVal, (long)iVal2, iCnt);
-				if (__Min<=iVal && iVal<=__Max) {
-					if (iVal < iMin) iMin = iVal;
-					if (iMax < iVal) iMax = iVal;
-					valuesArray[ arrayCnt ] = iVal;	// 各平均値、　　歩数は合計
-				} else {
-					valuesArray[ arrayCnt ] = 0;
-				}
-				if (__Min<=iVal2 && iVal2<=__Max) { // Bp夜のみ
-					if (iVal2 < iMin) iMin = iVal2;
-					if (iMax < iVal2) iMax = iVal2;
-					valuesArray2[ arrayCnt ] = iVal2;		//Bp夜の平均値
-				} else {
-					valuesArray2[ arrayCnt ] = 0;
-				}
-				arrayCnt++;
-				if (GRAPH_PAGE_LIMIT < arrayCnt) break; // OK
-				iPrevMonth = comp.month;
-				iPrevDay = comp.day;
-				iValSum = 0;
-				iValSum2 = 0;
-				iCnt = 0;	//平均の母数
-				iCnt2 = 0;	//平均の母数
-			}
-			// 合計
-			if (iHour==2) { //Bp夜
-				iValSum2 += [[e2 valueForKey:__EntityKey] integerValue];
-				iCnt2++;	//平均の母数
-			} else {
-				iValSum += [[e2 valueForKey:__EntityKey] integerValue];
-				iCnt++;	//平均の母数
+			} else {		// 1本：合計または平均　 ＜＜Active(2)へ集計
+				mValSum2 += [[e2 valueForKey:__EntityKey] integerValue];
+				mValCnt2++;	//平均の母数
 			}
 		}
+	}
+	if (0<mValCnt1 OR 0<mValCnt2 OR 0<mValCnt3) {
+		NSLog(@"<<%d/%d>>LAST  mValuesCount=%d", iPrevMonth, iPrevDay, mValuesCount);
+		// 最終日の集計処理する
+		[self mValuesMake];
 	}
 	
 	// 描画開始
@@ -282,67 +391,100 @@
 	
 	CGFloat fYstep;
 	CGPoint po;
-	CGPoint	pointsArray[GRAPH_PAGE_LIMIT+20+1];
+	CGPoint	pointsArray[GRAPH_DAYS_MAX+20+1];
 	CGFloat	fXgoal = self.bounds.size.width - RECORD_WIDTH/2;		// 最初、GOALを中央に表示する
 	
 	//--------------------------------------------------------------------------プロット
-	if (iMin==iMax) {
-		iMin--;
-		iMax++;
+	if (mValMin==mValMax) {
+		mValMin--;
+		mValMax++;
 	}
-	fYstep = (rect.size.height - GRAPH_H_GAP*2) / (iMax - iMin);  // 1あたりのポイント数
-	po.x = fXgoal;
-	po.y = GRAPH_H_GAP + fYstep * (CGFloat)(iGoal - iMin);
-	pointsArray[0] = po;	// The GOAL
-	po.x -= RECORD_WIDTH;
-	for (int ii = 1; ii < arrayCnt; ii++) {
-		if (po.x <= 0) break;
-		po.y = GRAPH_H_GAP + fYstep * (CGFloat)(valuesArray[ ii ] - iMin);
-		pointsArray[ ii ] = po;
-		po.x -= RECORD_WIDTH;
-	}
-	// valuesArray[]<=0 を除外する
-	CGPoint	points[GRAPH_PAGE_LIMIT+20+1];
-	long			values[GRAPH_PAGE_LIMIT+20+1];
-	points[0] = pointsArray[0];
-	values[0] = valuesArray[0];
+	fYstep = (rect.size.height - GRAPH_H_GAP*2) / (mValMax - mValMin);  // 1あたりのポイント数
+	CGPoint	points[GRAPH_DAYS_MAX+20+1];
+	long			values[GRAPH_DAYS_MAX+20+1];
 	int iCount = 1;
-	for (int ii=1; ii < arrayCnt; ii++) {
-		if (0 < valuesArray[ii]) {
-			values[iCount] = valuesArray[ii];
-			points[iCount] = pointsArray[ii];
-			iCount++;
-		}
-	}
-	//描画
-	if (iMode==1) {
-		[self graphDraw:cgc count:iCount  points:points values:values valueType:__Dec	 cR:1 cG:1 cB:1];
-	} else {
-		[self graphDraw:cgc count:iCount  points:points values:values valueType:__Dec cR:0 cG:0 cB:1];
-	}
-
-	if (iMode==1) {	// values2: Bp夜の平均値
+	
+	//-------------------------3本目　　＜＜2本目よりも下層になるように先に描画している。
+	if (mValuesMode==0) {	//For-sleep:黒
 		po.x = fXgoal;
-		po.y = GRAPH_H_GAP + fYstep * (CGFloat)(iGoal - iMin);
+		po.y = GRAPH_H_GAP + fYstep * (CGFloat)(iGoal - mValMin);
 		pointsArray[0] = po;	// The GOAL
 		po.x -= RECORD_WIDTH;
-		for (int ii = 1; ii < arrayCnt; ii++) {
+		for (int ii = 1; ii < mValuesCount; ii++) {
 			if (po.x <= 0) break;
-			po.y = GRAPH_H_GAP + fYstep * (CGFloat)(valuesArray2[ ii ] - iMin);//Bp夜の平均値
+			po.y = GRAPH_H_GAP + fYstep * (CGFloat)(mValues3[ ii ] - mValMin);
 			pointsArray[ ii ] = po;
 			po.x -= RECORD_WIDTH;
 		}
+		// Goal
+		values[0] = mValues3[0];
+		points[0] = pointsArray[0];
 		// valuesArray[]<=0 を除外する
 		iCount = 1;
-		for (int ii=1; ii < arrayCnt; ii++) {
-			if (0 < valuesArray2[ii]) {
-				values[iCount] = valuesArray2[ii];
+		for (int ii=iCount; ii < mValuesCount; ii++) {
+			if (0 < mValues3[ii]) {
+				values[iCount] = mValues3[ii];
 				points[iCount] = pointsArray[ii];
 				iCount++;
 			}
 		}
 		//描画
-		[self graphDraw:cgc count:iCount  points:points values:values valueType:__Dec cR:0 cG:0 cB:0];
+		[self graphDraw:cgc count:iCount  points:points values:values valueType:__Dec lineNo:3];
+	}
+	
+	//-------------------------2本目　　＜＜1本目よりも下層になるように先に描画している。
+	// Active: 2本目は常に描画
+	po.x = fXgoal;
+	po.y = GRAPH_H_GAP + fYstep * (CGFloat)(iGoal - mValMin);
+	pointsArray[0] = po;	// The GOAL
+	po.x -= RECORD_WIDTH;
+	for (int ii = 1; ii < mValuesCount; ii++) {
+		if (po.x <= 0) break;
+		po.y = GRAPH_H_GAP + fYstep * (CGFloat)(mValues2[ ii ] - mValMin);
+		pointsArray[ ii ] = po;
+		po.x -= RECORD_WIDTH;
+	}
+	// Goal
+	values[0] = mValues2[0];
+	points[0] = pointsArray[0];
+	// valuesArray[]<=0 を除外する
+	iCount = 1;
+	for (int ii=iCount; ii < mValuesCount; ii++) {
+		if (0 < mValues2[ii]) {
+			values[iCount] = mValues2[ii];
+			points[iCount] = pointsArray[ii];
+			iCount++;
+		}
+	}
+	//描画
+	[self graphDraw:cgc count:iCount  points:points values:values valueType:__Dec lineNo:2];
+	
+	//-------------------------1本目
+	if (mValuesMode==0) {	//Wake-up:黄
+		po.x = fXgoal;
+		po.y = GRAPH_H_GAP + fYstep * (CGFloat)(iGoal - mValMin);
+		pointsArray[0] = po;	// The GOAL
+		po.x -= RECORD_WIDTH;
+		for (int ii = 1; ii < mValuesCount; ii++) {
+			if (po.x <= 0) break;
+			po.y = GRAPH_H_GAP + fYstep * (CGFloat)(mValues1[ ii ] - mValMin);
+			pointsArray[ ii ] = po;
+			po.x -= RECORD_WIDTH;
+		}
+		// Goal
+		values[0] = mValues1[0];
+		points[0] = pointsArray[0];
+		// valuesArray[]<=0 を除外する
+		iCount = 1;
+		for (int ii=iCount; ii < mValuesCount; ii++) {
+			if (0 < mValues1[ii]) {
+				values[iCount] = mValues1[ii];
+				points[iCount] = pointsArray[ii];
+				iCount++;
+			}
+		}
+		//描画
+		[self graphDraw:cgc count:iCount  points:points values:values valueType:__Dec	 lineNo:1];
 	}
 }
 

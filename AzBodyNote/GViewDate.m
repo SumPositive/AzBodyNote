@@ -32,9 +32,12 @@
 	}
 	//NSLog(@"__E2records=%@", __E2records);
 	
+	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	mGraphDays = [[userDefaults objectForKey:GUD_SettGraphDays] integerValue];
+
 	CGPoint po;
-	CGPoint	pointsArray[GRAPH_PAGE_LIMIT+20+1];
-	long			valuesArray[GRAPH_PAGE_LIMIT+20+1];
+	CGPoint	pointsArray[GRAPH_DAYS_MAX+20+1];
+	long			valuesArray[GRAPH_DAYS_MAX+20+1];
 	CGFloat	fXgoal = self.bounds.size.width - RECORD_WIDTH/2;		// 最初、GOALを中央に表示する
 	//-------------------------------------------------------------------------------------- Date 描画
 	//システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
@@ -64,7 +67,7 @@
 				pointsArray[ arrayCnt ] = po;
 				valuesArray[ arrayCnt ] = iVal;
 				arrayCnt++;
-				if (GRAPH_PAGE_LIMIT < arrayCnt) break; // OK
+				if (mGraphDays < arrayCnt) break; // OK
 				iPrevMonth = comp.month;
 				iPrevDay = comp.day;
 			}

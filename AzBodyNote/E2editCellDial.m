@@ -160,7 +160,6 @@
 
 
 #pragma mark - <AZDialDelegate>
-
 - (void)dialChanged:(id)sender dial:(NSInteger)dial
 {	// dialが変位したとき
 	mValue = dial;

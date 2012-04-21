@@ -42,6 +42,7 @@
 	{
 		if ([moE2node_.nYearMM integerValue]==E2_nYearMM_GOAL) {
 			ibLbDate.text = @"The GOAL";  //NSLocalizedString(@"TheGoal",nil);
+			ibIvDateOpt.image = nil;
 		} else {
 			NSDateFormatter *fm = [[NSDateFormatter alloc] init];
 			// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定

@@ -1,5 +1,5 @@
 //
-//  SettPanelTVC.h
+//  SettGraphTVC.h
 //  AzBodyNote
 //
 //  Created by 松山 masa on 12/04/17.
@@ -7,15 +7,22 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "AZDial.h"
 
 #import "AppDelegate.h"
 
 
-@interface SettPanelTVC : UITableViewController
+@interface SettGraphTVC : UITableViewController <AZDialDelegate>
 {
 @private
 	AppDelegate					*mAppDelegate;
 	NSMutableArray				*mPanels;
-	//NSMutableArray				*mGraphs;
+
+	NSInteger		mValueDays;
+	AZDial				*mDialDays;
+	UILabel			*mLbValueDays;
 }
+
+@property (nonatomic, assign) BOOL		ppBackButton;
+
 @end

@@ -12,7 +12,7 @@
 
 #import "AppDelegate.h"
 #import "AZCalendarSelect.h"
-#import "SettPanelTVC.h"
+#import "SettGraphTVC.h"
 
 
 @interface SettingTVC : UITableViewController <AZStoreDelegate>

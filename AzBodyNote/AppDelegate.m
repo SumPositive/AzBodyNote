@@ -113,7 +113,7 @@
 							 nil];
 	[userDefaults registerDefaults:dicDef];	// 未定義のKeyのみ更新される
 	
-	if ([userDefaults objectForKey:GUD_SettPanels]==nil) 
+	if ([userDefaults objectForKey:GUD_SettGraphs]==nil) 
 	{	// 測定パネル順序設定の初期値
 		NSArray *aPanels = [[NSArray alloc] initWithObjects:
 				   [NSNumber numberWithInteger: AzConditionNote],
@@ -126,7 +126,7 @@
 				   [NSNumber numberWithInteger: AzConditionFat],
 				   [NSNumber numberWithInteger: AzConditionSkm],
 				   nil];
-		[userDefaults setObject:aPanels forKey:GUD_SettPanels];
+		[userDefaults setObject:aPanels forKey:GUD_SettGraphs];
 	}
 
 	// 画面表示に関係する Option Setting を取得する

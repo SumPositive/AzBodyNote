@@ -55,9 +55,9 @@
 	mMocFunc = mAppDelegate.mocBase; // Read Only
 	assert(mMocFunc);
 	
-	if (mAppDelegate.app_is_unlock==NO) {
-		uiActivePageMax_ = 0; // 0ページ制限
-	}
+	//if (mAppDelegate.app_is_unlock==NO) {
+	//	uiActivePageMax_ = 0; // 0ページ制限
+	//}
 
 	// listen to our app delegates notification that we might want to refresh our detail view
     [[NSNotificationCenter defaultCenter] addObserver:self 
@@ -80,12 +80,12 @@
 - (void)labelGraphRect:(CGRect)rect  text:(NSString*)text
 {
 	UILabel *lb = [[UILabel alloc] initWithFrame:CGRectMake(rect.origin.x+rect.size.width, 
-															rect.origin.y+rect.size.height-36, 100,36)];
+															rect.origin.y+rect.size.height-20, 100,20)];
 	lb.text = text;
 	lb.backgroundColor = [UIColor clearColor];
 	lb.textColor = [UIColor darkGrayColor];
-	lb.font = [UIFont systemFontOfSize:12];
-	lb.numberOfLines = 2;
+	lb.font = [UIFont systemFontOfSize:14];
+	lb.numberOfLines = 1;
 	lb.adjustsFontSizeToFitWidth = YES;
 	lb.minimumFontSize = 10;
 	[ibScrollView addSubview:lb];
@@ -94,7 +94,7 @@
 - (void)graphViewPage:(NSUInteger)page //section:(NSUInteger)section
 {
 	//NSLog(@"graphViewPage: page=%d  section=%d", page, section);
-	if (uiActivePageMax_ < page) return;
+	//if (uiActivePageMax_ < page) return;
 
 	// Sort条件
 	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
@@ -102,33 +102,34 @@
 	
 	NSInteger iOverLeft = 1;  // iPad対応時に調整が必要
 	NSInteger iOverRight = 0;  // GOAL列が常に+1される
-	NSInteger iOffset = (GRAPH_PAGE_LIMIT * 3 * page);
+	//NSInteger iOffset = 0;
 
-	if (page==0) {
+/*	if (page==0) {
 		iOverRight = 0;
 		iOffset = 0;
 	} else {
 		iOffset -= iOverRight;
-	}
+	}*/
 
 	NSArray *e2recs = [mMocFunc select: E2_ENTITYNAME
-									limit: iOverLeft + GRAPH_PAGE_LIMIT + iOverRight
-									offset: iOffset
+									limit: (mGraphDays * 3)
+									offset: 0
 									where: [NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"] // 未保存を除外する
 									sort: sortDesc]; // 最新日付から抽出
 
-	if (0 < uiActivePage_ && [e2recs count] <= iOverLeft + iOverRight) { // 次ページなし
+/*	if (0 < uiActivePage_ && [e2recs count] <= iOverLeft + iOverRight) { // 次ページなし
 		uiActivePageMax_ = uiActivePage_;  // 最終ページ判明
 		return;
 	}
 	else if ([e2recs count] < iOverLeft + GRAPH_PAGE_LIMIT + iOverRight) {
 		uiActivePageMax_ = page;  // 最終ページ判明
-	}
+	}*/
 	
 	// GraphView サイズを決める
 	CGRect rc = ibScrollView.bounds;
 	CGFloat fWhalf = rc.size.width / 2.0; // 表示幅の半分（画面中央）
-	int iCount = [e2recs count] - iOverLeft - iOverRight;
+	//int iCount = [e2recs count] - iOverLeft - iOverRight;
+	int iCount = mGraphDays - iOverLeft - iOverRight;
 	if (iCount < 2) iCount = 2; // 1だとスクロール出来なくなる
 	//                     (                 左余白                 ) + (               レコード               ) + (                 右余白                 ); 
 	rc.size.width = (fWhalf - RECORD_WIDTH/2) + (RECORD_WIDTH * iCount) + (fWhalf - RECORD_WIDTH/2);
@@ -314,7 +315,7 @@
 		rcgv.origin.y += fHeight;
 	}
 
-	//-------------------------------------------
+/*	//-------------------------------------------
 	if (page < uiActivePage_) {	// [ibGraphView setNeedsDisplay]より先にスクロールさせること
 		// 左端を画面中央に表示する
 		pointNext_ = CGPointMake(0, 0); 
@@ -324,13 +325,17 @@
 	}
 	ibScrollView.contentOffset = pointNext_;
 	uiActivePage_ = page;
+ */
+	// 右端を画面中央に表示する
+	ibScrollView.contentOffset = CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);
+
 }
 
 - (void)animation_after
 {
 	[actIndicator_ stopAnimating];
 	
-	ibScrollView.contentOffset = pointNext_;
+	//ibScrollView.contentOffset = pointNext_;
 }
 
 - (void)graphViewPage:(NSUInteger)page animated:(BOOL)animated
@@ -369,13 +374,19 @@
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	// パネル順序読み込み ⇒ グラフON(-)のパネルだけ抽出する
 	NSMutableArray *mua = [NSMutableArray new];
-	NSArray *ar = [userDefaults objectForKey:GUD_SettPanels];
+	NSArray *ar = [userDefaults objectForKey:GUD_SettGraphs];
 	for (NSNumber *num in ar) {
 		if ([num integerValue]<0) { //(-)負値ならばグラフＯＮ
 			[mua addObject:num];
 		}
 	}
 	mPanelGraphs = [NSArray arrayWithArray:mua]; //グラフON(-)のパネルだけ
+	
+	mGraphDays = [[userDefaults objectForKey:GUD_SettGraphDays] integerValue];
+	if (mGraphDays<1 OR GRAPH_DAYS_MAX<mGraphDays) {
+		mGraphDays = 1;
+		[userDefaults setObject:[NSNumber numberWithInteger:mGraphDays] forKey:GUD_SettGraphDays];
+	}
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -388,7 +399,7 @@
 		return;
 	}
 
-	uiActivePageMax_ = 999; // この時点で最終ページは不明
+	//uiActivePageMax_ = 999; // この時点で最終ページは不明
 	[self graphViewPage:0  animated:YES];
 	// 最初、GOALを画面中央に表示する
 	//ibScrollView.contentOffset = CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);  
@@ -474,7 +485,7 @@
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {	// スクロール中に呼ばれる
 	//NSLog(@"scrollViewDidScroll: .contentOffset.x=%f  .y=%f", scrollView.contentOffset.x, scrollView.contentOffset.y);
-	if (mAppDelegate.app_is_unlock) {
+/*	if (mAppDelegate.app_is_unlock) {
 		if (scrollView.contentOffset.x < -70) {
 			// PREV（過去）ページへ
 			if (uiActivePage_ < uiActivePageMax_) {
@@ -500,15 +511,14 @@
 				[actIndicator_ stopAnimating];
 			}
 		}
-	}
+	}*/
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {	// スクロール終了時（指を離した時）に呼ばれる
 	//NSLog(@"scrollViewDidEndDragging: .contentOffset.x=%f  .y=%f / height=%f", 
 	//	  scrollView.contentOffset.x, scrollView.contentOffset.y, scrollView.frame.size.height);
-
-	if (mAppDelegate.app_is_unlock) {
+/*	if (mAppDelegate.app_is_unlock) {
 		if (scrollView.contentOffset.x < -70) {
 			// PREV（過去）ページへ
 			if (uiActivePage_ < uiActivePageMax_) {
@@ -523,6 +533,18 @@
 				[self graphViewPage:uiActivePage_ - 1 animated:YES];
 			}
 		}
+	}*/
+
+	if (scrollView.contentSize.width - ibScrollView.bounds.size.width + 70 < scrollView.contentOffset.x) {
+		// 右へ　　グラフ設定
+		SettGraphTVC *vc = [[SettGraphTVC alloc] init];
+		vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
+		vc.ppBackButton = YES;
+
+		UINavigationController* nc = [[UINavigationController alloc] initWithRootViewController:vc];
+		//nc.modalPresentationStyle = UIModalPresentationFormSheet;
+		nc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+		[self presentModalViewController:nc animated:YES];
 	}
 }
 

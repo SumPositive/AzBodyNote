@@ -2516,7 +2516,7 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="WakeUp"
-     style="display:none"
+     style="display:inline"
      sodipodi:insensitive="true">
     <g
        label="Ebene 1"
@@ -2688,7 +2688,7 @@
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="ForSleep"
-     style="display:inline"
+     style="display:none"
      sodipodi:insensitive="true">
     <g
        id="g4450"

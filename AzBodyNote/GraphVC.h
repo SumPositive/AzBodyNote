@@ -11,12 +11,13 @@
 #import "AppDelegate.h"
 #import "GViewDate.h"
 #import "GViewLine.h"
+#import "SettGraphTVC.h"
 
 
 #ifdef DEBUGxxx
-#define GRAPH_PAGE_LIMIT			10		// < iOverlay
+//#define GRAPH_PAGE_LIMIT			10		// < iOverlay
 #else
-#define GRAPH_PAGE_LIMIT			50		// グラフ表示の最大レコード数　＜＜有料版にてページ移動可能にする予定
+//#define GRAPH_PAGE_LIMIT			100		// グラフ表示の最大レコード数　＜＜有料版にてページ移動可能にする予定
 #endif
 
 #define RECORD_WIDTH				44.0		// 1レコード分の幅
@@ -32,11 +33,12 @@
 	AppDelegate					*mAppDelegate;
 	MocFunctions					*mMocFunc;
 	
-	NSUInteger								uiActivePage_;
-	NSUInteger								uiActivePageMax_;
+	//NSUInteger								uiActivePage_;
+	//NSUInteger								uiActivePageMax_;
 	UIActivityIndicatorView			*actIndicator_;
-	CGPoint									pointNext_;
+	//CGPoint									pointNext_;
 	NSArray									*mPanelGraphs;
+	NSUInteger								mGraphDays;
 	
 	GViewDate						*mGvDate;
 	GViewLine						*mGvBpHi;

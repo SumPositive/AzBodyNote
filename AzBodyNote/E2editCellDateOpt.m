@@ -54,7 +54,7 @@
 				   NSLocalizedString(@"DateOpt For-sleep",nil),
 				   nil];
 	}
-
+	
 	ibSegment.selectedSegmentIndex = [__E2record.nDateOpt integerValue];
 	[self buttonDraw];
 }

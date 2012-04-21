@@ -13,6 +13,11 @@
 
 
 @interface GViewLine : UIView
+{
+@private
+	NSUInteger								mGraphDays;
+	NSDecimalNumberHandler		*mDecBehavior;
+}
 
 @property (nonatomic, retain) NSArray		*ppE2records;
 @property (nonatomic, retain) NSString		*ppEntityKey;

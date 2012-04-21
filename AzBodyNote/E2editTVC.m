@@ -590,7 +590,7 @@
 		mEKCalendar = nil;
 	}
 	// パネル順序読み込み
-	mPanels = [userDefaults objectForKey:GUD_SettPanels];
+	mPanels = [userDefaults objectForKey:GUD_SettGraphs];
 
 	
 	if (bEditDate_) {
@@ -802,8 +802,16 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	if (indexPath.row<=1) {
-		return 44; // DateTime
+	switch (indexPath.row) {
+		case 0:	// dateTime
+			return 44;
+			break;
+		case 1:	// DateOpt
+			if (kvsGoal_) {
+				return 0;
+			}
+			return 44;
+			break;
 	}
     return 88; // Default
 }
@@ -939,11 +947,14 @@
 		return cell;
 	}
 	else if (indexPath.row==1) {
-		E2editCellDateOpt *cell = [self cellDateOpt:tableView];
-		cell.ppE2record = moE2edit_;
-		//NG//[cell setNeedsDisplay]; // コンテンツ描画  drawRect:が呼ばれる
-		[cell drawRect:cell.frame]; // コンテンツ描画
-		return cell;
+		if (!kvsGoal_) {
+			E2editCellDateOpt *cell = [self cellDateOpt:tableView];
+			cell.ppE2record = moE2edit_;
+			//NG//[cell setNeedsDisplay]; // コンテンツ描画  drawRect:が呼ばれる
+			[cell drawRect:cell.frame]; // コンテンツ描画
+			return cell;
+		}
+		return [self cellBlank:tableView]; //Goal 非表示(.height=0)
 	}
 	else if (2<=indexPath.row && indexPath.row<=[mPanels count]) 
 	{	// 測定パネル順序に従ってセル表示する

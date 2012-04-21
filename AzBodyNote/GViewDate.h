@@ -12,6 +12,10 @@
 
 
 @interface GViewDate : UIView
+{
+@private
+	NSUInteger								mGraphDays;
+}
 
 @property (nonatomic, retain) NSArray	*ppE2records;
 //@property (nonatomic, assign) NSUInteger		ppSectionHeight;

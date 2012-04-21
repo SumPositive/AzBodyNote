@@ -79,7 +79,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {	// Return the number of rows in the section.
 	if (section==0) {
-		return 4;
+		return 3;
 	} else {
 		return 2;
 	}
@@ -106,20 +106,14 @@
     
 	switch (indexPath.section*100 + indexPath.row) 
 	{
-		case 0: {	// Goal
+		case 0: {	// SettGraph
 			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
 			if (cell == nil) {
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 			}
-			cell.textLabel.text = NSLocalizedString(@"SettGoal",nil);
-			cell.detailTextLabel.text = NSLocalizedString(@"SettGoal detail",nil);
-			cell.detailTextLabel.adjustsFontSizeToFitWidth = YES;
-			cell.detailTextLabel.minimumFontSize = 10;
-			if ([userDefaults boolForKey:GUD_bGoal]) {
-				cell.accessoryType = UITableViewCellAccessoryCheckmark;
-			} else {
-				cell.accessoryType = UITableViewCellAccessoryNone;
-			}
+			cell.textLabel.text = NSLocalizedString(@"SettGraph",nil);
+			cell.detailTextLabel.text = NSLocalizedString(@"SettGraph detail",nil);
+			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 			return cell;
 		}	break;
 			
@@ -162,17 +156,6 @@
 			return cell;
 		}	break;
 			
-		case 3: {	// SettPanelTVC
-			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
-			if (cell == nil) {
-				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
-			}
-			cell.textLabel.text = NSLocalizedString(@"SettPanel",nil);
-			cell.detailTextLabel.text = NSLocalizedString(@"SettPanel detail",nil);
-			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-			return cell;
-		}	break;
-
 	/*	case 9: {	// GSpread
 			static NSString *cid = @"SettCellGSpread";  //== Identifire に一致させること
 			SettCellGSpread *cell = (SettCellGSpread*)[tableView dequeueReusableCellWithIdentifier:cid];
@@ -236,17 +219,10 @@
 	
 	switch (indexPath.section*100 + indexPath.row) 
 	{
-		case 0: {  // Goal
-			NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-			UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-			if ([userDefaults boolForKey:GUD_bGoal]) {
-				[userDefaults setBool: NO forKey:GUD_bGoal];
-				cell.accessoryType = UITableViewCellAccessoryNone;
-			} else {
-				[userDefaults setBool: YES forKey:GUD_bGoal];
-				cell.accessoryType = UITableViewCellAccessoryCheckmark;
-			}
-			[userDefaults synchronize];
+		case 0: {  // グラフ設定
+			SettGraphTVC *vc = [[SettGraphTVC alloc] init];
+			vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
+			[self.navigationController pushViewController:vc animated:YES];
 		} break;
 			
 		case 1: {  // Tweet
@@ -268,12 +244,6 @@
 			[self.navigationController pushViewController:vc animated:YES];
 		} break;
 			
-		case 3: {  // SettPanelTVC
-			SettPanelTVC *vc = [[SettPanelTVC alloc] init];
-			vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
-			[self.navigationController pushViewController:vc animated:YES];
-		} break;
-
 		case 100: {	// このアプリについて
 			AZAboutVC *vc = [[AZAboutVC alloc] init];
 			vc.ppImgIcon = [UIImage imageNamed:@"Icon57"];
