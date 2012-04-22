@@ -55,7 +55,11 @@
 				   nil];
 	}
 	
-	ibSegment.selectedSegmentIndex = [__E2record.nDateOpt integerValue];
+	if (__E2record.nDateOpt) {
+		ibSegment.selectedSegmentIndex = [__E2record.nDateOpt integerValue];
+	} else {
+		ibSegment.selectedSegmentIndex = 1; //活動中
+	}
 	[self buttonDraw];
 }
 

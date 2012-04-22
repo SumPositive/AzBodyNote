@@ -138,9 +138,9 @@
 	if (0 < values[1]) {
 		CGPoint po = points[1];//Avg.
 		if (lineNo==2) {
-			po.x += 10;
+			po.x += 15;
 		} else {
-			po.x -= 10; //少し左側に、文字を右側に書くため
+			po.x -= 12; //少し左側に、文字を右側に書くため
 		}
 		CGContextSaveGState(cgc); //PUSH
 		{
@@ -157,7 +157,7 @@
 				[self imageGraph:cgc center:po lineNo:lineNo];
 			}
 			// 平均 特別
-			CGContextSelectFont (cgc, "Helvetica", 10.0, kCGEncodingMacRoman);
+			CGContextSelectFont (cgc, "Helvetica", 11.0, kCGEncodingMacRoman);
 			// 数値
 			const char *cc;
 			switch (valueType) {
@@ -175,15 +175,16 @@
 	}
 	
 	//----------------------------------------------------[2]〜Record
+	CGContextSetRGBStrokeColor(cgc, fColR, fColG, fColB, fAlpha);
 	//[0.9]常にGoalへ結ばない  [0][1]を除き[2]から描画する
 	CGContextAddLines(cgc, &points[2], count-2);	
 	CGContextStrokePath(cgc);
-	// 朝夕アイコン表示
+	/*// 朝夕アイコン表示
 	if (lineNo==1 OR lineNo==3) {
 		if (2<count && 0<values[2]) {
 			[self imageGraph:cgc center:points[2] lineNo:lineNo];
 		}
-	}
+	}*/
 	// Record plott
 	for (int iNo=2; iNo < count; iNo++) 
 	{
@@ -406,7 +407,7 @@ int				mValuesMode;		//(0)3本平均  (1)1本合計  (2)1本平均
 		if ([e2 valueForKey:__EntityKey]) {
 			NSInteger iVal = [[e2 valueForKey:__EntityKey] integerValue];
 			if (0 < iVal) {
-				if (mValuesMode==0) {	// 3本：平均
+				if (mValuesMode==0 && e2.nDateOpt) {	// 3本：平均
 					switch ([e2.nDateOpt integerValue]) {
 						case 0: //Wake-up(1)
 							mValSum1 += iVal;

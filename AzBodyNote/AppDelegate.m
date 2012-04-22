@@ -142,7 +142,8 @@
 		alertBox(@"! STOP !", @"Need more iOS 5.0", nil);
 		exit(0);
 	}
-	//app_is_iPad_ = [[[UIDevice currentDevice] model] hasPrefix:@"iPad"];	// iPad
+	//NG//app_is_iPad_ = [[[UIDevice currentDevice] model] hasPrefix:@"iPad"];	// iPad
+	//app_is_iPad_ = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad);
 	//NSLog(@"app_is_iPad_=%d,  app_is_Ad_=%d,  __app_is_unlock=%d", app_is_iPad_, app_is_Ad_, __app_is_unlock);
 
 	//  iCloud KVS     [0.9.0]以降、userDefaultsを廃して、kvsへ移行統一
@@ -689,7 +690,7 @@
 /**
  Returns the managed object context for the application.
  If the context doesn't already exist, it is created and bound to the persistent store coordinator for the application.
- */
+**/
 - (NSManagedObjectContext *)managedObjectContext
 {
 	if (managedObjectContext_) {
