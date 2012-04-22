@@ -17,6 +17,8 @@
 #import "E2editCellDial.h"
 #import "E2editCellNote.h"
 
+#define PANEL_TOP_ROW		2
+
 
 @interface E2editTVC : UITableViewController 
 			<UITableViewDelegate, NSFetchedResultsControllerDelegate, 

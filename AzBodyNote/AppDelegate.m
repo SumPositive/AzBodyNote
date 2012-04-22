@@ -110,6 +110,7 @@
 							@"YES",			GUD_bGoal,								// YES=GOAL表示する
 							@"NO",			GUD_bCalender,						// YES=カレンダーへ記録
 							@"NO",			GUD_bGSpread,						// YES=Googleスプレッドへ記録
+							[NSNumber numberWithInt:14],	GUD_SettGraphDays,
 							 nil];
 	[userDefaults registerDefaults:dicDef];	// 未定義のKeyのみ更新される
 	

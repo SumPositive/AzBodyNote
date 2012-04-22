@@ -37,7 +37,7 @@ typedef NSUInteger AzConditionItems;
 
 #define TABBAR_CHANGE_TIME				0.5		// TabBar切替時のディゾルブ時間(s)
 #define DateOpt_AroundHOUR						2			// 前後許容時間
-#define GRAPH_DAYS_MAX						200
+#define GRAPH_DAYS_MAX						100
 
 // UserDefault ------------------------------------- Settings		【注意】リリース後は変更厳禁！
 //0.9//#define GUD_bPaid									@"GUD_bPaid"
@@ -53,7 +53,7 @@ typedef NSUInteger AzConditionItems;
 #define GUD_SettGraphs						@"GUD_SettGraphs"	//UserDef保存につき変更禁止 NSArrey型 
 #define GUD_DateOptWakeUp				@"GUD_DateOptWakeUp"		//(0)Wake-upとされた平均時。以後この前後2時間をWake-upとする
 #define GUD_DateOptForSleep				@"GUD_DateOptForSleep"		//(2)for sleepとされた平均時。以後この前後2時間をfor sleepとする
-#define GUD_SettGraphDays						@"GUD_SettGraphDays"
+#define GUD_SettGraphDays					@"GUD_SettGraphDays"
 
 // iCloud-KVS UserDefault ------------------------------------- Settings
 // Goal_nBpHi_mmHg 関係は、"MocEntity.h" にて定義

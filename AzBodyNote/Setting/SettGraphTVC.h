@@ -23,6 +23,6 @@
 	UILabel			*mLbValueDays;
 }
 
-@property (nonatomic, assign) BOOL		ppBackButton;
+@property (nonatomic, assign) BOOL		ppBackGraph;
 
 @end

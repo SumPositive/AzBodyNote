@@ -13,7 +13,7 @@
 @end
 
 @implementation SettGraphTVC
-@synthesize ppBackButton = __BackButton;
+@synthesize ppBackGraph = __BackGraph;
 
 
 - (void)actionBack
@@ -29,7 +29,7 @@
 		mAppDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
 		assert(mAppDelegate);
 		GA_TRACK_PAGE(@"SettGraphTVC");
-		__BackButton = NO;
+		__BackGraph = NO;
     }
     return self;
 }
@@ -59,10 +59,10 @@
 {
     [super viewWillAppear:animated];
 
-	if (__BackButton) {
+	if (__BackGraph) {
 		// Graphから呼び出されたときバックボタンが無いので付ける
 		self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
-												 initWithTitle: NSLocalizedString(@"Back", nil)
+												 initWithTitle: NSLocalizedString(@"SettGraph Back", nil)
 												 style:UIBarButtonItemStyleBordered
 												 target:self action:@selector(actionBack)];
 	}
@@ -114,7 +114,7 @@
 {
 	if (indexPath.section==0) {
 		if (indexPath.row==1) return 88; // Days
-		return 55;
+		return 44;
 	}
     return 44; // Default
 }
@@ -153,9 +153,9 @@
 					cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 				}
 				cell.textLabel.text = NSLocalizedString(@"SettGraph Goal",nil);
-				cell.detailTextLabel.text = NSLocalizedString(@"SettGraph Goal detail",nil);
-				cell.detailTextLabel.adjustsFontSizeToFitWidth = YES;
-				cell.detailTextLabel.minimumFontSize = 10;
+				//cell.detailTextLabel.text = NSLocalizedString(@"SettGraph Goal detail",nil);
+				//cell.detailTextLabel.adjustsFontSizeToFitWidth = YES;
+				//cell.detailTextLabel.minimumFontSize = 10;
 				if ([userDefaults boolForKey:GUD_bGoal]) {
 					cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				} else {

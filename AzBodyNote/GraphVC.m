@@ -79,8 +79,10 @@
 
 - (void)labelGraphRect:(CGRect)rect  text:(NSString*)text
 {
-	UILabel *lb = [[UILabel alloc] initWithFrame:CGRectMake(rect.origin.x+rect.size.width, 
-															rect.origin.y+rect.size.height-20, 100,20)];
+	CGFloat fx = rect.origin.x+rect.size.width;
+	if (mGoalDisp==NO) fx -= (RECORD_WIDTH/2); 	//Goal非表示につき左に寄せる
+	
+	UILabel *lb = [[UILabel alloc] initWithFrame:CGRectMake(fx, rect.origin.y+rect.size.height-25, 100,20)];
 	lb.text = text;
 	lb.backgroundColor = [UIColor clearColor];
 	lb.textColor = [UIColor darkGrayColor];
@@ -100,8 +102,8 @@
 	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
 	NSArray *sortDesc = [NSArray arrayWithObjects: sort1,nil]; // 日付降順：Limit抽出に使用
 	
-	NSInteger iOverLeft = 1;  // iPad対応時に調整が必要
-	NSInteger iOverRight = 0;  // GOAL列が常に+1される
+	//NSInteger iOverLeft = 0;  // iPad対応時に調整が必要
+	//NSInteger iOverRight = 0;  // GOAL列が常に+1される
 	//NSInteger iOffset = 0;
 
 /*	if (page==0) {
@@ -112,7 +114,7 @@
 	}*/
 
 	NSArray *e2recs = [mMocFunc select: E2_ENTITYNAME
-									limit: (mGraphDays * 3)
+									limit: (mGraphDays * 3)		//1日時間違いが平均3回と仮定した
 									offset: 0
 									where: [NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"] // 未保存を除外する
 									sort: sortDesc]; // 最新日付から抽出
@@ -126,22 +128,22 @@
 	}*/
 	
 	// GraphView サイズを決める
-	CGRect rc = ibScrollView.bounds;
-	CGFloat fWhalf = rc.size.width / 2.0; // 表示幅の半分（画面中央）
+	CGRect rcScrollContent = ibScrollView.bounds;
+	CGFloat fWhalf = rcScrollContent.size.width / 2.0; // 表示幅の半分（画面中央）
 	//int iCount = [e2recs count] - iOverLeft - iOverRight;
-	int iCount = mGraphDays - iOverLeft - iOverRight;
+	int iCount = mGraphDays; // - iOverLeft - iOverRight;
 	if (iCount < 2) iCount = 2; // 1だとスクロール出来なくなる
 	//                     (                 左余白                 ) + (               レコード               ) + (                 右余白                 ); 
-	rc.size.width = (fWhalf - RECORD_WIDTH/2) + (RECORD_WIDTH * iCount) + (fWhalf - RECORD_WIDTH/2);
+	rcScrollContent.size.width = (fWhalf - RECORD_WIDTH/2) + (RECORD_WIDTH * iCount) + (fWhalf - RECORD_WIDTH/2);
 	
-	ibScrollView.contentSize = CGSizeMake(rc.size.width, rc.size.height);
+	ibScrollView.contentSize = CGSizeMake(rcScrollContent.size.width, rcScrollContent.size.height);
 	
-	rc.origin.x = (fWhalf - RECORD_WIDTH/2) - (RECORD_WIDTH * iOverLeft);  // 左余白
-	rc.size.width = RECORD_WIDTH * (iCount + iOverLeft + iOverRight + 1);	// +1はGOAL列
+	rcScrollContent.origin.x = (fWhalf - RECORD_WIDTH/2); // - (RECORD_WIDTH * iOverLeft);  // 左余白
+	//rcScrollContent.size.width = RECORD_WIDTH * (iCount + iOverLeft + iOverRight + 2);	// +2はGoal,Avg列
+	rcScrollContent.size.width = RECORD_WIDTH * (iCount + 2);	// +2はGoal,Avg列
 
-	// rc = 原点左上
-	CGRect rcgv = rc;
 	//------------------------------------------------------日付
+	CGRect rcgv = rcScrollContent;
 	rcgv.origin.y = 10;
 	rcgv.size.height = 20;
 	if (mGvDate==nil) {
@@ -387,6 +389,8 @@
 		mGraphDays = 1;
 		[userDefaults setObject:[NSNumber numberWithInteger:mGraphDays] forKey:GUD_SettGraphDays];
 	}
+
+	mGoalDisp = [userDefaults boolForKey:GUD_bGoal];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -539,7 +543,7 @@
 		// 右へ　　グラフ設定
 		SettGraphTVC *vc = [[SettGraphTVC alloc] init];
 		vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
-		vc.ppBackButton = YES;
+		vc.ppBackGraph = YES;
 
 		UINavigationController* nc = [[UINavigationController alloc] initWithRootViewController:vc];
 		//nc.modalPresentationStyle = UIModalPresentationFormSheet;

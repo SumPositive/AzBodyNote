@@ -635,7 +635,7 @@
 			[buDelete_ addTarget:self action:@selector(actionDelete:) forControlEvents:UIControlEventTouchUpInside];
 			NSIndexPath* indexPath;
 			@try {
-				indexPath = [NSIndexPath indexPathForRow:[mPanels count]+1 inSection:0]; //【注意】
+				indexPath = [NSIndexPath indexPathForRow:[mPanels count]+PANEL_TOP_ROW inSection:0]; //【注意】
 			}
 			@catch (NSException *exception) {
 				NSLog(@"***ERROR*** indexPathForRow: NN 測定項目の増減による影響に注意");
@@ -807,7 +807,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {	// Return the number of rows in the section.
-	return [mPanels count] + 2;  // +1:日時　　+1:末尾の余白セル
+	return [mPanels count] + PANEL_TOP_ROW + 1;  // +1:日時 +1:DateOpt　　+1:末尾の余白セル
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -966,9 +966,10 @@
 		}
 		return [self cellBlank:tableView]; //Goal 非表示(.height=0)
 	}
-	else if (2<=indexPath.row && indexPath.row<=[mPanels count]) 
+	else if (PANEL_TOP_ROW<=indexPath.row && indexPath.row<PANEL_TOP_ROW+[mPanels count]) 
 	{	// 測定パネル順序に従ってセル表示する
-		NSInteger iPanel = [[mPanels objectAtIndex:indexPath.row-2] integerValue];
+		assert(PANEL_TOP_ROW <= indexPath.row);
+		NSInteger iPanel = [[mPanels objectAtIndex:indexPath.row-PANEL_TOP_ROW] integerValue];
 		if (iPanel < 0) { // 負ならばグラフ表示ON
 			iPanel *= (-1); // 正にする
 		}

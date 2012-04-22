@@ -34,7 +34,9 @@
 	
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	mGraphDays = [[userDefaults objectForKey:GUD_SettGraphDays] integerValue];
+	BOOL bGoal = [userDefaults boolForKey:GUD_bGoal];
 
+	
 	CGPoint po;
 	CGPoint	pointsArray[GRAPH_DAYS_MAX+20+1];
 	long			valuesArray[GRAPH_DAYS_MAX+20+1];
@@ -45,12 +47,18 @@
 	NSDateComponents* comp;
 	int iPrevMonth = 0, iPrevDay = 0;
 
+	//[VA_GOAL0]Goal
 	po.x = fXgoal;
 	po.y = GRAPH_H_GAP;
-	pointsArray[0] = po;	// The GOAL
-	valuesArray[0] = 0;	// The GOAL
+	pointsArray[VA_GOAL] = po;	// The GOAL
+	valuesArray[VA_GOAL] = 0;	// The GOAL
+	//[VA_AVE]Avg.
+	po.x -= RECORD_WIDTH;
+	pointsArray[VA_AVE] = po;
+	valuesArray[VA_AVE] = 0;
+	//[VA_REC]〜Record
 	NSInteger iVal = 0;
-	int	arrayCnt = 1;		//[0]Goal  [1]〜Record
+	int	arrayCnt = VA_REC; //[VA_REC]〜Record
 	for (E2record *e2 in __E2records) {
 		if (po.x <= 0) break;
 		if ([e2 valueForKey:E2_dateTime]) 
@@ -67,13 +75,22 @@
 				pointsArray[ arrayCnt ] = po;
 				valuesArray[ arrayCnt ] = iVal;
 				arrayCnt++;
-				if (mGraphDays < arrayCnt) break; // OK
+				iVal = 0;	//終端処理されないように
+				if (mGraphDays+VA_REC <= arrayCnt) break; // OK
 				iPrevMonth = comp.month;
 				iPrevDay = comp.day;
 			}
 		}
 		iVal = comp.month * 100 + comp.day;
 	}
+	//終端
+	if (0 < iVal) {
+		po.x -= RECORD_WIDTH;
+		pointsArray[ arrayCnt ] = po;
+		valuesArray[ arrayCnt ] = iVal;
+		arrayCnt++;
+	}
+	
 	// 描画
 	CGContextRef cgc = UIGraphicsGetCurrentContext();
 	// CoreGraphicsの原点が左下なので原点を合わせる
@@ -96,7 +113,7 @@
 	// 文字列 カラー設定(0.0-1.0でRGBAを指定する)
 	//CGContextSetRGBStrokeColor(cgc, 151.0/255, 80.0/255, 77.0/255, 1.0); //文字の色
 	//CGContextSetRGBFillColor (cgc, 151.0/255, 80.0/255, 77.0/255, 1.0);
-	CGContextSetRGBFillColor (cgc, 151.0/295, 80.0/295, 77.0/295, 1.0);
+	CGContextSetRGBFillColor (cgc, 151.0/295, 80.0/295, 77.0/295, 1.0);//Azukid色の薄め
 
 	for (int iNo=0; iNo < arrayCnt; iNo++) 
 	{
@@ -106,25 +123,27 @@
 		//NSLog(@"graphDrawDate: [ %d ]=%ld=(%.2f, %.2f)", iNo, val, po.x, po.y);
 		
 		const char *cc;
-		if (val < 100) {
-			//cc = [[NSString stringWithString:NSLocalizedString(@"TheGoal",nil)] UTF8String]; ＜＜日本語NG
-			cc = [[NSString stringWithString:@"GOAL"] UTF8String];
-			CGContextShowTextAtPoint (cgc, po.x-15, po.y+1, cc, strlen(cc));
+		if (iNo==VA_GOAL) {	//Goal
+			if (bGoal) {
+				cc = [[NSString stringWithString:@"GOAL"] UTF8String];
+				CGContextShowTextAtPoint (cgc, po.x-15, po.y+1, cc, strlen(cc));
+			}
+		}
+		else if (iNo==VA_AVE) {	//Avg.
+			cc = [[NSString stringWithString:@"Average"] UTF8String];
+			CGContextShowTextAtPoint (cgc, po.x-20, po.y+1, cc, strlen(cc));
 		}
 		else {
+			assert(VA_REC<=iNo);
 			int iMonth = val / 100;
 			val -= iMonth * 100;
 			int iDay = val;
-			//val -= iDay * 10000;
-			//int iHour = val / 100;
-			//val -= iHour * 100;
-			//int iMinute = val;
-			
 			cc = [[NSString stringWithFormat:@"%d/%d", iMonth, iDay] UTF8String];
-			CGContextShowTextAtPoint (cgc, po.x-15, po.y+1, cc, strlen(cc));
-			
-			//cc = [[NSString stringWithFormat:@"%02d:%02d", iHour, iMinute] UTF8String];
-			//CGContextShowTextAtPoint (cgc, po.x-15, po.y+0, cc, strlen(cc));
+			if (4 < strlen(cc)) {
+				CGContextShowTextAtPoint (cgc, po.x-15, po.y+1, cc, strlen(cc));
+			} else {
+				CGContextShowTextAtPoint (cgc, po.x-10, po.y+1, cc, strlen(cc));
+			}
 		}
 	}
 }

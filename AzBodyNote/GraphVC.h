@@ -32,14 +32,10 @@
 @private
 	AppDelegate					*mAppDelegate;
 	MocFunctions					*mMocFunc;
-	
-	//NSUInteger								uiActivePage_;
-	//NSUInteger								uiActivePageMax_;
-	UIActivityIndicatorView			*actIndicator_;
-	//CGPoint									pointNext_;
-	NSArray									*mPanelGraphs;
-	NSUInteger								mGraphDays;
-	
+	UIActivityIndicatorView	*actIndicator_;
+	NSArray							*mPanelGraphs;
+	NSUInteger						mGraphDays;
+	BOOL								mGoalDisp;
 	GViewDate						*mGvDate;
 	GViewLine						*mGvBpHi;
 	GViewLine						*mGvBpLo;
