@@ -170,9 +170,10 @@
 	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 	NSDateComponents* comp = [calendar components: NSHourCalendarUnit  fromDate:date]; // Hourのみ
 	
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	if ([userDefaults objectForKey:GUD_DateOptWakeUp]) {	// 保存時に自動学習(記録更新)している
-		NSInteger iHour = [[userDefaults objectForKey:GUD_DateOptWakeUp] integerValue];
+	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	if ([kvs objectForKey:GUD_DateOptWakeUp]) {	// 保存時に自動学習(記録更新)している
+		NSInteger iHour = [[kvs objectForKey:GUD_DateOptWakeUp] integerValue];
 		if (iHour-DateOpt_AroundHOUR < 0) {
 			iHour += DateOpt_AroundHOUR;
 			comp.hour += DateOpt_AroundHOUR;
@@ -181,8 +182,8 @@
 			return 0;  // (0)起床後
 		}
 	}
-	if ([userDefaults objectForKey:GUD_DateOptForSleep]) {	// 保存時に自動学習(記録更新)している
-		NSInteger iHour = [[userDefaults objectForKey:GUD_DateOptForSleep] integerValue];
+	if ([kvs objectForKey:GUD_DateOptForSleep]) {	// 保存時に自動学習(記録更新)している
+		NSInteger iHour = [[kvs objectForKey:GUD_DateOptForSleep] integerValue];
 		if (iHour-DateOpt_AroundHOUR < 0) {
 			iHour += DateOpt_AroundHOUR;
 			comp.hour += DateOpt_AroundHOUR;
@@ -246,9 +247,10 @@
 
 - (void)syncExport
 {
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	if (appDelegate_.eventStore==nil OR mEKCalendar==nil) {
-		if ([userDefaults boolForKey:GUD_bTweet]==NO) return;
+		if ([kvs boolForKey:GUD_bTweet]==NO) return;
 	}
 	
 	// TweetおよびEvent用の本文作成
@@ -349,7 +351,7 @@
 	}
 	
 	// Twitter Export
-	if ([userDefaults boolForKey:GUD_bTweet]) {
+	if ([kvs boolForKey:GUD_bTweet]) {
 		// Tweet メッセージ作成
 		NSString *zz = zTweet;
 		if (editMode_==0) { // AddNewのとき
@@ -412,13 +414,14 @@
 		[mocFunc_ commit];
 
 		//自動学習(記録更新)する
-		NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+		//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+		NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 		switch ([moE2edit_.nDateOpt integerValue]) {
 			case 0: //起床後
-				[userDefaults setObject:[NSNumber numberWithInteger:comp.hour] forKey:GUD_DateOptWakeUp];
+				[kvs setObject:[NSNumber numberWithInteger:comp.hour] forKey:GUD_DateOptWakeUp];
 				break;
 			case 2: //就寝前
-				[userDefaults setObject:[NSNumber numberWithInteger:comp.hour] forKey:GUD_DateOptForSleep];
+				[kvs setObject:[NSNumber numberWithInteger:comp.hour] forKey:GUD_DateOptForSleep];
 				break;
 		}
 		//[userDefaults synchronize];
@@ -586,20 +589,20 @@
     [super viewWillAppear:animated];
 	appDelegate_.app_is_AdShow = YES; //これは広告表示可能なViewである。 viewWillAppear:以降で定義すること
 	
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	appDelegate_.app_is_unlock = [userDefaults boolForKey:STORE_PRODUCTID_UNLOCK];
+	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	appDelegate_.app_is_unlock = [kvs boolForKey:STORE_PRODUCTID_UNLOCK];
 
 	// カレンダー設定
-	if ([userDefaults objectForKey:GUD_CalendarID]) {
+	if ([kvs objectForKey:GUD_CalendarID]) {
 		mEKCalendar = [appDelegate_.eventStore 
-					   calendarWithIdentifier: [userDefaults objectForKey:GUD_CalendarID]];
+					   calendarWithIdentifier: [kvs objectForKey:GUD_CalendarID]];
 		NSLog(@"E2editTVC: mEKCalendar={%@}", mEKCalendar);
 	} else {
 		mEKCalendar = nil;
 	}
 	// パネル順序読み込み
-	mPanels = [userDefaults objectForKey:GUD_SettGraphs];
-
+	mPanels = [kvs objectForKey:GUD_SettGraphs];
 	
 	if (bEditDate_) {
 		// 日付修正から戻ったとき
@@ -788,10 +791,6 @@
 		[kvs synchronize]; // 最新同期
 		if ([kvs boolForKey:STORE_PRODUCTID_UNLOCK] && appDelegate_.app_is_unlock==NO) {
 			appDelegate_.app_is_unlock = YES;
-			// UDへ登録
-			NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-			[userDefaults setBool:appDelegate_.app_is_unlock  forKey:STORE_PRODUCTID_UNLOCK];
-			[userDefaults synchronize];
 		}
 	}
 	[self.tableView reloadData];

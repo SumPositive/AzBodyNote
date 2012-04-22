@@ -373,10 +373,11 @@
 		mAppDelegate.adWhirlView.hidden = YES;
 	}
 
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	// パネル順序読み込み ⇒ グラフON(-)のパネルだけ抽出する
 	NSMutableArray *mua = [NSMutableArray new];
-	NSArray *ar = [userDefaults objectForKey:GUD_SettGraphs];
+	NSArray *ar = [kvs objectForKey:GUD_SettGraphs];
 	for (NSNumber *num in ar) {
 		if ([num integerValue]<0) { //(-)負値ならばグラフＯＮ
 			[mua addObject:num];
@@ -384,13 +385,13 @@
 	}
 	mPanelGraphs = [NSArray arrayWithArray:mua]; //グラフON(-)のパネルだけ
 	
-	mGraphDays = [[userDefaults objectForKey:GUD_SettGraphDays] integerValue];
+	mGraphDays = [[kvs objectForKey:GUD_SettGraphDays] integerValue];
 	if (mGraphDays<1 OR GRAPH_DAYS_MAX<mGraphDays) {
 		mGraphDays = 1;
-		[userDefaults setObject:[NSNumber numberWithInteger:mGraphDays] forKey:GUD_SettGraphDays];
+		[kvs setObject:[NSNumber numberWithInteger:mGraphDays] forKey:GUD_SettGraphDays];
 	}
 
-	mGoalDisp = [userDefaults boolForKey:GUD_bGoal];
+	mGoalDisp = [kvs boolForKey:GUD_bGoal];
 }
 
 - (void)viewDidAppear:(BOOL)animated

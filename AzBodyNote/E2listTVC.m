@@ -30,10 +30,6 @@
 		[kvs synchronize]; // 最新同期
 		if ([kvs boolForKey:STORE_PRODUCTID_UNLOCK] && appDelegate_.app_is_unlock==NO) {
 			appDelegate_.app_is_unlock = YES;
-			// UDへ登録
-			NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-			[userDefaults setBool:appDelegate_.app_is_unlock  forKey:STORE_PRODUCTID_UNLOCK];
-			[userDefaults synchronize];
 		}
 	}
 	[self.tableView reloadData];
@@ -145,8 +141,9 @@
     [super viewWillAppear:animated];
 	appDelegate_.app_is_AdShow = YES; //これは広告表示可能なViewである。 viewWillAppear:以降で定義すること
 
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	appDelegate_.app_is_unlock = [userDefaults boolForKey:STORE_PRODUCTID_UNLOCK];
+	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	appDelegate_.app_is_unlock = [kvs boolForKey:STORE_PRODUCTID_UNLOCK];
 
 	// 表示行調整
 	if (indexPathEdit_) { // E2editTVC:から戻ったとき、

@@ -43,8 +43,9 @@
 	}
 	NSLog(@"mCalendars={%@}", mCalendars);
 	
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	mCalendarID = [userDefaults objectForKey:GUD_CalendarID];
+	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	mCalendarID = [kvs objectForKey:GUD_CalendarID];
 }
 
 - (void)viewDidUnload
@@ -169,18 +170,20 @@
 	UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
 	cell.accessoryType = UITableViewCellAccessoryCheckmark;
 
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	
 	if (0 < indexPath.row && indexPath.row<=[mCalendars count]) {
 		EKCalendar* calendar = [mCalendars objectAtIndex:indexPath.row - 1];
 		mCalendarID = calendar.calendarIdentifier;
 		NSLog(@"mCalendarID={%@}", mCalendarID);
-		[userDefaults setValue:calendar.calendarIdentifier forKey:GUD_CalendarID];
-		[userDefaults setValue:calendar.title forKey:GUD_CalendarTitle];
+		[kvs setObject:calendar.calendarIdentifier forKey:GUD_CalendarID];
+		[kvs setObject:calendar.title forKey:GUD_CalendarTitle];
 	} else {
-		[userDefaults removeObjectForKey:GUD_CalendarID]; // なし
-		[userDefaults removeObjectForKey:GUD_CalendarTitle]; // なし
+		[kvs removeObjectForKey:GUD_CalendarID]; // なし
+		[kvs removeObjectForKey:GUD_CalendarTitle]; // なし
 	}
-	[userDefaults synchronize];
+	[kvs synchronize];
 	
 	[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
 }

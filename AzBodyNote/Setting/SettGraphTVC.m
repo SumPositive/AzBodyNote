@@ -40,8 +40,9 @@
 	self.title = NSLocalizedString(@"SettGraph",nil);
 	
 	if (mPanels==nil) {
-		NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-		NSArray *ar = [userDefaults objectForKey:GUD_SettGraphs];
+		//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+		NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+		NSArray *ar = [kvs objectForKey:GUD_SettGraphs];
 		if (ar) {
 			mPanels = [[NSMutableArray alloc] initWithArray:ar];
 		} else {
@@ -67,8 +68,9 @@
 												 target:self action:@selector(actionBack)];
 	}
 
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	mValueDays = [[userDefaults objectForKey:GUD_SettGraphDays] integerValue];
+	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	mValueDays = [[kvs objectForKey:GUD_SettGraphDays] integerValue];
 	if (mValueDays<1 OR GRAPH_DAYS_MAX<mValueDays) {
 		mValueDays = 1;
 	}
@@ -76,9 +78,10 @@
 
 - (void)viewWillDisappear:(BOOL)animated
 {	// 非表示になる前に呼び出される
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	[userDefaults setObject:mPanels forKey:GUD_SettGraphs];
-	[userDefaults synchronize];
+	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	[kvs setObject:mPanels forKey:GUD_SettGraphs];
+	[kvs synchronize];
     [super viewWillDisappear:animated];
 }
 
@@ -143,7 +146,8 @@
 {
 	static NSString *sysCellSubtitle = @"sysCellSubtitle"; //システム既定セル
 	static NSString *sysCellDial = @"sysCellDial";
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	
 	if (indexPath.section==0) {
 		switch (indexPath.row) {
@@ -156,7 +160,7 @@
 				//cell.detailTextLabel.text = NSLocalizedString(@"SettGraph Goal detail",nil);
 				//cell.detailTextLabel.adjustsFontSizeToFitWidth = YES;
 				//cell.detailTextLabel.minimumFontSize = 10;
-				if ([userDefaults boolForKey:GUD_bGoal]) {
+				if ([kvs boolForKey:GUD_bGoal]) {
 					cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				} else {
 					cell.accessoryType = UITableViewCellAccessoryNone;
@@ -323,16 +327,17 @@
 	if (indexPath.section==0) {
 		switch (indexPath.row) {
 			case 0: {  // Goal
-				NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+				//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+				NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 				UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-				if ([userDefaults boolForKey:GUD_bGoal]) {
-					[userDefaults setBool: NO forKey:GUD_bGoal];
+				if ([kvs boolForKey:GUD_bGoal]) {
+					[kvs setBool: NO forKey:GUD_bGoal];
 					cell.accessoryType = UITableViewCellAccessoryNone;
 				} else {
-					[userDefaults setBool: YES forKey:GUD_bGoal];
+					[kvs setBool: YES forKey:GUD_bGoal];
 					cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				}
-				[userDefaults synchronize];
+				[kvs synchronize];
 			} break;
 		}
 		return;
@@ -364,8 +369,9 @@
 	mValueDays = dial;
 	[self refreshGraphDays];
 
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	[userDefaults setObject:[NSNumber numberWithInteger:mValueDays] forKey:GUD_SettGraphDays];
+	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	[kvs setObject:[NSNumber numberWithInteger:mValueDays] forKey:GUD_SettGraphDays];
 }
 
 

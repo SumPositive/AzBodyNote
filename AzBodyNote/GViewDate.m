@@ -32,9 +32,10 @@
 	}
 	//NSLog(@"__E2records=%@", __E2records);
 	
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	mGraphDays = [[userDefaults objectForKey:GUD_SettGraphDays] integerValue];
-	BOOL bGoal = [userDefaults boolForKey:GUD_bGoal];
+	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	mGraphDays = [[kvs objectForKey:GUD_SettGraphDays] integerValue];
+	BOOL bGoal = [kvs boolForKey:GUD_bGoal];
 
 	
 	CGPoint po;

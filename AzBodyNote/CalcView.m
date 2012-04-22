@@ -536,8 +536,9 @@ int levelOperator( NSString *zOpe )  // 演算子の優先順位
 	mIsShow = NO;
 	title_ = [title copy];	// [AC]で表示するため保持
 
-	NSUserDefaults *udef = [NSUserDefaults standardUserDefaults];
-	siCalcMethod = [udef integerForKey:GUD_Calc_Method];	// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
+	//NSUserDefaults *udef = [NSUserDefaults standardUserDefaults];
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	siCalcMethod = [[kvs objectForKey:GUD_Calc_Method] integerValue];	// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
 
 	//------------------------------------------
 	assert(mSubView==nil);
@@ -679,7 +680,7 @@ int levelOperator( NSString *zOpe )  // 演算子の優先順位
 	
 	// 丸め方法
 	NSUInteger uiRound = NSRoundPlain; //　四捨五入
-	if ([[NSUserDefaults standardUserDefaults] boolForKey:GUD_Calc_RoundBankers]) {
+	if ([kvs boolForKey:GUD_Calc_RoundBankers]) {
 		uiRound = NSRoundBankers; // 偶数丸め
 	}
 	if (mDecimal < 0) {

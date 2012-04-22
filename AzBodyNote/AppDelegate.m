@@ -95,8 +95,9 @@
 	GA_TRACK_EVENT(@"Device", @"systemVersion", [[UIDevice currentDevice] systemVersion], 0);
 
 	mAzukiUnlock = NO;	// YES=購入意思ありと見なしてUnlockする
+	
+	/**[0.9.0]以降、kvsへ移行統一する
 	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-
 	//-------------------------------------------------Setting Defult
 	// User Defaultsを使い，キー値を変更したり読み出す前に，NSUserDefaultsクラスのインスタンスメソッド
 	// registerDefaultsメソッドを使い，初期値を指定します。
@@ -109,26 +110,9 @@
 							@"NO",			GUD_bTweet,							// YES=新規保存後ツイート
 							@"YES",			GUD_bGoal,								// YES=GOAL表示する
 							@"NO",			GUD_bCalender,						// YES=カレンダーへ記録
-							@"NO",			GUD_bGSpread,						// YES=Googleスプレッドへ記録
 							[NSNumber numberWithInt:14],	GUD_SettGraphDays,
 							 nil];
 	[userDefaults registerDefaults:dicDef];	// 未定義のKeyのみ更新される
-	
-	if ([userDefaults objectForKey:GUD_SettGraphs]==nil) 
-	{	// 測定パネル順序設定の初期値
-		NSArray *aPanels = [[NSArray alloc] initWithObjects:
-				   [NSNumber numberWithInteger: AzConditionNote],
-				   [NSNumber numberWithInteger: AzConditionBpHi		* (-1)],		//*(-1):Graph表示する
-				   [NSNumber numberWithInteger: AzConditionBpLo		* (-1)],
-				   [NSNumber numberWithInteger: AzConditionPuls			* (-1)],
-				   [NSNumber numberWithInteger: AzConditionTemp		* (-1)],
-				   [NSNumber numberWithInteger: AzConditionWeight	* (-1)],
-				   [NSNumber numberWithInteger: AzConditionPedo],
-				   [NSNumber numberWithInteger: AzConditionFat],
-				   [NSNumber numberWithInteger: AzConditionSkm],
-				   nil];
-		[userDefaults setObject:aPanels forKey:GUD_SettGraphs];
-	}
 
 	// 画面表示に関係する Option Setting を取得する
 	//__app_is_sponsor = [userDefaults boolForKey:STORE_PRODUCTID_UNLOCK]; //GUD_bPaid
@@ -144,6 +128,7 @@
 		[userDefaults setBool:__app_is_unlock forKey:STORE_PRODUCTID_UNLOCK];
 	}
 	[userDefaults synchronize]; // plistへ書き出す
+  **/	
 	
 	// Moc初期化
 	if (__mocBase==nil) {
@@ -160,13 +145,11 @@
 	//app_is_iPad_ = [[[UIDevice currentDevice] model] hasPrefix:@"iPad"];	// iPad
 	//NSLog(@"app_is_iPad_=%d,  app_is_Ad_=%d,  __app_is_unlock=%d", app_is_iPad_, app_is_Ad_, __app_is_unlock);
 
-	//  iCloud KVS 
+	//  iCloud KVS     [0.9.0]以降、userDefaultsを廃して、kvsへ移行統一
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	[kvs synchronize]; // 最新同期
 	if ([[kvs objectForKey:Goal_nBpHi_mmHg] integerValue] < E2_nBpHi_MIN) {
 		// 初期データ追加
-		//[kvs setObject:[NSNull null]	forKey:Goal_sNote1]; // Attempt to insert non-property value '<null>' of class 'NSNull'.
-		//[kvs setObject:[NSNull null]	forKey:Goal_sNote2];
 		[kvs setObject:[NSNumber numberWithInt:120] forKey:Goal_nBpHi_mmHg];
 		[kvs setObject:[NSNumber numberWithInt:  80] forKey:Goal_nBpLo_mmHg];
 		[kvs setObject:[NSNumber numberWithInt:  65] forKey:Goal_nPulse_bpm];
@@ -177,6 +160,31 @@
 		[kvs setObject:[NSNumber numberWithInt:E2_nSkMuscle_INIT] forKey:Goal_nSkMuscle_10p];
 		[kvs synchronize];
 	}
+	
+	if ([kvs objectForKey:GUD_SettGraphs]==nil)		//[0.9.0]NEW
+	{	// 測定パネル順序設定の初期値
+		NSArray *aPanels = [[NSArray alloc] initWithObjects:
+							[NSNumber numberWithInteger: AzConditionNote],
+							[NSNumber numberWithInteger: AzConditionBpHi		* (-1)],		//*(-1):Graph表示する
+							[NSNumber numberWithInteger: AzConditionBpLo		* (-1)],
+							[NSNumber numberWithInteger: AzConditionPuls],
+							[NSNumber numberWithInteger: AzConditionTemp],
+							[NSNumber numberWithInteger: AzConditionWeight],
+							[NSNumber numberWithInteger: AzConditionPedo],
+							[NSNumber numberWithInteger: AzConditionFat],
+							[NSNumber numberWithInteger: AzConditionSkm],
+							nil];
+		[kvs setObject:aPanels	forKey:GUD_SettGraphs];
+		[kvs setBool:NO		forKey:GUD_bTweet];		// YES=新規保存後ツイート
+		[kvs setBool:YES		forKey:GUD_bGoal];			// YES=GOAL表示する
+		[kvs setBool:NO		forKey:GUD_bCalender];	// YES=カレンダーへ記録
+		[kvs setObject:[NSNumber numberWithInt:14]	forKey:GUD_SettGraphDays];
+		[kvs synchronize];
+	}
+
+	if (![kvs objectForKey:GUD_Calc_Method])	[kvs setObject:@"0" forKey:GUD_Calc_Method];
+	if (![kvs boolForKey:GUD_Calc_Method])		[kvs setBool:YES		forKey:GUD_Calc_Method];
+	
 	if (__app_is_unlock==NO) {
 		__app_is_unlock = [kvs boolForKey:STORE_PRODUCTID_UNLOCK];
 		//[0.8]以前に対応するため
@@ -184,12 +192,20 @@
 			__app_is_unlock = [kvs boolForKey:@"GUD_bPaid"];  //[0.8]以前の定義
 			if (__app_is_unlock==NO) {
 				__app_is_unlock = [kvs boolForKey:@"GUD_bUnlock"];  //[0.8]以前の定義
+				if (__app_is_unlock==NO) {
+					NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+					if (__app_is_unlock==NO) {
+						__app_is_unlock = [userDefaults boolForKey:@"GUD_bPaid"];  //[0.8]以前の定義
+						if (__app_is_unlock==NO) {
+							__app_is_unlock = [userDefaults boolForKey:@"GUD_bUnlock"];  //[0.8]以前の定義
+						}
+					}
+				}
 			}
 		}
-		if (__app_is_unlock) {	// UDへ登録
-			[userDefaults setBool:YES forKey:STORE_PRODUCTID_UNLOCK];
-			[userDefaults synchronize]; // plistへ書き出す
-			//[kvs setBool:YES forKey:STORE_PRODUCTID_UNLOCK];  KVSには保存しない ＜＜再インスト時にリセットさせるため
+		if (__app_is_unlock) {	//登録
+			[kvs setBool:YES forKey:STORE_PRODUCTID_UNLOCK];
+			[kvs synchronize]; // plistへ書き出す
 		}
 	}
 

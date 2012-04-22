@@ -102,8 +102,9 @@
 	CGContextSetRGBFillColor (cgc, fColR, fColG, fColB, 1.0); // Black
 	
 	//---------------------------------------------[0]Goal
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	if (0<values[0] && lineNo==2 && [userDefaults boolForKey:GUD_bGoal]) {
+	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	if (0<values[0] && lineNo==2 && [kvs boolForKey:GUD_bGoal]) {
 		CGContextSaveGState(cgc); //PUSH
 		{
 			CGPoint po = points[0];//Goal
@@ -336,9 +337,8 @@ int				mValuesMode;		//(0)3本平均  (1)1本合計  (2)1本平均
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	NSInteger iGoal = [[kvs objectForKey: __GoalKey] integerValue];  // NSNullならば "<null>"文字列となり数値化して0になる
 
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	mGraphDays = [[userDefaults objectForKey:GUD_SettGraphDays] integerValue];
-	//BOOL bGoal = [userDefaults boolForKey:GUD_bGoal];
+	mGraphDays = [[kvs objectForKey:GUD_SettGraphDays] integerValue];
+	//BOOL bGoal = [kvs boolForKey:GUD_bGoal];
 
 	mValuesMode = 0;  //DateOptモード： 3本値
 	if ([__EntityKey isEqualToString:E2_nPedometer]) {

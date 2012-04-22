@@ -102,7 +102,8 @@
 {
 	static NSString *sysCellSubtitle = @"sysCellSubtitle"; //システム既定セル
 
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
     
 	switch (indexPath.section*100 + indexPath.row) 
 	{
@@ -128,7 +129,7 @@
 			} else {
 				cell.detailTextLabel.text = NSLocalizedString(@"SettTweet detail FREE",nil);
 			}
-			if ([userDefaults boolForKey:GUD_bTweet]) {
+			if ([kvs boolForKey:GUD_bTweet]) {
 				cell.accessoryType = UITableViewCellAccessoryCheckmark;
 			} else {
 				cell.accessoryType = UITableViewCellAccessoryNone;
@@ -141,11 +142,10 @@
 			if (cell == nil) {
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 			}
-			NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-			if ([userDefaults objectForKey:GUD_CalendarID]) {
+			if ([kvs objectForKey:GUD_CalendarID]) {
 				cell.textLabel.text = [NSString stringWithFormat:@"%@: %@",
 									   NSLocalizedString(@"SettCalender",nil), 
-									   [userDefaults objectForKey:GUD_CalendarTitle]];
+									   [kvs objectForKey:GUD_CalendarTitle]];
 			} else {
 				cell.textLabel.text = [NSString stringWithFormat:@"%@: %@",
 									   NSLocalizedString(@"SettCalender",nil), 
@@ -226,16 +226,17 @@
 		} break;
 			
 		case 1: {  // Tweet
-			NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+			//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+			NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 			UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-			if ([userDefaults boolForKey:GUD_bTweet]) {
-				[userDefaults setBool: NO forKey:GUD_bTweet];
+			if ([kvs boolForKey:GUD_bTweet]) {
+				[kvs setBool: NO forKey:GUD_bTweet];
 				cell.accessoryType = UITableViewCellAccessoryNone;
 			} else {
-				[userDefaults setBool: YES forKey:GUD_bTweet];
+				[kvs setBool: YES forKey:GUD_bTweet];
 				cell.accessoryType = UITableViewCellAccessoryCheckmark;
 			}
-			[userDefaults synchronize];
+			[kvs synchronize];
 		} break;
 			
 		case 2: {  // AZCalendarSelect
