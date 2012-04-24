@@ -168,39 +168,25 @@
 		switch ([num integerValue] * (-1)) 
 		{
 			case AzConditionBpHi:
-				if (mGvBpHi==nil) {
-					mGvBpHi = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
-					mGvBpHi.ppE2records = e2recs;
-					mGvBpHi.ppEntityKey = E2_nBpHi_mmHg;
-					mGvBpHi.ppGoalKey = Goal_nBpHi_mmHg;
-					mGvBpHi.ppDec = 0;
-					mGvBpHi.ppMin = E2_nBpHi_MIN;
-					mGvBpHi.ppMax = E2_nBpHi_MAX;
-					[ibScrollView addSubview:mGvBpHi];
-					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph BpHi",nil)];
+				rcgv.size.height *= 2.0;
+				if (mGvBp==nil) {
+					mGvBp = [[GViewBp alloc] initWithFrame: rcgv]; // 1値汎用
+					mGvBp.ppE2records = e2recs;
+					[ibScrollView addSubview:mGvBp];
+					CGRect rc = rcgv;
+					rc.size.height = 30;
+					[self labelGraphRect:rc  text:NSLocalizedString(@"Graph BpHi",nil)];
+					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph BpLo",nil)];
 				} else {
-					mGvBpHi.ppE2records = e2recs;
-					[mGvBpHi setFrame:rcgv];
-					[mGvBpHi setNeedsDisplay]; //drawRect:が呼び出される
+					mGvBp.ppE2records = e2recs;
+					[mGvBp setFrame:rcgv];
+					[mGvBp setNeedsDisplay]; //drawRect:が呼び出される
 				}
 				break;
 			case AzConditionBpLo:
-				if (mGvBpLo==nil) {
-					mGvBpLo = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
-					mGvBpLo.ppE2records = e2recs;
-					mGvBpLo.ppEntityKey = E2_nBpLo_mmHg;
-					mGvBpLo.ppGoalKey = Goal_nBpLo_mmHg;
-					mGvBpLo.ppDec = 0;
-					mGvBpLo.ppMin = E2_nBpLo_MIN;
-					mGvBpLo.ppMax = E2_nBpLo_MAX;
-					[ibScrollView addSubview:mGvBpLo];
-					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph BpLo",nil)];
-				} else {
-					mGvBpLo.ppE2records = e2recs;
-					[mGvBpLo setFrame:rcgv];
-					[mGvBpLo setNeedsDisplay]; //drawRect:が呼び出される
-				}
-				break;
+				//この後、rcgv.origin.y += fHeight; のみ通す
+				break; //AzConditionBpHi:にて処理済み
+
 			case AzConditionPuls:
 				if (mGvPuls==nil) {
 					mGvPuls = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
@@ -317,17 +303,6 @@
 		rcgv.origin.y += fHeight;
 	}
 
-/*	//-------------------------------------------
-	if (page < uiActivePage_) {	// [ibGraphView setNeedsDisplay]より先にスクロールさせること
-		// 左端を画面中央に表示する
-		pointNext_ = CGPointMake(0, 0); 
-	} else {
-		// 右端を画面中央に表示する
-		pointNext_ = CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);
-	}
-	ibScrollView.contentOffset = pointNext_;
-	uiActivePage_ = page;
- */
 	// 右端を画面中央に表示する
 	ibScrollView.contentOffset = CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);
 
@@ -441,8 +416,7 @@
 {	// Called after the view was dismissed, covered or otherwise hidden. Default does nothing
 	// クリアする
 	mGvDate = nil;
-	mGvBpHi = nil;
-	mGvBpLo = nil;
+	mGvBp = nil;
 	mGvPuls = nil;
 	mGvTemp = nil;
 	mGvWeight = nil;

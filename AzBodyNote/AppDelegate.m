@@ -166,9 +166,9 @@
 	{	// 測定パネル順序設定の初期値
 		NSArray *aPanels = [[NSArray alloc] initWithObjects:
 							[NSNumber numberWithInteger: AzConditionNote],
-							[NSNumber numberWithInteger: AzConditionBpHi		* (-1)],		//*(-1):Graph表示する
-							[NSNumber numberWithInteger: AzConditionBpLo		* (-1)],
-							[NSNumber numberWithInteger: AzConditionPuls],
+							[NSNumber numberWithInteger: AzConditionBpHi	* (-1)],		//*(-1):Graph表示する
+							[NSNumber numberWithInteger: AzConditionBpLo	* (-1)],		//*(-1):Graph表示する
+							[NSNumber numberWithInteger: AzConditionPuls	* (-1)],		//*(-1):Graph表示する
 							[NSNumber numberWithInteger: AzConditionTemp],
 							[NSNumber numberWithInteger: AzConditionWeight],
 							[NSNumber numberWithInteger: AzConditionPedo],

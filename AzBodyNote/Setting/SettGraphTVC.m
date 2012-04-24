@@ -8,9 +8,6 @@
 
 #import "SettGraphTVC.h"
 
-@interface SettGraphTVC ()
-
-@end
 
 @implementation SettGraphTVC
 @synthesize ppBackGraph = __BackGraph;
@@ -307,7 +304,8 @@
 }
 
 // Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
+	  toIndexPath:(NSIndexPath *)toIndexPath
 {
 	if (fromIndexPath.section != 1) return;
 	if (toIndexPath.section != 1) return;
@@ -354,6 +352,41 @@
 		cell.accessoryType = UITableViewCellAccessoryNone;			// グラフ表示OFF
 	}
 	[mPanels replaceObjectAtIndex:indexPath.row withObject:num]; //置換
+
+	// BpHi と BpLo を同調させる
+	item = [[mPanels objectAtIndex:indexPath.row] integerValue];
+	if (abs(item)==AzConditionBpHi) {
+		// BpLoを更新する
+		for (int iRow=0; iRow<[mPanels count]; iRow++) {
+			if (abs([[mPanels objectAtIndex:iRow] integerValue])==AzConditionBpLo) {
+				NSIndexPath *ip = [NSIndexPath indexPathForRow:iRow inSection:indexPath.section];
+				cell = [tableView cellForRowAtIndexPath:ip];
+				if ([num integerValue] < 0) {
+					cell.accessoryType = UITableViewCellAccessoryCheckmark;	// グラフ表示ON
+				} else {
+					cell.accessoryType = UITableViewCellAccessoryNone;			// グラフ表示OFF
+				}
+				[mPanels replaceObjectAtIndex:iRow withObject:num]; //置換
+				break;
+			}
+		}
+	}
+	else if (abs(item)==AzConditionBpLo) {
+		// BpHiを更新する
+		for (int iRow=0; iRow<[mPanels count]; iRow++) {
+			if (abs([[mPanels objectAtIndex:iRow] integerValue])==AzConditionBpHi) {
+				NSIndexPath *ip = [NSIndexPath indexPathForRow:iRow inSection:indexPath.section];
+				cell = [tableView cellForRowAtIndexPath:ip];
+				if ([num integerValue] < 0) {
+					cell.accessoryType = UITableViewCellAccessoryCheckmark;	// グラフ表示ON
+				} else {
+					cell.accessoryType = UITableViewCellAccessoryNone;			// グラフ表示OFF
+				}
+				[mPanels replaceObjectAtIndex:iRow withObject:num]; //置換
+				break;
+			}
+		}
+	}
 }
 
 

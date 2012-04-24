@@ -10,6 +10,7 @@
 
 #import "AppDelegate.h"
 #import "GViewDate.h"
+#import "GViewBp.h"
 #import "GViewLine.h"
 #import "SettGraphTVC.h"
 
@@ -37,8 +38,7 @@
 	NSUInteger						mGraphDays;
 	BOOL								mGoalDisp;
 	GViewDate						*mGvDate;
-	GViewLine						*mGvBpHi;
-	GViewLine						*mGvBpLo;
+	GViewBp							*mGvBp;
 	GViewLine						*mGvPuls;
 	GViewLine						*mGvTemp;
 	GViewLine						*mGvWeight;
