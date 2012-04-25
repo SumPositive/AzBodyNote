@@ -8,6 +8,9 @@
 #import "GViewDate.h"
 #import "GraphVC.h"
 
+#define SPACE_Y				5.0
+
+
 @implementation GViewDate
 @synthesize ppE2records = __E2records;
 
@@ -50,7 +53,7 @@
 
 	//[VA_GOAL0]Goal
 	po.x = fXgoal;
-	po.y = GRAPH_H_GAP;
+	po.y = SPACE_Y;
 	pointsArray[VA_GOAL] = po;	// The GOAL
 	valuesArray[VA_GOAL] = 0;	// The GOAL
 	//[VA_AVE]Avg.

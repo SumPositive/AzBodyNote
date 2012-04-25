@@ -6,7 +6,7 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 #import "E2listCell.h"
-
+#import "GViewBp.h"		//enum optType
 
 @implementation E2listCell
 @synthesize moE2node = moE2node_;
@@ -53,14 +53,17 @@
 			//
 			if (moE2node_.nDateOpt) {
 				switch ([moE2node_.nDateOpt integerValue]) {
-					case 0: //起床後
-						ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-WakeUp"]; //H20xW24px
+					case optWake: //起床後
+						ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-Wake"]; //H20xW24px
 						break;
-					case 1: //日中   ＜＜実際の天候を取得して表示したい。 地域情報が必要
-						ibIvDateOpt.image = nil;  //[UIImage imageNamed:@"Icon20-Daytime"];
+					case optRest:
+						ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-Rest"]; //H20xW24px
 						break;
-					case 2: //就寝前
-						ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-ForSleep"];
+					case optDown:
+						ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-Down"]; //H20xW24px
+						break;
+					case optSleep: //就寝前
+						ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-Sleep"];
 						break;
 					default:
 						ibIvDateOpt.image = nil;

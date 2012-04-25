@@ -8,6 +8,8 @@
 #import "GViewLine.h"
 #import "GraphVC.h"
 
+#define SPACE_Y				5.0
+
 
 @implementation GViewLine
 @synthesize ppE2records = __E2records;
@@ -504,7 +506,7 @@ int				mValuesMode;		//(0)3本平均  (1)1本合計  (2)1本平均
 		mValMin--;
 		mValMax++;
 	}
-	fYstep = (rect.size.height - GRAPH_H_GAP*2) / (mValMax - mValMin);  // 1あたりのポイント数
+	fYstep = (rect.size.height - SPACE_Y*2) / (mValMax - mValMin);  // 1あたりのポイント数
 	CGPoint	points[GRAPH_DAYS_MAX+GRAPH_DAYS_SAFE+1];
 	float			values[GRAPH_DAYS_MAX+GRAPH_DAYS_SAFE+1];
 	int iCount = 1;
@@ -514,7 +516,7 @@ int				mValuesMode;		//(0)3本平均  (1)1本合計  (2)1本平均
 		po.x = fXgoal;
 		for (int ii = 0; ii < mValuesCount; ii++) {
 			if (po.x <= 0) break;
-			po.y = GRAPH_H_GAP + fYstep * (CGFloat)(mValues3[ ii ] - (float)mValMin);
+			po.y = SPACE_Y + fYstep * (CGFloat)(mValues3[ ii ] - (float)mValMin);
 			pointsArray[ ii ] = po;
 			po.x -= RECORD_WIDTH;
 		}
@@ -536,7 +538,7 @@ int				mValuesMode;		//(0)3本平均  (1)1本合計  (2)1本平均
 	po.x = fXgoal;
 	for (int ii = 0; ii < mValuesCount; ii++) {
 		if (po.x <= 0) break;
-		po.y = GRAPH_H_GAP + fYstep * (CGFloat)(mValues2[ ii ] - (float)mValMin);
+		po.y = SPACE_Y + fYstep * (CGFloat)(mValues2[ ii ] - (float)mValMin);
 		pointsArray[ ii ] = po;
 		po.x -= RECORD_WIDTH;
 	}
@@ -557,7 +559,7 @@ int				mValuesMode;		//(0)3本平均  (1)1本合計  (2)1本平均
 		po.x = fXgoal;
 		for (int ii = 0; ii < mValuesCount; ii++) {
 			if (po.x <= 0) break;
-			po.y = GRAPH_H_GAP + fYstep * (CGFloat)(mValues1[ ii ] - (float)mValMin);
+			po.y = SPACE_Y + fYstep * (CGFloat)(mValues1[ ii ] - (float)mValMin);
 			pointsArray[ ii ] = po;
 			NSLog(@"***mValues1[%d]=%.2f --> pointsArray[%d]=(%.2f, %.2f)", ii, mValues1[ii], ii, po.x, po.y);
 			po.x -= RECORD_WIDTH;

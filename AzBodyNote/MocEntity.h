@@ -36,7 +36,7 @@
 @interface E2record : NSManagedObject 
 @property (nonatomic, retain) NSString		*bCaution;			// BOOL　YES=注意
 @property (nonatomic, retain) NSDate			*dateTime;			// NSDate型ならば定義名のPrefix(先頭)を"date"にする！JSON変換のため
-@property (nonatomic, retain) NSNumber   *nDateOpt;			//2// (0)起床後　(1)活動中　(2)就寝前
+@property (nonatomic, retain) NSNumber   *nDateOpt;			//2// (optType)
 @property (nonatomic, retain) NSNumber   *nYearMM;			// セクション表示のため「年月」を記録
 @property (nonatomic, retain) NSString		*sEventID;			// カレンダー
 @property (nonatomic, retain) NSString		*sGSpreadID;		// Google Spread

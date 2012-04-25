@@ -455,13 +455,14 @@
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="1" id="zOq-vn-DdU">
-                                            <rect key="frame" x="20" y="0.0" width="280" height="44"/>
+                                        <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="1" id="zOq-vn-DdU">
+                                            <rect key="frame" x="10" y="7" width="300" height="30"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <segments>
                                                 <segment title="Wake-up"/>
-                                                <segment title="Active"/>
-                                                <segment title="for sleep"/>
+                                                <segment title="Warm-up"/>
+                                                <segment title="Slowdown"/>
+                                                <segment title="For-sleep"/>
                                             </segments>
                                             <connections>
                                                 <action selector="ibSegmentChange:" destination="j2w-EF-0hk" eventType="valueChanged" id="9Kv-Rk-Moj"/>

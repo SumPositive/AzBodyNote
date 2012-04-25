@@ -11,10 +11,23 @@
 
 #import "Global.h"
 
-//#define VA_GOAL		0
-//#define VA_AVG			1
-//#define VA_REC			2
 #define GRAPH_DAYS_SAFE		20  //安全帯
+
+enum {
+	bpHi		= 0,
+	bpLo	= 1,
+	bpEnd	= 2 //End count
+};
+typedef NSInteger bpType;
+
+enum {
+	optWake		= 0,		// Wake up
+	optRest		= 1,		// at Rest
+	optDown		= 2,		// Slowdown
+    optSleep		= 3,		// for Sleep
+	optEnd			= 4 //End count
+};
+typedef NSInteger optType;
 
 
 @interface GViewBp : UIView

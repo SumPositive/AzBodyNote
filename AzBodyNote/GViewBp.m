@@ -9,23 +9,12 @@
 #import "GraphVC.h"
 
 
+#define SPACE_Y			  8.0		// グラフの最大および最小の極限余白 > LINE_WID/2.0
+#define LINE_WID			15.0		// BpHi と BpLo を結ぶ縦線の太さ   < SPACE_Y*2.0
+
+
 @implementation GViewBp
 @synthesize ppE2records = __E2records;
-
-enum {
-	bpHi		= 0,
-	bpLo	= 1,
-	bpEnd	= 2 //End count
-};
-typedef NSInteger bpType;
-
-enum {
-	optWake		= 0,
-	optActive	= 1,
-    optSleep		= 2,
-	optEnd			= 3 //End count
-};
-typedef NSInteger optType;
 
 NSInteger	pValMin[bpEnd], pValMax[bpEnd];
 NSInteger	pDaySum[bpEnd][optEnd];
@@ -76,10 +65,16 @@ NSInteger	pValuesCount = 0;
 	UIImage *img = nil;
 	switch (opt) {
 		case optWake:	//Wake-up
-			img = [UIImage imageNamed:@"Icon20-WakeUp"];
+			img = [UIImage imageNamed:@"Icon20-Wake"];
+			break;
+		case optRest:
+			img = [UIImage imageNamed:@"Icon20-Rest"];
+			break;
+		case optDown:
+			img = [UIImage imageNamed:@"Icon20-Down"];
 			break;
 		case optSleep:	//For-sleep
-			img = [UIImage imageNamed:@"Icon20-ForSleep"];
+			img = [UIImage imageNamed:@"Icon20-Sleep"];
 			break;
 		default:
 			return;
@@ -95,25 +90,59 @@ NSInteger	pValuesCount = 0;
 	CGContextRestoreGState(cgc); //POP
 }
 
-#define HILO_WID		15.0		// BpHi と BpLo を結ぶ縦線の太さ
 
-- (void)bpValueDraw:(CGContextRef)cgc  value:(float)value  center:(CGPoint)cpo
+- (void)bpValueDraw:(CGContextRef)cgc  value:(float)value  po:(CGPoint)po  isHi:(BOOL)isHi
 {
 	const char *cc;
-	long lg = (long)(value * 10);
-	if (value == (float)lg) {
+	long lg = (long)(value * 10.0);
+	if (lg==(lg/10)*10) {
 		//　小数なし
 		cc = [[NSString stringWithFormat:@"%0.0f", value] UTF8String];
 	} else {
 		// 小数あり
 		cc = [[NSString stringWithFormat:@"%0.1f", value] UTF8String];
 	}
+	if (isHi) {
+		// BpHi
+		po.x += 5.0;
+		po.y -= (5.0 + strlen(cc) * 7.0);
+	} else {
+		// BpLo
+		po.x += 5.0;
+		po.y += 5.0;
+	}
 	CGContextSaveGState(cgc); //PUSH
 	{
-		CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 1.0);	// 文字の色
-		CGContextShowTextAtPoint (cgc, cpo.x, cpo.y, cc, strlen(cc));
+		CGContextSelectFont (cgc, "Helvetica", 14.0, kCGEncodingMacRoman);
+		CGContextSetTextDrawingMode (cgc, kCGTextFill);
+		CGContextSetRGBFillColor (cgc, 1, 1, 1, 1.0); // 塗り潰し色　Black
+		//CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 1.0);	// 文字の色
+		CGAffineTransform  myTextTransform =  CGAffineTransformMakeRotation( 3.1415/2.0 );
+		CGContextSetTextMatrix (cgc, myTextTransform); 
+		CGContextShowTextAtPoint (cgc, po.x, po.y, cc, strlen(cc));
 	}
 	CGContextRestoreGState(cgc); //POP
+}
+
+- (void)strokeColor:(CGContextRef)cgc opt:(optType)opt
+{
+	switch (opt) {
+		case optWake:
+			CGContextSetRGBStrokeColor (cgc, 0.9, 0.9, 0.0, 0.7); //Yellow
+			break;
+		case optRest:
+			CGContextSetRGBStrokeColor (cgc, 0.0, 0.0, 0.0, 1.0); //Black
+			break;
+		case optDown:
+			CGContextSetRGBStrokeColor (cgc, 0.0, 0.0, 1.0, 1.0); //Blue
+			break;
+		case optSleep:
+			CGContextSetRGBStrokeColor (cgc, 0.3, 0.3, 0.3, 0.7); //Black
+			break;
+		default:
+			CGContextSetRGBStrokeColor (cgc, 0.0, 0.5, 0.0, 0.3); //Blue
+			break;
+	}
 }
 
 - (void)graphDraw:(CGContextRef)cgc 
@@ -121,146 +150,202 @@ NSInteger	pValuesCount = 0;
 	CGPoint po;
 	
 	//文字列の設定
-	CGContextSetTextDrawingMode (cgc, kCGTextFill);
-	CGContextSelectFont (cgc, "Helvetica", 12.0, kCGEncodingMacRoman);
 
 	//------------------------------------------------------------------------------ BpHi と BpLo を結ぶ縦線
 	// カラー設定(0.0-1.0でRGBAを指定する)
 	CGContextSetRGBFillColor (cgc, 0, 0, 0, 0.5); // 塗り潰し色　Black
 	CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 0.5);	// 文字の色
 	CGContextSetLineWidth(cgc, 1.0); //線の太さ
+	CGContextSetLineCap(cgc, kCGLineCapRound);	//線分の端の形状指定: 端を丸くする
 
 	//--------------------------------------------------- Goal
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	if ([kvs boolForKey:GUD_bGoal]) {
-		if (0<pValGoal[bpHi]) {
-			po = poGoal[bpHi];
-			CGContextFillEllipseInRect(cgc, CGRectMake(po.x-1.5, po.y-1.5, 3, 3));	//円Fill
-			po.y += HILO_WID;
-			[self bpValueDraw:cgc value:pValGoal[bpHi] center:po];
-		}
-		if (0<pValGoal[bpLo]) {
-			po = poGoal[bpLo];
-			CGContextFillEllipseInRect(cgc, CGRectMake(po.x-1.5, po.y-1.5, 3, 3));	//円Fill
-			po.y -= HILO_WID;
-			[self bpValueDraw:cgc value:pValGoal[bpLo] center:po];
-		}
-		if (0<pValGoal[bpHi] && 0<pValGoal[bpLo]) {
-			CGContextSetLineWidth(cgc, HILO_WID); //太さ
+		if (0<pValGoal[bpHi] && 0<pValGoal[bpLo]) 
+		{	//文字を上層にすべく、このタテ棒を先に描画する
+			CGContextSetLineWidth(cgc, LINE_WID); //太さ
 			po = poGoal[bpHi];
 			CGContextMoveToPoint(cgc, po.x, po.y);
 			po = poGoal[bpLo];
 			CGContextAddLineToPoint(cgc, po.x, po.y);
 			CGContextStrokePath(cgc);
 		}
+		if (0<pValGoal[bpHi]) {
+			po = poGoal[bpHi];
+			CGContextFillEllipseInRect(cgc, CGRectMake(po.x-1.5, po.y-1.5, 3, 3));	//円Fill
+			po.y += LINE_WID;
+			[self bpValueDraw:cgc value:pValGoal[bpHi] po:po isHi:YES];
+		}
+		if (0<pValGoal[bpLo]) {
+			po = poGoal[bpLo];
+			CGContextFillEllipseInRect(cgc, CGRectMake(po.x-1.5, po.y-1.5, 3, 3));	//円Fill
+			po.y -= LINE_WID;
+			[self bpValueDraw:cgc value:pValGoal[bpLo] po:po isHi:NO];		}
 	}
 	//--------------------------------------------------- Avg
-	for (optType opt=optWake; opt<optEnd; opt++) {
+	CGFloat fLineWid;	//タテ棒の太さ
+	CGFloat fXofs;
+	BOOL  bAvgLine = NO;
+	for (optType opt=0; opt<optEnd; opt++) 
+	{
+		[self strokeColor:cgc opt:opt];
 		switch (opt) {
-			case optWake:	//Wake-up
-				CGContextSetRGBFillColor (cgc, 1, 1, 0, 0.4); //Yellow
-				CGContextSetRGBStrokeColor(cgc, 1, 1, 0, 0.4);	// 文字の色
+			case optWake:
+				fLineWid = LINE_WID;
+				fXofs = -2.0 - 2.0 - LINE_WID/2.0;
+				bAvgLine = YES;
 				break;
-			case optSleep:	//For-sleep
-				CGContextSetRGBFillColor (cgc, 0, 0, 0, 0.4); //Black
-				CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 0.4);	// 文字の色
+			case optRest:
+				fLineWid = 1.0;
+				fXofs = -2.0;
+				bAvgLine = NO;
 				break;
-			default:	//Active
-				CGContextSetRGBFillColor (cgc, 0, 0, 1, 0.4); //Blue
-				CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 0.4);	// 文字の色
+			case optDown:
+				fLineWid = 1.0;
+				fXofs = +2.0;
+				bAvgLine = NO;
 				break;
+			case optSleep:
+				fLineWid = LINE_WID;
+				fXofs = +2.0 + 2.0 + fLineWid/2.0;
+				bAvgLine = YES;
+				break;
+			default:
+				GA_TRACK_EVENT_ERROR(@"optType other",0);
+				assert(NO);
 		}
-		if (0<pValAvg[bpHi][opt]) {
+		if (0<pValAvg[bpHi][opt] && 0<pValAvg[bpLo][opt]) 
+		{	//文字を上層にすべく、このタテ棒を先に描画する
+			CGContextSetLineWidth(cgc, fLineWid); //太さ
 			po = poAvg[bpHi][opt];
-			po.x += (HILO_WID * (opt-1));
-			CGContextFillEllipseInRect(cgc, CGRectMake(po.x-1.5, po.y-1.5, 3, 3));	//円Fill
-			//平均水平線
-			CGContextSaveGState(cgc); //PUSH
-			{
-				CGFloat len[]={1.0, 5.0}; //点線の形状指定　　={描画ピクセル数, 空白ピクセル数}
-				CGContextSetLineDash(cgc, 0, len, sizeof(len)/sizeof(len[0]));  //点線の形状指定
-				CGContextSetLineWidth(cgc, 2.0); //太さ
-				CGContextMoveToPoint(cgc, po.x, po.y);
-				CGContextAddLineToPoint(cgc, poValues[bpHi][opt][pValuesCount-1].x, po.y);
-				CGContextStrokePath(cgc);
-			}
-			CGContextRestoreGState(cgc); //POP
-			po.y += HILO_WID;
-			[self bpValueDraw:cgc value:pValAvg[bpHi][opt] center:po];
-		}
-		if (0<pValAvg[bpLo][opt]) {
-			po = poAvg[bpLo][opt];
-			po.x += (HILO_WID * (opt-1));
-			CGContextFillEllipseInRect(cgc, CGRectMake(po.x-1.5, po.y-1.5, 3, 3));	//円Fill
-			//平均水平線
-			CGContextSaveGState(cgc); //PUSH
-			{
-				CGFloat len[]={1.0, 5.0}; //点線の形状指定　　={描画ピクセル数, 空白ピクセル数}
-				CGContextSetLineDash(cgc, 0, len, sizeof(len)/sizeof(len[0]));  //点線の形状指定
-				CGContextSetLineWidth(cgc, 1.0); //太さ
-				CGContextMoveToPoint(cgc, po.x, po.y);
-				CGContextAddLineToPoint(cgc, poValues[bpLo][opt][pValuesCount-1].x, po.y);
-				CGContextStrokePath(cgc);
-			}
-			CGContextRestoreGState(cgc); //POP
-			po.y -= HILO_WID;
-			[self bpValueDraw:cgc value:pValAvg[bpLo][opt] center:po];
-		}
-		if (0<pValAvg[bpHi][opt] && 0<pValAvg[bpLo][opt]) {
-			CGContextSetLineWidth(cgc, HILO_WID); //太さ
-			po = poAvg[bpHi][opt];
-			po.x += (HILO_WID * (opt-1));
+			po.x += fXofs;
 			CGContextMoveToPoint(cgc, po.x, po.y);
 			po = poAvg[bpLo][opt];
-			po.x += (HILO_WID * (opt-1));
+			po.x += fXofs;
 			CGContextAddLineToPoint(cgc, po.x, po.y);
 			CGContextStrokePath(cgc);
 			// 朝夕アイコン表示
 			po.y = poAvg[bpHi][opt].y/2 + poAvg[bpLo][opt].y/2;
 			[self imageGraph:cgc center:po opt:opt];
 		}
+		if (0<pValAvg[bpHi][opt]) {
+			po = poAvg[bpHi][opt];
+			po.x += fXofs;
+			CGContextFillEllipseInRect(cgc, CGRectMake(po.x-1.5, po.y-1.5, 3, 3));	//円Fill
+			//平均水平線
+			if (bAvgLine) {
+				CGContextSaveGState(cgc); //PUSH
+				{
+					//CGFloat len[]={1.0, 5.0}; //点線の形状指定　　={描画ピクセル数, 空白ピクセル数}
+					//CGContextSetLineDash(cgc, 0, len, sizeof(len)/sizeof(len[0]));  //点線の形状指定
+					CGContextSetLineWidth(cgc, 0.5); //太さ
+					CGContextMoveToPoint(cgc, po.x, po.y);
+					CGContextAddLineToPoint(cgc, poValues[bpHi][opt][pValuesCount-1].x, po.y);
+					CGContextStrokePath(cgc);
+				}
+				CGContextRestoreGState(cgc); //POP
+				[self bpValueDraw:cgc value:pValAvg[bpHi][opt] po:po isHi:YES];
+			}
+		}
+		if (0<pValAvg[bpLo][opt]) {
+			po = poAvg[bpLo][opt];
+			po.x += fXofs;
+			CGContextFillEllipseInRect(cgc, CGRectMake(po.x-1.5, po.y-1.5, 3, 3));	//円Fill
+			//平均水平線
+			if (bAvgLine) {
+				CGContextSaveGState(cgc); //PUSH
+				{
+					//CGFloat len[]={1.0, 5.0}; //点線の形状指定　　={描画ピクセル数, 空白ピクセル数}
+					//CGContextSetLineDash(cgc, 0, len, sizeof(len)/sizeof(len[0]));  //点線の形状指定
+					CGContextSetLineWidth(cgc, 0.5); //太さ
+					CGContextMoveToPoint(cgc, po.x, po.y);
+					CGContextAddLineToPoint(cgc, poValues[bpLo][opt][pValuesCount-1].x, po.y);
+					CGContextStrokePath(cgc);
+				}
+				CGContextRestoreGState(cgc); //POP
+				[self bpValueDraw:cgc value:pValAvg[bpLo][opt] po:po isHi:NO];
+			}
+		}
 	}
 
 	//--------------------------------------------------- Record
-	for (int ii=0; ii<pValuesCount; ii++) {
-		for (optType opt=optWake; opt<optEnd; opt++) {
+	BOOL bLine;
+	for (int ii=0; ii<pValuesCount; ii++) 
+	{
+		for (optType opt=0; opt<optEnd; opt++) 
+		{
+			[self strokeColor:cgc opt:opt];
 			switch (opt) {
-				case optWake:	//Wake-up
-					CGContextSetRGBFillColor (cgc, 1, 1, 0, 0.4); //Yellow
-					CGContextSetRGBStrokeColor(cgc, 1, 1, 0, 0.4);	// 文字の色
+				case optWake:
+					fLineWid = LINE_WID;
+					fXofs = -2.0 - 2.0 - LINE_WID/2.0;
+					bAvgLine = YES;
 					break;
-				case optSleep:	//For-sleep
-					CGContextSetRGBFillColor (cgc, 0, 0, 0, 0.4); //Black
-					CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 0.4);	// 文字の色
+				case optRest:
+					fLineWid = 1.0;
+					fXofs = -2.0;
+					bAvgLine = NO;
 					break;
-				default:	//Active
-					CGContextSetRGBFillColor (cgc, 0, 0, 1, 0.4); //Blue
-					CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 0.4);	// 文字の色
+				case optDown:
+					fLineWid = 1.0;
+					fXofs = +2.0;
+					bAvgLine = NO;
 					break;
+				case optSleep:
+					fLineWid = LINE_WID;
+					fXofs = +2.0 + 2.0 + fLineWid/2.0;
+					bAvgLine = YES;
+					break;
+				default:
+					assert(NO);
 			}
-			if (0<pValues[bpHi][opt][ii]) {
+			if (0<pValues[bpHi][opt][ii] && 0<pValues[bpLo][opt][ii])
+			{	//文字を上層にすべく、このタテ棒を先に描画する
+				CGContextSetLineWidth(cgc, fLineWid); //太さ
 				po = poValues[bpHi][opt][ii];
-				po.x += (HILO_WID * (opt-1));
-				CGContextFillEllipseInRect(cgc, CGRectMake(po.x-1.5, po.y-1.5, 3, 3));	//円Fill
-				po.y += HILO_WID;
-				[self bpValueDraw:cgc value:pValues[bpHi][opt][ii] center:po];
-			}
-			if (0<pValues[bpLo][opt][ii]) {
-				po = poValues[bpLo][opt][ii];
-				po.x += (HILO_WID * (opt-1));
-				CGContextFillEllipseInRect(cgc, CGRectMake(po.x-1.5, po.y-1.5, 3, 3));	//円Fill
-				po.y -= HILO_WID;
-				[self bpValueDraw:cgc value:pValues[bpLo][opt][ii] center:po];
-			}
-			if (0<pValues[bpHi][opt][ii] && 0<pValues[bpLo][opt][ii]) {
-				CGContextSetLineWidth(cgc, HILO_WID); //太さ
-				po = poValues[bpHi][opt][ii];
-				po.x += (HILO_WID * (opt-1));
+				po.x += fXofs;
 				CGContextMoveToPoint(cgc, po.x, po.y);
 				po = poValues[bpLo][opt][ii];
-				po.x += (HILO_WID * (opt-1));
+				po.x += fXofs;
 				CGContextAddLineToPoint(cgc, po.x, po.y);
 				CGContextStrokePath(cgc);
+				bLine = YES;
+			} else {
+				bLine = NO;
+			}
+			if (0<pValues[bpHi][opt][ii]) {
+				if (bLine==NO) {  // 平均線まで引く
+					CGContextSetLineWidth(cgc, fLineWid); //太さ
+					po = poValues[bpHi][opt][ii];
+					po.x += fXofs;
+					CGContextMoveToPoint(cgc, po.x, po.y);
+					po.y = poAvg[bpLo][opt].y; //poValues[bpLo][opt][ii];
+					CGContextAddLineToPoint(cgc, po.x, po.y);
+					CGContextStrokePath(cgc);
+				}
+				po = poValues[bpHi][opt][ii];
+				po.x += fXofs;
+				CGContextFillEllipseInRect(cgc, CGRectMake(po.x-1.5, po.y-1.5, 3, 3));	//円Fill
+				if (bAvgLine) {
+					[self bpValueDraw:cgc value:pValues[bpHi][opt][ii] po:po isHi:YES];
+				}
+			}
+			if (0<pValues[bpLo][opt][ii]) {
+				if (bLine==NO) {  // 平均線まで引く
+					CGContextSetLineWidth(cgc, fLineWid); //太さ
+					po = poValues[bpLo][opt][ii];
+					po.x += fXofs;
+					CGContextMoveToPoint(cgc, po.x, po.y);
+					po.y = poAvg[bpHi][opt].y; //poValues[bpLo][opt][ii];
+					CGContextAddLineToPoint(cgc, po.x, po.y);
+					CGContextStrokePath(cgc);
+				}
+				po = poValues[bpLo][opt][ii];
+				po.x += fXofs;
+				CGContextFillEllipseInRect(cgc, CGRectMake(po.x-1.5, po.y-1.5, 3, 3));	//円Fill
+				if (bAvgLine) {
+					[self bpValueDraw:cgc value:pValues[bpLo][opt][ii] po:po isHi:NO];
+				}
 			}
 		}
 	}
@@ -375,6 +460,10 @@ NSInteger	pValuesCount = 0;
 		}
 		// 集計
 		optType opt = [e2.nDateOpt integerValue];
+		if (opt<0 OR optEnd<=opt) {
+			opt = optRest;
+			GA_TRACK_EVENT_ERROR(@"optType",0);
+		}
 		NSInteger val[bpEnd];
 		val[bpHi] = [e2.nBpHi_mmHg integerValue];
 		val[bpLo] = [e2.nBpLo_mmHg integerValue];
@@ -453,27 +542,31 @@ NSInteger	pValuesCount = 0;
 	for (bpType bp=0; bp<bpEnd; bp++)
 	{
 		if (fValMax - fValMin < 10.0) {
-			fValMin -= 10;
-			fValMax += 10;
+			fValMin -= 5;
+			fValMax += 5;
 		}
 		assert(fValMin < fValMax);
-		// 描画範囲(rect)の高さに収まるようにＹ軸スケールを調整する
-		fYstep = (rect.size.height - GRAPH_H_GAP*2) / (fValMax - fValMin);  // Ｙ座標スケール
+		// 端丸の余白
+//		fYstep = (rect.size.height - SPACE_Y*2) / (fValMax - fValMin);  //余白なしのＹ座標スケール
+//		fValMin -= (LINE_WID * fYstep);
+//		fValMax += (LINE_WID * fYstep);
+		// 改めて描画範囲(rect)の高さに収まるようにＹ軸スケールを調整する
+		fYstep = (rect.size.height - SPACE_Y*2) / (fValMax - fValMin);  //上下余白を考慮したＹ座標スケール
 		//
 		po.x = fXgoal;
-		po.y = GRAPH_H_GAP + fYstep * (CGFloat)(pValGoal[bp] - fValMin);
+		po.y = SPACE_Y + fYstep * (CGFloat)(pValGoal[bp] - fValMin);
 		poGoal[bp] = po;
 		//
 		for (optType opt=optWake; opt<optEnd; opt++)
 		{
 			po.x = fXgoal - RECORD_WIDTH;
-			po.y = GRAPH_H_GAP + fYstep * (CGFloat)(pValAvg[bp][opt] - fValMin);
+			po.y = SPACE_Y + fYstep * (CGFloat)(pValAvg[bp][opt] - fValMin);
 			poAvg[bp][opt] = po;
 			po.x -= RECORD_WIDTH;	//左へ
 			//
 			for (int ii=0; ii<pValuesCount; ii++) {
 				if (po.x <= 0) break;
-				po.y = GRAPH_H_GAP + fYstep * (CGFloat)(pValues[bp][opt][ ii ] - fValMin);
+				po.y = SPACE_Y + fYstep * (CGFloat)(pValues[bp][opt][ ii ] - fValMin);
 				poValues[bp][opt][ii] = po;
 				po.x -= RECORD_WIDTH;	//1日づつ
 			}

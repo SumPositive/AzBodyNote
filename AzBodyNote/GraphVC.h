@@ -22,7 +22,7 @@
 #endif
 
 #define RECORD_WIDTH				44.0		// 1レコード分の幅
-#define GRAPH_H_GAP			5.0		// グラフの最大および最小の極限余白
+
 #define SEPARATE_HEIGHT	3.0		// 区切り線の高さ
 
 

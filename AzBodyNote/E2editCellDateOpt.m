@@ -6,6 +6,7 @@
 //  Copyright 2011 Azukid. All rights reserved.
 //
 #import "E2editCellDateOpt.h"
+#import "GViewBp.h"  // enum optType;
 
 @implementation E2editCellDateOpt
 @synthesize delegate = __delegate;
@@ -14,23 +15,29 @@
 
 - (void)buttonDraw
 {
-	for (int ii = 0; ii < ibSegment.numberOfSegments; ii++) {
-		if (ii == ibSegment.selectedSegmentIndex) {
-			switch (ii) {
-				case 0: //起床後
-					[ibSegment setImage:[UIImage imageNamed:@"Icon20-WakeUp"] forSegmentAtIndex:ii];
+	for (optType opt=0; opt < ibSegment.numberOfSegments; opt++) {
+		if (opt == ibSegment.selectedSegmentIndex) {
+			switch (opt) {
+				case optWake: //起床後
+					[ibSegment setImage:[UIImage imageNamed:@"Icon20-Wake"] forSegmentAtIndex:opt];
 					break;
-				case 2: //就寝前
-					[ibSegment setImage:[UIImage imageNamed:@"Icon20-ForSleep"] forSegmentAtIndex:ii];
+				case optRest: //安静時
+					[ibSegment setImage:[UIImage imageNamed:@"Icon20-Relax"] forSegmentAtIndex:opt];
+					break;
+				case optDown: //運動後
+					[ibSegment setImage:[UIImage imageNamed:@"Icon20-Down"] forSegmentAtIndex:opt];
+					break;
+				case optSleep: //就寝前
+					[ibSegment setImage:[UIImage imageNamed:@"Icon20-Sleep"] forSegmentAtIndex:opt];
 					break;
 				default:
-					[ibSegment setImage:nil forSegmentAtIndex:ii];
-					[ibSegment setTitle:[mTitles objectAtIndex:ii] forSegmentAtIndex:ii];
+					[ibSegment setImage:nil forSegmentAtIndex:opt];
+					[ibSegment setTitle:[mTitles objectAtIndex:opt] forSegmentAtIndex:opt];
 					break;
 			}
 		} else {
-			[ibSegment setImage:nil forSegmentAtIndex:ii];
-			[ibSegment setTitle:[mTitles objectAtIndex:ii] forSegmentAtIndex:ii];
+			[ibSegment setImage:nil forSegmentAtIndex:opt];
+			[ibSegment setTitle:[mTitles objectAtIndex:opt] forSegmentAtIndex:opt];
 		}
 	}
 }
@@ -49,16 +56,17 @@
 {
 	if (mTitles==nil) {
 		mTitles = [NSArray arrayWithObjects:
-				   NSLocalizedString(@"DateOpt Wake-up",nil),
-				   NSLocalizedString(@"DateOpt Active",nil),
-				   NSLocalizedString(@"DateOpt For-sleep",nil),
+				   NSLocalizedString(@"DateOpt Wake",nil),
+				   NSLocalizedString(@"DateOpt Rest",nil),
+				   NSLocalizedString(@"DateOpt Down",nil),
+				   NSLocalizedString(@"DateOpt Sleep",nil),
 				   nil];
 	}
 	
 	if (__E2record.nDateOpt) {
 		ibSegment.selectedSegmentIndex = [__E2record.nDateOpt integerValue];
 	} else {
-		ibSegment.selectedSegmentIndex = 1; //活動中
+		ibSegment.selectedSegmentIndex = 1; //Warm-up
 	}
 	[self buttonDraw];
 }
