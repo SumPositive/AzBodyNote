@@ -25,14 +25,6 @@
 }
 */
 
-- (void)didReceiveMemoryWarning
-{
-    // Releases the view if it doesn't have a superview.
-    [super didReceiveMemoryWarning];
-    
-    // Release any cached data, images, etc that aren't in use.
-}
-
 #pragma mark - View lifecycle
 
 /*XIB
@@ -56,7 +48,7 @@
 	assert(mMocFunc);
 	
 	//if (mAppDelegate.app_is_unlock==NO) {
-	//	uiActivePageMax_ = 0; // 0ページ制限
+	//	mPageMax = 0; // 0ページ制限
 	//}
 
 	// listen to our app delegates notification that we might want to refresh our detail view
@@ -96,42 +88,41 @@
 - (void)graphViewPage:(NSUInteger)page //section:(NSUInteger)section
 {
 	//NSLog(@"graphViewPage: page=%d  section=%d", page, section);
-	//if (uiActivePageMax_ < page) return;
+	if (mPageMax < page) return;
 
 	// Sort条件
 	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
 	NSArray *sortDesc = [NSArray arrayWithObjects: sort1,nil]; // 日付降順：Limit抽出に使用
 	
-	//NSInteger iOverLeft = 0;  // iPad対応時に調整が必要
-	//NSInteger iOverRight = 0;  // GOAL列が常に+1される
-	//NSInteger iOffset = 0;
+	NSInteger iOverLeft = 0;  // iPad対応時に調整が必要
+	NSInteger iOverRight = 0;  // GOAL列が常に+1される
+	NSInteger iOffset = 0;
 
-/*	if (page==0) {
+	if (page==0) {
 		iOverRight = 0;
 		iOffset = 0;
 	} else {
 		iOffset -= iOverRight;
-	}*/
+	}
 
 	NSArray *e2recs = [mMocFunc select: E2_ENTITYNAME
-									limit: (mGraphDays * 3)		//1日時間違いが平均3回と仮定した
+									limit: GRAPH_PAGE_LIMIT
 									offset: 0
 									where: [NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"] // 未保存を除外する
 									sort: sortDesc]; // 最新日付から抽出
 
-/*	if (0 < uiActivePage_ && [e2recs count] <= iOverLeft + iOverRight) { // 次ページなし
-		uiActivePageMax_ = uiActivePage_;  // 最終ページ判明
+	if (0 < mPage && [e2recs count] <= iOverLeft + iOverRight) { // 次ページなし
+		mPageMax = mPage;  // 最終ページ判明
 		return;
 	}
 	else if ([e2recs count] < iOverLeft + GRAPH_PAGE_LIMIT + iOverRight) {
-		uiActivePageMax_ = page;  // 最終ページ判明
-	}*/
+		mPageMax = page;  // 最終ページ判明
+	}
 	
 	// GraphView サイズを決める
 	CGRect rcScrollContent = ibScrollView.bounds;
 	CGFloat fWhalf = rcScrollContent.size.width / 2.0; // 表示幅の半分（画面中央）
-	//int iCount = [e2recs count] - iOverLeft - iOverRight;
-	int iCount = mGraphDays; // - iOverLeft - iOverRight;
+	int iCount = [e2recs count] - iOverLeft - iOverRight;
 	if (iCount < 2) iCount = 2; // 1だとスクロール出来なくなる
 	//                     (                 左余白                 ) + (               レコード               ) + (                 右余白                 ); 
 	rcScrollContent.size.width = (fWhalf - RECORD_WIDTH/2) + (RECORD_WIDTH * iCount) + (fWhalf - RECORD_WIDTH/2);
@@ -139,13 +130,12 @@
 	ibScrollView.contentSize = CGSizeMake(rcScrollContent.size.width, rcScrollContent.size.height);
 	
 	rcScrollContent.origin.x = (fWhalf - RECORD_WIDTH/2); // - (RECORD_WIDTH * iOverLeft);  // 左余白
-	//rcScrollContent.size.width = RECORD_WIDTH * (iCount + iOverLeft + iOverRight + 2);	// +2はGoal,Avg列
-	rcScrollContent.size.width = RECORD_WIDTH * (iCount + 2);	// +2はGoal,Avg列
+	rcScrollContent.size.width = RECORD_WIDTH * (iCount + iOverLeft + iOverRight + 2);	// +2はGoal,Avg列
 
 	//------------------------------------------------------日付
 	CGRect rcgv = rcScrollContent;
 	rcgv.origin.y = 10;
-	rcgv.size.height = 20;
+	rcgv.size.height = 40;
 	if (mGvDate==nil) {
 		mGvDate = [[GViewDate alloc] initWithFrame: rcgv]; // 日付専用
 		mGvDate.ppE2records = e2recs;
@@ -174,7 +164,7 @@
 					mGvBp.ppE2records = e2recs;
 					[ibScrollView addSubview:mGvBp];
 					CGRect rc = rcgv;
-					rc.size.height = 30;
+					rc.size.height = 30; //上ラベル位置
 					[self labelGraphRect:rc  text:NSLocalizedString(@"Graph BpHi",nil)];
 					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph BpLo",nil)];
 				} else {
@@ -327,7 +317,7 @@
 		[UIView setAnimationDidStopSelector:@selector(animation_after)]; //アニメーション終了後に呼び出す＜＜setAnimationDelegate必要
 	}
 	// アニメ終了状態
-	[self graphViewPage:page];// この中で、uiActivePage_が更新される
+	[self graphViewPage:page];// この中で、mPageが更新される
 
 	if (animated) {
 		// アニメ実行
@@ -360,11 +350,11 @@
 	}
 	mPanelGraphs = [NSArray arrayWithArray:mua]; //グラフON(-)のパネルだけ
 	
-	mGraphDays = [[kvs objectForKey:GUD_SettGraphDays] integerValue];
+/*	mGraphDays = [[kvs objectForKey:GUD_SettGraphDays] integerValue];
 	if (mGraphDays<1 OR GRAPH_DAYS_MAX<mGraphDays) {
 		mGraphDays = 1;
 		[kvs setObject:[NSNumber numberWithInteger:mGraphDays] forKey:GUD_SettGraphDays];
-	}
+	}*/
 
 	mGoalDisp = [kvs boolForKey:GUD_bGoal];
 }
@@ -379,10 +369,10 @@
 		return;
 	}
 
-	//uiActivePageMax_ = 999; // この時点で最終ページは不明
+	mPageMax = 999; // この時点で最終ページは不明
 	[self graphViewPage:0  animated:YES];
 	// 最初、GOALを画面中央に表示する
-	//ibScrollView.contentOffset = CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);  
+	ibScrollView.contentOffset = CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);  
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -391,26 +381,6 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 	//return YES; //[0.9]ヨコにすると「血圧の日変動分布」グラフ表示する
 }
-
-/*
-- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
-{
-	if (UIInterfaceOrientationIsPortrait(toInterfaceOrientation)) { // ロールグラフ
-		uiActivePageMax_ = 999; // この時点で最終ページは不明
-		[self graphViewPage:0 animated:YES];
-		// 最初、GOALを画面中央に表示する
-		//ibScrollView.contentOffset = CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);  
-	}
-	else {	// 「血圧の日変動分布」グラフ
-		
-	}
-}
-
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
-	
-}
-*/
 
 - (void)viewDidDisappear:(BOOL)animated
 {	// Called after the view was dismissed, covered or otherwise hidden. Default does nothing
@@ -464,10 +434,10 @@
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {	// スクロール中に呼ばれる
 	//NSLog(@"scrollViewDidScroll: .contentOffset.x=%f  .y=%f", scrollView.contentOffset.x, scrollView.contentOffset.y);
-/*	if (mAppDelegate.app_is_unlock) {
+	if (mAppDelegate.app_is_unlock) {
 		if (scrollView.contentOffset.x < -70) {
 			// PREV（過去）ページへ
-			if (uiActivePage_ < uiActivePageMax_) {
+			if (mPage < mPageMax) {
 				// 画面左側にインジケータ表示
 				if (![actIndicator_ isAnimating]) {
 					[actIndicator_ setFrame:CGRectMake(-50, ibScrollView.frame.size.height/2-25, 50, 50)];
@@ -477,7 +447,7 @@
 		}
 		else if (scrollView.contentSize.width - ibScrollView.bounds.size.width + 70 < scrollView.contentOffset.x) {
 			// NEXT（未来）ページへ
-			if (0 < uiActivePage_) {
+			if (0 < mPage) {
 				// 画面右側にインジケータ表示
 				if (![actIndicator_ isAnimating]) {
 					[actIndicator_ setFrame:CGRectMake(ibScrollView.contentSize.width, ibScrollView.frame.size.height/2-25, 50, 50)];
@@ -490,29 +460,31 @@
 				[actIndicator_ stopAnimating];
 			}
 		}
-	}*/
+	}
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {	// スクロール終了時（指を離した時）に呼ばれる
 	//NSLog(@"scrollViewDidEndDragging: .contentOffset.x=%f  .y=%f / height=%f", 
 	//	  scrollView.contentOffset.x, scrollView.contentOffset.y, scrollView.frame.size.height);
-/*	if (mAppDelegate.app_is_unlock) {
+	if (mAppDelegate.app_is_unlock) {
 		if (scrollView.contentOffset.x < -70) {
 			// PREV（過去）ページへ
-			if (uiActivePage_ < uiActivePageMax_) {
-				NSLog(@"scrollViewDidEndDragging: PREV uiActivePage_=%d + 1", uiActivePage_);
-				[self graphViewPage:uiActivePage_ + 1  animated:YES];
+			if (mPage < mPageMax) {
+				NSLog(@"scrollViewDidEndDragging: PREV mPage=%d + 1", mPage);
+				[self graphViewPage:mPage + 1  animated:YES];
+				return;
 			}
 		}
 		else if (scrollView.contentSize.width - ibScrollView.bounds.size.width + 70 < scrollView.contentOffset.x) {
 			// NEXT（未来）ページへ
-			if (0 < uiActivePage_) {
-				NSLog(@"scrollViewDidEndDragging: NEXT uiActivePage_=%d - 1", uiActivePage_);
-				[self graphViewPage:uiActivePage_ - 1 animated:YES];
+			if (0 < mPage) {
+				NSLog(@"scrollViewDidEndDragging: NEXT mPage=%d - 1", mPage);
+				[self graphViewPage:mPage - 1 animated:YES];
+				return;
 			}
 		}
-	}*/
+	}
 
 	if (scrollView.contentSize.width - ibScrollView.bounds.size.width + 70 < scrollView.contentOffset.x) {
 		// 右へ　　グラフ設定
@@ -526,7 +498,6 @@
 		[self presentModalViewController:nc animated:YES];
 	}
 }
-
 
 
 @end

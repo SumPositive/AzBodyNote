@@ -15,19 +15,19 @@
 
 - (void)buttonDraw
 {
-	for (optType opt=0; opt < ibSegment.numberOfSegments; opt++) {
+	for (DateOpt opt=0; opt < ibSegment.numberOfSegments; opt++) {
 		if (opt == ibSegment.selectedSegmentIndex) {
 			switch (opt) {
-				case optWake: //起床後
+				case DtOpWake: //起床後
 					[ibSegment setImage:[UIImage imageNamed:@"Icon20-Wake"] forSegmentAtIndex:opt];
 					break;
-				case optRest: //安静時
+				case DtOpRest: //安静時
 					[ibSegment setImage:[UIImage imageNamed:@"Icon20-Relax"] forSegmentAtIndex:opt];
 					break;
-				case optDown: //運動後
+				case DtOpDown: //運動後
 					[ibSegment setImage:[UIImage imageNamed:@"Icon20-Down"] forSegmentAtIndex:opt];
 					break;
-				case optSleep: //就寝前
+				case DtOpSleep: //就寝前
 					[ibSegment setImage:[UIImage imageNamed:@"Icon20-Sleep"] forSegmentAtIndex:opt];
 					break;
 				default:

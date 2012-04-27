@@ -7,6 +7,7 @@
 //
 
 #import "SettGraphTVC.h"
+#import "GraphVC.h"
 
 
 @implementation SettGraphTVC
@@ -67,8 +68,8 @@
 
 	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	mValueDays = [[kvs objectForKey:GUD_SettGraphDays] integerValue];
-	if (mValueDays<1 OR GRAPH_DAYS_MAX<mValueDays) {
+	mValueDays = [[kvs objectForKey:GUD_SettStatDays] integerValue];
+	if (mValueDays<1 OR GRAPH_PAGE_LIMIT <mValueDays) {
 		mValueDays = 1;
 	}
 }
@@ -404,7 +405,7 @@
 
 	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	[kvs setObject:[NSNumber numberWithInteger:mValueDays] forKey:GUD_SettGraphDays];
+	[kvs setObject:[NSNumber numberWithInteger:mValueDays] forKey:GUD_SettStatDays];
 }
 
 

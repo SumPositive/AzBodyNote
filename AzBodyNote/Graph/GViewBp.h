@@ -21,21 +21,21 @@ enum {
 typedef NSInteger bpType;
 
 enum {
-	optWake		= 0,		// Wake up
-	optRest		= 1,		// at Rest
-	optDown		= 2,		// Slowdown
-    optSleep		= 3,		// for Sleep
-	optEnd			= 4 //End count
+	DtOpWake	= 0,		// Wake up
+	DtOpRest		= 1,		// at Rest
+	DtOpDown	= 2,		// Slowdown
+    DtOpSleep	= 3,		// for Sleep
+	DtOpEnd		= 4 //End count
 };
-typedef NSInteger optType;
+typedef NSInteger DateOpt;
 
 
 @interface GViewBp : UIView
 {
 @private
-	NSUInteger								mGraphDays;
-	NSDecimalNumberHandler		*mBehaviorDec0; //小数以下0桁＝整数
-	NSDecimalNumberHandler		*mBehaviorDec1; //小数以下1桁
+	//NSUInteger								mGraphDays;
+	//NSDecimalNumberHandler		*mBehaviorDec0; //小数以下0桁＝整数
+	//NSDecimalNumberHandler		*mBehaviorDec1; //小数以下1桁
 }
 
 @property (nonatomic, retain) NSArray		*ppE2records;

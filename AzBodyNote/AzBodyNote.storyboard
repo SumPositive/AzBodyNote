@@ -6,11 +6,11 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="1181"/>
     </dependencies>
     <scenes>
-        <!--GraphVC - Graph-->
+        <!--View Controller - GraphVC-->
         <scene sceneID="qaR-l3-Cgj">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="zzZ-UW-wVY" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <viewController title="Graph" modalTransitionStyle="crossDissolve" id="pJ2-eu-18r" customClass="GraphVC" sceneMemberID="viewController">
+                <viewController title="Graph" modalTransitionStyle="crossDissolve" id="pJ2-eu-18r" userLabel="View Controller - GraphVC" customClass="GraphVC" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Mes-uB-0Hv">
                         <rect key="frame" x="0.0" y="20" width="320" height="411"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -23,13 +23,6 @@
                                 <rect key="frame" x="0.0" y="1" width="320" height="410"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
-                            <label hidden="YES" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.20000000000000004" contentMode="left" text="Condition" lineBreakMode="tailTruncation" minimumFontSize="10" id="ie6-pp-UQ7">
-                                <rect key="frame" x="190" y="35" width="96" height="51"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" name="Zapfino" family="Zapfino" pointSize="14"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <view userInteractionEnabled="NO" alpha="0.20000000000000015" contentMode="scaleToFill" id="JCq-go-u0F">
                                 <rect key="frame" x="138" y="16" width="44" height="390"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -45,6 +38,43 @@
                 </viewController>
             </objects>
             <point key="canvasLocation" x="-1" y="574"/>
+        </scene>
+        <!--View Controller - StatisticsVC-->
+        <scene sceneID="wzE-5A-WaR">
+            <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rDS-3g-KiX" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <viewController title="Statistics" modalTransitionStyle="crossDissolve" id="DPa-5P-xBn" userLabel="View Controller - StatisticsVC" customClass="StatisticsVC" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Cwo-OY-S1z">
+                        <rect key="frame" x="0.0" y="20" width="320" height="411"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="5fm-PA-odh">
+                                <rect key="frame" x="0.0" y="30" width="320" height="381"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            </scrollView>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="Te6-rf-Myx">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <segments>
+                                    <segment title="Wake-Sleep"/>
+                                    <segment title="Rest-Down"/>
+                                    <segment title="Dispersal 24H"/>
+                                </segments>
+                                <connections>
+                                    <action selector="ibSegmentChange:" destination="DPa-5P-xBn" eventType="valueChanged" id="I2H-54-gBF"/>
+                                </connections>
+                            </segmentedControl>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Statistics" image="Tab32-Statistics.png" id="gMC-S8-gyf"/>
+                    <connections>
+                        <outlet property="ibScrollView" destination="5fm-PA-odh" id="bjw-OD-oia"/>
+                        <outlet property="ibSegment" destination="Te6-rf-Myx" id="6bT-Aj-mf3"/>
+                    </connections>
+                </viewController>
+            </objects>
+            <point key="canvasLocation" x="-1" y="1178"/>
         </scene>
         <!--SettingTVC - Settings-->
         <scene sceneID="EtZ-nn-ruz">
@@ -129,7 +159,7 @@
                     <navigationItem key="navigationItem" title="Settings" id="lDo-cr-lSC"/>
                 </tableViewController>
             </objects>
-            <point key="canvasLocation" x="521" y="1109"/>
+            <point key="canvasLocation" x="500" y="1879"/>
         </scene>
         <!--Navigation Controller - Settings-->
         <scene sceneID="cDg-AD-sm0">
@@ -145,7 +175,7 @@
                     </connections>
                 </navigationController>
             </objects>
-            <point key="canvasLocation" x="-1" y="1199"/>
+            <point key="canvasLocation" x="-1" y="1788"/>
         </scene>
         <!--Navigation Controller - List-->
         <scene sceneID="f7r-rG-arv">
@@ -426,7 +456,7 @@
                         <rect key="frame" x="0.0" y="64" width="320" height="367"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="E2editCellDate" textLabel="Aqg-bI-U8c" rowHeight="44" style="IBUITableViewCellStyleDefault" id="Kfj-Ut-rAJ">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="E2editCellDate" textLabel="Aqg-bI-U8c" rowHeight="44" style="IBUITableViewCellStyleDefault" id="Kfj-Ut-rAJ" userLabel="Cell - E2editCellDate">
                                 <rect key="frame" x="0.0" y="22" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
@@ -448,7 +478,7 @@
                                     <segue destination="ae1-NJ-t9I" kind="push" identifier="pushDate" id="9QJ-hR-yf7"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" shouldIndentWhileEditing="NO" reuseIdentifier="E2editCellDateOpt" rowHeight="44" id="j2w-EF-0hk" customClass="E2editCellDateOpt">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" shouldIndentWhileEditing="NO" reuseIdentifier="E2editCellDateOpt" rowHeight="44" id="j2w-EF-0hk" userLabel="Cell - E2editCellDateOpt" customClass="E2editCellDateOpt">
                                 <rect key="frame" x="0.0" y="66" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
@@ -476,7 +506,7 @@
                                     <outlet property="ibSegment" destination="zOq-vn-DdU" id="LPF-2g-6Nt"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" shouldIndentWhileEditing="NO" reuseIdentifier="E2editCellNote" rowHeight="88" id="dJs-Zj-SaJ" customClass="E2editCellNote">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" shouldIndentWhileEditing="NO" reuseIdentifier="E2editCellNote" rowHeight="88" id="dJs-Zj-SaJ" userLabel="Cell - E2editCellNote" customClass="E2editCellNote">
                                 <rect key="frame" x="0.0" y="110" width="320" height="88"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
@@ -508,7 +538,7 @@
                                     <outlet property="ibTfNote2" destination="yx1-s0-WCa" id="iDg-ir-76h"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" shouldIndentWhileEditing="NO" reuseIdentifier="E2editCellDial" rowHeight="88" id="Zka-eI-Kfg" customClass="E2editCellDial">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" shouldIndentWhileEditing="NO" reuseIdentifier="E2editCellDial" rowHeight="88" id="Zka-eI-Kfg" userLabel="Cell - E2editCellDial" customClass="E2editCellDial">
                                 <rect key="frame" x="0.0" y="198" width="320" height="88"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
@@ -589,6 +619,91 @@
                                     <outlet property="ibLbValue" destination="AAf-dS-wPz" id="c7H-54-T9F"/>
                                 </connections>
                             </tableViewCell>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" shouldIndentWhileEditing="NO" reuseIdentifier="E2editCellNote" rowHeight="88" id="4j0-QO-TFj" userLabel="Cell - E2editCellCondition" customClass="E2editCellNote">
+                                <rect key="frame" x="0.0" y="286" width="320" height="88"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="87"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="Tx-Brown320x88.png" id="fYj-Qj-YCb">
+                                            <rect key="frame" x="5" y="0.0" width="310" height="88"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        </imageView>
+                                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Condition memo" minimumFontSize="12" id="qjk-I4-eHg">
+                                            <rect key="frame" x="15" y="10" width="290" height="31"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                            <textInputTraits key="textInputTraits" returnKeyType="done"/>
+                                        </textField>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="r85-bN-hr9">
+                                            <rect key="frame" x="156" y="49" width="24" height="24"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                            <state key="normal">
+                                                <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                            <state key="highlighted">
+                                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="KXB-hq-eM3">
+                                            <rect key="frame" x="186" y="49" width="24" height="24"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                            <state key="normal">
+                                                <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                            <state key="highlighted">
+                                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="eEa-vD-9yU">
+                                            <rect key="frame" x="216" y="49" width="24" height="24"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                            <state key="normal">
+                                                <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                            <state key="highlighted">
+                                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="n6A-hn-aIp">
+                                            <rect key="frame" x="246" y="49" width="24" height="24"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                            <state key="normal">
+                                                <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                            <state key="highlighted">
+                                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="znr-Do-PFo">
+                                            <rect key="frame" x="276" y="49" width="24" height="24"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                            <state key="normal">
+                                                <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                            <state key="highlighted">
+                                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                        </button>
+                                    </subviews>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                </view>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="ibTfNote1" destination="qjk-I4-eHg" id="lYo-5p-YHG"/>
+                                </connections>
+                            </tableViewCell>
                         </prototypes>
                         <connections>
                             <outlet property="dataSource" destination="g6r-81-43n" id="EIR-Lp-PKG"/>
@@ -600,7 +715,7 @@
                     </navigationItem>
                 </tableViewController>
             </objects>
-            <point key="canvasLocation" x="1084" y="-576"/>
+            <point key="canvasLocation" x="1064" y="-579"/>
         </scene>
         <!--Edit DateVC-->
         <scene sceneID="bo2-qi-yiM">
@@ -700,6 +815,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                         <segue destination="GAi-aS-64n" kind="relationship" relationship="viewControllers" id="vUF-2y-a1l"/>
                         <segue destination="a96-47-bvo" kind="relationship" relationship="viewControllers" id="LwS-9x-fQW"/>
                         <segue destination="pJ2-eu-18r" kind="relationship" relationship="viewControllers" id="Fpu-er-Xea"/>
+                        <segue destination="DPa-5P-xBn" kind="relationship" relationship="viewControllers" id="OTu-wI-PYc"/>
                         <segue destination="MqS-Ic-m4v" kind="relationship" relationship="viewControllers" id="he3-rX-L03"/>
                     </connections>
                 </tabBarController>
@@ -714,6 +830,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         <image name="Tab32-Add.png" width="32" height="32"/>
         <image name="Tab32-Graph.png" width="32" height="32"/>
         <image name="Tab32-List.png" width="32" height="32"/>
+        <image name="Tab32-Statistics.png" width="16" height="16"/>
         <image name="Tx-Brown320x88.png" width="320" height="88"/>
     </resources>
     <classes>
@@ -788,6 +905,13 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         </class>
         <class className="SettingTVC" superclassName="UITableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/SettingTVC.h"/>
+        </class>
+        <class className="StatisticsVC" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/StatisticsVC.h"/>
+            <relationships>
+                <relationship kind="outlet" name="ibScrollView" candidateClass="UIScrollView"/>
+                <relationship kind="outlet" name="ibSegment" candidateClass="UISegmentedControl"/>
+            </relationships>
         </class>
     </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

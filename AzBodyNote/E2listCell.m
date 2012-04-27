@@ -53,16 +53,16 @@
 			//
 			if (moE2node_.nDateOpt) {
 				switch ([moE2node_.nDateOpt integerValue]) {
-					case optWake: //起床後
+					case DtOpWake: //起床後
 						ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-Wake"]; //H20xW24px
 						break;
-					case optRest:
+					case DtOpRest:
 						ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-Rest"]; //H20xW24px
 						break;
-					case optDown:
+					case DtOpDown:
 						ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-Down"]; //H20xW24px
 						break;
-					case optSleep: //就寝前
+					case DtOpSleep: //就寝前
 						ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-Sleep"];
 						break;
 					default:

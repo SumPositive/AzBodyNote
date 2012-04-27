@@ -581,7 +581,8 @@
 	 [[aTab objectAtIndex:0] setTitle: NSLocalizedString(@"TabAdd",nil)];
 	 [[aTab objectAtIndex:1] setTitle: NSLocalizedString(@"TabList",nil)];
 	 [[aTab objectAtIndex:2] setTitle: NSLocalizedString(@"TabGraph",nil)];
-	 [[aTab objectAtIndex:3] setTitle: NSLocalizedString(@"TabSettings",nil)];
+	 [[aTab objectAtIndex:3] setTitle: NSLocalizedString(@"TabStatistics",nil)];
+	 [[aTab objectAtIndex:4] setTitle: NSLocalizedString(@"TabSettings",nil)];
 }
 
 - (void)viewWillAppear:(BOOL)animated

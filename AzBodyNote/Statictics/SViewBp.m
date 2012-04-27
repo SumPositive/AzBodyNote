@@ -1,33 +1,34 @@
 //
-//  GViewBp.m
+//  SViewBp.m
 //  AzBodyNote
 //
 //  Created by 松山 masa on 12/04/15.
 //  Copyright (c) 2012年 __MyCompanyName__. All rights reserved.
 //
-#import "GViewBp.h"
-#import "GraphVC.h"
+#import "SViewBp.h"
+#import "StatisticsVC.h"
 
 
 #define SPACE_Y			  8.0		// グラフの最大および最小の極限余白 > LINE_WID/2.0
 #define LINE_WID			15.0		// BpHi と BpLo を結ぶ縦線の太さ   < SPACE_Y*2.0
 
 
-@implementation GViewBp
+@implementation SViewBp
 @synthesize ppE2records = __E2records;
+@synthesize ppSelectedSegmentIndex = __SelectedSegmentIndex;
+
 
 NSInteger	pValMin[bpEnd], pValMax[bpEnd];
 NSInteger	pDaySum[bpEnd][optEnd];
 NSInteger	pDayCnt[bpEnd][optEnd];
 
-NSInteger	pValGoal[bpEnd];
-CGPoint		poGoal[bpEnd ];
-
 float				pValAvg[bpEnd][optEnd];
 CGPoint		poAvg[bpEnd][optEnd];
 
-float				pValues[bpEnd][optEnd][VA_REC+GRAPH_DAYS_MAX+GRAPH_DAYS_SAFE+1];
-CGPoint		poValues[bpEnd][optEnd][VA_REC+GRAPH_DAYS_MAX+GRAPH_DAYS_SAFE+1];
+NSInteger	pDate[GRAPH_DAYS_MAX+GRAPH_DAYS_SAFE+1];
+					//= M*1000000 + D*10000 + h*100 + m
+float				pValues[bpEnd][optEnd][GRAPH_DAYS_MAX+GRAPH_DAYS_SAFE+1];
+CGPoint		poValues[bpEnd][optEnd][GRAPH_DAYS_MAX+GRAPH_DAYS_SAFE+1];
 NSInteger	pValuesCount = 0;
 
 
@@ -64,7 +65,7 @@ NSInteger	pValuesCount = 0;
 {
 	UIImage *img = nil;
 	switch (opt) {
-		case optWake:	//Wake-up
+		case optWake:
 			img = [UIImage imageNamed:@"Icon20-Wake"];
 			break;
 		case optRest:
@@ -73,7 +74,7 @@ NSInteger	pValuesCount = 0;
 		case optDown:
 			img = [UIImage imageNamed:@"Icon20-Down"];
 			break;
-		case optSleep:	//For-sleep
+		case optSleep:
 			img = [UIImage imageNamed:@"Icon20-Sleep"];
 			break;
 		default:
@@ -148,8 +149,6 @@ NSInteger	pValuesCount = 0;
 - (void)graphDraw:(CGContextRef)cgc 
 {
 	CGPoint po;
-	
-	//文字列の設定
 
 	//------------------------------------------------------------------------------ BpHi と BpLo を結ぶ縦線
 	// カラー設定(0.0-1.0でRGBAを指定する)
@@ -420,11 +419,7 @@ NSInteger	pValuesCount = 0;
 	
 	//--------------------------------------------------------------------------------------- iCloud KVS GOAL!
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	pValGoal[bpHi] = [[kvs objectForKey: Goal_nBpHi_mmHg] integerValue];  // NSNullならば "<null>"文字列となり数値化して0になる
-	pValGoal[bpLo] = [[kvs objectForKey: Goal_nBpLo_mmHg] integerValue];
-	
-	mGraphDays = [[kvs objectForKey:GUD_SettGraphDays] integerValue];
-	//BOOL bGoal = [kvs boolForKey:GUD_bGoal];
+	mStatDays = [[kvs objectForKey:GUD_SettStatDays] integerValue];
 
 	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
 	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
@@ -455,18 +450,21 @@ NSInteger	pValuesCount = 0;
 			iPrevMonth = comp.month;
 			iPrevDay = comp.day;
 			// 日付が変わったので、前日の集計処理する
-			[self pValuesForDay];
+			pDate[pValuesCount] = iPrevMonth*100 + iPrevDay;
+			[self pValuesForDay];	//この中で、pValuesCount++;
 			if (mGraphDays <= pValuesCount) break; // OK
 		}
 		// 集計
+		NSInteger val[bpEnd];
+		val[bpHi] = [e2.nBpHi_mmHg integerValue];
+		val[bpLo] = [e2.nBpLo_mmHg integerValue];
+		val[bpPuls] = [e2.nPulse_bpm integerValue];
+
 		optType opt = [e2.nDateOpt integerValue];
 		if (opt<0 OR optEnd<=opt) {
 			opt = optRest;
 			GA_TRACK_EVENT_ERROR(@"optType",0);
 		}
-		NSInteger val[bpEnd];
-		val[bpHi] = [e2.nBpHi_mmHg integerValue];
-		val[bpLo] = [e2.nBpLo_mmHg integerValue];
 		for (bpType bp=0; bp<bpEnd; bp++) {
 			if (pValMin[bp]<=val[bp] && val[bp]<=pValMax[bp]) {
 				pDaySum[bp][opt] += val[bp]; //合計
@@ -477,7 +475,8 @@ NSInteger	pValuesCount = 0;
 	//終端
 	NSLog(@"<<%d/%d>>LAST  mValuesCount=%d", iPrevMonth, iPrevDay, pValuesCount);
 	// 最終日の集計処理する
-	[self pValuesForDay];
+	pDate[pValuesCount] = iPrevMonth*100 + iPrevDay;
+	[self pValuesForDay];	//この中で、pValuesCount++;
 
 	float  fValMin = E2_nBpHi_MAX;	//プロット範囲の下限
 	float  fValMax = E2_nBpLo_MIN;	//プロット範囲の上限

@@ -16,13 +16,12 @@
 
 
 #ifdef DEBUGxxx
-//#define GRAPH_PAGE_LIMIT			10		// < iOverlay
+#define GRAPH_PAGE_LIMIT			10		// < iOverlay
 #else
-//#define GRAPH_PAGE_LIMIT			100		// グラフ表示の最大レコード数　＜＜有料版にてページ移動可能にする予定
+#define GRAPH_PAGE_LIMIT			100		// グラフ表示の最大レコード数　
 #endif
 
-#define RECORD_WIDTH				44.0		// 1レコード分の幅
-
+#define RECORD_WIDTH		36.0		// 1レコード分の幅
 #define SEPARATE_HEIGHT	3.0		// 区切り線の高さ
 
 
@@ -33,9 +32,11 @@
 @private
 	AppDelegate					*mAppDelegate;
 	MocFunctions					*mMocFunc;
+	NSUInteger						mPage;
+	NSUInteger						mPageMax;
 	UIActivityIndicatorView	*actIndicator_;
 	NSArray							*mPanelGraphs;
-	NSUInteger						mGraphDays;
+	//NSUInteger						mGraphDays;
 	BOOL								mGoalDisp;
 	GViewDate						*mGvDate;
 	GViewBp							*mGvBp;
