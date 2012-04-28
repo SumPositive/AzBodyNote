@@ -96,9 +96,9 @@
 			// 月/日
 			cc = [[NSString stringWithFormat:@"%d/%d", comp.month, comp.day] UTF8String];
 			if (4 < strlen(cc)) {
-				CGContextShowTextAtPoint (cgc, po.x-15, po.y+10, cc, strlen(cc));
+				CGContextShowTextAtPoint (cgc, po.x-15, po.y+12, cc, strlen(cc));
 			} else {
-				CGContextShowTextAtPoint (cgc, po.x-10, po.y+10, cc, strlen(cc));
+				CGContextShowTextAtPoint (cgc, po.x-10, po.y+12, cc, strlen(cc));
 			}
 			// 時:分
 			cc = [[NSString stringWithFormat:@"%d:%d", comp.hour, comp.minute] UTF8String];

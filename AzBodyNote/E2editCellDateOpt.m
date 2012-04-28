@@ -22,7 +22,7 @@
 					[ibSegment setImage:[UIImage imageNamed:@"Icon20-Wake"] forSegmentAtIndex:opt];
 					break;
 				case DtOpRest: //安静時
-					[ibSegment setImage:[UIImage imageNamed:@"Icon20-Relax"] forSegmentAtIndex:opt];
+					[ibSegment setImage:[UIImage imageNamed:@"Icon20-Rest"] forSegmentAtIndex:opt];
 					break;
 				case DtOpDown: //運動後
 					[ibSegment setImage:[UIImage imageNamed:@"Icon20-Down"] forSegmentAtIndex:opt];

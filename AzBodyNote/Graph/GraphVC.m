@@ -124,13 +124,13 @@
 	CGFloat fWhalf = rcScrollContent.size.width / 2.0; // 表示幅の半分（画面中央）
 	int iCount = [e2recs count] - iOverLeft - iOverRight;
 	if (iCount < 2) iCount = 2; // 1だとスクロール出来なくなる
-	//                     (                 左余白                 ) + (               レコード               ) + (                 右余白                 ); 
+	//										   (                 左余白                 ) + (               レコード               ) + (                 右余白                 ); 
 	rcScrollContent.size.width = (fWhalf - RECORD_WIDTH/2) + (RECORD_WIDTH * iCount) + (fWhalf - RECORD_WIDTH/2);
 	
 	ibScrollView.contentSize = CGSizeMake(rcScrollContent.size.width, rcScrollContent.size.height);
 	
 	rcScrollContent.origin.x = (fWhalf - RECORD_WIDTH/2); // - (RECORD_WIDTH * iOverLeft);  // 左余白
-	rcScrollContent.size.width = RECORD_WIDTH * (iCount + iOverLeft + iOverRight + 2);	// +2はGoal,Avg列
+	rcScrollContent.size.width = RECORD_WIDTH * (iCount + iOverLeft + iOverRight + 1);	// +はGoal列
 
 	//------------------------------------------------------日付
 	CGRect rcgv = rcScrollContent;
@@ -399,12 +399,16 @@
 			UILabel *lb = sv;
 			[lb removeFromSuperview];
 		}
-		else if ([sv isMemberOfClass:[GViewLine class]]) {
-			GViewLine *gv = sv;
-			[gv removeFromSuperview];
-		}
 		else if ([sv isMemberOfClass:[GViewDate class]]) {
 			GViewDate *gv = sv;
+			[gv removeFromSuperview];
+		}
+		else if ([sv isMemberOfClass:[GViewBp class]]) {
+			GViewBp *gv = sv;
+			[gv removeFromSuperview];
+		}
+		else if ([sv isMemberOfClass:[GViewLine class]]) {
+			GViewLine *gv = sv;
 			[gv removeFromSuperview];
 		}
 	}

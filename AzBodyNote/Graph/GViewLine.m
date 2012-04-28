@@ -80,13 +80,16 @@ NSInteger	pValueCount;
 
 	//文字列の設定
 	CGContextSetTextDrawingMode (cgc, kCGTextFill);
-	CGContextSelectFont (cgc, "Helvetica", 12.0, kCGEncodingMacRoman);
-	CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 1.0);
-	CGContextSetRGBFillColor (cgc, 0, 0, 0, 1.0); // Black
+	CGContextSelectFont (cgc, "Helvetica", 14.0, kCGEncodingMacRoman);
+	//CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 1.0);
+	//CGContextSetRGBFillColor (cgc, 0, 0, 0, 0.5); // Black
+	CGContextSetGrayFillColor(cgc, 0.5, 0.5);
 
 	// 端点
-	CGContextFillEllipseInRect(cgc, CGRectMake(po.x-1.5, po.y-1.5, 3, 3));	//円Fill
+	CGContextSetGrayFillColor(cgc, 0.5, 0.5);
+	CGContextFillEllipseInRect(cgc, CGRectMake(po.x-3, po.y-3, 6, 6));	//円Fill
 	// 数値
+	CGContextSetGrayFillColor(cgc, 1.0, 1.0);
 	const char *cc;
 	switch (valueType) {
 		case 1:	// Temp(999⇒99.9℃)  // Weight(9999⇒999.9Kg)
@@ -96,8 +99,24 @@ NSInteger	pValueCount;
 			cc = [[NSString stringWithFormat:@"%0.0f", value] UTF8String];
 			break;
 	}
-	// 右側に表示
-	CGContextShowTextAtPoint (cgc, po.x+5, po.y-4, cc, strlen(cc));
+	
+	if (self.bounds.size.height < po.y+20) {	//点の左下へ
+		po.x -= strlen(cc)*7 - 14.0;
+		po.y -= strlen(cc)*7 + 6.0;
+	} else {	//点の右上へ
+		//po.x += 0.0;
+		po.y += 6.0;
+	}
+	CGContextSaveGState(cgc); //PUSH
+	{
+		CGContextSelectFont (cgc, "Helvetica", 14.0, kCGEncodingMacRoman);
+		CGContextSetTextDrawingMode (cgc, kCGTextFill);
+		CGContextSetRGBFillColor (cgc, 1, 1, 1, 1.0); // 文字 塗り潰し色
+		CGAffineTransform  myTextTransform =  CGAffineTransformMakeRotation( 3.1415/4.0 );
+		CGContextSetTextMatrix (cgc, myTextTransform); 
+		CGContextShowTextAtPoint (cgc, po.x, po.y, cc, strlen(cc));
+	}
+	CGContextRestoreGState(cgc); //POP
 }
 
 // Only override drawRect: if you perform custom drawing.
@@ -114,24 +133,6 @@ NSInteger	pValueCount;
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	BOOL bGoal = [kvs boolForKey:GUD_bGoal];
 	NSInteger iGoal = [[kvs objectForKey: __GoalKey] integerValue];  // NSNullならば "<null>"文字列となり数値化して0になる
-
-	//mGraphDays = [[kvs objectForKey:GUD_SettGraphDays] integerValue];
-	//BOOL bGoal = [kvs boolForKey:GUD_bGoal];
-
-/*	mValuesMode = 0;  //DateOptモード： 3本値
-	if ([__EntityKey isEqualToString:E2_nPedometer]) {
-		mValuesMode = 1; // 合計
-	}
-	else if ([__EntityKey isEqualToString:E2_nWeight_10Kg] 
-		OR [__EntityKey isEqualToString:E2_nBodyFat_10p]
-		OR [__EntityKey isEqualToString:E2_nSkMuscle_10p]) {
-		mValuesMode = 2; // 平均
-	}*/
-		
-	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
-	//NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-	//NSDateComponents* comp;
-	//int iPrevMonth = 0, iPrevDay = 0;
 
 	//--------------------------------------------------------------------------集計しながらMinMaxを求める
 	//Goal
@@ -178,6 +179,8 @@ NSInteger	pValueCount;
 	CGPoint po;
 	CGFloat	fXgoal = self.bounds.size.width - RECORD_WIDTH/2;
 	
+	//--------------------------------------------------------------------------Line折れ線
+	CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 0.8);
 	//--------------------------------------------------------------------------プロット
 	if (pValMin==pValMax) {
 		pValMin--;
@@ -199,7 +202,7 @@ NSInteger	pValueCount;
 		po.x -= RECORD_WIDTH;
 		if (po.x <= 0) break;
 		po.y = SPACE_Y + fYstep * (CGFloat)(pValue[ ii ] - pValMin);
-		if (0 < po.y) { // 有効な点だけにする
+		if (0 < pValue[ ii ]) { // 有効な点だけにする
 			if (bStart) {
 				CGContextMoveToPoint(cgc, po.x, po.y);
 				bStart = NO;

@@ -21,7 +21,7 @@
 #define GRAPH_PAGE_LIMIT			100		// グラフ表示の最大レコード数　
 #endif
 
-#define RECORD_WIDTH		36.0		// 1レコード分の幅
+#define RECORD_WIDTH		40.0		// 1レコード分の幅
 #define SEPARATE_HEIGHT	3.0		// 区切り線の高さ
 
 
