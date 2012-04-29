@@ -18,5 +18,6 @@
 }
 
 @property (nonatomic, retain) NSArray	*ppE2records;
+@property (nonatomic, assign) NSInteger	ppPage;
 
 @end

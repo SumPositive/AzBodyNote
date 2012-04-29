@@ -8,11 +8,12 @@
 #import "GViewLine.h"
 #import "GraphVC.h"
 
-#define SPACE_Y				5.0
-
+#define SPACE_Y			10.0		// グラフの最大および最小の極限余白
+#define FONT_SIZE			14.0
 
 @implementation GViewLine
 @synthesize ppE2records = __E2records;
+@synthesize ppPage = __Page;
 @synthesize ppEntityKey = __EntityKey;
 @synthesize ppGoalKey = __GoalKey;
 @synthesize ppDec = __Dec;
@@ -32,89 +33,47 @@ NSInteger	pValueCount;
     self = [super initWithFrame:frame];
     if (self) {
         // Initialization code
-/*		// 丸め指定
-		if (mBehaviorDec0==nil) {
-			mBehaviorDec0 = [[NSDecimalNumberHandler alloc]
-							initWithRoundingMode: NSRoundBankers		// 偶数丸め
-							scale: 0									// 丸めた後の桁数　　0=整数化
-							raiseOnExactness: YES			// 精度
-							raiseOnOverflow: YES				// オーバーフロー
-							raiseOnUnderflow: YES			// アンダーフロー
-							raiseOnDivideByZero: YES ];	// アンダーフロー
-		}
-		if (mBehaviorDec1==nil) {
-			mBehaviorDec1 = [[NSDecimalNumberHandler alloc]
-							 initWithRoundingMode: NSRoundBankers		// 偶数丸め
-							 scale: 1									// 丸めた後の桁数　　0=整数化
-							 raiseOnExactness: YES			// 精度
-							 raiseOnOverflow: YES				// オーバーフロー
-							 raiseOnUnderflow: YES			// アンダーフロー
-							 raiseOnDivideByZero: YES ];	// アンダーフロー
-		}*/
     }
     return self;
 }
 
-//[self drawPoint:cgc po:po value:pValGoal valueType:__Dec];
 - (void)drawPoint:(CGContextRef)cgc 
 		   po:(CGPoint)po
 		   value:(NSInteger)value  
 		valueType:(int)valueType		// 0=Integer  1=Temp(999⇒99.9℃)　　2=Weight(999999g⇒999.99Kg)
 {
-	//assert(count <= GRAPH_PAGE_LIMIT + );
-	//CGFloat fColR, fColG, fColB, fAlpha;
-	//CGFloat fXoffset = 0;
-/*	switch (lineNo) {
-		case 1:	//Wake-up
-			fColR=1, fColG=1, fColB=0, fAlpha=0.5; //Yellow
-			fXoffset = -10;
-			break;
-		case 3:	//For-sleep
-			fColR=0, fColG=0, fColB=0, fAlpha=0.5; //Black
-			fXoffset = +10;
-			break;
-		default:	//Active
-			fColR=0, fColG=0, fColB=1, fAlpha=0.5; //Blue
-			break;
-	}*/
-
-	//文字列の設定
-	CGContextSetTextDrawingMode (cgc, kCGTextFill);
-	CGContextSelectFont (cgc, "Helvetica", 14.0, kCGEncodingMacRoman);
-	//CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 1.0);
-	//CGContextSetRGBFillColor (cgc, 0, 0, 0, 0.5); // Black
-	CGContextSetGrayFillColor(cgc, 0.5, 0.5);
-
-	// 端点
-	CGContextSetGrayFillColor(cgc, 0.5, 0.5);
-	CGContextFillEllipseInRect(cgc, CGRectMake(po.x-3, po.y-3, 6, 6));	//円Fill
-	// 数値
-	CGContextSetGrayFillColor(cgc, 1.0, 1.0);
 	const char *cc;
 	switch (valueType) {
 		case 1:	// Temp(999⇒99.9℃)  // Weight(9999⇒999.9Kg)
-			cc = [[NSString stringWithFormat:@"%0.1f", value / 10.0] cStringUsingEncoding:NSMacOSRomanStringEncoding];
+			cc = [[NSString stringWithFormat:@"%0.1f", (float)value / 10.0] cStringUsingEncoding:NSMacOSRomanStringEncoding];
 			break;
 		default:
-			cc = [[NSString stringWithFormat:@"%0.0f", value] UTF8String];
+			cc = [[NSString stringWithFormat:@"%ld", (long)value] UTF8String];
 			break;
 	}
 	
-	if (self.bounds.size.height < po.y+20) {	//点の左下へ
-		po.x -= strlen(cc)*7 - 14.0;
-		po.y -= strlen(cc)*7 + 6.0;
-	} else {	//点の右上へ
-		//po.x += 0.0;
-		po.y += 6.0;
-	}
 	CGContextSaveGState(cgc); //PUSH
 	{
-		CGContextSelectFont (cgc, "Helvetica", 14.0, kCGEncodingMacRoman);
+		// 端点
+		CGContextSetGrayFillColor(cgc, 0, 0.7);
+		CGContextFillEllipseInRect(cgc, CGRectMake(po.x-3, po.y-3, 6, 6));	//円Fill
+		// 数値	// 文字列の設定
+		CGContextSelectFont (cgc, "Helvetica", FONT_SIZE, kCGEncodingMacRoman);
 		CGContextSetTextDrawingMode (cgc, kCGTextFill);
-		CGContextSetRGBFillColor (cgc, 1, 1, 1, 1.0); // 文字 塗り潰し色
+		CGContextSetGrayFillColor(cgc, 0, 1);
+		// 回転	// 45度
 		CGAffineTransform  myTextTransform =  CGAffineTransformMakeRotation( 3.1415/4.0 );
 		CGContextSetTextMatrix (cgc, myTextTransform); 
-		CGContextShowTextAtPoint (cgc, po.x, po.y, cc, strlen(cc));
+		// 文字描画
+		size_t  slen = strlen(cc);
+		if (self.bounds.size.height < po.y+10+(FONT_SIZE*slen/2.0)) {	//点の左下へ
+			po.x -= (FONT_SIZE*slen/2.5) - 8.0;
+			po.y -= (FONT_SIZE*slen/2.5) + 10.0;
+		} else {	//点の右上へ
+			//po.x += 0.0;
+			po.y += 7.0;
+		}
+		CGContextShowTextAtPoint (cgc, po.x, po.y, cc, slen);
 	}
 	CGContextRestoreGState(cgc); //POP
 }
@@ -141,8 +100,8 @@ NSInteger	pValueCount;
 		pValMax = iGoal;
 		pValGoal = iGoal;
 	} else {
-		pValMax = 0;
 		pValMin = 9999;
+		pValMax = 0;
 		pValGoal = 0;
 	}
 	
@@ -152,12 +111,12 @@ NSInteger	pValueCount;
 	{
 		NSInteger iVal = [[e2 valueForKey:__EntityKey] integerValue];
 	
-		if (iVal < pValMin) pValMin = iVal;
+		if (0 < iVal && iVal < pValMin) pValMin = iVal;
 		if (pValMax < iVal) pValMax = iVal;
 		
 		pValue[pValueCount] = iVal;
 		pValueCount++;
-		if (GRAPH_PAGE_LIMIT <= pValueCount) break; // OK
+		//NG//if (GRAPH_PAGE_LIMIT <= pValueCount) break; // OK
 	}
 
 	// 描画開始
@@ -166,18 +125,16 @@ NSInteger	pValueCount;
 	CGContextTranslateCTM(cgc, 0, rect.size.height);
 	CGContextScaleCTM(cgc, 1.0, -1.0);	//Y座標(-1)反転
 	//　全域クリア
-	CGContextSetRGBFillColor (cgc, 0.67, 0.67, 0.67, 1.0); // スクロール領域外と同じグレー
+	//CGContextSetRGBFillColor (cgc, 0.67, 0.67, 0.67, 1.0); // スクロール領域外と同じグレー
+	CGContextSetGrayFillColor(cgc, 0.67, 1.0); // スクロール領域外と同じグレー
+
 	CGContextFillRect(cgc, rect);
 	// 領域の下線
 	CGRect rc = rect; //self.bounds;
 	rc.origin.y = 1;  //rc.size.height - 3;
-	rc.size.height = 2;
-	CGContextSetRGBFillColor (cgc, 0.75, 0.75, 0.75, 1.0);
+	rc.size.height = 3;
+	CGContextSetGrayFillColor(cgc, 0.75, 1.0); // スクロール領域外と同じグレー
 	CGContextFillRect(cgc, rc);
-	
-	CGFloat fYstep;
-	CGPoint po;
-	CGFloat	fXgoal = self.bounds.size.width - RECORD_WIDTH/2;
 	
 	//--------------------------------------------------------------------------Line折れ線
 	CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 0.8);
@@ -186,32 +143,36 @@ NSInteger	pValueCount;
 		pValMin--;
 		pValMax++;
 	}
-	fYstep = (rect.size.height - SPACE_Y*2) / (pValMax - pValMin);  // 1あたりのポイント数
+
+	CGFloat fYstep = (rect.size.height - SPACE_Y*2) / (pValMax - pValMin);  // 1あたりのポイント数
+	CGPoint po;
+	po.x = self.bounds.size.width - RECORD_WIDTH/2;
 	
-	BOOL bStart = YES;
-	//Goal
-	po.x = fXgoal;
-	if (bGoal) {
-		CGContextMoveToPoint(cgc, po.x, po.y);
-		bStart = NO;
-		[self drawPoint:cgc po:po value:pValGoal valueType:__Dec];
+	if (__Page==0) {
+		//Goal
+		if (bGoal && 0 < pValGoal) {
+			po.y = SPACE_Y + fYstep * (CGFloat)(pValGoal - pValMin);
+			[self drawPoint:cgc po:po value:pValGoal valueType:__Dec];
+		}
+		po.x -= RECORD_WIDTH;
 	}
 	
 	//Record
+	CGPoint	poLine[GRAPH_PAGE_LIMIT+GRAPH_DAYS_SAFE+1];
+	int  iCntLine = 0;
 	for (int ii = 0; ii < pValueCount; ii++) {
-		po.x -= RECORD_WIDTH;
 		if (po.x <= 0) break;
 		po.y = SPACE_Y + fYstep * (CGFloat)(pValue[ ii ] - pValMin);
 		if (0 < pValue[ ii ]) { // 有効な点だけにする
-			if (bStart) {
-				CGContextMoveToPoint(cgc, po.x, po.y);
-				bStart = NO;
-			} else {
-				CGContextAddLineToPoint(cgc, po.x, po.y);
-			}
+			poLine[iCntLine++] = po;
 			[self drawPoint:cgc po:po value:pValue[ii] valueType:__Dec];
 		}
+		po.x -= RECORD_WIDTH;
 	}
+	//------------------------------------------------------------------------------時系列折れ線
+	CGContextSetLineWidth(cgc, 1.0); //太さ
+	CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 0.4);
+	CGContextAddLines(cgc, poLine, iCntLine);
 	CGContextStrokePath(cgc);
 }
 

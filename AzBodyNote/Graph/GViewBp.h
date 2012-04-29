@@ -12,6 +12,7 @@
 #import "Global.h"
 
 #define GRAPH_DAYS_SAFE		20  //安全帯
+#define IMAGE_GAP_MIN			70.0
 
 enum {
 	bpHi		= 0,
@@ -19,15 +20,6 @@ enum {
 	bpEnd	= 2 //End count
 };
 typedef NSInteger bpType;
-
-enum {
-	DtOpWake	= 0,		// Wake up
-	DtOpRest		= 1,		// at Rest
-	DtOpDown	= 2,		// Slowdown
-    DtOpSleep	= 3,		// for Sleep
-	DtOpEnd		= 4 //End count
-};
-typedef NSInteger DateOpt;
 
 
 @interface GViewBp : UIView
@@ -39,5 +31,6 @@ typedef NSInteger DateOpt;
 }
 
 @property (nonatomic, retain) NSArray		*ppE2records;
+@property (nonatomic, assign) NSInteger	ppPage;
 
 @end

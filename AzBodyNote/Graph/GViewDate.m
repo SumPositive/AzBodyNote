@@ -13,7 +13,7 @@
 
 @implementation GViewDate
 @synthesize ppE2records = __E2records;
-
+@synthesize ppPage = __Page;
 
 
 - (id)initWithFrame:(CGRect)frame
@@ -36,16 +36,10 @@
 	}
 	//NSLog(@"__E2records=%@", __E2records);
 	
-	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	//mGraphDays = [[kvs objectForKey:GUD_SettGraphDays] integerValue];
 	BOOL bGoal = [kvs boolForKey:GUD_bGoal];
 
 	
-	CGPoint po;
-	//CGPoint	pointsArray[GRAPH_PAGE_LIMIT +20+1];
-	//long			valuesArray[GRAPH_PAGE_LIMIT+20+1];
-	CGFloat	fXgoal = self.bounds.size.width - RECORD_WIDTH/2;		// 最初、GOALを中央に表示する
 	//-------------------------------------------------------------------------------------- Date 描画
 	// 描画
 	CGContextRef cgc = UIGraphicsGetCurrentContext();
@@ -74,12 +68,17 @@
 	NSDateComponents* comp;
 	const char *cc;
 
-	//Goal
-	po.x = fXgoal;
+	CGPoint po;
+	po.x = self.bounds.size.width - RECORD_WIDTH/2.0;
 	po.y = SPACE_Y;
-	if (bGoal) {
-		cc = [[NSString stringWithString:@"GOAL"] UTF8String];
-		CGContextShowTextAtPoint (cgc, po.x-15, po.y+1, cc, strlen(cc));
+	
+	if (__Page==0) { 
+		//Goal
+		if (bGoal) {
+			cc = [[NSString stringWithString:@"GOAL"] UTF8String];
+			CGContextShowTextAtPoint (cgc, po.x-15, po.y+1, cc, strlen(cc));
+		}
+		po.x -= RECORD_WIDTH;
 	}
 
 	//Record
@@ -92,7 +91,6 @@
 			comp = [calendar components: NSMonthCalendarUnit | NSDayCalendarUnit
 					| NSHourCalendarUnit | NSMinuteCalendarUnit   fromDate:e2.dateTime];
 			
-			po.x -= RECORD_WIDTH;
 			// 月/日
 			cc = [[NSString stringWithFormat:@"%d/%d", comp.month, comp.day] UTF8String];
 			if (4 < strlen(cc)) {
@@ -107,6 +105,7 @@
 			} else {
 				CGContextShowTextAtPoint (cgc, po.x-10, po.y+1, cc, strlen(cc));
 			}
+			po.x -= RECORD_WIDTH;
 		}
 	}
 }

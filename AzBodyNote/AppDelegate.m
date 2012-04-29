@@ -204,6 +204,9 @@
 				}
 			}
 		}
+#ifdef DEBUG
+		__app_is_unlock = YES;
+#endif
 		if (__app_is_unlock) {	//登録
 			[kvs setBool:YES forKey:STORE_PRODUCTID_UNLOCK];
 			[kvs synchronize]; // plistへ書き出す

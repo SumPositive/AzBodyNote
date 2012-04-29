@@ -52,6 +52,16 @@
 @property (nonatomic, retain) NSNumber   *nBodyFat_10p;		//2//体脂肪率
 @property (nonatomic, retain) NSNumber   *nSkMuscle_10p;	//2//骨格筋率
 @end
+
+enum {
+	DtOpWake	= 0,		// Wake up
+	DtOpRest		= 1,		// at Rest
+	DtOpDown	= 2,		// Slowdown
+    DtOpSleep	= 3,		// for Sleep
+	DtOpEnd		= 4		// End count
+};
+typedef NSInteger DateOpt;
+
 #define E2_ENTITYNAME			@"E2record"
 #define E2_bCaution					@"bCaution"
 #define E2_dateTime					@"dateTime"

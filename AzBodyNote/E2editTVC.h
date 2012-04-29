@@ -45,6 +45,7 @@
 	
 	EKCalendar	*mEKCalendar;
 	NSArray		*mPanels;
+	TWTweetComposeViewController		*mTweetVC;
 }
 
 @property (nonatomic, assign) NSInteger	editMode;		//==0:AddNew,  1:Edit,  2:Goal Edit

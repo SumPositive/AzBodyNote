@@ -26,6 +26,7 @@
 }
 
 @property (nonatomic, retain) NSArray		*ppE2records;
+@property (nonatomic, assign) NSInteger	ppPage;
 @property (nonatomic, retain) NSString		*ppEntityKey;
 @property (nonatomic, retain) NSString		*ppGoalKey;
 @property (nonatomic, assign) NSInteger	ppDec;

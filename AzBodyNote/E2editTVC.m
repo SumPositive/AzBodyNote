@@ -225,15 +225,20 @@
 {
 	GA_TRACK_METHOD
 	NSLog(@"actionTweet: message=%@", message);
-	TWTweetComposeViewController *tweetVC = [[TWTweetComposeViewController alloc] init];
-    [tweetVC setInitialText:message];
-    //[tweetVC addImage: [UIImage imageNamed:@"Icon57"]];
-	if (appDelegate_.app_is_unlock==NO) {
-		[tweetVC addURL:[NSURL URLWithString: NSLocalizedString(@"Tweet URL",nil)]];
+	if (mTweetVC==nil) {  //レスポンス向上のためにviewDidLoad:にて事前生成している
+		mTweetVC = [[TWTweetComposeViewController alloc] init];
 	}
-    [self presentModalViewController:tweetVC animated:YES];
+	// Tweetメッセージ
+    [mTweetVC setInitialText:message];
+	// 添付画像
+    //[tweetVC addImage: [UIImage imageNamed:@"Icon57"]];
+	// 添付ＵＲＬ
+	if (appDelegate_.app_is_unlock==NO) {
+		[mTweetVC addURL:[NSURL URLWithString: NSLocalizedString(@"Tweet URL",nil)]];
+	}
 	
-    tweetVC.completionHandler = ^(TWTweetComposeViewControllerResult res) {
+/*	// レス・ハンドラー　　　NG//フリーズする
+	[mTweetVC setCompletionHandler:^(TWTweetComposeViewControllerResult res) {
         if (res == TWTweetComposeViewControllerResultDone) {
             NSLog(@"Tweet done");
 			GA_TRACK_EVENT(@"E2edit",@"Tweet",@"Done", 0);
@@ -241,8 +246,10 @@
             NSLog(@"Tweet cancel");
 			GA_TRACK_EVENT(@"E2edit",@"Tweet",@"Cancel", 0);
         }
-		[self dismissModalViewControllerAnimated:YES]; //これが無いと固まる
-	};
+	}];*/
+
+	// OPEN
+    [self presentModalViewController:mTweetVC animated:YES];
 }
 
 - (void)syncExport
@@ -256,54 +263,68 @@
 	// TweetおよびEvent用の本文作成
 	NSString *zTweet = NSLocalizedString(@"Event Title",nil);
 	if (moE2edit_.nBpHi_mmHg OR moE2edit_.nBpLo_mmHg) {
-		zTweet = [zTweet stringByAppendingFormat:@"\n(%@ %@-%@) ", 
+		switch ([moE2edit_.nDateOpt integerValue]) {
+			case DtOpWake:
+				zTweet = [zTweet stringByAppendingFormat:@" %@ ", NSLocalizedString(@"DateOpt Wake",nil)];
+				break;
+			case DtOpRest:
+				zTweet = [zTweet stringByAppendingFormat:@" %@ ", NSLocalizedString(@"DateOpt Rest",nil)];
+				break;
+			case DtOpDown:
+				zTweet = [zTweet stringByAppendingFormat:@" %@ ", NSLocalizedString(@"DateOpt Down",nil)];
+				break;
+			case DtOpSleep:
+				zTweet = [zTweet stringByAppendingFormat:@" %@ ", NSLocalizedString(@"DateOpt Sleep",nil)];
+				break;
+		}
+		zTweet = [zTweet stringByAppendingFormat:@"\n%@:%@-%@ ", 
 				  NSLocalizedString(@"Event Bp",nil),
 				  strValue([moE2edit_.nBpHi_mmHg integerValue], 0),
 				  strValue([moE2edit_.nBpLo_mmHg integerValue], 0)];
 	}
 	if (moE2edit_.nPulse_bpm) {
-		zTweet = [zTweet stringByAppendingFormat:@"\n(%@ %@) ", 
+		zTweet = [zTweet stringByAppendingFormat:@"\n%@:%@ ", 
 				  NSLocalizedString(@"Event Puls",nil),
 				  strValue([moE2edit_.nPulse_bpm integerValue], 0)];
 	}
 	if (moE2edit_.nWeight_10Kg) {
-		zTweet = [zTweet stringByAppendingFormat:@"\n(%@ %@) ", 
+		zTweet = [zTweet stringByAppendingFormat:@"\n%@:%@ ", 
 				  NSLocalizedString(@"Event Weight",nil),
 				  strValue([moE2edit_.nWeight_10Kg integerValue], 1)];
 	}
 	if (moE2edit_.nTemp_10c) {
-		zTweet = [zTweet stringByAppendingFormat:@"\n(%@ %@) ", 
+		zTweet = [zTweet stringByAppendingFormat:@"\n%@:%@ ", 
 				  NSLocalizedString(@"Event Temp",nil),
 				  strValue([moE2edit_.nTemp_10c integerValue], 1)];
 	}
 	if (moE2edit_.nPedometer) {
-		zTweet = [zTweet stringByAppendingFormat:@"\n(%@ %@) ", 
+		zTweet = [zTweet stringByAppendingFormat:@"\n%@:%@ ", 
 				  NSLocalizedString(@"Event Pedo",nil),
 				  strValue([moE2edit_.nPedometer integerValue], 0)];
 	}
 	if (moE2edit_.nBodyFat_10p) {
-		zTweet = [zTweet stringByAppendingFormat:@"\n(%@ %@) ", 
+		zTweet = [zTweet stringByAppendingFormat:@"\n%@:%@ ", 
 				  NSLocalizedString(@"Event BodyFat",nil),
 				  strValue([moE2edit_.nBodyFat_10p integerValue], 1)];
 	}
 	if (moE2edit_.nSkMuscle_10p) {
-		zTweet = [zTweet stringByAppendingFormat:@"\n(%@ %@) ", 
+		zTweet = [zTweet stringByAppendingFormat:@"\n%@:%@ ", 
 				  NSLocalizedString(@"Event SkMuscle",nil),
 				  strValue([moE2edit_.nSkMuscle_10p integerValue], 1)];
 	}
 	if (0<[moE2edit_.sNote1 length]) {
-		zTweet = [zTweet stringByAppendingFormat:@"\n(%@ %@) ", 
+		zTweet = [zTweet stringByAppendingFormat:@"\n%@:%@ ", 
 				  NSLocalizedString(@"Event Note1",nil),
 				  moE2edit_.sNote1];
 	}
 	if (0<[moE2edit_.sNote2 length]) {
-		zTweet = [zTweet stringByAppendingFormat:@"\n(%@ %@) ", 
+		zTweet = [zTweet stringByAppendingFormat:@"\n%@:%@ ", 
 				  NSLocalizedString(@"Event Note2",nil),
 				  moE2edit_.sNote2];
 	}
 	NSLog(@"actionSave: zTweet={%@}", zTweet);
 	
-	// Calendar Export
+	// Calendar Export  ＜＜常にローカル記録されるためオフライン対応は考えなくて良い。
 	if (appDelegate_.eventStore && mEKCalendar) {
 		EKEvent *event = nil;
 		if (10<[moE2edit_.sEventID length]) {	// 既存につき更新する
@@ -319,21 +340,6 @@
 		event.startDate = moE2edit_.dateTime;
 		event.endDate = moE2edit_.dateTime;
 		//
-		/***中止、、Google Spreadを使って同期実装する予定
-		NSDictionary *dic = [mocFunc_ dictionaryObject:moE2edit_]; //Entity⇒Dictionary
-		// NSDictionary --> JSON
-		DBJSON	*js = [DBJSON new];
-		NSError *err = nil;
-		NSString *zJson = [js stringWithObject:dic error:&err];
-		if (err) {
-			NSLog(@"syncExport: DBJSON: stringWithObject: (err=%@) zJson=%@", [err description], zJson);
-			GA_TRACK_EVENT_ERROR([err description],0);
-		} else {
-			NSLog(@"syncExport: zJson=%@", zJson);
-			event.notes = [NSString stringWithFormat:@"%@ %@", NSLocalizedString(@"syncExport Header",nil), zJson];
-		}
-		 ***/
-		
 		// イベントが関連付けられるカレンダーを設定
 		[event setCalendar:mEKCalendar];
 		// イベントをカレンダーデータベースに保存
@@ -502,7 +508,7 @@
 
 	// アクティブになったとき、未保存ならば日時更新する
     [[NSNotificationCenter defaultCenter] addObserver:self 
-											 selector:@selector(refreshDateTime:) 
+											 selector:@selector(refreshDidBecomeActive:) 
 												 name:NFM_AppDidBecomeActive
 											   object:[[UIApplication sharedApplication] delegate]];
 	
@@ -590,9 +596,14 @@
     [super viewWillAppear:animated];
 	appDelegate_.app_is_AdShow = YES; //これは広告表示可能なViewである。 viewWillAppear:以降で定義すること
 	
-	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	appDelegate_.app_is_unlock = [kvs boolForKey:STORE_PRODUCTID_UNLOCK];
+	
+	// Tweet設定
+	if (mTweetVC==nil && [kvs boolForKey:GUD_bTweet]) {
+		//レスポンス向上のためにviewDidLoad:にて事前生成している
+		mTweetVC = [[TWTweetComposeViewController alloc] init];
+	}
 
 	// カレンダー設定
 	if ([kvs objectForKey:GUD_CalendarID]) {
@@ -619,9 +630,9 @@
 				NSLog(@"AddNew: *** E2_nYearMM <= 200000 *** [e2recs count]=%d", (int)[e2recs count]);
 				moE2edit_ = [e2recs objectAtIndex:0]; // AddNew途中のレコードを復帰させる
 				GA_TRACK_PAGE(@"E2edit-AddEdit");
-				[self refreshDateTime:nil]; // 未保存ならば最新日時にする
-				[self setAutoDateOpt];	//.dateTimeに最適な.nDateOptをセットする
-				[self setE2recordPrev];		// .dateTime より前の値を初期値としてセットする
+				[self refreshDidBecomeActive:nil]; // 未保存ならば最新日時にする
+				//[self setAutoDateOpt];	//.dateTimeに最適な.nDateOptをセットする
+				//[self setE2recordPrev];		// .dateTime より前の値を初期値としてセットする
 			}
 			else {
 				moE2edit_ = [mocFunc_ insertAutoEntity:E2_ENTITYNAME]; // 新規追加
@@ -774,13 +785,11 @@
 
 
 #pragma mark - refresh
-- (void)refreshDateTime:(NSNotification*)note 
+- (void)refreshDidBecomeActive:(NSNotification*)note 
 {
-	if (editMode_==0 && moE2edit_) { // AddNew
+	if (editMode_==0 && moE2edit_ && kvsGoal_==nil) { // AddNew
 		if (self.navigationItem.rightBarButtonItem.enabled==NO) { // 未登録ならば最新日時にする
-			moE2edit_.dateTime = [NSDate date];
-			//moE2edit_.nDateOpt ここでは変更しない。
-			[self.tableView reloadData];
+			[self actionClear];  //クリア
 		}
 	}
 }

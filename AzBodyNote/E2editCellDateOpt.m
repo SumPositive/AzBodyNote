@@ -6,7 +6,6 @@
 //  Copyright 2011 Azukid. All rights reserved.
 //
 #import "E2editCellDateOpt.h"
-#import "GViewBp.h"  // enum optType;
 
 @implementation E2editCellDateOpt
 @synthesize delegate = __delegate;

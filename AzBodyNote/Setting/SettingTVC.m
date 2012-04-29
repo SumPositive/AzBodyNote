@@ -226,7 +226,6 @@
 		} break;
 			
 		case 1: {  // Tweet
-			//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 			NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 			UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
 			if ([kvs boolForKey:GUD_bTweet]) {
