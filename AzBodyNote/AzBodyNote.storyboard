@@ -67,7 +67,7 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Statistics" image="Tab32-Statistics.png" id="gMC-S8-gyf"/>
+                    <tabBarItem key="tabBarItem" title="Statistics" image="Tab32-Stat.png" id="gMC-S8-gyf"/>
                     <connections>
                         <outlet property="ibScrollView" destination="5fm-PA-odh" id="bjw-OD-oia"/>
                         <outlet property="ibSegment" destination="Te6-rf-Myx" id="6bT-Aj-mf3"/>
@@ -830,7 +830,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         <image name="Tab32-Add.png" width="32" height="32"/>
         <image name="Tab32-Graph.png" width="32" height="32"/>
         <image name="Tab32-List.png" width="32" height="32"/>
-        <image name="Tab32-Statistics.png" width="16" height="16"/>
+        <image name="Tab32-Stat.png" width="32" height="32"/>
         <image name="Tx-Brown320x88.png" width="320" height="88"/>
     </resources>
     <classes>

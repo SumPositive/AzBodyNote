@@ -92,7 +92,7 @@ typedef NSInteger DateOpt;
 #define Goal_nSkMuscle_10p		@"Goal_nSkMuscle_10p"
 
 #define E2_dateTime_GOAL		@"2200-01-01T00:00:00 +0000"  // 目標値を記録したE2固有レコード（最大日付+1日）
-#define E2_nYearMM_GOAL			 220001		// 比較レスポンス向上のために利用する
+//#define E2_nYearMM_GOAL			 220001		// 比較レスポンス向上のために利用する
 #define E2_dateTime_MAX		@"2090-12-31T23:59:59 +0000"  // 最大入力許可日付
 #define E2_nBpHi_MIN			30			//_MIN 最小値
 #define E2_nBpHi_INIT			120			//_INIT 初期値

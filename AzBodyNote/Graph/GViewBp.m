@@ -9,7 +9,7 @@
 #import "GraphVC.h"
 
 
-#define SPACE_Y			14.0		// グラフの最大および最小の極限余白 > LINE_WID/2.0
+#define SPACE_Y			15.0		// グラフの最大および最小の極限余白 > LINE_WID/2.0
 #define LINE_WID			24.0		// BpHi と BpLo を結ぶ縦線の太さ   < SPACE_Y*2.0
 #define FONT_SIZE			14.0
 
@@ -48,7 +48,7 @@ NSInteger	pValueCount = 0;
 {
 	UIImage *img = nil;
 	switch (dtop) {
-		case DtOpWake:	//Wake-up
+		case DtOpWake:
 			img = [UIImage imageNamed:@"Icon20-Wake"];
 			break;
 		case DtOpRest:
@@ -57,8 +57,11 @@ NSInteger	pValueCount = 0;
 		case DtOpDown:
 			img = [UIImage imageNamed:@"Icon20-Down"];
 			break;
-		case DtOpSleep:	//For-sleep
+		case DtOpSleep:
 			img = [UIImage imageNamed:@"Icon20-Sleep"];
+			break;
+		case DtOpEnd: // GOAL
+			img = [UIImage imageNamed:@"Icon20-Goal"];
 			break;
 		default:
 			return;
@@ -115,6 +118,8 @@ NSInteger	pValueCount = 0;
 
 - (void)graphDraw:(CGContextRef)cgc 
 {
+	BOOL bLine;
+	CGFloat fy;
 	CGPoint po;
 	
 	//------------------------------------------------------------------------------ BpHi と BpLo を結ぶ縦線
@@ -131,14 +136,32 @@ NSInteger	pValueCount = 0;
 			{	//文字を上層にすべく、このタテ棒を先に描画する
 				po = poValGoal[bpHi];
 				CGContextMoveToPoint(cgc, po.x, po.y);
+				fy = po.y;
 				po = poValGoal[bpLo];
 				CGContextAddLineToPoint(cgc, po.x, po.y);
 				CGContextStrokePath(cgc);
+				if (IMAGE_GAP_MIN <= fy - po.y) {
+					po.y += (fy - po.y)/2.0;
+					[self imageGraph:cgc center:po DtOp:DtOpEnd];
+				}
+				bLine = YES;
+			} else {
+				bLine = NO;
 			}
 			if (0<pValGoal[bpHi]) {
+				if (bLine==NO) {
+					po = poValGoal[bpHi];
+					po.y -= IMAGE_GAP_MIN/2.0;
+					[self imageGraph:cgc center:po DtOp:DtOpEnd];
+				}
 				[self drawPoint:cgc value:pValGoal[bpHi] po:poValGoal[bpHi] isHi:YES];
 			}
 			if (0<pValGoal[bpLo]) {
+				if (bLine==NO) {
+					po = poValGoal[bpLo];
+					po.y += IMAGE_GAP_MIN/2.0;
+					[self imageGraph:cgc center:po DtOp:DtOpEnd];
+				}
 				[self drawPoint:cgc value:pValGoal[bpLo] po:poValGoal[bpLo] isHi:NO];		
 			}
 		}
@@ -148,8 +171,6 @@ NSInteger	pValueCount = 0;
 	CGPoint	poBpHi[GRAPH_PAGE_LIMIT+GRAPH_DAYS_SAFE+1];
 	CGPoint	poBpLo[GRAPH_PAGE_LIMIT+GRAPH_DAYS_SAFE+1];
 	int  iCntBpHi = 0, iCntBpLo = 0;
-	BOOL bLine;
-	CGFloat fy;
 	for (int ii=0; ii<pValueCount; ii++) 
 	{
 		if (0<pValue[bpHi][ii] && 0<pValue[bpLo][ii])

@@ -73,28 +73,22 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {	// Return the number of sections.
-    return 2;
+    return 3;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {	// Return the number of rows in the section.
-	if (section==0) {
-		return 3;
-	} else {
-		return 2;
+	switch (section) {
+		case 0:	return 2;			break;
+		case 1:	return 2;			break;
+		case 2:	return 2;			break;
 	}
+	return 0;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	switch (indexPath.section*100 + indexPath.row) 
-	{
-		case 0:	// Tweet
-		case 1:	// Goal
-		case 2:	// Calender
-		case 3:	// Panels Graphs
-			return  55;
-	}
+	//switch (indexPath.section*100 + indexPath.row) 
     return 44; // Default
 }
 
@@ -102,23 +96,11 @@
 {
 	static NSString *sysCellSubtitle = @"sysCellSubtitle"; //システム既定セル
 
-	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
     
 	switch (indexPath.section*100 + indexPath.row) 
 	{
-		case 0: {	// SettGraph
-			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
-			if (cell == nil) {
-				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
-			}
-			cell.textLabel.text = NSLocalizedString(@"SettGraph",nil);
-			cell.detailTextLabel.text = NSLocalizedString(@"SettGraph detail",nil);
-			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-			return cell;
-		}	break;
-			
-		case 1: {	// Tweet
+		case 0: {	// Tweet
 			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
 			if (cell == nil) {
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
@@ -131,13 +113,15 @@
 			}
 			if ([kvs boolForKey:GUD_bTweet]) {
 				cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				cell.imageView.image = [UIImage imageNamed:@"bird_32_blue"];
 			} else {
 				cell.accessoryType = UITableViewCellAccessoryNone;
+				cell.imageView.image = [UIImage imageNamed:@"bird_32_gray"];
 			}
 			return cell;
 		}	break;
 			
-		case 2: {	// Calender
+		case 1: {	// Calender
 			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
 			if (cell == nil) {
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
@@ -156,19 +140,32 @@
 			return cell;
 		}	break;
 			
-	/*	case 9: {	// GSpread
-			static NSString *cid = @"SettCellGSpread";  //== Identifire に一致させること
-			SettCellGSpread *cell = (SettCellGSpread*)[tableView dequeueReusableCellWithIdentifier:cid];
+		case 100: {	// SettGraph
+			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
 			if (cell == nil) {
-				UINib *nib = [UINib nibWithNibName:cid   bundle:nil];
-				[nib instantiateWithOwner:self options:nil];
-				cell = (SettCellGSpread*)[tableView dequeueReusableCellWithIdentifier:cid];
-				assert(cell);
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 			}
+			cell.imageView.image = [UIImage imageNamed:@"Tab32-Graph"];
+			cell.textLabel.text = NSLocalizedString(@"SettGraph",nil);
+			cell.detailTextLabel.text = NSLocalizedString(@"SettGraph detail",nil);
+			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 			return cell;
-		}	break;*/
+		}	break;
 			
-		case 100: {	// このアプリについて
+		case 101: {	// SettStat
+			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
+			if (cell == nil) {
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
+			}
+			cell.imageView.image = [UIImage imageNamed:@"Tab32-Stat"];
+			cell.textLabel.text = NSLocalizedString(@"SettStat",nil);
+			cell.detailTextLabel.text = NSLocalizedString(@"SettStat detail",nil);
+			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+			return cell;
+		}	break;
+
+			
+		case 200: {	// このアプリについて
 			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
 			if (cell == nil) {
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
@@ -182,7 +179,7 @@
 			return cell;
 		}	break;
 
-		case 101: {	// あずき商店
+		case 201: {	// あずき商店
 			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
 			if (cell == nil) {
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
@@ -219,32 +216,43 @@
 	
 	switch (indexPath.section*100 + indexPath.row) 
 	{
-		case 0: {  // グラフ設定
-			SettGraphTVC *vc = [[SettGraphTVC alloc] init];
-			vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
-			[self.navigationController pushViewController:vc animated:YES];
-		} break;
-			
-		case 1: {  // Tweet
+		case 0: {  // Tweet
 			NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 			UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
 			if ([kvs boolForKey:GUD_bTweet]) {
 				[kvs setBool: NO forKey:GUD_bTweet];
 				cell.accessoryType = UITableViewCellAccessoryNone;
+				cell.imageView.image = [UIImage imageNamed:@"bird_32_gray"];
 			} else {
 				[kvs setBool: YES forKey:GUD_bTweet];
 				cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				cell.imageView.image = [UIImage imageNamed:@"bird_32_blue"];
 			}
 			[kvs synchronize];
+			//NG//[cell setNeedsDisplay]; 無反応
 		} break;
 			
-		case 2: {  // AZCalendarSelect
+		case 1: {  // AZCalendarSelect
 			AZCalendarSelect *vc = [[AZCalendarSelect alloc] init];
 			vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
 			[self.navigationController pushViewController:vc animated:YES];
 		} break;
 			
-		case 100: {	// このアプリについて
+
+		case 100: {  // 時系列グラフ設定
+			SettGraphTVC *vc = [[SettGraphTVC alloc] init];
+			vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
+			[self.navigationController pushViewController:vc animated:YES];
+		} break;
+			
+		case 101: {  // 統計グラフ設定
+			SettStatTVC *vc = [[SettStatTVC alloc] init];
+			vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
+			[self.navigationController pushViewController:vc animated:YES];
+		} break;
+			
+			
+		case 200: {	// このアプリについて
 			AZAboutVC *vc = [[AZAboutVC alloc] init];
 			vc.ppImgIcon = [UIImage imageNamed:@"Icon57"];
 			vc.ppProductTitle = @"Condition";	// 世界共通名称
@@ -255,7 +263,7 @@
 			[self.navigationController pushViewController:vc animated:YES];
 		}	break;
 			
-		case 101: {	// あずき商店
+		case 201: {	// あずき商店
 			AZStoreTVC *vc = [[AZStoreTVC alloc] init];
 			// 商品IDリスト
 			NSSet *pids = [NSSet setWithObjects:STORE_PRODUCTID_UNLOCK, nil]; // 商品が複数ある場合は列記

@@ -50,9 +50,14 @@ typedef NSUInteger AzConditionItems;
 #define GUD_CalendarID						@"GUD_CalendarID"
 #define GUD_CalendarTitle					@"GUD_CalendarTitle"
 #define GUD_SettGraphs						@"GUD_SettGraphs"	//UserDef保存につき変更禁止 NSArrey型 
-#define GUD_DateOptWakeUp				@"GUD_DateOptWakeUp"		//(0)Wake-upとされた平均時。以後この前後2時間をWake-upとする
-#define GUD_DateOptForSleep				@"GUD_DateOptForSleep"		//(2)for sleepとされた平均時。以後この前後2時間をfor sleepとする
 #define GUD_SettStatDays					@"GUD_SettStatDays"
+
+//この時刻の前後2時間を判定している
+#define GUD_DateOptWake_HOUR		@"GUD_DateOptWake_HOUR"
+#define GUD_DateOptRest_HOUR			@"GUD_DateOptRest_HOUR"
+#define GUD_DateOptDown_HOUR		@"GUD_DateOptDown_HOUR"
+#define GUD_DateOptSleep_HOUR		@"GUD_DateOptSleep_HOUR"
+
 
 // iCloud-KVS UserDefault ------------------------------------- Settings
 // Goal_nBpHi_mmHg 関係は、"MocEntity.h" にて定義

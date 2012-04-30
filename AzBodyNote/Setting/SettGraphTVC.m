@@ -43,6 +43,14 @@
 		NSArray *ar = [kvs objectForKey:GUD_SettGraphs];
 		if (ar) {
 			mPanels = [[NSMutableArray alloc] initWithArray:ar];
+			// 設定中は、BpLoを取り除き、BpHiだけにする ＞＞ 保存時にBpHiの次にBpLoを挿入する
+			for (int iRow=0; iRow<[mPanels count]; iRow++) {
+				NSInteger item = [[mPanels objectAtIndex:iRow] integerValue];
+				if (abs(item)==AzConditionBpLo) {
+					[mPanels removeObjectAtIndex:iRow];	//BpLo削除
+					break;
+				}
+			}
 		} else {
 			// didFinishLaunchingWithOptions:にて初期セット済み
 			alertBox(NSLocalizedString(@"SettGraph ERR GUD",nil), NSLocalizedString(@"SettGraph ERR GUD detail",nil), @"OK");
@@ -51,7 +59,7 @@
 		}
 	}
 	//[self.tableView setEditing:YES];
-	self.navigationItem.rightBarButtonItem = [self editButtonItem];
+	self.navigationItem.rightBarButtonItem = [self editButtonItem];	//右[Edit]ボタン
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -65,18 +73,24 @@
 												 style:UIBarButtonItemStyleBordered
 												 target:self action:@selector(actionBack)];
 	}
-
-	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	mValueDays = [[kvs objectForKey:GUD_SettStatDays] integerValue];
-	if (mValueDays<1 OR GRAPH_PAGE_LIMIT <mValueDays) {
-		mValueDays = 1;
-	}
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {	// 非表示になる前に呼び出される
-	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	// 設定中は、BpLoを取り除き、BpHiだけ ＞＞ 保存時にBpHiの次にBpLoを挿入する
+	for (int iRow=0; iRow<[mPanels count]; iRow++) {
+		NSInteger item = [[mPanels objectAtIndex:iRow] integerValue];
+		if (abs(item)==AzConditionBpHi) {
+			if (item < 0) {
+				item = AzConditionBpLo * (-1); //Lo ON
+			} else {
+				item = AzConditionBpLo; //Lo OFF
+			}
+			// BpHiの次にBpLoを挿入する
+			[mPanels insertObject:[NSNumber numberWithInteger:item] atIndex:iRow+1];
+			break;
+		}
+	}
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	[kvs setObject:mPanels forKey:GUD_SettGraphs];
 	[kvs synchronize];
@@ -105,7 +119,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
 	if (section==0) {
-		return 2;
+		return 1;
 	}
 	assert(section==1);
     return [mPanels count];
@@ -114,7 +128,6 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	if (indexPath.section==0) {
-		if (indexPath.row==1) return 88; // Days
 		return 44;
 	}
     return 44; // Default
@@ -133,18 +146,11 @@
 	return nil;
 }
 
-- (void)refreshGraphDays
-{
-	if (mLbValueDays) {
-		mLbValueDays.text = [NSString stringWithFormat:@"%ld", (long)mValueDays];
-	}
-}
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	static NSString *sysCellSubtitle = @"sysCellSubtitle"; //システム既定セル
-	static NSString *sysCellDial = @"sysCellDial";
-	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+	//static NSString *sysCellDial = @"sysCellDial";
+
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	
 	if (indexPath.section==0) {
@@ -154,6 +160,7 @@
 				if (cell == nil) {
 					cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 				}
+				cell.imageView.image = [UIImage imageNamed:@"Icon20-Goal"];
 				cell.textLabel.text = NSLocalizedString(@"SettGraph Goal",nil);
 				//cell.detailTextLabel.text = NSLocalizedString(@"SettGraph Goal detail",nil);
 				//cell.detailTextLabel.adjustsFontSizeToFitWidth = YES;
@@ -163,38 +170,6 @@
 				} else {
 					cell.accessoryType = UITableViewCellAccessoryNone;
 				}
-				return cell;
-			}	break;
-			case 1: {	// 期間指定
-				UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellDial];
-				if (cell == nil) {
-					cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellDial];
-					// Label
-					UILabel *lb = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, 180, 25)];
-					lb.font = [UIFont boldSystemFontOfSize:20];
-					lb.adjustsFontSizeToFitWidth = YES;
-					lb.minimumFontSize = 10;
-					lb.backgroundColor = [UIColor clearColor];
-					lb.text = NSLocalizedString(@"SettGraph Days",nil);
-					[cell.contentView addSubview:lb];
-					// Label
-					mLbValueDays = [[UILabel alloc] initWithFrame:CGRectMake(200, 8, 70, 30)];
-					mLbValueDays.font = [UIFont systemFontOfSize:26];
-					mLbValueDays.textAlignment = UITextAlignmentRight;
-					mLbValueDays.backgroundColor = [UIColor clearColor];
-					[cell.contentView addSubview:mLbValueDays];
-					// AZDial
-					mDialDays = [[AZDial alloc] initWithFrame:CGRectMake(15, 40, 280, 44)
-													 delegate: self
-														 dial: mValueDays
-														  min: 1
-														  max: 200
-														 step: 1
-													  stepper: 1];
-					[cell.contentView addSubview:mDialDays];
-					mDialDays.backgroundColor = [UIColor clearColor]; //self.backgroundColor;
-				}
-				[self refreshGraphDays];
 				return cell;
 			}	break;
 		}
@@ -207,6 +182,7 @@
 	if (cell == nil) {
 		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 	}
+	cell.imageView.image = nil;
 	
 	NSInteger item = [[mPanels objectAtIndex:indexPath.row] integerValue];
 	if (item < 0) {
@@ -224,10 +200,10 @@
 			cell.selectionStyle = UITableViewCellSelectionStyleNone; // 選択時ハイライトなし
 			break;
 		case AzConditionBpHi:
-			cell.textLabel.text = NSLocalizedString(@"SettGraph BpHi",nil);
+			cell.textLabel.text = NSLocalizedString(@"SettGraph Bp",nil);
 			break;
-		case AzConditionBpLo:
-			cell.textLabel.text = NSLocalizedString(@"SettGraph BpLo",nil);
+		case AzConditionBpLo: //ここではBpHiのみ代表として使用
+			assert(NO);
 			break;
 		case AzConditionPuls:
 			cell.textLabel.text = NSLocalizedString(@"SettGraph Pulse",nil);
@@ -344,28 +320,34 @@
 	
 	assert(indexPath.section==1);
 	UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+	BOOL bCheck;
 	// グラフ表示チェック
 	NSInteger item = [[mPanels objectAtIndex:indexPath.row] integerValue];
 	NSNumber *num = [NSNumber numberWithInteger: item * (-1)]; //反転
 	if ([num integerValue] < 0) {
 		cell.accessoryType = UITableViewCellAccessoryCheckmark;	// グラフ表示ON
+		bCheck = YES;
 	} else {
 		cell.accessoryType = UITableViewCellAccessoryNone;			// グラフ表示OFF
+		bCheck = NO;
 	}
 	[mPanels replaceObjectAtIndex:indexPath.row withObject:num]; //置換
 
+/*** BpHiのみ代表方式にしたので不要になった。
 	// BpHi と BpLo を同調させる
-	item = [[mPanels objectAtIndex:indexPath.row] integerValue];
 	if (abs(item)==AzConditionBpHi) {
 		// BpLoを更新する
 		for (int iRow=0; iRow<[mPanels count]; iRow++) {
-			if (abs([[mPanels objectAtIndex:iRow] integerValue])==AzConditionBpLo) {
-				NSIndexPath *ip = [NSIndexPath indexPathForRow:iRow inSection:indexPath.section];
-				cell = [tableView cellForRowAtIndexPath:ip];
-				if ([num integerValue] < 0) {
+			item = [[mPanels objectAtIndex:iRow] integerValue];
+			if (abs(item)==AzConditionBpLo) {
+				NSIndexPath *ipLo = [NSIndexPath indexPathForRow:iRow inSection:indexPath.section];
+				cell = [tableView cellForRowAtIndexPath:ipLo];
+				if (bCheck) {
 					cell.accessoryType = UITableViewCellAccessoryCheckmark;	// グラフ表示ON
+					num = [NSNumber numberWithInteger: AzConditionBpLo * (-1)]; //Lo ON
 				} else {
 					cell.accessoryType = UITableViewCellAccessoryNone;			// グラフ表示OFF
+					num = [NSNumber numberWithInteger: AzConditionBpLo]; //Lo OFF
 				}
 				[mPanels replaceObjectAtIndex:iRow withObject:num]; //置換
 				break;
@@ -375,38 +357,22 @@
 	else if (abs(item)==AzConditionBpLo) {
 		// BpHiを更新する
 		for (int iRow=0; iRow<[mPanels count]; iRow++) {
-			if (abs([[mPanels objectAtIndex:iRow] integerValue])==AzConditionBpHi) {
-				NSIndexPath *ip = [NSIndexPath indexPathForRow:iRow inSection:indexPath.section];
-				cell = [tableView cellForRowAtIndexPath:ip];
-				if ([num integerValue] < 0) {
+			item = [[mPanels objectAtIndex:iRow] integerValue];
+			if (abs(item)==AzConditionBpHi) {
+				NSIndexPath *ipHi = [NSIndexPath indexPathForRow:iRow inSection:indexPath.section];
+				cell = [tableView cellForRowAtIndexPath:ipHi];
+				if (bCheck) {
 					cell.accessoryType = UITableViewCellAccessoryCheckmark;	// グラフ表示ON
+					num = [NSNumber numberWithInteger: AzConditionBpHi * (-1)]; //Hi ON
 				} else {
 					cell.accessoryType = UITableViewCellAccessoryNone;			// グラフ表示OFF
+					num = [NSNumber numberWithInteger: AzConditionBpHi]; //Hi OFF
 				}
 				[mPanels replaceObjectAtIndex:iRow withObject:num]; //置換
 				break;
 			}
 		}
-	}
+	}*/
 }
-
-
-#pragma mark - <AZDialDelegate>
-- (void)dialChanged:(id)sender dial:(NSInteger)dial
-{	// dialが変位したとき
-	mValueDays = dial;
-	[self refreshGraphDays];
-}
-
-- (void)dialDone:(id)sender dial:(NSInteger)dial
-{	// dial変位が停止したとき
-	mValueDays = dial;
-	[self refreshGraphDays];
-
-	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	[kvs setObject:[NSNumber numberWithInteger:mValueDays] forKey:GUD_SettStatDays];
-}
-
 
 @end

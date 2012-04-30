@@ -163,7 +163,7 @@
 	}
 	
 	if ([kvs objectForKey:GUD_SettGraphs]==nil)		//[0.9.0]NEW
-	{	// 測定パネル順序設定の初期値
+	{	// 測定パネル順序設定の初期値				※BpHiの次がBpLoになること。
 		NSArray *aPanels = [[NSArray alloc] initWithObjects:
 							[NSNumber numberWithInteger: AzConditionBpHi	* (-1)],		//*(-1):Graph表示する
 							[NSNumber numberWithInteger: AzConditionBpLo	* (-1)],		//*(-1):Graph表示する
@@ -177,8 +177,8 @@
 							nil];
 		[kvs setObject:aPanels	forKey:GUD_SettGraphs];
 		[kvs setBool:NO		forKey:GUD_bTweet];		// YES=新規保存後ツイート
-		[kvs setBool:YES		forKey:GUD_bGoal];			// YES=GOAL表示する
 		[kvs setBool:NO		forKey:GUD_bCalender];	// YES=カレンダーへ記録
+		[kvs setBool:YES		forKey:GUD_bGoal];			// YES=GOAL表示する
 		[kvs setObject:[NSNumber numberWithInt:14]	forKey:GUD_SettStatDays];
 		[kvs synchronize];
 	}

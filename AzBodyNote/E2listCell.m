@@ -40,42 +40,34 @@
 {
 	if (moE2node_) 
 	{
-		if ([moE2node_.nYearMM integerValue]==E2_nYearMM_GOAL) {
-			ibLbDate.text = @"The GOAL";  //NSLocalizedString(@"TheGoal",nil);
-			ibIvDateOpt.image = nil;
-		} else {
-			NSDateFormatter *fm = [[NSDateFormatter alloc] init];
-			// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
-			NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-			[fm setCalendar:calendar];
-			[fm setDateFormat:@"dd  HH:mm"];
-			ibLbDate.text = [fm stringFromDate:moE2node_.dateTime];
-			//
-			if (moE2node_.nDateOpt) {
-				switch ([moE2node_.nDateOpt integerValue]) {
-					case DtOpWake: //起床後
-						ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-Wake"]; //H20xW24px
-						break;
-					case DtOpRest:
-						ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-Rest"]; //H20xW24px
-						break;
-					case DtOpDown:
-						ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-Down"]; //H20xW24px
-						break;
-					case DtOpSleep: //就寝前
-						ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-Sleep"];
-						break;
-					default:
-						ibIvDateOpt.image = nil;
-						break;
-				}
-			} else {
-				ibIvDateOpt.image = nil;
+		NSDateFormatter *fm = [[NSDateFormatter alloc] init];
+		// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
+		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+		[fm setCalendar:calendar];
+		[fm setDateFormat:@"dd  HH:mm"];
+		ibLbDate.text = [fm stringFromDate:moE2node_.dateTime];
+		if (moE2node_.nDateOpt) {
+			switch ([moE2node_.nDateOpt integerValue]) {
+				case DtOpWake: //起床後
+					ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-Wake"]; //H20xW24px
+					break;
+				case DtOpRest:
+					ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-Rest"]; //H20xW24px
+					break;
+				case DtOpDown:
+					ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-Down"]; //H20xW24px
+					break;
+				case DtOpSleep: //就寝前
+					ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-Sleep"];
+					break;
+				default:
+					ibIvDateOpt.image = nil;
+					break;
 			}
+		} else {
+			ibIvDateOpt.image = nil;
 		}
-		
 		//NSLog(@"--- moE2node_.sNote2=%@", moE2node_.sNote2);
-
 		ibLbBpHi.text = strValue([moE2node_.nBpHi_mmHg integerValue], 0); 
 		ibLbBpLo.text = strValue([moE2node_.nBpLo_mmHg integerValue], 0); 
 		ibLbPuls.text = strValue([moE2node_.nPulse_bpm integerValue], 0); 
@@ -84,9 +76,7 @@
 		ibLbPedo.text = strValue([moE2node_.nPedometer integerValue], 0); 
 		ibLbBodyFat.text = strValue([moE2node_.nBodyFat_10p integerValue] , 1); 
 		ibLbSkMuscle.text = strValue([moE2node_.nSkMuscle_10p integerValue], 1); 
-		
-		//ibLbNote1.text = moE2node_.sNote1;
-		//ibLbNote2.text = moE2node_.sNote2;
+
 		if (0<[moE2node_.sNote1 length]) {
 			if (0<[moE2node_.sNote2 length]) {
 				ibLbNote1.text = [NSString stringWithFormat:@"%@  %@", moE2node_.sNote1,  moE2node_.sNote2];
@@ -105,8 +95,9 @@
 		//  iCloud KVS 
 		NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 		//E2listTVC:viewWillAppear:にて処理// [kvs synchronize]; // iCloud最新同期（取得）
-
 		ibLbDate.text = @"The GOAL";  //NSLocalizedString(@"TheGoal",nil);
+		ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-Goal"];
+
 		ibLbBpHi.text = strValue([[kvs objectForKey:Goal_nBpHi_mmHg] integerValue], 0); 
 		ibLbBpLo.text = strValue([[kvs objectForKey:Goal_nBpLo_mmHg] integerValue], 0); 
 		ibLbPuls.text = strValue([[kvs objectForKey:Goal_nPulse_bpm] integerValue], 0); 
@@ -116,8 +107,6 @@
 		ibLbBodyFat.text = strValue([[kvs objectForKey:Goal_nBodyFat_10p] integerValue], 1); 
 		ibLbSkMuscle.text = strValue([[kvs objectForKey:Goal_nSkMuscle_10p] integerValue], 1);
 		
-		//ibLbNote1.text = [kvs objectForKey:Goal_sNote1];
-		//ibLbNote2.text = [kvs objectForKey:Goal_sNote2];
 		if (0<[toNil([kvs objectForKey:Goal_sNote1]) length]) {
 			if (0<[toNil([kvs objectForKey:Goal_sNote2]) length]) {
 				ibLbNote1.text = [NSString stringWithFormat:@"%@  %@",

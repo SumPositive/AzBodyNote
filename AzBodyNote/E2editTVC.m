@@ -164,35 +164,47 @@
 	}
 }
 
-- (NSInteger)integerDateOpt:(NSDate *)date
+- (AzConditionItems)integerDateOpt:(NSDate *)date
 {
 	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
 	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 	NSDateComponents* comp = [calendar components: NSHourCalendarUnit  fromDate:date]; // Hourのみ
 	
-	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	if ([kvs objectForKey:GUD_DateOptWakeUp]) {	// 保存時に自動学習(記録更新)している
-		NSInteger iHour = [[kvs objectForKey:GUD_DateOptWakeUp] integerValue];
+	if ([kvs objectForKey:GUD_DateOptWake_HOUR]) {	// 保存時に自動学習(記録更新)している
+		NSInteger iHour = [[kvs objectForKey:GUD_DateOptWake_HOUR] integerValue];
 		if (iHour-DateOpt_AroundHOUR < 0) {
 			iHour += DateOpt_AroundHOUR;
 			comp.hour += DateOpt_AroundHOUR;
 		}
 		if (iHour-DateOpt_AroundHOUR <= comp.hour && comp.hour < iHour+DateOpt_AroundHOUR) {
-			return 0;  // (0)起床後
+			return DtOpWake;
 		}
 	}
-	if ([kvs objectForKey:GUD_DateOptForSleep]) {	// 保存時に自動学習(記録更新)している
-		NSInteger iHour = [[kvs objectForKey:GUD_DateOptForSleep] integerValue];
+	//
+	// DtOpRest:は、デフォルト。どれにも該当しなければ、return DtOpRest;
+	//
+	if ([kvs objectForKey:GUD_DateOptDown_HOUR]) {	// 保存時に自動学習(記録更新)している
+		NSInteger iHour = [[kvs objectForKey:GUD_DateOptDown_HOUR] integerValue];
 		if (iHour-DateOpt_AroundHOUR < 0) {
 			iHour += DateOpt_AroundHOUR;
 			comp.hour += DateOpt_AroundHOUR;
 		}
 		if (iHour-DateOpt_AroundHOUR <= comp.hour && comp.hour < iHour+DateOpt_AroundHOUR) {
-			return 2;  // (2)就寝前
+			return DtOpDown;
 		}
 	}
-	return 1; //(1)日中
+	if ([kvs objectForKey:GUD_DateOptSleep_HOUR]) {	// 保存時に自動学習(記録更新)している
+		NSInteger iHour = [[kvs objectForKey:GUD_DateOptSleep_HOUR] integerValue];
+		if (iHour-DateOpt_AroundHOUR < 0) {
+			iHour += DateOpt_AroundHOUR;
+			comp.hour += DateOpt_AroundHOUR;
+		}
+		if (iHour-DateOpt_AroundHOUR <= comp.hour && comp.hour < iHour+DateOpt_AroundHOUR) {
+			return DtOpSleep;
+		}
+	}
+	return DtOpRest;		//デフォルト
 }
 
 - (void)actionClear
@@ -420,17 +432,21 @@
 		[mocFunc_ commit];
 
 		//自動学習(記録更新)する
-		//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 		NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 		switch ([moE2edit_.nDateOpt integerValue]) {
-			case 0: //起床後
-				[kvs setObject:[NSNumber numberWithInteger:comp.hour] forKey:GUD_DateOptWakeUp];
+			case DtOpWake:
+				[kvs setObject:[NSNumber numberWithInteger:comp.hour] forKey:GUD_DateOptWake_HOUR];
 				break;
-			case 2: //就寝前
-				[kvs setObject:[NSNumber numberWithInteger:comp.hour] forKey:GUD_DateOptForSleep];
+			case DtOpRest:
+				[kvs setObject:[NSNumber numberWithInteger:comp.hour] forKey:GUD_DateOptRest_HOUR];
+				break;
+			case DtOpDown:
+				[kvs setObject:[NSNumber numberWithInteger:comp.hour] forKey:GUD_DateOptDown_HOUR];
+				break;
+			case DtOpSleep:
+				[kvs setObject:[NSNumber numberWithInteger:comp.hour] forKey:GUD_DateOptSleep_HOUR];
 				break;
 		}
-		//[userDefaults synchronize];
 
 		[self syncExport];
 		
