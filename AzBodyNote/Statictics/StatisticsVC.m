@@ -42,9 +42,14 @@
 												 name:NFM_REFRESH_ALL_VIEWS 
 											   object:nil];
 	
-	ibScrollView.delegate = nil; // <UIScrollViewDelegate>
-	ibScrollView.directionalLockEnabled = YES;
+	ibScrollView.delegate = self; // <UIScrollViewDelegate>
+	ibScrollView.directionalLockEnabled = NO;
 	ibScrollView.pagingEnabled = NO;
+
+/*	// ズーム：　ピンチアウト操作
+	UIPinchGestureRecognizer *pinchGesture = [[UIPinchGestureRecognizer alloc]
+											  initWithTarget:self action:@selector(handlePinchGesture:)];
+	[ibScrollView addGestureRecognizer:pinchGesture];*/
 }
 
 
@@ -65,6 +70,32 @@
 
 - (void)graphViewPage:(NSUInteger)page //section:(NSUInteger)section
 {
+	CGRect rcContent = ibScrollView.bounds;
+//	rcContent.size.width *= ZOOM_MAX;
+//	rcContent.size.height *= ZOOM_MAX;
+
+	[ibScrollView setContentSize:rcContent.size];
+	[ibScrollView setZoomScale:1.0];
+	[ibScrollView setMinimumZoomScale:1.0];
+	[ibScrollView setMaximumZoomScale:ZOOM_MAX];
+	
+/*	CGFloat fw = ibScrollView.frame.size.width / rcContent.size.width;
+	CGFloat fh = ibScrollView.frame.size.height / rcContent.size.height;
+	NSLog(@"fw=%0.2f  fh=%0.2f", fw, fh);
+	if (fw < fh) {
+		[ibScrollView setMinimumZoomScale:fw];
+		[ibScrollView setZoomScale:fw];
+	} else {
+		[ibScrollView setMinimumZoomScale:fh];
+		[ibScrollView setZoomScale:fh];
+	}
+	//ibScrollView.contentSize = rcContent.size;
+	[ibScrollView setContentSize:rcContent.size];
+*/
+	
+	// グラフ原点表示
+	ibScrollView.contentOffset = CGPointMake(0, 0);
+
 	// Sort条件
 	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
 	NSArray *sortDesc = [NSArray arrayWithObjects: sort1,nil]; // 日付降順：Limit抽出に使用
@@ -74,19 +105,6 @@
 								offset: 0
 								 where: [NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"] // 未保存を除外する
 								  sort: sortDesc]; // 最新日付から抽出
-	
-	// GraphView サイズを決める
-	CGRect rcScrollContent = ibScrollView.bounds;
-	CGFloat fWhalf = rcScrollContent.size.width / 2.0; // 表示幅の半分（画面中央）
-	int iCount = mStatDays;
-	if (iCount < 2) iCount = 2; // 1だとスクロール出来なくなる
-	//                     (                 左余白                 ) + (               レコード               ) + (                 右余白                 ); 
-	rcScrollContent.size.width = (fWhalf - RECORD_WIDTH/2) + (RECORD_WIDTH * iCount) + (fWhalf - RECORD_WIDTH/2);
-	
-	ibScrollView.contentSize = CGSizeMake(rcScrollContent.size.width, rcScrollContent.size.height);
-	
-	rcScrollContent.origin.x = (fWhalf - RECORD_WIDTH/2); //左余白
-	rcScrollContent.size.width = RECORD_WIDTH * (iCount + 2);	// +2はGoal,Avg列
 	
 	//------------------------------------------------------
 	switch (ibSegment.selectedSegmentIndex) 
@@ -112,37 +130,60 @@
 		default:
 			break;
 	}
-	// 右端を画面中央に表示する
-	ibScrollView.contentOffset = CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);
+
+	if (mSvBp==nil) {
+		mSvBp = [[SViewBp alloc] initWithFrame: rcContent];
+		mSvBp.ppE2records = e2recs;
+		[ibScrollView addSubview:mSvBp];
+	} else {
+		mSvBp.ppE2records = e2recs;
+		[mSvBp setFrame: rcContent];
+		[mSvBp setNeedsDisplay]; //drawRect:が呼び出される
+	}
+}
+
+- (void)animation_after
+{
+	//[mActIndicator stopAnimating];
+	
+	// アニメ準備
+	[UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationDuration: 0.7];
+	[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
+	
+	ibScrollView.alpha = 1;
+	
+	// アニメ実行
+	[UIView commitAnimations];
 }
 
 - (void)graphViewPage:(NSUInteger)page animated:(BOOL)animated
 {
 	if (animated) {
+		ibScrollView.alpha = 0.1;
 		// アニメ準備
-		CGContextRef context = UIGraphicsGetCurrentContext();
-		[UIView beginAnimations:@"Graph" context:context];
-		[UIView setAnimationDuration:0.3];
+		[UIView beginAnimations:nil context:NULL];
+		[UIView setAnimationDuration:1.2];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
+		//[UIView setAnimationDelegate:self];
+		//[UIView setAnimationDidStopSelector:@selector(animation_after)]; //アニメーション終了後に呼び出す＜＜setAnimationDelegate必要
 	}
 	// アニメ終了状態
+	ibScrollView.alpha = 1.0;
 	[self graphViewPage:page];// この中で、uiActivePage_が更新される
 	
 	if (animated) {
 		// アニメ実行
 		[UIView commitAnimations];
+	} else {
+		//[mActIndicator stopAnimating];
+		//[self animation_after]; //アニメーション終了後に呼び出す
 	}
 }
 
 - (void)viewWillAppear:(BOOL)animated 
 {
     [super viewWillAppear:animated];
-	
-	mAppDelegate.app_is_AdShow = NO; //これは広告表示しないViewである。 viewWillAppear:以降で定義すること
-	if (mAppDelegate.adWhirlView) {	// Ad OFF
-		//mAppDelegate.adWhirlView.frame = CGRectMake(0, self.view.frame.size.height+100, 320, 50);  //下へ隠す
-		mAppDelegate.adWhirlView.hidden = YES;
-	}
 	
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	mStatDays = [[kvs objectForKey:GUD_SettStatDays] integerValue];
@@ -156,16 +197,7 @@
 {
 	[super viewDidAppear:animated];
 	
-	if ([mPanelGraphs count]<1) {
-		alertBox(NSLocalizedString(@"Graph NoPanel",nil), NSLocalizedString(@"Graph NoPanel detail",nil), @"OK");
-		self.navigationController.tabBarController.selectedIndex = 3; // Setting画面へ
-		return;
-	}
-	
-	//uiActivePageMax_ = 999; // この時点で最終ページは不明
 	[self graphViewPage:0  animated:YES];
-	// 最初、GOALを画面中央に表示する
-	//ibScrollView.contentOffset = CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);  
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -231,5 +263,17 @@
 		[self presentModalViewController:nc animated:YES];
 	}
 }
+
+- (UIView*)viewForZoomingInScrollView:(UIScrollView *)scrollView
+{	// Zoom対象となるViewを知らせる
+	return mSvBp;
+}
+/*
+#pragma mark - <UIGestureRecognizer>
+- (IBAction)handlePinchGesture:(UIGestureRecognizer *)sender 
+{
+	CGFloat factor = [(UIPinchGestureRecognizer *)sender scale];
+	ibScrollView.zoomScale = factor;
+}*/
 
 @end

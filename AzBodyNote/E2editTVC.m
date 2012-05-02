@@ -165,13 +165,14 @@
 }
 
 - (AzConditionItems)integerDateOpt:(NSDate *)date
-{
+{	// 保存時に自動学習(記録更新)する
 	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
 	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 	NSDateComponents* comp = [calendar components: NSHourCalendarUnit  fromDate:date]; // Hourのみ
 	
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	if ([kvs objectForKey:GUD_DateOptWake_HOUR]) {	// 保存時に自動学習(記録更新)している
+	// Wake,Sleepを優先して判定
+	if ([kvs objectForKey:GUD_DateOptWake_HOUR]) {
 		NSInteger iHour = [[kvs objectForKey:GUD_DateOptWake_HOUR] integerValue];
 		if (iHour-DateOpt_AroundHOUR < 0) {
 			iHour += DateOpt_AroundHOUR;
@@ -181,9 +182,17 @@
 			return DtOpWake;
 		}
 	}
-	//
+	if ([kvs objectForKey:GUD_DateOptSleep_HOUR]) {
+		NSInteger iHour = [[kvs objectForKey:GUD_DateOptSleep_HOUR] integerValue];
+		if (iHour-DateOpt_AroundHOUR < 0) {
+			iHour += DateOpt_AroundHOUR;
+			comp.hour += DateOpt_AroundHOUR;
+		}
+		if (iHour-DateOpt_AroundHOUR <= comp.hour && comp.hour < iHour+DateOpt_AroundHOUR) {
+			return DtOpSleep;
+		}
+	}
 	// DtOpRest:は、デフォルト。どれにも該当しなければ、return DtOpRest;
-	//
 	if ([kvs objectForKey:GUD_DateOptDown_HOUR]) {	// 保存時に自動学習(記録更新)している
 		NSInteger iHour = [[kvs objectForKey:GUD_DateOptDown_HOUR] integerValue];
 		if (iHour-DateOpt_AroundHOUR < 0) {
@@ -192,16 +201,6 @@
 		}
 		if (iHour-DateOpt_AroundHOUR <= comp.hour && comp.hour < iHour+DateOpt_AroundHOUR) {
 			return DtOpDown;
-		}
-	}
-	if ([kvs objectForKey:GUD_DateOptSleep_HOUR]) {	// 保存時に自動学習(記録更新)している
-		NSInteger iHour = [[kvs objectForKey:GUD_DateOptSleep_HOUR] integerValue];
-		if (iHour-DateOpt_AroundHOUR < 0) {
-			iHour += DateOpt_AroundHOUR;
-			comp.hour += DateOpt_AroundHOUR;
-		}
-		if (iHour-DateOpt_AroundHOUR <= comp.hour && comp.hour < iHour+DateOpt_AroundHOUR) {
-			return DtOpSleep;
 		}
 	}
 	return DtOpRest;		//デフォルト
@@ -610,7 +609,8 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-	appDelegate_.app_is_AdShow = YES; //これは広告表示可能なViewである。 viewWillAppear:以降で定義すること
+	
+//	appDelegate_.app_is_AdShow = YES; //これは広告表示可能なViewである。 viewWillAppear:以降で定義すること
 	
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	appDelegate_.app_is_unlock = [kvs boolForKey:STORE_PRODUCTID_UNLOCK];
@@ -691,7 +691,7 @@
 {
 	[super viewDidAppear:animated];
 
-	if (appDelegate_.app_is_unlock==NO  &&  appDelegate_.adWhirlView) {	// Ad ON
+/*	if (appDelegate_.app_is_unlock==NO  &&  appDelegate_.adWhirlView) {	// Ad ON
 		[UIView beginAnimations:nil context:NULL];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
 		[UIView setAnimationDuration:1.2];
@@ -702,7 +702,7 @@
 		}
 		appDelegate_.adWhirlView.hidden = NO;
 		[UIView commitAnimations];
-	}
+	}*/
 	
 #ifdef DEBUGxxxxxx				// テストデータ生成
 	// 全データを削除する

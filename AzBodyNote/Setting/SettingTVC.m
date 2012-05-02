@@ -42,7 +42,7 @@
     [super viewWillAppear:animated];
 	[self.tableView reloadData];
 
-	mAppDelegate.app_is_AdShow = NO; //これは広告表示しないViewである。 viewWillAppear:以降で定義すること
+/*	mAppDelegate.app_is_AdShow = NO; //これは広告表示しないViewである。 viewWillAppear:以降で定義すること
 	if (mAppDelegate.adWhirlView) {	// Ad ON
 		mAppDelegate.adWhirlView.frame = CGRectMake(0, 700, 320, 50);  // GAD_SIZE_320x50
 		mAppDelegate.adWhirlView.hidden = YES;
@@ -51,7 +51,7 @@
 			// あずき商店にて Non-Ad を購入した直後。Ad停止＆破棄する
 			[mAppDelegate adDealloc];
 		}
-	}
+	}*/
 }
 /*
 - (void)viewDidAppear:(BOOL)animated

@@ -167,14 +167,21 @@
 {
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];	// 選択状態を解除する
 	
-	UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-	cell.accessoryType = UITableViewCellAccessoryCheckmark;
-
-	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	
+
 	if (0 < indexPath.row && indexPath.row<=[mCalendars count]) {
 		EKCalendar* calendar = [mCalendars objectAtIndex:indexPath.row - 1];
+		if (mAppDelegate.app_is_unlock==NO) {	// Free制限
+			if (calendar.type != EKCalendarTypeLocal) {
+				// Freeでは「ローカルカレンダー」だけに制限する
+				alertBox(NSLocalizedString(@"FreeLock",nil), 
+						 NSLocalizedString(@"FreeLock CalendarLocal",nil), @"OK");
+				return;
+			}
+		}
+		UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+		cell.accessoryType = UITableViewCellAccessoryCheckmark;
+		//
 		mCalendarID = calendar.calendarIdentifier;
 		NSLog(@"mCalendarID={%@}", mCalendarID);
 		[kvs setObject:calendar.calendarIdentifier forKey:GUD_CalendarID];

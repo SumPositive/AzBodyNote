@@ -14,14 +14,18 @@
 
 このアプリには、下記各社のWebサービスが組み込まれています。
 いずれも「個人を特定できる情報」を生成や通信しないことを確認しています。
-・Apple - iAd,AppStore,iCloud　-　http://www.apple.com/jp/privacy/
-・Google - AdSence,AdMob,Analytics　-　http://www.google.com/intl/ja/policies/privacy/
+・Apple - AppStore,iCloud　-　http://www.apple.com/jp/privacy/
+・Google - Analytics　-　http://www.google.com/intl/ja/policies/privacy/
+広告が表示される場合、
+・Apple - iAd　-　http://www.apple.com/jp/privacy/
+・Google - AdSence,AdMob　-　http://www.google.com/intl/ja/policies/privacy/
 ・AppBank - Ad Network　-　http://www.appbank.net/privacypolicy
 ・mediba - mediba ad　-　http://medibaad.com/sp/privacy/privacy.html
 
 下記のWebサービスについては、ログイン情報が暗号通信されます。
 ・Google - GData　-　http://www.google.com/intl/ja/policies/privacy/
 ・Dropbox - http://www.dropbox.com/dmca#privacy
+
 
 （詳細：AzukiSoftが使用する認証鍵について）
 　デバイスMACアドレスにユーザ名やアプリ名などを混ぜてハッシュ化（不可逆変換）した文字列を鍵として使用することがあります。

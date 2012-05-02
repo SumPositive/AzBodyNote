@@ -26,11 +26,11 @@
 @synthesize window = __window;
 @synthesize mocBase = __mocBase;
 @synthesize tabBarController = __tabBarController;
-@synthesize adWhirlView = __pAdWhirlView;
+//@synthesize adWhirlView = __pAdWhirlView;
 //@synthesize app_is_sponsor = __app_is_sponsor;
 @synthesize app_is_unlock = __app_is_unlock;
 @synthesize app_e2record_count = __app_e2record_count;
-@synthesize app_is_AdShow = __app_is_AdShow;
+//@synthesize app_is_AdShow = __app_is_AdShow;
 @synthesize app_is_iPad = __app_is_iPad;
 @synthesize eventStore = __eventStore;
 
@@ -238,6 +238,7 @@
 							 root:kDBRootAppFolder]; // either kDBRootAppFolder or kDBRootDropbox
 	[DBSession setSharedSession:dbSession];
 
+#ifdef xxxxxNoAdd //広告廃止
 	if (__app_is_unlock==NO) {
 		//CGRect rcAd = CGRectMake(0, self.view.frame.size.height-28-50, 320, 50);  // GAD_SIZE_320x50
 		//--------------------------------------------------------------------------------------------------------- AdWirl
@@ -270,6 +271,7 @@
 			}
 		}
 	}
+#endif
 	
 	if (__eventStore==nil) {
 		__eventStore = [[EKEventStore alloc] init];
@@ -342,7 +344,7 @@
 	// iCloud KVS 変更通知の待ち受け解放
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
-
+/***
 - (void)adDealloc
 {
 	if (mNendView) {
@@ -357,11 +359,11 @@
 		__pAdWhirlView.delegate = nil;
 		__pAdWhirlView = nil;
 	}
-}
+}*/
 
 - (void)dealloc
 {
-	[self adDealloc];
+	//[self adDealloc];
 	__eventStore = nil;
 }
 
@@ -747,7 +749,7 @@
 	return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
 }
 
-
+/*
 #pragma mark - Ads <AdWhirlDelegate>
 - (NSString *)adWhirlApplicationKey
 {	//return @"ここにAdwhirl管理画面のアプリのページ上部に記載されているSDK Keyをコピペ";
@@ -791,6 +793,6 @@
 		[adWhirlView replaceBannerViewWith:mMedibaAd.view];
 	}
 }
-
+*/
 
 @end

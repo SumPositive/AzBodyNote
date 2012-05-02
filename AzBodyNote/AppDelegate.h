@@ -9,18 +9,20 @@
 #import <UIKit/UIKit.h>
 #import <eventkit/EventKit.h>
 
+/*[0.9]広告廃止、制限のみにした
 #import "AdWhirlView.h"
 #import "AdWhirlDelegateProtocol.h"
 #define GAD_SIZE_320x50     CGSizeMake(320, 50)
 #import "MasManagerViewController.h"
 #import "NADView.h"  //AppBank nend
+*/
 
 #import "Global.h"
 #import "MocEntity.h"
 #import "MocFunctions.h"
 
 
-@interface AppDelegate : NSObject <UIApplicationDelegate, AdWhirlDelegate, NADViewDelegate>
+@interface AppDelegate : NSObject <UIApplicationDelegate>
 {
 @private
 	NSManagedObjectModel				*moModel_;
@@ -32,8 +34,8 @@
 	BOOL											mAzukiUnlock;	// YES=購入意思ありと見なしてUnlockする
 	
 	//AdWhirlView							*mAdWhirlView;
-	NADView										*mNendView;
-	MasManagerViewController		*mMedibaAd; 
+	//NADView										*mNendView;
+	//MasManagerViewController		*mMedibaAd; 
 }
 
 @property (nonatomic, strong) IBOutlet UIWindow *window;
@@ -41,14 +43,14 @@
 
 @property (nonatomic, strong, readonly) NSManagedObjectContext	*managedObjectContext;
 @property (nonatomic, strong, readonly) MocFunctions							*mocBase;
-@property (nonatomic, strong, readonly) AdWhirlView							*adWhirlView;
+//@property (nonatomic, strong, readonly) AdWhirlView							*adWhirlView;
 @property (nonatomic, strong, readonly) EKEventStore							*eventStore;
 
 // app_ Global paramaters
 //@property (nonatomic, assign) BOOL			app_is_sponsor;
 @property (nonatomic, assign) BOOL			app_is_unlock;				// In App Purchese = 広告なし ＆ 制限解除
 @property (nonatomic, assign) NSInteger	app_e2record_count;		// Trial制限に使用。　 コメント投稿情報に表示。
-@property (nonatomic, assign) BOOL			app_is_AdShow;				// YES=現在広告可能なViewである
+//@property (nonatomic, assign) BOOL			app_is_AdShow;				// YES=現在広告可能なViewである
 
 @property (nonatomic, assign, readonly) BOOL	app_is_iPad;	// YES=iPad
 
@@ -62,6 +64,6 @@
 - (NSString*)tmpFileLoad;
 
 - (NSString *)applicationDocumentsDirectory;
-- (void)adDealloc;
+//- (void)adDealloc;
 
 @end

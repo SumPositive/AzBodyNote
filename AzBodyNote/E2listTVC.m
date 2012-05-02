@@ -139,9 +139,9 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-	appDelegate_.app_is_AdShow = YES; //これは広告表示可能なViewである。 viewWillAppear:以降で定義すること
 
-	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+//	appDelegate_.app_is_AdShow = YES; //これは広告表示可能なViewである。 viewWillAppear:以降で定義すること
+
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	appDelegate_.app_is_unlock = [kvs boolForKey:STORE_PRODUCTID_UNLOCK];
 
@@ -187,14 +187,14 @@
 {
 	[super viewDidAppear:animated];
 	
-	if (appDelegate_.adWhirlView) {	// Ad ON
+/*	if (appDelegate_.adWhirlView) {	// Ad ON
 		[UIView beginAnimations:nil context:NULL];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
 		[UIView setAnimationDuration:1.2];
 		appDelegate_.adWhirlView.frame = CGRectMake(0, 480-49-50, 320, 50);  // GAD_SIZE_320x50
 		appDelegate_.adWhirlView.hidden = NO;
 		[UIView commitAnimations];
-	}
+	}*/
 }
 
 /*

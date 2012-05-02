@@ -142,6 +142,19 @@
 		mGvDate.ppPage = mPage;
 		[mGvDate setNeedsDisplay]; //drawRect:が呼び出される
 	}
+
+	if (mPage==0) {
+		if (mIvSetting==nil) {
+			mIvSetting = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Icon32-Sett_Right"]];
+		}
+		CGRect rc = rcgv;
+		rc.size.height = 30; //上ラベル位置
+		mIvSetting.frame = rc;
+		mIvSetting.hidden = NO;
+	} else {
+		mIvSetting.hidden = YES;
+	}
+	
 	//------------------------------------------------------ グラフ
 	rcgv.origin.y += rcgv.size.height;
 	CGFloat fHeight = ibScrollView.bounds.size.height - rcgv.origin.y - 8;  // 日付と下の余白を除く
@@ -347,7 +360,6 @@ NSInteger afterPageChange = 0;
 	afterPageChange = pageChange;
 	if (animated) {
 		// アニメ準備
-		//CGContextRef context = UIGraphicsGetCurrentContext();
 		[UIView beginAnimations:nil context:NULL];
 		[UIView setAnimationDuration: 0.7];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
@@ -428,11 +440,11 @@ NSInteger afterPageChange = 0;
 {
     [super viewWillAppear:animated];
 
-	mAppDelegate.app_is_AdShow = NO; //これは広告表示しないViewである。 viewWillAppear:以降で定義すること
+/*	mAppDelegate.app_is_AdShow = NO; //これは広告表示しないViewである。 viewWillAppear:以降で定義すること
 	if (mAppDelegate.adWhirlView) {	// Ad OFF
 		//mAppDelegate.adWhirlView.frame = CGRectMake(0, self.view.frame.size.height+100, 320, 50);  //下へ隠す
 		mAppDelegate.adWhirlView.hidden = YES;
-	}
+	}*/
 
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	// パネル順序読み込み ⇒ グラフON(-)のパネルだけ抽出する
@@ -536,8 +548,8 @@ NSInteger afterPageChange = 0;
 	if (scrollView.contentOffset.x < -70) {
 		// PREV（過去）ページへ
 		if (mAppDelegate.app_is_unlock==NO) {
-			alertBox(NSLocalizedString(@"Graph PrevLocked",nil), 
-							NSLocalizedString(@"Graph PrevLocked detail",nil), @"OK");
+			alertBox(NSLocalizedString(@"FreeLock",nil), 
+							NSLocalizedString(@"FreeLock GraphLimit",nil), @"OK");
 			return;
 		}
 		NSLog(@"mPage=%ld < mPageMax=%ld", (long)mPage, (long)mPageMax);

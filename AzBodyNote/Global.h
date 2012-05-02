@@ -10,8 +10,6 @@
 #define GD_PRODUCTNAME	@"AzBodyNote"  // IMPORTANT PRODUCT NAME  和名「健康日記」
 													//↑↑変更禁止！！Keychainの'ServiceName'に使っているので読み出せなくなる。
 
-//AdWhirl//#define AdMobID_BodyNote		@"a14ece23da85f5e";		// 体調メモ パブリッシャー ID
-
 // AppStore In-App Purchase ProductIdentifier
 #define STORE_PRODUCTID_UNLOCK		@"com.azukid.AzBodyNote.Unlock"
 

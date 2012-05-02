@@ -16,9 +16,9 @@
    version="1.1"
    inkscape:version="0.48.1 r9760"
    sodipodi:docname="Icon32--128x128.svg"
-   inkscape:export-filename="/Users/masa/AzukiSoft/AzBodyNote/AzBodyNote/AzBodyNote/Design/Tab32-Statistics@2x.png"
-   inkscape:export-xdpi="45"
-   inkscape:export-ydpi="45"
+   inkscape:export-filename="/Users/masa/AzukiSoft/AzBodyNote/AzBodyNote/AzBodyNote/Design/Icon32-Sett_Right.png"
+   inkscape:export-xdpi="22.5"
+   inkscape:export-ydpi="22.5"
    style="display:inline">
   <defs
      id="defs2838">
@@ -2288,10 +2288,10 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="4.52"
-     inkscape:cx="71.956796"
-     inkscape:cy="68.103646"
-     inkscape:current-layer="layer4"
+     inkscape:zoom="4.5718617"
+     inkscape:cx="33.683376"
+     inkscape:cy="64.082005"
+     inkscape:current-layer="layer5"
      showgrid="false"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
@@ -2407,7 +2407,7 @@
      inkscape:groupmode="layer"
      id="layer4"
      inkscape:label="Tab32-Statistics"
-     style="display:inline"
+     style="display:none"
      sodipodi:insensitive="true">
     <g
        label="Layer 1"
@@ -2665,5 +2665,22 @@
          id="tspan3915"
          x="48.421516"
          y="99.373947">i</tspan></text>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer5"
+     inkscape:label="Icon32-Sett_Right"
+     style="display:inline"
+     sodipodi:insensitive="true">
+    <path
+       style="fill:#ff0000;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 86.25,29.625 C 94.750018,38.587909 100,50.672425 100,64 100,76.944176 95.070347,88.745641 87,97.625 L 127.65625,63.8125 86.25,29.625 z"
+       id="rect4255"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:#4169e1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
+       d="m 41.744099,15.500017 0,14.941436 c -4.097386,0.881751 -7.927012,2.500744 -11.337356,4.702018 L 19.833176,24.569899 9.5698813,34.833186 20.143458,45.406758 c -2.205387,3.416706 -3.821358,7.255163 -4.70202,11.361221 L 0.5,56.791849 0.5,71.30366 15.465306,71.27979 c 0.881632,4.079995 2.487471,7.89136 4.678152,11.289612 L 9.5698813,93.142979 19.833176,103.40624 30.406743,92.832687 c 3.413107,2.204898 7.235572,3.843179 11.337356,4.725889 l 0,14.941424 14.511811,0 0,-14.941424 c 4.097387,-0.881759 7.927017,-2.500748 11.337352,-4.702021 L 78.166836,103.43012 88.430122,93.166847 77.856549,82.59327 c 2.205383,-3.416702 3.821357,-7.25516 4.702018,-11.361217 L 97.5,71.208183 l 0,-14.51181 -14.965301,0.02387 C 81.653068,52.640246 80.04723,48.828879 77.856549,45.430626 L 88.430122,34.857054 78.166836,24.593767 67.593262,35.16734 C 64.180158,32.962438 60.357695,31.324149 56.25591,30.441453 l 0,-14.941436 -14.511811,0 z m 7.255905,25.634349 c 12.62835,0 22.86565,10.237301 22.86565,22.86565 0,12.628347 -10.2373,22.865643 -22.86565,22.865643 -12.628348,0 -22.86565,-10.237296 -22.86565,-22.865643 0,-12.628349 10.237302,-22.86565 22.86565,-22.86565 z"
+       id="rect3018-8"
+       inkscape:connector-curvature="0" />
   </g>
 </svg>

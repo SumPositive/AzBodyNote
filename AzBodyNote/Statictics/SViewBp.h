@@ -9,25 +9,16 @@
 #import <UIKit/UIKit.h>
 
 #import "Global.h"
+#import "MocEntity.h"
 
-#define GRAPH_DAYS_SAFE		20  //安全帯
+#define STAT_DAYS_SAFE		20  //安全帯
 
 enum {
 	bpHi		= 0,
 	bpLo	= 1,
-	bpPuls	= 2,
-	bpEnd	= 3 //End count
+	bpEnd	= 2 //End count
 };
 typedef NSInteger bpType;
-
-enum {
-	optWake		= 0,		// Wake up
-	optRest		= 1,		// at Rest
-	optDown		= 2,		// Slowdown
-    optSleep		= 3,		// for Sleep
-	optEnd			= 4 //End count
-};
-typedef NSInteger optType;
 
 
 @interface SViewBp : UIView
@@ -36,6 +27,7 @@ typedef NSInteger optType;
 	NSUInteger								mStatDays;
 	NSDecimalNumberHandler		*mBehaviorDec0; //小数以下0桁＝整数
 	NSDecimalNumberHandler		*mBehaviorDec1; //小数以下1桁
+	CGContextRef					canvasContext;
 }
 
 @property (nonatomic, retain) NSArray		*ppE2records;

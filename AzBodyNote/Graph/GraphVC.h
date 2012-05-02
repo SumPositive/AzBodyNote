@@ -35,12 +35,11 @@
 	NSUInteger						mPage;
 	NSUInteger						mPageMax;
 	NSUInteger						mLimit;
-	//NSUInteger						mPageInitPointX;
 	UIActivityIndicatorView	*mActIndicator;
 	NSArray							*mPanelGraphs;
-	//NSUInteger						mGraphDays;
-	//BOOL								mReDraw;
 	BOOL								mGoalDisp;
+
+	UIImageView					*mIvSetting;
 	GViewDate						*mGvDate;
 	GViewBp							*mGvBp;
 	GViewLine						*mGvPuls;
