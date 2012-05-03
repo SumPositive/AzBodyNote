@@ -179,7 +179,9 @@
 		[kvs setBool:NO		forKey:GUD_bTweet];		// YES=新規保存後ツイート
 		[kvs setBool:NO		forKey:GUD_bCalender];	// YES=カレンダーへ記録
 		[kvs setBool:YES		forKey:GUD_bGoal];			// YES=GOAL表示する
-		[kvs setObject:[NSNumber numberWithInt:14]	forKey:GUD_SettStatDays];
+		[kvs setObject:[NSNumber numberWithInt:0]	forKey:GUD_SettStatType];
+		[kvs setObject:[NSNumber numberWithInt:5]	forKey:GUD_SettStatDays]; // Free制限:Max=7
+		[kvs setBool:YES		forKey:GUD_SettStatAvgShow];	// YES=平均±標準偏差を表示する
 		[kvs synchronize];
 	}
 

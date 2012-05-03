@@ -95,7 +95,7 @@
 		//  iCloud KVS 
 		NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 		//E2listTVC:viewWillAppear:にて処理// [kvs synchronize]; // iCloud最新同期（取得）
-		ibLbDate.text = @"The GOAL";  //NSLocalizedString(@"TheGoal",nil);
+		ibLbDate.text = @"Goal    ";  //NSLocalizedString(@"TheGoal",nil);
 		ibIvDateOpt.image = [UIImage imageNamed:@"Icon20-Goal"];
 
 		ibLbBpHi.text = strValue([[kvs objectForKey:Goal_nBpHi_mmHg] integerValue], 0); 

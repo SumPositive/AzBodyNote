@@ -75,7 +75,7 @@
 	if (__Page==0) { 
 		//Goal
 		if (bGoal) {
-			cc = [[NSString stringWithString:@"GOAL"] UTF8String];
+			cc = [[NSString stringWithString:@"Goal"] UTF8String];
 			CGContextShowTextAtPoint (cgc, po.x-15, po.y+1, cc, strlen(cc));
 		}
 		po.x -= RECORD_WIDTH;

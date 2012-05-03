@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <QuartzCore/QuartzCore.h>
 
 #import "Global.h"
 #import "MocEntity.h"
@@ -20,17 +21,21 @@ enum {
 };
 typedef NSInteger bpType;
 
+enum {
+	statDispersalHiLo		= 0,
+	statDispersal24Hour	= 1,
+	statTypeEnd				= 2 //End count
+};
+typedef NSInteger statType;
+
 
 @interface SViewBp : UIView
 {
 @private
-	NSUInteger								mStatDays;
-	NSDecimalNumberHandler		*mBehaviorDec0; //小数以下0桁＝整数
-	NSDecimalNumberHandler		*mBehaviorDec1; //小数以下1桁
-	CGContextRef					canvasContext;
 }
 
 @property (nonatomic, retain) NSArray		*ppE2records;
-@property (nonatomic, assign) NSInteger	ppSelectedSegmentIndex;
+@property (nonatomic, assign) statType		ppStatType;
+@property (nonatomic, assign) NSInteger	ppDays;
 
 @end

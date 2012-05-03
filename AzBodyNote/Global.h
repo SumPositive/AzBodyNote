@@ -48,7 +48,9 @@ typedef NSUInteger AzConditionItems;
 #define GUD_CalendarID						@"GUD_CalendarID"
 #define GUD_CalendarTitle					@"GUD_CalendarTitle"
 #define GUD_SettGraphs						@"GUD_SettGraphs"	//UserDef保存につき変更禁止 NSArrey型 
+#define GUD_SettStatType					@"GUD_SettStatType"
 #define GUD_SettStatDays					@"GUD_SettStatDays"
+#define GUD_SettStatAvgShow			@"GUD_SettStatAvgShow"
 
 //この時刻の前後2時間を判定している
 #define GUD_DateOptWake_HOUR		@"GUD_DateOptWake_HOUR"

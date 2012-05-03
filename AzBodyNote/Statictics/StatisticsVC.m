@@ -30,6 +30,9 @@
 	GA_TRACK_PAGE(@"StatisticsVC");
 	
 	self.title = NSLocalizedString(@"TabStatistics",nil);
+	// View 背景
+	UIImage *imgTile = [UIImage imageNamed:@"Tx-LzBeige320"];
+	self.view.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 	
 	mAppDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
 	assert(mAppDelegate);
@@ -46,100 +49,44 @@
 	ibScrollView.directionalLockEnabled = NO;
 	ibScrollView.pagingEnabled = NO;
 
-/*	// ズーム：　ピンチアウト操作
-	UIPinchGestureRecognizer *pinchGesture = [[UIPinchGestureRecognizer alloc]
-											  initWithTarget:self action:@selector(handlePinchGesture:)];
-	[ibScrollView addGestureRecognizer:pinchGesture];*/
-}
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	ibSegment.selectedSegmentIndex = [[kvs objectForKey:GUD_SettStatType] integerValue];
 
-
-- (void)labelGraphRect:(CGRect)rect  text:(NSString*)text
-{
-	CGFloat fx = rect.origin.x+rect.size.width;
+	ibSpDays.maximumValue = STAT_DAYS_MAX;
+	ibSpDays.value = [[kvs objectForKey:GUD_SettStatDays] integerValue];
 	
-	UILabel *lb = [[UILabel alloc] initWithFrame:CGRectMake(fx, rect.origin.y+rect.size.height-25, 100,20)];
-	lb.text = text;
-	lb.backgroundColor = [UIColor clearColor];
-	lb.textColor = [UIColor darkGrayColor];
-	lb.font = [UIFont systemFontOfSize:14];
-	lb.numberOfLines = 1;
-	lb.adjustsFontSizeToFitWidth = YES;
-	lb.minimumFontSize = 10;
-	[ibScrollView addSubview:lb];
+	[ibSpDays addTarget:self action:@selector(actionStepperChange:) forControlEvents:UIControlEventValueChanged];
 }
 
-- (void)graphViewPage:(NSUInteger)page //section:(NSUInteger)section
-{
-	CGRect rcContent = ibScrollView.bounds;
-//	rcContent.size.width *= ZOOM_MAX;
-//	rcContent.size.height *= ZOOM_MAX;
 
+- (void)graphView
+{
+	// グラフ リセット
+	ibScrollView.contentOffset = CGPointMake(0, 0); //ここで原点をリセットしなければ、前回の移動先が原点になってしまう。
+	CGRect rcContent = ibScrollView.bounds;
 	[ibScrollView setContentSize:rcContent.size];
 	[ibScrollView setZoomScale:1.0];
 	[ibScrollView setMinimumZoomScale:1.0];
 	[ibScrollView setMaximumZoomScale:ZOOM_MAX];
-	
-/*	CGFloat fw = ibScrollView.frame.size.width / rcContent.size.width;
-	CGFloat fh = ibScrollView.frame.size.height / rcContent.size.height;
-	NSLog(@"fw=%0.2f  fh=%0.2f", fw, fh);
-	if (fw < fh) {
-		[ibScrollView setMinimumZoomScale:fw];
-		[ibScrollView setZoomScale:fw];
-	} else {
-		[ibScrollView setMinimumZoomScale:fh];
-		[ibScrollView setZoomScale:fh];
-	}
-	//ibScrollView.contentSize = rcContent.size;
-	[ibScrollView setContentSize:rcContent.size];
-*/
-	
-	// グラフ原点表示
-	ibScrollView.contentOffset = CGPointMake(0, 0);
 
 	// Sort条件
 	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
 	NSArray *sortDesc = [NSArray arrayWithObjects: sort1,nil]; // 日付降順：Limit抽出に使用
 	
 	NSArray *e2recs = [mMocFunc select: E2_ENTITYNAME
-								 limit: (mStatDays * 3)		//1日時間違いが平均3回と仮定した
+								 limit: (ibSpDays.value * 5)		//1日の測定回数をDateOpt全種+1回と仮定した
 								offset: 0
 								 where: [NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"] // 未保存を除外する
 								  sort: sortDesc]; // 最新日付から抽出
 	
-	//------------------------------------------------------
-	switch (ibSegment.selectedSegmentIndex) 
-	{
-		case 0:	// 起床後／就寝前の日推移
-		case 1:	// 安静時／運動後の日推移
-/*			if (mSvBp==nil) {
-				mSvBp = [[SViewBp alloc] initWithFrame: rcScrollContent];
-				mSvBp.ppE2records = e2recs;
-				mSvBp.ppSelectedSegmentIndex = ibSegment.selectedSegmentIndex;
-				[ibScrollView addSubview:mSvBp];
-			} else {
-				mSvBp.ppE2records = e2recs;
-				mSvBp.ppSelectedSegmentIndex = ibSegment.selectedSegmentIndex;
-				[mSvBp setNeedsDisplay]; //drawRect:が呼び出される
-			}*/
-			break;
 
-		case 2:	// 24時間 分布図
-
-			break;
-		
-		default:
-			break;
-	}
-
-	if (mSvBp==nil) {
-		mSvBp = [[SViewBp alloc] initWithFrame: rcContent];
-		mSvBp.ppE2records = e2recs;
-		[ibScrollView addSubview:mSvBp];
-	} else {
-		mSvBp.ppE2records = e2recs;
-		[mSvBp setFrame: rcContent];
-		[mSvBp setNeedsDisplay]; //drawRect:が呼び出される
-	}
+	[mSvBp removeFromSuperview]; //クリア
+	mSvBp = nil;
+	mSvBp = [[SViewBp alloc] initWithFrame: rcContent];
+	mSvBp.ppE2records = e2recs;
+	mSvBp.ppStatType = ibSegment.selectedSegmentIndex; //= statType
+	mSvBp.ppDays = ibSpDays.value;
+	[ibScrollView addSubview:mSvBp];
 }
 
 - (void)animation_after
@@ -157,10 +104,10 @@
 	[UIView commitAnimations];
 }
 
-- (void)graphViewPage:(NSUInteger)page animated:(BOOL)animated
+- (void)graphViewAnimated:(BOOL)animated
 {
 	if (animated) {
-		ibScrollView.alpha = 0.1;
+		ibScrollView.alpha = 0.2;
 		// アニメ準備
 		[UIView beginAnimations:nil context:NULL];
 		[UIView setAnimationDuration:1.2];
@@ -170,7 +117,7 @@
 	}
 	// アニメ終了状態
 	ibScrollView.alpha = 1.0;
-	[self graphViewPage:page];// この中で、uiActivePage_が更新される
+	[self graphView];// この中で、uiActivePage_が更新される
 	
 	if (animated) {
 		// アニメ実行
@@ -186,18 +133,20 @@
     [super viewWillAppear:animated];
 	
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	mStatDays = [[kvs objectForKey:GUD_SettStatDays] integerValue];
-	if (mStatDays<1 OR STAT_DAYS_MAX<mStatDays) {
-		mStatDays = 1;
-		[kvs setObject:[NSNumber numberWithInteger:mStatDays] forKey:GUD_SettStatDays];
+	NSInteger iDays = [[kvs objectForKey:GUD_SettStatDays] integerValue];
+	if (iDays<1 OR STAT_DAYS_MAX<iDays) {
+		iDays = 1;
+		[kvs setObject:[NSNumber numberWithInteger:iDays] forKey:GUD_SettStatDays];
 	}
+	ibSpDays.value = iDays;
+	ibLbDays.text = [NSString stringWithFormat:NSLocalizedString(@"Stat Last %ld days",nil), iDays];
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
 	
-	[self graphViewPage:0  animated:YES];
+	[self graphViewAnimated:YES];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -209,6 +158,9 @@
 
 - (void)viewDidDisappear:(BOOL)animated
 {	// Called after the view was dismissed, covered or otherwise hidden. Default does nothing
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	[kvs synchronize];
+
 	// クリアする
 	mSvBp = nil;
 	NSLog(@"ibScrollView.subviews={%@}", ibScrollView.subviews);
@@ -242,38 +194,48 @@
     }
 }
 
+#pragma mark - IBAction
+- (IBAction)ibSegmentChange:(UISegmentedControl *)sender
+{
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	[kvs setObject:[NSNumber numberWithInteger:ibSegment.selectedSegmentIndex]
+			forKey:GUD_SettStatType];
+
+	// 再描画
+	[self graphViewAnimated:YES];
+}
+
+
+#pragma mark - Action
+- (void)actionStepperChange:(UIStepper *)sender
+{	// iOS5以降
+	NSLog(@"actionStepperChange: sender.value=%.2lf  (.stepValue=%.2lf)", sender.value, sender.stepValue);
+
+	if (mAppDelegate.app_is_unlock==NO && STAT_DAYS_FREE < ibSpDays.value) {
+		ibSpDays.value = STAT_DAYS_FREE;
+		alertBox(NSLocalizedString(@"FreeLock",nil), 
+				 NSLocalizedString(@"FreeLock StatLimit",nil), @"OK");
+		return;
+	}
+
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	[kvs setObject:[NSNumber numberWithInteger:ibSpDays.value]	forKey:GUD_SettStatDays];
+
+	ibLbDays.text = [NSString stringWithFormat:NSLocalizedString(@"Stat Last %ld days",nil), (long)sender.value];
+	// 再描画
+	[self graphViewAnimated:YES];
+}
+
 
 #pragma mark - <UIScrollViewDelegate> Methods
 
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView
-{	// スクロール中に呼ばれる
-}
+//- (void)scrollViewDidScroll:(UIScrollView *)scrollView
 
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
-{	// スクロール終了時（指を離した時）に呼ばれる
-	if (scrollView.contentSize.width - ibScrollView.bounds.size.width + 70 < scrollView.contentOffset.x) {
-		// 右へ　　グラフ設定
-		SettGraphTVC *vc = [[SettGraphTVC alloc] init];
-		vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
-		vc.ppBackGraph = YES;
-		
-		UINavigationController* nc = [[UINavigationController alloc] initWithRootViewController:vc];
-		//nc.modalPresentationStyle = UIModalPresentationFormSheet;
-		nc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-		[self presentModalViewController:nc animated:YES];
-	}
-}
+//- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 
 - (UIView*)viewForZoomingInScrollView:(UIScrollView *)scrollView
 {	// Zoom対象となるViewを知らせる
 	return mSvBp;
 }
-/*
-#pragma mark - <UIGestureRecognizer>
-- (IBAction)handlePinchGesture:(UIGestureRecognizer *)sender 
-{
-	CGFloat factor = [(UIPinchGestureRecognizer *)sender scale];
-	ibScrollView.zoomScale = factor;
-}*/
 
 @end

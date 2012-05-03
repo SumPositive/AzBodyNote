@@ -146,10 +146,9 @@
 	if (mPage==0) {
 		if (mIvSetting==nil) {
 			mIvSetting = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Icon32-Sett_Right"]];
+			[ibScrollView addSubview:mIvSetting];
 		}
-		CGRect rc = rcgv;
-		rc.size.height = 30; //上ラベル位置
-		mIvSetting.frame = rc;
+		mIvSetting.frame = CGRectMake(ibScrollView.contentSize.width-30, 20, 32, 32);
 		mIvSetting.hidden = NO;
 	} else {
 		mIvSetting.hidden = YES;
