@@ -69,16 +69,19 @@ NSInteger	pStatCount = 0;
 	{
 		CGContextSelectFont (cgc, "Helvetica", 14.0, kCGEncodingMacRoman);
 		CGContextSetTextDrawingMode (cgc, kCGTextFill);
-		if (isX) {
-			CGContextSetRGBFillColor (cgc, 0, 0, 1, 0.5); // 塗り潰し色
-		} else {
-			CGContextSetRGBFillColor (cgc, 1, 0, 0, 0.5); // 塗り潰し色
-		}
+		
 		if (__StatType==statDispersal24Hour && isX) {  // Hour表示だけ水平にするため
+			CGContextSetRGBFillColor (cgc, 0, 0, 0, 0.7); // 文字塗り潰し色
 			CGContextSetTextMatrix (cgc, CGAffineTransformMakeRotation( 0 )); // +0 水平
 		} else {
+			if (isX) {
+				CGContextSetRGBFillColor (cgc, 0, 0, 1, 1.0); // 文字塗り潰し色
+			} else {
+				CGContextSetRGBFillColor (cgc, 1, 0, 0, 1.0); // 文字塗り潰し色
+			}
 			CGContextSetTextMatrix (cgc, CGAffineTransformMakeRotation( M_PI/4.0 )); // +45
 		}
+		
 		CGContextShowTextAtPoint (cgc, po.x, po.y, cc, strlen(cc));
 	}
 	CGContextRestoreGState(cgc); //POP
@@ -254,16 +257,17 @@ NSInteger	pStatCount = 0;
 			fStep = fYstep;
 		}
 		// エリア全域：高血圧 中等症
-		CGContextSetRGBFillColor (cgc, 1, 0.5, 0.5, 1.0);
+		CGContextSetRGBFillColor(cgc, 0.6, 0.4, 0.4, 1);
 		CGContextFillRect(cgc, rcPlot);
 		// エリア：高血圧 中等症
-		CGContextSetRGBFillColor (cgc, 0.9, 0.7, 0.7, 1);
+		CGContextSetRGBFillColor(cgc, 0.7, 0.7, 0.4, 1);
 		CGContextFillRect(cgc, CGRectMake(50, 50, fStep*(100-pValMin[bpLo]), fStep*(160-pValMin[bpHi])));
 		// エリア：正常血圧
-		CGContextSetRGBFillColor (cgc, 0.7, 0.7, 0.9, 1);
+		CGContextSetRGBFillColor(cgc, 0.4, 0.7, 0.7, 1);
 		CGContextFillRect(cgc, CGRectMake(50, 50, fStep*(85-pValMin[bpLo]), fStep*(130-pValMin[bpHi])));
 		// Y軸 ヨコ線 BpHi
-		CGContextSetRGBStrokeColor(cgc, 1, 0, 0, 0.2);
+		CGContextSetLineWidth(cgc, 0.5); //太さ
+		CGContextSetRGBStrokeColor(cgc, 1, 0, 0, 0.4);
 		for (NSInteger val=pValMin[bpHi]; val<=pValMax[bpHi]; val += 10) {
 			CGFloat fy = 50 + (val - pValMin[bpHi])*fStep;
 			CGContextMoveToPoint(cgc, 50, fy); //原点
@@ -272,7 +276,7 @@ NSInteger	pStatCount = 0;
 			[self drawValue:cgc value:val po:CGPointMake(50, fy) isX:NO];
 		}
 		// X軸 タテ線 BpLo
-		CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 0.2);
+		CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 0.4);
 		for (NSInteger val=pValMin[bpLo]; val<=pValMax[bpLo]; val += 10) {
 			CGFloat fx = 50 + (val - pValMin[bpLo])*fStep;
 			CGContextMoveToPoint(cgc, fx, 50); //原点
@@ -298,7 +302,8 @@ NSInteger	pStatCount = 0;
 					 poEnd:CGPointMake(rc.origin.x, rc.origin.y+10)];
  */
 		// Y軸 ヨコ線 Bp
-		CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 0.2);
+		CGContextSetLineWidth(cgc, 0.5); //太さ
+		CGContextSetRGBStrokeColor(cgc, 1, 0, 0, 0.4);
 		for (NSInteger val=pValMin[bpLo]; val<=pValMax[bpHi]; val += 10) {
 			CGFloat fy = 50 + (val - pValMin[bpLo])*fYstep;
 			CGContextMoveToPoint(cgc, 50, fy); //原点
@@ -307,7 +312,8 @@ NSInteger	pStatCount = 0;
 			[self drawValue:cgc value:val po:CGPointMake(50, fy) isX:NO];
 		}
 		// X軸 タテ線 24Hour
-		CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 0.2);
+		CGContextSetLineWidth(cgc, 0.5); //太さ
+		CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 0.4);
 		for (NSInteger val=0; val<=24*60; val += 60*2) {  // += 2Hour
 			CGFloat fx = 50 + (val - 0)*fXstep;
 			CGContextMoveToPoint(cgc, fx, 50); //原点
@@ -368,7 +374,7 @@ NSInteger	pStatCount = 0;
 	[self addSubview:lb];
 	
 	po.x = 190;
-	CGContextSetRGBFillColor (cgc, 0.3, 0.3, 0.9, 1); // 塗り潰し色
+	CGContextSetRGBFillColor (cgc, 0, 0, 1, 1); // 塗り潰し色
 	CGContextFillEllipseInRect(cgc, CGRectMake(po.x-2.5, po.y-2.5, 5, 5));	//円Fill
 	lb = [[UILabel alloc] initWithFrame:CGRectMake(po.x+3, self.bounds.size.height-14, 50, 14)];
 	lb.font = [UIFont systemFontOfSize:10];
@@ -388,7 +394,7 @@ NSInteger	pStatCount = 0;
 	[self addSubview:lb];
 	
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	if ([kvs boolForKey:GUD_SettStatAvgShow] && 2<pStatCount) {
+	if ([kvs boolForKey:KVS_SettStatAvgShow] && 2<pStatCount) {
 		assert(0<pStatCount);
 		//--------------------------------------------------------------------------平均 Average
 		double dAvgHi = 0.0;
@@ -505,6 +511,8 @@ NSInteger	pStatCount = 0;
 	}
 
 	//--------------------------------------------------------------------------プロット HiLo
+	BOOL b24H_Line = [kvs boolForKey:KVS_SettStat24H_Line];
+	BOOL bLineStart = NO;
 	CGPoint	poBpHi[STAT_DAYS_MAX+STAT_DAYS_SAFE+1];
 	CGPoint	poBpLo[STAT_DAYS_MAX+STAT_DAYS_SAFE+1];
 	int   iCntBpHi = 0;
@@ -514,16 +522,16 @@ NSInteger	pStatCount = 0;
 	{
 		switch (pDateOpt[ii]) {
 			case DtOpWake:
-				CGContextSetRGBFillColor (cgc, 1.0, 1.0, 0.0, 1); // 塗り潰し色
+				CGContextSetRGBFillColor (cgc, 1, 1, 0, 1); // 塗り潰し色
 				CGContextSetRGBStrokeColor(cgc, 1, 1, 0, 0.5);
 				break;
 			case DtOpRest:
-				CGContextSetRGBFillColor (cgc, 1.0, 1.0, 1.0, 1); // 塗り潰し色
+				CGContextSetRGBFillColor (cgc, 1, 1, 1, 1); // 塗り潰し色
 				CGContextSetRGBStrokeColor(cgc, 1, 1, 1, 0.5);
 				break;
 			case DtOpDown:
-				CGContextSetRGBFillColor (cgc, 0.3, 0.3, 0.9, 1); // 塗り潰し色
-				CGContextSetRGBStrokeColor(cgc, 0.3, 0.3, 0.9, 0.5);
+				CGContextSetRGBFillColor (cgc, 0, 0, 1, 1); // 塗り潰し色
+				CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 0.5);
 				break;
 			case DtOpSleep:
 				CGContextSetRGBFillColor (cgc, 0, 0, 0, 1); // 塗り潰し色
@@ -539,6 +547,7 @@ NSInteger	pStatCount = 0;
 				po.x = 50 + (po.x - pValMin[bpLo]) * fStep;
 				po.y = 50 + (po.y - pValMin[bpHi]) * fStep;
 				CGContextFillEllipseInRect(cgc, CGRectMake(po.x-2.5, po.y-2.5, 5, 5));	//円Fill
+				poBpHi[iCntBpHi++] = po;
 			}
 		}
 		else {
@@ -549,32 +558,39 @@ NSInteger	pStatCount = 0;
 				po.y = 50 + (po.y - pValMin[bpLo]) * fYstep;
 				CGContextFillEllipseInRect(cgc, CGRectMake(po.x-2.5, po.y-2.5, 5, 5));	//円Fill
 				poBpHi[iCntBpHi++] = po;
-				CGContextMoveToPoint(cgc, po.x, po.y);
+				if (b24H_Line) {
+					CGContextMoveToPoint(cgc, po.x, po.y);
+					bLineStart = YES;
+				}
 			}
 			// Lo
 			po = poStat24[bpLo][ii];
 			if (0<=po.x && 0<po.y) {
 				po.x = 50 + (po.x - 0) * fXstep;
 				po.y = 50 + (po.y - pValMin[bpLo]) * fYstep;
-				CGContextAddLineToPoint(cgc, po.x, po.y);
-				CGContextStrokePath(cgc);
+				if (b24H_Line && bLineStart) {
+					bLineStart = NO;
+					CGContextAddLineToPoint(cgc, po.x, po.y);
+					CGContextStrokePath(cgc);
+				}
 				CGContextFillEllipseInRect(cgc, CGRectMake(po.x-2.5, po.y-2.5, 5, 5));	//円Fill
 				poBpLo[iCntBpLo++] = po;
 			}
 		}
 	}
-/*	//------------------------------------------------------------------------------時系列線
-	CGContextSetLineWidth(cgc, 0.4); //太さ
-	//CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 0.4);
-	CGContextSetGrayStrokeColor(cgc, 0.1, 0.3);
-	if (1<iCntBpHi) {
-		CGContextAddLines(cgc, poBpHi, iCntBpHi);
+
+	//------------------------------------------------------------------------------時系列線で結ぶ
+	if ( [kvs boolForKey:KVS_SettStatTimeLine] ) {
+		CGContextSetLineWidth(cgc, 0.4); //太さ
+		CGContextSetGrayStrokeColor(cgc, 0.1, 0.3);
+		if (1<iCntBpHi) {
+			CGContextAddLines(cgc, poBpHi, iCntBpHi);
+		}
+		if (1<iCntBpLo) {
+			CGContextAddLines(cgc, poBpLo, iCntBpLo);
+		}
+		CGContextStrokePath(cgc);
 	}
-	if (1<iCntBpLo) {
-		CGContextAddLines(cgc, poBpLo, iCntBpLo);
-	}
-	CGContextStrokePath(cgc);
- */
 }
 
 

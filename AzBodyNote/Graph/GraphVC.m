@@ -309,7 +309,7 @@
 				break;
 				
 			default: //ERROR
-				GA_TRACK_EVENT_ERROR(@"Graph mPanelGraphs",0);
+				GA_TRACK_EVENT_ERROR(@"LOGIC ERROR No AzConditionItems",0);
 				assert(NO);
 				break;
 		}
@@ -448,7 +448,7 @@ NSInteger afterPageChange = 0;
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	// パネル順序読み込み ⇒ グラフON(-)のパネルだけ抽出する
 	NSMutableArray *mua = [NSMutableArray new];
-	NSArray *ar = [kvs objectForKey:GUD_SettGraphs];
+	NSArray *ar = [kvs objectForKey:KVS_SettGraphs];
 	for (NSNumber *num in ar) {
 		if ([num integerValue]<0) { //(-)負値ならばグラフＯＮ
 			[mua addObject:num];
@@ -458,8 +458,8 @@ NSInteger afterPageChange = 0;
 		mPanelGraphs = [NSArray arrayWithArray:mua]; //グラフON(-)のパネルだけ
 		//mReDraw = YES; //=YES:設定に変化あり ⇒ クリアして再描画する
 	}
-	if (mGoalDisp != [kvs boolForKey:GUD_bGoal]) {
-		mGoalDisp = [kvs boolForKey:GUD_bGoal];
+	if (mGoalDisp != [kvs boolForKey:KVS_bGoal]) {
+		mGoalDisp = [kvs boolForKey:KVS_bGoal];
 		//mReDraw = YES; //=YES:設定に変化あり ⇒ クリアして再描画する
 	}
 	//if (mReDraw) {

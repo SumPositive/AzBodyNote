@@ -45,8 +45,8 @@
 		 abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. If it is not possible to recover from the error, display an alert panel that instructs the user to quit the application by pressing the Home button.
 		 */
 		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-		GA_TRACK_EVENT_ERROR([error description],0);
-		abort();
+		GA_TRACK_EVENT_ERROR([error localizedDescription],0);
+		//abort();
 	}		
 	[self.tableView reloadData];
 }
@@ -155,7 +155,7 @@
 		@catch (NSException *exception) {
 			// 最終行を削除したとき
 			NSLog(@"LOGIC ERROR!!! - indexPathEdit_.row=%ld", (long)indexPathEdit_.row);
-			GA_TRACK_EVENT_ERROR(@"LOGIC ERROR!!! - indexPathEdit_.row OVER",0);
+			GA_TRACK_EVENT_ERROR([exception description],0);
 			//assert(NO);
 		}
 		@finally {
@@ -177,7 +177,7 @@
 		}
 		@catch (NSException *exception) {
 			NSLog(@"LOGIC ERROR!!! - 最終行");
-			GA_TRACK_EVENT_ERROR(@"LOGIC ERROR!!! - LINE OVER",0);
+			GA_TRACK_EVENT_ERROR([exception description],0);
 			assert(NO);
 		}
 	}
@@ -530,8 +530,8 @@
 	if (![aFrc performFetch:&error])
 	{
 	    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-		GA_TRACK_EVENT_ERROR([error description],0);
-	    abort();
+		GA_TRACK_EVENT_ERROR([error localizedDescription],0);
+	    //abort();
 	}
 	
     __fetchedRc = aFrc; //retain

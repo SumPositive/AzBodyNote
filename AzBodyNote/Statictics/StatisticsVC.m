@@ -38,6 +38,7 @@
 	assert(mAppDelegate);
 	mMocFunc = mAppDelegate.mocBase; // Read Only
 	assert(mMocFunc);
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	
 	// listen to our app delegates notification that we might want to refresh our detail view
     [[NSNotificationCenter defaultCenter] addObserver:self 
@@ -49,11 +50,12 @@
 	ibScrollView.directionalLockEnabled = NO;
 	ibScrollView.pagingEnabled = NO;
 
-	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	ibSegment.selectedSegmentIndex = [[kvs objectForKey:GUD_SettStatType] integerValue];
+	[ibSegment setTitle:NSLocalizedString(@"Stat Seg0 Hi-Lo",nil) forSegmentAtIndex:0];
+	[ibSegment setTitle:NSLocalizedString(@"Stat Seg1 24H",nil) forSegmentAtIndex:1];
+	ibSegment.selectedSegmentIndex = [[kvs objectForKey:KVS_SettStatType] integerValue];
 
 	ibSpDays.maximumValue = STAT_DAYS_MAX;
-	ibSpDays.value = [[kvs objectForKey:GUD_SettStatDays] integerValue];
+	ibSpDays.value = [[kvs objectForKey:KVS_SettStatDays] integerValue];
 	
 	[ibSpDays addTarget:self action:@selector(actionStepperChange:) forControlEvents:UIControlEventValueChanged];
 }
@@ -133,10 +135,10 @@
     [super viewWillAppear:animated];
 	
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	NSInteger iDays = [[kvs objectForKey:GUD_SettStatDays] integerValue];
+	NSInteger iDays = [[kvs objectForKey:KVS_SettStatDays] integerValue];
 	if (iDays<1 OR STAT_DAYS_MAX<iDays) {
 		iDays = 1;
-		[kvs setObject:[NSNumber numberWithInteger:iDays] forKey:GUD_SettStatDays];
+		[kvs setObject:[NSNumber numberWithInteger:iDays] forKey:KVS_SettStatDays];
 	}
 	ibSpDays.value = iDays;
 	ibLbDays.text = [NSString stringWithFormat:NSLocalizedString(@"Stat Last %ld days",nil), iDays];
@@ -199,7 +201,7 @@
 {
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	[kvs setObject:[NSNumber numberWithInteger:ibSegment.selectedSegmentIndex]
-			forKey:GUD_SettStatType];
+			forKey:KVS_SettStatType];
 
 	// 再描画
 	[self graphViewAnimated:YES];
@@ -219,7 +221,7 @@
 	}
 
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	[kvs setObject:[NSNumber numberWithInteger:ibSpDays.value]	forKey:GUD_SettStatDays];
+	[kvs setObject:[NSNumber numberWithInteger:ibSpDays.value]	forKey:KVS_SettStatDays];
 
 	ibLbDays.text = [NSString stringWithFormat:NSLocalizedString(@"Stat Last %ld days",nil), (long)sender.value];
 	// 再描画

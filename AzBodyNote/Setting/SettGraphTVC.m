@@ -40,7 +40,7 @@
 	if (mPanels==nil) {
 		//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 		NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-		NSArray *ar = [kvs objectForKey:GUD_SettGraphs];
+		NSArray *ar = [kvs objectForKey:KVS_SettGraphs];
 		if (ar) {
 			mPanels = [[NSMutableArray alloc] initWithArray:ar];
 			// 設定中は、BpLoを取り除き、BpHiだけにする ＞＞ 保存時にBpHiの次にBpLoを挿入する
@@ -92,7 +92,7 @@
 		}
 	}
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	[kvs setObject:mPanels forKey:GUD_SettGraphs];
+	[kvs setObject:mPanels forKey:KVS_SettGraphs];
 	[kvs synchronize];
     [super viewWillDisappear:animated];
 }
@@ -165,7 +165,7 @@
 				//cell.detailTextLabel.text = NSLocalizedString(@"SettGraph Goal detail",nil);
 				//cell.detailTextLabel.adjustsFontSizeToFitWidth = YES;
 				//cell.detailTextLabel.minimumFontSize = 10;
-				if ([kvs boolForKey:GUD_bGoal]) {
+				if ([kvs boolForKey:KVS_bGoal]) {
 					cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				} else {
 					cell.accessoryType = UITableViewCellAccessoryNone;
@@ -305,11 +305,11 @@
 				//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 				NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 				UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-				if ([kvs boolForKey:GUD_bGoal]) {
-					[kvs setBool: NO forKey:GUD_bGoal];
+				if ([kvs boolForKey:KVS_bGoal]) {
+					[kvs setBool: NO forKey:KVS_bGoal];
 					cell.accessoryType = UITableViewCellAccessoryNone;
 				} else {
-					[kvs setBool: YES forKey:GUD_bGoal];
+					[kvs setBool: YES forKey:KVS_bGoal];
 					cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				}
 				[kvs synchronize];
@@ -320,16 +320,16 @@
 	
 	assert(indexPath.section==1);
 	UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-	BOOL bCheck;
+	//BOOL bCheck;
 	// グラフ表示チェック
 	NSInteger item = [[mPanels objectAtIndex:indexPath.row] integerValue];
 	NSNumber *num = [NSNumber numberWithInteger: item * (-1)]; //反転
 	if ([num integerValue] < 0) {
 		cell.accessoryType = UITableViewCellAccessoryCheckmark;	// グラフ表示ON
-		bCheck = YES;
+		//bCheck = YES;
 	} else {
 		cell.accessoryType = UITableViewCellAccessoryNone;			// グラフ表示OFF
-		bCheck = NO;
+		//bCheck = NO;
 	}
 	[mPanels replaceObjectAtIndex:indexPath.row withObject:num]; //置換
 

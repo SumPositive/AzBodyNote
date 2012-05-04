@@ -90,7 +90,7 @@ NSInteger	pValueCount;
 
 	//--------------------------------------------------------------------------------------- iCloud KVS GOAL!
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	BOOL bGoal = [kvs boolForKey:GUD_bGoal];
+	BOOL bGoal = [kvs boolForKey:KVS_bGoal];
 	NSInteger iGoal = [[kvs objectForKey: __GoalKey] integerValue];  // NSNullならば "<null>"文字列となり数値化して0になる
 
 	//--------------------------------------------------------------------------集計しながらMinMaxを求める

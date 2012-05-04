@@ -148,6 +148,9 @@
 
 	//  iCloud KVS     [0.9.0]以降、userDefaultsを廃して、kvsへ移行統一
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	if (kvs==nil) {
+		GA_TRACK_EVENT_ERROR(@"KVS==nil",0);
+	}
 	[kvs synchronize]; // 最新同期
 	if ([[kvs objectForKey:Goal_nBpHi_mmHg] integerValue] < E2_nBpHi_MIN) {
 		// 初期データ追加
@@ -162,7 +165,7 @@
 		[kvs synchronize];
 	}
 	
-	if ([kvs objectForKey:GUD_SettGraphs]==nil)		//[0.9.0]NEW
+	if ([kvs objectForKey:KVS_SettGraphs]==nil)		//[0.9.0]NEW
 	{	// 測定パネル順序設定の初期値				※BpHiの次がBpLoになること。
 		NSArray *aPanels = [[NSArray alloc] initWithObjects:
 							[NSNumber numberWithInteger: AzConditionBpHi	* (-1)],		//*(-1):Graph表示する
@@ -175,18 +178,20 @@
 							[NSNumber numberWithInteger: AzConditionFat],
 							[NSNumber numberWithInteger: AzConditionSkm],
 							nil];
-		[kvs setObject:aPanels	forKey:GUD_SettGraphs];
-		[kvs setBool:NO		forKey:GUD_bTweet];		// YES=新規保存後ツイート
-		[kvs setBool:NO		forKey:GUD_bCalender];	// YES=カレンダーへ記録
-		[kvs setBool:YES		forKey:GUD_bGoal];			// YES=GOAL表示する
-		[kvs setObject:[NSNumber numberWithInt:0]	forKey:GUD_SettStatType];
-		[kvs setObject:[NSNumber numberWithInt:5]	forKey:GUD_SettStatDays]; // Free制限:Max=7
-		[kvs setBool:YES		forKey:GUD_SettStatAvgShow];	// YES=平均±標準偏差を表示する
+		[kvs setObject:aPanels	forKey:KVS_SettGraphs];
+		[kvs setBool:NO		forKey:KVS_bTweet];		// YES=新規保存後ツイート
+		[kvs setBool:NO		forKey:KVS_bCalender];	// YES=カレンダーへ記録
+		[kvs setBool:YES		forKey:KVS_bGoal];			// YES=GOAL表示する
+		[kvs setObject:[NSNumber numberWithInt:0]	forKey:KVS_SettStatType];
+		[kvs setObject:[NSNumber numberWithInt:5]	forKey:KVS_SettStatDays]; // Free制限:Max=7
+		[kvs setBool:YES		forKey:KVS_SettStatAvgShow];	// YES=平均±標準偏差を表示する
+		[kvs setBool:NO		forKey:KVS_SettStatTimeLine];	// YES=時系列線で結ぶ
+		[kvs setBool:NO		forKey:KVS_SettStat24H_Line];	// YES=24Hourタテ結線する
 		[kvs synchronize];
 	}
 
-	if (![kvs objectForKey:GUD_Calc_Method])	[kvs setObject:@"0" forKey:GUD_Calc_Method];
-	if (![kvs boolForKey:GUD_Calc_Method])		[kvs setBool:YES		forKey:GUD_Calc_Method];
+	if (![kvs objectForKey:KVS_Calc_Method])	[kvs setObject:@"0" forKey:KVS_Calc_Method];
+	if (![kvs boolForKey:KVS_Calc_Method])		[kvs setBool:YES		forKey:KVS_Calc_Method];
 	
 	if (__app_is_unlock==NO) {
 		__app_is_unlock = [kvs boolForKey:STORE_PRODUCTID_UNLOCK];
@@ -218,6 +223,7 @@
 	//-------------------------------------------------デバイス、ＯＳ確認
 	if ([[[UIDevice currentDevice] systemVersion] compare:@"5.0"]==NSOrderedAscending) { // ＜ "5.0"
 		// iOS5.0より前
+		GA_TRACK_EVENT_ERROR(@"Need more iOS 5.0",0);
 		alertBox(@"! STOP !", @"Need more iOS 5.0", nil);
 		exit(0);
 	}
@@ -238,6 +244,9 @@
 							 initWithAppKey: DBOX_KEY
 							 appSecret: DBOX_SECRET
 							 root:kDBRootAppFolder]; // either kDBRootAppFolder or kDBRootDropbox
+	if (dbSession==nil) {
+		GA_TRACK_EVENT_ERROR(@"dbSession==nil",0);
+	}
 	[DBSession setSharedSession:dbSession];
 
 #ifdef xxxxxNoAdd //広告廃止
@@ -278,6 +287,9 @@
 	if (__eventStore==nil) {
 		__eventStore = [[EKEventStore alloc] init];
 		//NSLog(@"[__eventStore calendars]={%@}", [__eventStore calendars]);
+		if (__eventStore==nil) {
+			GA_TRACK_EVENT_ERROR(@"__eventStore==nil",0);
+		}
 	}
 	
     return YES;

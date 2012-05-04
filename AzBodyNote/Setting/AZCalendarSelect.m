@@ -45,7 +45,7 @@
 	
 	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	mCalendarID = [kvs objectForKey:GUD_CalendarID];
+	mCalendarID = [kvs objectForKey:KVS_CalendarID];
 }
 
 - (void)viewDidUnload
@@ -184,11 +184,11 @@
 		//
 		mCalendarID = calendar.calendarIdentifier;
 		NSLog(@"mCalendarID={%@}", mCalendarID);
-		[kvs setObject:calendar.calendarIdentifier forKey:GUD_CalendarID];
-		[kvs setObject:calendar.title forKey:GUD_CalendarTitle];
+		[kvs setObject:calendar.calendarIdentifier forKey:KVS_CalendarID];
+		[kvs setObject:calendar.title forKey:KVS_CalendarTitle];
 	} else {
-		[kvs removeObjectForKey:GUD_CalendarID]; // なし
-		[kvs removeObjectForKey:GUD_CalendarTitle]; // なし
+		[kvs removeObjectForKey:KVS_CalendarID]; // なし
+		[kvs removeObjectForKey:KVS_CalendarTitle]; // なし
 	}
 	[kvs synchronize];
 	

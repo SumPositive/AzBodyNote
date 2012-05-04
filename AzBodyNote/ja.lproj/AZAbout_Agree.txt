@@ -16,6 +16,7 @@
 いずれも「個人を特定できる情報」を生成や通信しないことを確認しています。
 ・Apple - AppStore,iCloud　-　http://www.apple.com/jp/privacy/
 ・Google - Analytics　-　http://www.google.com/intl/ja/policies/privacy/
+
 広告が表示される場合、
 ・Apple - iAd　-　http://www.apple.com/jp/privacy/
 ・Google - AdSence,AdMob　-　http://www.google.com/intl/ja/policies/privacy/

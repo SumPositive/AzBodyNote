@@ -37,7 +37,7 @@
 	//NSLog(@"__E2records=%@", __E2records);
 	
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	BOOL bGoal = [kvs boolForKey:GUD_bGoal];
+	BOOL bGoal = [kvs boolForKey:KVS_bGoal];
 
 	
 	//-------------------------------------------------------------------------------------- Date 描画

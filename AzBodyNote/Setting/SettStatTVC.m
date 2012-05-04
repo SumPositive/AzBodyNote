@@ -53,7 +53,7 @@
 	}
 
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	mValueDays = [[kvs objectForKey:GUD_SettStatDays] integerValue];
+	mValueDays = [[kvs objectForKey:KVS_SettStatDays] integerValue];
 	if (mValueDays<1 OR STAT_DAYS_MAX<mValueDays) {
 		mValueDays = 1;
 	}
@@ -90,7 +90,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
 	if (section==0) {
-		return 2;
+		return 4;
 	}
     return 0;
 }
@@ -169,14 +169,44 @@
 			//cell.imageView.image = [UIImage imageNamed:@"Icon20-Goal"];
 			cell.textLabel.text = NSLocalizedString(@"SettStat Avg",nil);
 			cell.detailTextLabel.text = NSLocalizedString(@"SettStat Avg detail",nil);
-			if ([kvs boolForKey:GUD_SettStatAvgShow]) {
+			if ([kvs boolForKey:KVS_SettStatAvgShow]) {
 				cell.accessoryType = UITableViewCellAccessoryCheckmark;
 			} else {
 				cell.accessoryType = UITableViewCellAccessoryNone;
 			}
 			return cell;
 		}	break;
-	}
+
+		case 2: {	//時系列線で結ぶ
+			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
+			if (cell == nil) {
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
+			}
+			cell.textLabel.text = NSLocalizedString(@"SettStat TimeLine",nil);
+			cell.detailTextLabel.text = NSLocalizedString(@"SettStat TimeLine detail",nil);
+			if ([kvs boolForKey:KVS_SettStatTimeLine]) {
+				cell.accessoryType = UITableViewCellAccessoryCheckmark;
+			} else {
+				cell.accessoryType = UITableViewCellAccessoryNone;
+			}
+			return cell;
+		}	break;
+
+		case 3: {	//24Hour タテ結線する
+			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
+			if (cell == nil) {
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
+			}
+			cell.textLabel.text = NSLocalizedString(@"SettStat 24H_Line",nil);
+			cell.detailTextLabel.text = NSLocalizedString(@"SettStat 24H_Line detail",nil);
+			if ([kvs boolForKey:KVS_SettStat24H_Line]) {
+				cell.accessoryType = UITableViewCellAccessoryCheckmark;
+			} else {
+				cell.accessoryType = UITableViewCellAccessoryNone;
+			}
+			return cell;
+		}	break;
+}
     return nil;
 }
 
@@ -187,15 +217,39 @@
 {
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];	// 選択状態を解除する
 	
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	switch (indexPath.section*100 + indexPath.row) {
-		case 1: {  //Avg.
-			NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+		case 1: {  //KVS_SettStatAvgShow
 			UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-			if ([kvs boolForKey:GUD_SettStatAvgShow]) {
-				[kvs setBool: NO forKey:GUD_SettStatAvgShow];
+			if ([kvs boolForKey:KVS_SettStatAvgShow]) {
+				[kvs setBool: NO forKey:KVS_SettStatAvgShow];
 				cell.accessoryType = UITableViewCellAccessoryNone;
 			} else {
-				[kvs setBool: YES forKey:GUD_SettStatAvgShow];
+				[kvs setBool: YES forKey:KVS_SettStatAvgShow];
+				cell.accessoryType = UITableViewCellAccessoryCheckmark;
+			}
+			[kvs synchronize];
+		} break;
+
+		case 2: {  //KVS_SettStatTimeLine
+			UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+			if ([kvs boolForKey:KVS_SettStatTimeLine]) {
+				[kvs setBool: NO forKey:KVS_SettStatTimeLine];
+				cell.accessoryType = UITableViewCellAccessoryNone;
+			} else {
+				[kvs setBool: YES forKey:KVS_SettStatTimeLine];
+				cell.accessoryType = UITableViewCellAccessoryCheckmark;
+			}
+			[kvs synchronize];
+		} break;
+
+		case 3: {  //KVS_SettStat24H_Line
+			UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+			if ([kvs boolForKey:KVS_SettStat24H_Line]) {
+				[kvs setBool: NO forKey:KVS_SettStat24H_Line];
+				cell.accessoryType = UITableViewCellAccessoryNone;
+			} else {
+				[kvs setBool: YES forKey:KVS_SettStat24H_Line];
 				cell.accessoryType = UITableViewCellAccessoryCheckmark;
 			}
 			[kvs synchronize];
@@ -224,7 +278,7 @@
 	[self refreshStatDays];
 
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	[kvs setObject:[NSNumber numberWithInteger:mValueDays] forKey:GUD_SettStatDays];
+	[kvs setObject:[NSNumber numberWithInteger:mValueDays] forKey:KVS_SettStatDays];
 }
 
 

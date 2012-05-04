@@ -41,6 +41,7 @@
 												  delegate:nil cancelButtonTitle:nil 
 										 otherButtonTitles:NSLocalizedString(@"Roger", nil), nil];
 	[alv show];
+	GA_TRACK_EVENT_ERROR(@"Dropbox: alertCommError",0);
 }
 
 #pragma mark - Dropbox DBRestClient
@@ -251,6 +252,7 @@
 - (void)restClient:(DBRestClient *)client loadMetadataFailedWithError:(NSError *)error 
 {	// メタデータ読み込み失敗
     NSLog(@"Error loading metadata: %@", error);
+	GA_TRACK_EVENT_ERROR([error localizedDescription],0);
 	//[mMetadatas release];
 	mMetadatas = nil;
 	[ibTableView reloadData];
@@ -292,6 +294,7 @@
 													cancelButtonTitle:nil
 													otherButtonTitles:NSLocalizedString(@"Roger", nil), nil];
 				[alv	show];
+				GA_TRACK_EVENT_ERROR(zErr,0);
 			}
 			[self alertIndicatorOff];	// 進捗サインOFF
 			[self dismissModalViewControllerAnimated:YES];	// 閉じる
@@ -302,6 +305,7 @@
 - (void)restClient:(DBRestClient*)client loadFileFailedWithError:(NSError*)error 
 {	// ファイル読み込み失敗
     NSLog(@"There was an error loading the file - %@", error);
+	GA_TRACK_EVENT_ERROR([error localizedDescription],0);
 	[self alertIndicatorOff];
 	[self alertCommError];
 }
@@ -322,6 +326,7 @@
 - (void)restClient:(DBRestClient*)client uploadFileFailedWithError:(NSError*)error 
 {	// ファイル書き込み失敗
     NSLog(@"File upload failed with error - %@", error);
+	GA_TRACK_EVENT_ERROR([error localizedDescription],0);
 	[self alertIndicatorOff];
 	[self alertCommError];
 }
@@ -484,6 +489,7 @@ replacementString:(NSString *)string
 		}
 		@catch (NSException *exception) {
 			NSLog(@"ERROR");
+			GA_TRACK_EVENT_ERROR([exception description],0);
 		}
 	}
 
@@ -519,6 +525,7 @@ replacementString:(NSString *)string
 															cancelButtonTitle:nil
 															otherButtonTitles:NSLocalizedString(@"Roger", nil), nil];
 						[alv	show];
+						GA_TRACK_EVENT_ERROR(zErr,0);
 					}
 				});
 			});

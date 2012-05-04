@@ -85,7 +85,7 @@ static NSDate *dateGoal_ = nil;
 		NSError *err = nil;
 		if (![moc_  save:&err]) {
 			NSLog(@"*** MOC commit error ***\n%@\n%@\n***\n", err, [err userInfo]);
-			GA_TRACK_EVENT_ERROR([err description],0);
+			GA_TRACK_EVENT_ERROR([err localizedDescription],0);
 			//exit(-1);  // Fail
 			alertBox(NSLocalizedString(@"MOC CommitErr",nil),
 					 NSLocalizedString(@"MOC CommitErrMsg",nil),
@@ -129,13 +129,14 @@ static NSDate *dateGoal_ = nil;
 		NSUInteger count = [moc_ countForFetchRequest:req error:&error];
 		if (error) {
 			NSLog(@"count: Error %@, %@", error, [error userInfo]);
-			GA_TRACK_EVENT_ERROR([error description],0);
+			GA_TRACK_EVENT_ERROR([error localizedDescription],0);
 			return 0;
 		}
 		return count;
 	}
 	@catch (NSException *errEx) {
 		NSLog(@"count @catch:NSException: %@ : %@", [errEx name], [errEx reason]);
+		GA_TRACK_EVENT_ERROR([errEx description],0);
 	}
 	return 0;
 }
@@ -182,13 +183,14 @@ static NSDate *dateGoal_ = nil;
 		//[req release], req = nil;
 		if (error) {
 			NSLog(@"select: Error %@, %@", error, [error userInfo]);
-			GA_TRACK_EVENT_ERROR([error description],0);
+			GA_TRACK_EVENT_ERROR([error localizedDescription],0);
 			return nil;
 		}
 		return arFetch; // autorelease
 	}
 	@catch (NSException *errEx) {
 		NSLog(@"select @catch:NSException: %@ : %@", [errEx name], [errEx reason]);
+		GA_TRACK_EVENT_ERROR([errEx description],0);
 	}
 	@finally {
 		//[req release], req = nil;

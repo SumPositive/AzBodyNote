@@ -88,6 +88,7 @@
 	GA_TRACK_PAGE(@"EditDateVC");
 	NSLog(@"CdateSource=%@", CdateSource);
 	if (CdateSource==nil) {	// LOGIC ERROR!!!
+		GA_TRACK_EVENT_ERROR(@"LOGIC ERROR CdateSource==nil",0);
 		CdateSource = [NSDate date];
 	}
 	[ibDatePicker setDate:CdateSource animated:YES];

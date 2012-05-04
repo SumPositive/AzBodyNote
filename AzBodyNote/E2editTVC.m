@@ -172,8 +172,8 @@
 	
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	// Wake,Sleepを優先して判定
-	if ([kvs objectForKey:GUD_DateOptWake_HOUR]) {
-		NSInteger iHour = [[kvs objectForKey:GUD_DateOptWake_HOUR] integerValue];
+	if ([kvs objectForKey:KVS_DateOptWake_HOUR]) {
+		NSInteger iHour = [[kvs objectForKey:KVS_DateOptWake_HOUR] integerValue];
 		if (iHour-DateOpt_AroundHOUR < 0) {
 			iHour += DateOpt_AroundHOUR;
 			comp.hour += DateOpt_AroundHOUR;
@@ -182,8 +182,8 @@
 			return DtOpWake;
 		}
 	}
-	if ([kvs objectForKey:GUD_DateOptSleep_HOUR]) {
-		NSInteger iHour = [[kvs objectForKey:GUD_DateOptSleep_HOUR] integerValue];
+	if ([kvs objectForKey:KVS_DateOptSleep_HOUR]) {
+		NSInteger iHour = [[kvs objectForKey:KVS_DateOptSleep_HOUR] integerValue];
 		if (iHour-DateOpt_AroundHOUR < 0) {
 			iHour += DateOpt_AroundHOUR;
 			comp.hour += DateOpt_AroundHOUR;
@@ -193,8 +193,8 @@
 		}
 	}
 	// DtOpRest:は、デフォルト。どれにも該当しなければ、return DtOpRest;
-	if ([kvs objectForKey:GUD_DateOptDown_HOUR]) {	// 保存時に自動学習(記録更新)している
-		NSInteger iHour = [[kvs objectForKey:GUD_DateOptDown_HOUR] integerValue];
+	if ([kvs objectForKey:KVS_DateOptDown_HOUR]) {	// 保存時に自動学習(記録更新)している
+		NSInteger iHour = [[kvs objectForKey:KVS_DateOptDown_HOUR] integerValue];
 		if (iHour-DateOpt_AroundHOUR < 0) {
 			iHour += DateOpt_AroundHOUR;
 			comp.hour += DateOpt_AroundHOUR;
@@ -268,7 +268,7 @@
 	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	if (appDelegate_.eventStore==nil OR mEKCalendar==nil) {
-		if ([kvs boolForKey:GUD_bTweet]==NO) return;
+		if ([kvs boolForKey:KVS_bTweet]==NO) return;
 	}
 	
 	// TweetおよびEvent用の本文作成
@@ -358,7 +358,7 @@
 		//削除 [appDelegate_.eventStore removeEvent:event span:EKSpanThisEvent error:&error];
 		[appDelegate_.eventStore saveEvent:event span:EKSpanThisEvent error:&error]; // 保存
 		if (error) {
-			GA_TRACK_EVENT_ERROR([error description],0);
+			GA_TRACK_EVENT_ERROR([error localizedDescription],0);
 			NSLog(@"saveEvent: error={%@}", [error localizedDescription]);
 		} else {
 			NSLog(@"eventIdentifier={%@}", event.eventIdentifier);
@@ -368,7 +368,7 @@
 	}
 	
 	// Twitter Export
-	if ([kvs boolForKey:GUD_bTweet]) {
+	if ([kvs boolForKey:KVS_bTweet]) {
 		// Tweet メッセージ作成
 		NSString *zz = zTweet;
 		if (editMode_==0) { // AddNewのとき
@@ -434,16 +434,16 @@
 		NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 		switch ([moE2edit_.nDateOpt integerValue]) {
 			case DtOpWake:
-				[kvs setObject:[NSNumber numberWithInteger:comp.hour] forKey:GUD_DateOptWake_HOUR];
+				[kvs setObject:[NSNumber numberWithInteger:comp.hour] forKey:KVS_DateOptWake_HOUR];
 				break;
 			case DtOpRest:
-				[kvs setObject:[NSNumber numberWithInteger:comp.hour] forKey:GUD_DateOptRest_HOUR];
+				[kvs setObject:[NSNumber numberWithInteger:comp.hour] forKey:KVS_DateOptRest_HOUR];
 				break;
 			case DtOpDown:
-				[kvs setObject:[NSNumber numberWithInteger:comp.hour] forKey:GUD_DateOptDown_HOUR];
+				[kvs setObject:[NSNumber numberWithInteger:comp.hour] forKey:KVS_DateOptDown_HOUR];
 				break;
 			case DtOpSleep:
-				[kvs setObject:[NSNumber numberWithInteger:comp.hour] forKey:GUD_DateOptSleep_HOUR];
+				[kvs setObject:[NSNumber numberWithInteger:comp.hour] forKey:KVS_DateOptSleep_HOUR];
 				break;
 		}
 
@@ -616,21 +616,21 @@
 	appDelegate_.app_is_unlock = [kvs boolForKey:STORE_PRODUCTID_UNLOCK];
 	
 	// Tweet設定
-	if (mTweetVC==nil && [kvs boolForKey:GUD_bTweet]) {
+	if (mTweetVC==nil && [kvs boolForKey:KVS_bTweet]) {
 		//レスポンス向上のためにviewDidLoad:にて事前生成している
 		mTweetVC = [[TWTweetComposeViewController alloc] init];
 	}
 
 	// カレンダー設定
-	if ([kvs objectForKey:GUD_CalendarID]) {
+	if ([kvs objectForKey:KVS_CalendarID]) {
 		mEKCalendar = [appDelegate_.eventStore 
-					   calendarWithIdentifier: [kvs objectForKey:GUD_CalendarID]];
+					   calendarWithIdentifier: [kvs objectForKey:KVS_CalendarID]];
 		NSLog(@"E2editTVC: mEKCalendar={%@}", mEKCalendar);
 	} else {
 		mEKCalendar = nil;
 	}
 	// パネル順序読み込み
-	mPanels = [kvs objectForKey:GUD_SettGraphs];
+	mPanels = [kvs objectForKey:KVS_SettGraphs];
 	
 	if (bEditDate_) {
 		// 日付修正から戻ったとき
@@ -670,6 +670,7 @@
 			}
 			@catch (NSException *exception) {
 				NSLog(@"***ERROR*** indexPathForRow: NN 測定項目の増減による影響に注意");
+				GA_TRACK_EVENT_ERROR([exception description],0);
 			}
 			CGRect rc = [self.tableView rectForRowAtIndexPath:indexPath];
 			rc.size.width /= 2;
@@ -1266,8 +1267,8 @@
 						// イベントをカレンダーから削除する
 						[appDelegate_.eventStore removeEvent:event span:EKSpanThisEvent error:&error];
 						if (error) {
-							GA_TRACK_EVENT_ERROR(@"removeEvent: error",0);
 							NSLog(@"removeEvent: error={%@}", [error localizedDescription]);
+							GA_TRACK_EVENT_ERROR([error localizedDescription],0);
 						}
 					} else {
 						GA_TRACK_EVENT_ERROR(@"removeEvent: event=nil",0);

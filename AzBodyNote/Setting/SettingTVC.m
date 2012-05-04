@@ -111,7 +111,7 @@
 			} else {
 				cell.detailTextLabel.text = NSLocalizedString(@"SettTweet detail FREE",nil);
 			}
-			if ([kvs boolForKey:GUD_bTweet]) {
+			if ([kvs boolForKey:KVS_bTweet]) {
 				cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				cell.imageView.image = [UIImage imageNamed:@"bird_32_blue"];
 			} else {
@@ -126,15 +126,16 @@
 			if (cell == nil) {
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 			}
-			if ([kvs objectForKey:GUD_CalendarID]) {
+			if ([kvs objectForKey:KVS_CalendarID]) {
 				cell.textLabel.text = [NSString stringWithFormat:@"%@: %@",
 									   NSLocalizedString(@"SettCalender",nil), 
-									   [kvs objectForKey:GUD_CalendarTitle]];
+									   [kvs objectForKey:KVS_CalendarTitle]];
 			} else {
 				cell.textLabel.text = [NSString stringWithFormat:@"%@: %@",
 									   NSLocalizedString(@"SettCalender",nil), 
 									   NSLocalizedString(@"AZCalendarSelect NON",nil)];
 			}
+			cell.imageView.image = [UIImage imageNamed:@"Icon32-Calender"];
 			cell.detailTextLabel.text = NSLocalizedString(@"SettCalender detail",nil);
 			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 			return cell;
@@ -170,9 +171,7 @@
 			if (cell == nil) {
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 			}
-			//cell.imageView.image = [UIImage imageNamed:@"Icon57"];
-			//cell.imageView.contentMode = UIViewContentModeScaleAspectFit;
-			//cell.imageView.frame = CGRectMake(0, 0, 32, 32);
+			cell.imageView.image = [UIImage imageNamed:@"Icon32"];
 			cell.textLabel.text = AZClassLocalizedString(@"AZAbout",nil);
 			cell.detailTextLabel.text = nil;
 			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -219,12 +218,12 @@
 		case 0: {  // Tweet
 			NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 			UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-			if ([kvs boolForKey:GUD_bTweet]) {
-				[kvs setBool: NO forKey:GUD_bTweet];
+			if ([kvs boolForKey:KVS_bTweet]) {
+				[kvs setBool: NO forKey:KVS_bTweet];
 				cell.accessoryType = UITableViewCellAccessoryNone;
 				cell.imageView.image = [UIImage imageNamed:@"bird_32_gray"];
 			} else {
-				[kvs setBool: YES forKey:GUD_bTweet];
+				[kvs setBool: YES forKey:KVS_bTweet];
 				cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				cell.imageView.image = [UIImage imageNamed:@"bird_32_blue"];
 			}

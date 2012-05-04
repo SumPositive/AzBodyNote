@@ -16,6 +16,7 @@ This app, Web services of their respective owners has been included below.
 Each Web service has been confirmed not to generate and communicate personally identifiable information.
 ・Apple - AppStore,iCloud　-　http://www.apple.com/jp/privacy/
 ・Google - Analytics　-　http://www.google.com/intl/ja/policies/privacy/
+
 If your ad is displayed,
 ・Apple - iAd　-　http://www.apple.com/jp/privacy/
 ・Google - AdSence,AdMob　-　http://www.google.com/intl/ja/policies/privacy/

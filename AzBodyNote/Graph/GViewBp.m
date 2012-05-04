@@ -131,7 +131,7 @@ NSInteger	pValueCount = 0;
 	if (__Page==0) {
 		//--------------------------------------------------- Goal
 		NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-		if ([kvs boolForKey:GUD_bGoal]) {
+		if ([kvs boolForKey:KVS_bGoal]) {
 			if (0<pValGoal[bpHi] && 0<pValGoal[bpLo]) 
 			{	//文字を上層にすべく、このタテ棒を先に描画する
 				po = poValGoal[bpHi];
