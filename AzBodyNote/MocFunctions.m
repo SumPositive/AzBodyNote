@@ -87,7 +87,7 @@ static NSDate *dateGoal_ = nil;
 			NSLog(@"*** MOC commit error ***\n%@\n%@\n***\n", err, [err userInfo]);
 			GA_TRACK_EVENT_ERROR([err localizedDescription],0);
 			//exit(-1);  // Fail
-			alertBox(NSLocalizedString(@"MOC CommitErr",nil),
+			azAlertBox(NSLocalizedString(@"MOC CommitErr",nil),
 					 NSLocalizedString(@"MOC CommitErrMsg",nil),
 					 NSLocalizedString(@"Roger",nil));
 			return NO;

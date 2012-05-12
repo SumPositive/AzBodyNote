@@ -269,7 +269,7 @@
 {	// dial変位が停止したとき
 	if (mAppDelegate.app_is_unlock==NO && STAT_DAYS_FREE < dial) {
 		[mDialDays setDial:STAT_DAYS_FREE animated:NO];
-		alertBox(NSLocalizedString(@"FreeLock",nil), 
+		azAlertBox(NSLocalizedString(@"FreeLock",nil), 
 				 NSLocalizedString(@"FreeLock StatLimit",nil), @"OK");
 		return;
 	}

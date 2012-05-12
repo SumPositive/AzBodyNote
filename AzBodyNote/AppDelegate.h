@@ -58,10 +58,10 @@
 - (void)alertProgressOn:(NSString*)zTitle;
 - (void)alertProgressOff;
 
-- (void)dropboxView;
-- (NSString*)tmpFilePath;
-- (NSString*)tmpFileSave;
-- (NSString*)tmpFileLoad;
+//- (void)dropboxView;
+//- (NSString*)tmpFilePath;
+//- (NSString*)tmpFileSave;
+//- (NSString*)tmpFileLoad;
 
 - (NSString *)applicationDocumentsDirectory;
 //- (void)adDealloc;

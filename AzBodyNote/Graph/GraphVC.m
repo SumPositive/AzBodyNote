@@ -480,7 +480,7 @@ NSInteger afterPageChange = 0;
 	[super viewDidAppear:animated];
 	
 	if ([mPanelGraphs count]<1) {
-		alertBox(NSLocalizedString(@"Graph NoPanel",nil), NSLocalizedString(@"Graph NoPanel detail",nil), @"OK");
+		azAlertBox(NSLocalizedString(@"Graph NoPanel",nil), NSLocalizedString(@"Graph NoPanel detail",nil), @"OK");
 		self.navigationController.tabBarController.selectedIndex = 3; // Setting画面へ
 		return;
 	}
@@ -547,7 +547,7 @@ NSInteger afterPageChange = 0;
 	if (scrollView.contentOffset.x < -70) {
 		// PREV（過去）ページへ
 		if (mAppDelegate.app_is_unlock==NO) {
-			alertBox(NSLocalizedString(@"FreeLock",nil), 
+			azAlertBox(NSLocalizedString(@"FreeLock",nil), 
 							NSLocalizedString(@"FreeLock GraphLimit",nil), @"OK");
 			return;
 		}

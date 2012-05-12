@@ -77,7 +77,7 @@
 	}
 	
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	[kvs setObject: toNSNull(filename) forKey:USER_FILENAME_KEY];
+	[kvs setObject: azNSNull(filename) forKey:USER_FILENAME_KEY];
 	[kvs synchronize]; // iCloud最新同期（取得）
 	
 	// 上書き確認
@@ -145,7 +145,7 @@
 	//ibTfName.text = [userDef objectForKey:USER_FILENAME_KEY];
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	[kvs synchronize]; // iCloud最新同期（取得）
-	ibTfName.text = toNil([kvs objectForKey:USER_FILENAME_KEY]);
+	ibTfName.text = azNil([kvs objectForKey:USER_FILENAME_KEY]);
 
 	if ([ibTfName.text length] < 3) {
 		ibTfName.text = USER_FILENAME;

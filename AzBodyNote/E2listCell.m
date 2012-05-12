@@ -107,15 +107,15 @@
 		ibLbBodyFat.text = strValue([[kvs objectForKey:Goal_nBodyFat_10p] integerValue], 1); 
 		ibLbSkMuscle.text = strValue([[kvs objectForKey:Goal_nSkMuscle_10p] integerValue], 1);
 		
-		if (0<[toNil([kvs objectForKey:Goal_sNote1]) length]) {
-			if (0<[toNil([kvs objectForKey:Goal_sNote2]) length]) {
+		if (0<[azNil([kvs objectForKey:Goal_sNote1]) length]) {
+			if (0<[azNil([kvs objectForKey:Goal_sNote2]) length]) {
 				ibLbNote1.text = [NSString stringWithFormat:@"%@  %@",
 								  [kvs objectForKey:Goal_sNote1],  [kvs objectForKey:Goal_sNote2]];
 			} else {
 				ibLbNote1.text = [kvs objectForKey:Goal_sNote1];
 			}
 		} else {
-			if (0<[toNil([kvs objectForKey:Goal_sNote2]) length]) {
+			if (0<[azNil([kvs objectForKey:Goal_sNote2]) length]) {
 				ibLbNote1.text = [kvs objectForKey:Goal_sNote2];
 			} else {
 				ibLbNote1.text = nil;

@@ -572,16 +572,16 @@
 			//moE2edit_ = [[E2record alloc] init]; // MOCで無い！ 一時エンティティ
 			moE2edit_ = [mocFunc_ insertAutoEntity:E2_ENTITYNAME]; // 一時利用なので後で破棄すること ＜＜SAVEしない
 			[kvsGoal_ synchronize]; // iCloud最新同期（取得）
-			moE2edit_.sNote1 =				toNil([kvsGoal_ objectForKey:Goal_sNote1]);
-			moE2edit_.sNote2 =				toNil([kvsGoal_ objectForKey:Goal_sNote2]);
-			moE2edit_.nBpHi_mmHg =	toNil([kvsGoal_ objectForKey:Goal_nBpHi_mmHg]);
-			moE2edit_.nBpLo_mmHg =	toNil([kvsGoal_ objectForKey:Goal_nBpLo_mmHg]);
-			moE2edit_.nPulse_bpm =		toNil([kvsGoal_ objectForKey:Goal_nPulse_bpm]);
-			moE2edit_.nWeight_10Kg = toNil([kvsGoal_ objectForKey:Goal_nWeight_10Kg]);
-			moE2edit_.nTemp_10c =		toNil([kvsGoal_ objectForKey:Goal_nTemp_10c]);
-			moE2edit_.nPedometer =			toNil([kvsGoal_ objectForKey:Goal_nPedometer]);
-			moE2edit_.nBodyFat_10p =		toNil([kvsGoal_ objectForKey:Goal_nBodyFat_10p]);
-			moE2edit_.nSkMuscle_10p =	toNil([kvsGoal_ objectForKey:Goal_nSkMuscle_10p]);
+			moE2edit_.sNote1 =				azNil([kvsGoal_ objectForKey:Goal_sNote1]);
+			moE2edit_.sNote2 =				azNil([kvsGoal_ objectForKey:Goal_sNote2]);
+			moE2edit_.nBpHi_mmHg =	azNil([kvsGoal_ objectForKey:Goal_nBpHi_mmHg]);
+			moE2edit_.nBpLo_mmHg =	azNil([kvsGoal_ objectForKey:Goal_nBpLo_mmHg]);
+			moE2edit_.nPulse_bpm =		azNil([kvsGoal_ objectForKey:Goal_nPulse_bpm]);
+			moE2edit_.nWeight_10Kg = azNil([kvsGoal_ objectForKey:Goal_nWeight_10Kg]);
+			moE2edit_.nTemp_10c =		azNil([kvsGoal_ objectForKey:Goal_nTemp_10c]);
+			moE2edit_.nPedometer =			azNil([kvsGoal_ objectForKey:Goal_nPedometer]);
+			moE2edit_.nBodyFat_10p =		azNil([kvsGoal_ objectForKey:Goal_nBodyFat_10p]);
+			moE2edit_.nSkMuscle_10p =	azNil([kvsGoal_ objectForKey:Goal_nSkMuscle_10p]);
 		}	break;
 			
 		default:
@@ -756,7 +756,7 @@
 	}
 	else if (editMode_==0) {
 		if (self.navigationItem.rightBarButtonItem.enabled) {
-			alertBox(NSLocalizedString(@"NotSaved",nil), NSLocalizedString(@"NotSaved AddNew",nil), @"OK");
+			azAlertBox(NSLocalizedString(@"NotSaved",nil), NSLocalizedString(@"NotSaved AddNew",nil), @"OK");
 		}
 		// TabBar切替により隠されたとき、中断し、戻ったときに復帰できるようにする
 		[mocFunc_ commit]; // 未確定のまま保存し、復帰継続できるようにする

@@ -13,7 +13,7 @@
 
 #import "E2editTVC.h"
 #import "E2listTVC.h"
-#import "DropboxVC.h"
+//#import "DropboxVC.h"
 
 
 #define CoreData_iCloud_SYNC		NO	// YES or NO
@@ -139,7 +139,7 @@
 	// デバイス、ＯＳ確認
 	if ([[[UIDevice currentDevice] systemVersion] compare:@"5.0"]==NSOrderedAscending) { // ＜ "5.0"
 		// iOS5.0より前
-		alertBox(@"! STOP !", @"Need more iOS 5.0", nil);
+		azAlertBox(@"! STOP !", @"Need more iOS 5.0", nil);
 		exit(0);
 	}
 	//NG//app_is_iPad_ = [[[UIDevice currentDevice] model] hasPrefix:@"iPad"];	// iPad
@@ -224,7 +224,7 @@
 	if ([[[UIDevice currentDevice] systemVersion] compare:@"5.0"]==NSOrderedAscending) { // ＜ "5.0"
 		// iOS5.0より前
 		GA_TRACK_EVENT_ERROR(@"Need more iOS 5.0",0);
-		alertBox(@"! STOP !", @"Need more iOS 5.0", nil);
+		azAlertBox(@"! STOP !", @"Need more iOS 5.0", nil);
 		exit(0);
 	}
 	__app_is_iPad = [[[UIDevice currentDevice] model] hasPrefix:@"iPad"];	// iPad
@@ -304,24 +304,23 @@
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url 
 {	// Free と Stable が共存している場合、Free から戻ったとき Stableが呼ばれる。
-
-/*** DEBUG
-	NSString* msg = [NSString stringWithFormat:@"[URL]%@\n[schame]%@\n[Query]%@", 
+/*	NSString* msg = [NSString stringWithFormat:@"[URL]%@\n[schame]%@\n[Query]%@", 
                      [url absoluteString], [url scheme], [url query]];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"debug"
                                                     message:msg
                                                    delegate:self
                                           cancelButtonTitle:@"OK"
                                           otherButtonTitles:nil, nil];
-    [alert show]; */
+    [alert show];*/
 	
-    if ([[DBSession sharedSession] handleOpenURL:url]) {
-        if ([[DBSession sharedSession] isLinked]) 
+	// Dropbox OAuth 認証キーを取得する
+	if ([[DBSession sharedSession] handleOpenURL:url]) { //OAuth結果：urlに認証キーが含まれる
+	/*	if ([[DBSession sharedSession] isLinked]) 
 		{	// Dropbox 認証成功
             NSLog(@"App linked successfully!");
 			// DropboxTVC を開ける
 			[self dropboxView];
-        }
+        }*/
         return YES;
     }
     // Add whatever other url handling code your app requires here
@@ -386,180 +385,6 @@
 {
     //E2listTVC *rootViewController = (E2listTVC *)[self.navigationController topViewController];
     //rootViewController.managedObjectContext = self.managedObjectContext;
-}
-
-
-#pragma mark - Dropbox
-
-- (void)dropboxView
-{	// 未認証の場合、認証処理後、AzCalcAppDelegate:handleOpenURL:から呼び出される
-	if ([[DBSession sharedSession] isLinked]) 
-	{	// Dropbox 認証済み
-		// DropboxVC 表示
-		DropboxVC *vc = [[DropboxVC alloc] initWithNibName:@"DropboxVC" bundle:nil];
-		vc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-		vc.delegate = self;
-		[__window.rootViewController presentModalViewController:vc animated:YES];
-	}
-	else {
-		// Dropbox 未認証
-		[[DBSession sharedSession] link];
-	}
-}
-
-
-#pragma mark - delegate /tmp/file
-
-- (NSString*)tmpFilePath
-{
-	NSString *zPath = NSHomeDirectory();
-	zPath = [zPath stringByAppendingPathComponent:@"tmp"];	//NG//@"Documents"
-	zPath = [zPath stringByAppendingPathComponent:@"json.condition"];
-	NSLog(@"zPath=%@", zPath);
-	return zPath;
-}
-
-#define FILE_HEADER_PREFIX		@"Condition(C)Azukid"
-
-- (NSString*)tmpFileSave;
-{	// NSManagedObject を [self tmpFilePath] へ書き出す
-	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	[kvs synchronize]; // iCloud最新同期（取得）
-	// E2record 取得
-	// Sort条件
-	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
-	NSArray *sortDesc = [NSArray arrayWithObjects: sort1,nil]; // 日付降順：Limit抽出に使用
-	NSArray *aE2records = [__mocBase select: E2_ENTITYNAME
-									limit: 0
-								   offset: 0
-									where: [NSPredicate predicateWithFormat:E2_nYearMM @" > 200000"] // 未保存を除外する
-									 sort: sortDesc]; // 最新日付から抽出
-	// NSManagedObject を NSDictionary変換する。　JSON変換できるようにするため
-	NSMutableArray *maE2 = [NSMutableArray new];
-	NSDictionary *dict = [[NSDictionary alloc] initWithObjectsAndKeys:
-						  @"Header",									@"#class",
-						  FILE_HEADER_PREFIX,					@"#header",
-						  utcFromDate([NSDate date]),	@"#update",
-						  @"2",												@"#version",
-						 //----------------------------------------------------------------------------------  iCloud-KVS
-						  toNSNull([kvs objectForKey:Goal_nBpHi_mmHg]),		Goal_nBpHi_mmHg,
-						  toNSNull([kvs objectForKey:Goal_nBpLo_mmHg]),		Goal_nBpLo_mmHg,
-						  toNSNull([kvs objectForKey:Goal_nPulse_bpm]),			Goal_nPulse_bpm,
-						  toNSNull([kvs objectForKey:Goal_nTemp_10c]),			Goal_nTemp_10c,
-						  toNSNull([kvs objectForKey:Goal_nWeight_10Kg]),		Goal_nWeight_10Kg,
-						  toNSNull([kvs objectForKey:Goal_sEquipment]),			Goal_sEquipment,
-						  toNSNull([kvs objectForKey:Goal_sNote1]),					Goal_sNote1,
-						  toNSNull([kvs objectForKey:Goal_sNote2]),					Goal_sNote2,
-						  //----------[0.9]以下追加
-						  toNSNull([kvs objectForKey:Goal_nPedometer]),			Goal_nPedometer,
-						  toNSNull([kvs objectForKey:Goal_nBodyFat_10p]),		Goal_nBodyFat_10p,
-						  toNSNull([kvs objectForKey:Goal_nSkMuscle_10p]),	Goal_nSkMuscle_10p,
-						  //---------------------------------------------------------------------------------- 
-						  nil];
-	[maE2 addObject:dict];	// #class = "Header"
-	// E2record
-	for (E2record *e2 in aE2records) {
-		//NSLog(@"----- e2=%@", e2);
-		@autoreleasepool {
-			NSDictionary *dic = [__mocBase dictionaryObject:e2];
-			if (dic) {
-				//NSLog(@"----- ----- dic=%@", dic);
-				[maE2 addObject:dic];	// #class = "E2record"
-			}
-		}
-	}
-
-	// NSArray --> JSON
-	DBJSON	*js = [DBJSON new];
-	NSError *err = nil;
-	NSString *zJson = [js stringWithObject:maE2 error:&err];
-	if (err) {
-		NSLog(@"tmpFileSave: SBJSON: stringWithObject: (err=%@) zJson=%@", [err description], zJson);
-		GA_TRACK_EVENT_ERROR([err description],0);
-		return [err description];
-	}
-	NSLog(@"tmpFileSave: zJson=%@", zJson);
-	// 書き出す
-	//[zJson writeToFile:zPath atomically:YES]; NG//非推奨になった。
-	[zJson writeToFile:[self tmpFilePath] atomically:YES encoding:NSUTF8StringEncoding error:&err];
-	if (err) {
-		NSLog(@"tmpFileSave: writeToFile: (err=%@)", [err description]);
-		GA_TRACK_EVENT_ERROR([err description],0);
-		return [err description];
-	}
-	return nil;
-}
-
-- (NSString*)tmpFileLoad;
-{	// [self tmpFilePath] から NSManagedObject を読み込む
-	NSError *err = nil;
-	// 読み込む
-	NSString *zJson = [NSString stringWithContentsOfFile:[self tmpFilePath] encoding:NSUTF8StringEncoding error:&err];
-	if (err OR zJson==nil) {
-		NSLog(@"tmpFileLoad: stringWithContentsOfFile: (err=%@)", [err description]);
-		GA_TRACK_EVENT_ERROR([err description],0);
-		return [err description];
-	}
-	NSLog(@"tmpFileLoad: zJson=%@", zJson);
-	// JSON --> NSArray
-	DBJSON	*js = [DBJSON new];
-	NSArray *ary = [js objectWithString:zJson error:&err];
-	if (err) {
-		NSLog(@"tmpFileLoad: SBJSON: objectWithString: (err=%@) zJson=%@", [err description], zJson);
-		GA_TRACK_EVENT_ERROR([err description],0);
-		return [err description];
-	}
-	NSLog(@"tmpFileLoad: ary=%@", ary);
-	//
-	NSDictionary *dict = [ary objectAtIndex:0]; // Header
-	if (![[dict objectForKey:@"#class"] isEqualToString:@"Header"]) {
-		NSLog(@"tmpFileLoad: #class ERR: %@", dict);
-		return @"NG #class";
-	}
-	if (![[dict objectForKey:@"#header"] isEqualToString:FILE_HEADER_PREFIX]) {
-		NSLog(@"tmpFileLoad: #header ERR: %@", dict);
-		return @"NG #header";
-	}
-	//----------------------------------------------------------------------------------  iCloud-KVS
-	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	[kvs setObject: toNSNull([dict objectForKey:Goal_nBpHi_mmHg])		forKey:Goal_nBpHi_mmHg];
-	[kvs setObject: toNSNull([dict objectForKey:Goal_nBpLo_mmHg])		forKey:Goal_nBpLo_mmHg];
-	[kvs setObject: toNSNull([dict objectForKey:Goal_nPulse_bpm])			forKey:Goal_nPulse_bpm];
-	[kvs setObject: toNSNull([dict objectForKey:Goal_nTemp_10c])			forKey:Goal_nTemp_10c];
-	[kvs setObject: toNSNull([dict objectForKey:Goal_nWeight_10Kg])		forKey:Goal_nWeight_10Kg];
-	[kvs setObject: toNSNull([dict objectForKey:Goal_sEquipment])			forKey:Goal_sEquipment];
-	[kvs setObject: toNSNull([dict objectForKey:Goal_sNote1])					forKey:Goal_sNote1];
-	[kvs setObject: toNSNull([dict objectForKey:Goal_sNote2])					forKey:Goal_sNote2];
-	//----------[0.9]以下追加
-	[kvs setObject: toNSNull([dict objectForKey:Goal_nPedometer])			forKey:Goal_nPedometer];
-	[kvs setObject: toNSNull([dict objectForKey:Goal_nBodyFat_10p])		forKey:Goal_nBodyFat_10p];
-	[kvs setObject: toNSNull([dict objectForKey:Goal_nSkMuscle_10p])	forKey:Goal_nSkMuscle_10p];
-	[kvs synchronize]; // iCloud最新同期（取得）
-	//---------------------------------------------------------------------------------- 
-
-	// E2record 全クリア
-	[__mocBase deleteAllCoreData];
-	// E2record 生成
-	for (NSDictionary *dict in ary)
-	{
-		NSString *zClass = [dict objectForKey:@"#class"];
-
-		if ([zClass isEqualToString:E2_ENTITYNAME]) {
-			[__mocBase insertNewObjectForDictionary:dict];
-		}
-		//else if ([zClass isEqualToString:@"E1body"]) {
-		//	[mocBase insertNewObjectForDictionary:dict];
-		//}
-	}
-	// コミット
-	[__mocBase commit];
-	// E2 件数
-	__app_e2record_count = [__mocBase e2record_count];
-	// リフレッシュ通知
-    NSNotification* refreshNotification = [NSNotification notificationWithName:NFM_REFRESH_ALL_VIEWS
-																		object:self  userInfo:nil];
-    [[NSNotificationCenter defaultCenter] postNotification:refreshNotification];
-	return nil;
 }
 
 

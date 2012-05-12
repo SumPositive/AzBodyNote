@@ -8,7 +8,8 @@
 
 #import <UIKit/UIKit.h>
 #import "AZAboutVC.h"
-#import "AZStoreTVC.h"
+#import "AZStoreTVC.h"	//<AZStoreDelegate>
+#import "AZDropboxVC.h"	//<AZDropboxDelegate>
 
 #import "AppDelegate.h"
 #import "AZCalendarSelect.h"
@@ -16,7 +17,7 @@
 #import "SettStatTVC.h"
 
 
-@interface SettingTVC : UITableViewController <AZStoreDelegate>
+@interface SettingTVC : UITableViewController <AZStoreDelegate, AZDropboxDelegate>
 {
 @private
 	AppDelegate					*mAppDelegate;

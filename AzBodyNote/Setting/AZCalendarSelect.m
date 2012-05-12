@@ -174,7 +174,7 @@
 		if (mAppDelegate.app_is_unlock==NO) {	// Free制限
 			if (calendar.type != EKCalendarTypeLocal) {
 				// Freeでは「ローカルカレンダー」だけに制限する
-				alertBox(NSLocalizedString(@"FreeLock",nil), 
+				azAlertBox(NSLocalizedString(@"FreeLock",nil), 
 						 NSLocalizedString(@"FreeLock CalendarLocal",nil), @"OK");
 				return;
 			}

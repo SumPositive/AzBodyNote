@@ -215,7 +215,7 @@
 
 	if (mAppDelegate.app_is_unlock==NO && STAT_DAYS_FREE < ibSpDays.value) {
 		ibSpDays.value = STAT_DAYS_FREE;
-		alertBox(NSLocalizedString(@"FreeLock",nil), 
+		azAlertBox(NSLocalizedString(@"FreeLock",nil), 
 				 NSLocalizedString(@"FreeLock StatLimit",nil), @"OK");
 		return;
 	}

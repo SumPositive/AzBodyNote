@@ -53,7 +53,7 @@
 			}
 		} else {
 			// didFinishLaunchingWithOptions:にて初期セット済み
-			alertBox(NSLocalizedString(@"SettGraph ERR GUD",nil), NSLocalizedString(@"SettGraph ERR GUD detail",nil), @"OK");
+			azAlertBox(NSLocalizedString(@"SettGraph ERR GUD",nil), NSLocalizedString(@"SettGraph ERR GUD detail",nil), @"OK");
 			GA_TRACK_EVENT_ERROR(@"SettGraph ERR GUD",0);
 			[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
 		}

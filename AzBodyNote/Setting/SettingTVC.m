@@ -73,7 +73,7 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {	// Return the number of sections.
-    return 3;
+    return 4;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -82,6 +82,7 @@
 		case 0:	return 2;			break;
 		case 1:	return 2;			break;
 		case 2:	return 2;			break;
+		case 3:	return 1;			break;
 	}
 	return 0;
 }
@@ -90,6 +91,17 @@
 {
 	//switch (indexPath.section*100 + indexPath.row) 
     return 44; // Default
+}
+
+// TableView セクションタイトルを応答
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section 
+{
+	switch (section) {
+		case 3:
+			return	NSLocalizedString(@"All data will be removed", nil);
+			break;
+	}
+	return nil;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -172,7 +184,7 @@
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 			}
 			cell.imageView.image = [UIImage imageNamed:@"Icon32"];
-			cell.textLabel.text = AZClassLocalizedString(@"AZAbout",nil);
+			cell.textLabel.text = AZLocalizedString(@"AZAbout",nil);
 			cell.detailTextLabel.text = nil;
 			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 			return cell;
@@ -184,8 +196,21 @@
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 			}
 			cell.imageView.image = [UIImage imageNamed:@"Icon-Store-32"];
-			cell.textLabel.text = AZClassLocalizedString(@"AZStore",nil);
-			cell.detailTextLabel.text = AZClassLocalizedString(@"AZStore detail",nil);
+			cell.textLabel.text = AZLocalizedString(@"AZStore",nil);
+			cell.detailTextLabel.text = AZLocalizedString(@"AZStore detail",nil);
+			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+			return cell;
+		}	break;
+			
+		
+		case 300: {	// Dropbox - Download
+			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
+			if (cell == nil) {
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
+			}
+			cell.imageView.image = [UIImage imageNamed:@"AZDropbox-32"];
+			cell.textLabel.text = NSLocalizedString(@"Dropbox Download",nil);
+			cell.detailTextLabel.text = nil;
 			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 			return cell;
 		}	break;
@@ -270,6 +295,24 @@
 			vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
 			[self.navigationController pushViewController:vc animated:YES];
 		}	break;
+
+	
+		case 300: {	// Dropbox - Download
+			// Dropbox を開ける
+			AZDropboxVC *vc = [[AZDropboxVC alloc] initWithMode:AZDropboxDownload
+													  extension:GD_EXTENSION delegate:self];
+			vc.title = NSLocalizedString(@"Dropbox Download",nil);
+			[vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
+			// Set up NEXT Left [Back] buttons.
+			self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
+													 initWithTitle: NSLocalizedString(@"Back", nil)
+													 style:UIBarButtonItemStylePlain
+													 target:nil  action:nil];
+			//表示開始
+			[self.navigationController pushViewController:vc animated:YES];
+			//表示開始後にsetする
+			[vc setCryptHidden:YES	 Enabled:NO];////表示後にセットすること
+		}	break;
 	}
 }
 
@@ -286,5 +329,89 @@
 																		object:self  userInfo:nil];
 	[[NSNotificationCenter defaultCenter] postNotification:refreshNotification];
 }
+
+
+#pragma mark - <AZDropboxDelegate>
+- (NSString*)azDropboxBeforeUpFilePath:(NSString*)filePath crypt:(BOOL)crypt {	// 未使用
+	return @"NG";
+}
+
+- (NSString*)azDropboxDownAfterFilePath:(NSString*)filePath
+{	//Down後処理＜DOWNしたファイルを読み込むなど＞
+	// filePath から NSManagedObject を読み込む
+	NSError *err = nil;
+	// 読み込む
+	NSString *zJson = [NSString stringWithContentsOfFile:filePath
+												encoding:NSUTF8StringEncoding error:&err];
+	if (err OR zJson==nil) {
+		NSLog(@"tmpFileLoad: stringWithContentsOfFile: (err=%@)", [err description]);
+		GA_TRACK_EVENT_ERROR([err description],0);
+		return [err description];
+	}
+	NSLog(@"tmpFileLoad: zJson=%@", zJson);
+	// JSON --> NSArray
+	DBJSON	*js = [DBJSON new];
+	NSArray *ary = [js objectWithString:zJson error:&err];
+	if (err) {
+		NSLog(@"tmpFileLoad: SBJSON: objectWithString: (err=%@) zJson=%@", [err description], zJson);
+		GA_TRACK_EVENT_ERROR([err description],0);
+		return [err description];
+	}
+	NSLog(@"tmpFileLoad: ary=%@", ary);
+	//
+	NSDictionary *dict = [ary objectAtIndex:0]; // Header
+	if (![[dict objectForKey:@"#class"] isEqualToString:@"Header"]) {
+		NSLog(@"tmpFileLoad: #class ERR: %@", dict);
+		return @"NG #class";
+	}
+	if (![[dict objectForKey:@"#header"] isEqualToString:FILE_HEADER_PREFIX]) {
+		NSLog(@"tmpFileLoad: #header ERR: %@", dict);
+		return @"NG #header";
+	}
+	//----------------------------------------------------------------------------------  iCloud-KVS
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	[kvs setObject: azNSNull([dict objectForKey:Goal_nBpHi_mmHg])		forKey:Goal_nBpHi_mmHg];
+	[kvs setObject: azNSNull([dict objectForKey:Goal_nBpLo_mmHg])		forKey:Goal_nBpLo_mmHg];
+	[kvs setObject: azNSNull([dict objectForKey:Goal_nPulse_bpm])			forKey:Goal_nPulse_bpm];
+	[kvs setObject: azNSNull([dict objectForKey:Goal_nTemp_10c])			forKey:Goal_nTemp_10c];
+	[kvs setObject: azNSNull([dict objectForKey:Goal_nWeight_10Kg])	forKey:Goal_nWeight_10Kg];
+	[kvs setObject: azNSNull([dict objectForKey:Goal_sEquipment])			forKey:Goal_sEquipment];
+	[kvs setObject: azNSNull([dict objectForKey:Goal_sNote1])					forKey:Goal_sNote1];
+	[kvs setObject: azNSNull([dict objectForKey:Goal_sNote2])					forKey:Goal_sNote2];
+	//----------[0.9]以下追加
+	[kvs setObject: azNSNull([dict objectForKey:Goal_nPedometer])			forKey:Goal_nPedometer];
+	[kvs setObject: azNSNull([dict objectForKey:Goal_nBodyFat_10p])		forKey:Goal_nBodyFat_10p];
+	[kvs setObject: azNSNull([dict objectForKey:Goal_nSkMuscle_10p])	forKey:Goal_nSkMuscle_10p];
+	[kvs synchronize]; // iCloud最新同期（取得）
+	//---------------------------------------------------------------------------------- 
+	
+	// E2record 全クリア
+	[mAppDelegate.mocBase deleteAllCoreData];
+	// E2record 生成
+	for (NSDictionary *dict in ary)
+	{
+		NSString *zClass = [dict objectForKey:@"#class"];
+		
+		if ([zClass isEqualToString:E2_ENTITYNAME]) {
+			[mAppDelegate.mocBase insertNewObjectForDictionary:dict];
+		}
+		//else if ([zClass isEqualToString:@"E1body"]) {
+		//	[mocBase insertNewObjectForDictionary:dict];
+		//}
+	}
+	// コミット
+	[mAppDelegate.mocBase commit];
+	// E2 件数
+	mAppDelegate.app_e2record_count = [mAppDelegate.mocBase e2record_count];
+	return nil; //OK
+}
+
+- (void)azDropboxDownCompleated
+{	//ここで、Down成功後の再描画など行う
+	// 再読み込み 通知発信---> E1viewController
+	[[NSNotificationCenter defaultCenter] postNotificationName:NFM_REFRESH_ALL_VIEWS
+														object:self userInfo:nil];
+}
+
 
 @end

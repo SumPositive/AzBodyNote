@@ -354,12 +354,18 @@
 			}	break;
 
 			case 1: {	// Dropbox  "esuslogo101409"
-				static NSString *Cid = @"E2listDropbox"; // .storyboard定義名
+				//static NSString *Cid = @"E2listDropbox"; // .storyboard定義名
+				static NSString *Cid = @"E2listBasic";  //== Class名
 				UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
 				if (cell == nil) {
 					UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
 					[nib instantiateWithOwner:self options:nil];
 				}
+				cell.imageView.image = [UIImage imageNamed:@"AZDropbox-32"];
+				cell.textLabel.text = NSLocalizedString(@"Dropbox Upload",nil);
+				cell.userInteractionEnabled = YES;
+				cell.selectionStyle = UITableViewCellSelectionStyleBlue;
+				cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 				return cell;
 			}	break;
 				
@@ -373,7 +379,11 @@
 					//cell.showsReorderControl = NO; // Move禁止
 					//cell.selectionStyle = UITableViewCellSelectionStyleNone; // 選択時ハイライトなし
 				}
+				cell.imageView.image = nil;
 				cell.textLabel.text = @"";
+				cell.userInteractionEnabled = NO;
+				cell.selectionStyle = UITableViewCellSelectionStyleNone;
+				cell.accessoryType = UITableViewCellAccessoryNone;
 				return cell;
 			}	break;
 		}
@@ -465,8 +475,28 @@
 	{	// Functions
 		indexPathEdit_ = nil; // Editモード解除
 		if (indexPath.row==1) {	// Dropbox
-			AppDelegate *appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
-			[appDelegate dropboxView];
+			//AppDelegate *appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+			//[appDelegate dropboxView];
+			// Dropbox を開ける
+			AZDropboxVC *vc = [[AZDropboxVC alloc] initWithMode:AZDropboxUpload
+													  extension:GD_EXTENSION delegate:self];
+			vc.title = NSLocalizedString(@"Dropbox Upload",nil);
+			[vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
+			// Set up NEXT Left [Back] buttons.
+			self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
+													 initWithTitle: NSLocalizedString(@"Back", nil)
+													 style:UIBarButtonItemStylePlain
+													 target:nil  action:nil];
+			//表示開始
+			[self.navigationController pushViewController:vc animated:YES];
+			//表示開始後にsetする
+			[vc setCryptHidden:YES	 Enabled:NO];////表示後にセットすること
+			NSDateFormatter *fm = [[NSDateFormatter alloc] init];
+			// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
+			NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+			[fm setCalendar:calendar];
+			[fm setDateFormat:@"yyyy-MM"];	//年-月
+			[vc setUpFileName: [fm stringFromDate:[NSDate date]]];
 		}
 	}
 	else {
@@ -634,5 +664,84 @@
 		}
 	}
 }
+
+#pragma mark - <AZDropboxDelegate>
+- (NSString*)azDropboxBeforeUpFilePath:(NSString*)filePath crypt:(BOOL)crypt
+{	//Up前処理＜UPするファイルを準備する＞
+	// NSManagedObject を filePath へ書き出す           crypt未対応
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	[kvs synchronize]; // iCloud最新同期（取得）
+	// E2record 取得
+	// Sort条件
+	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
+	NSArray *sortDesc = [NSArray arrayWithObjects: sort1,nil]; // 日付降順：Limit抽出に使用
+	NSArray *aE2records = [mocFunc_ select: E2_ENTITYNAME
+									  limit: 0
+									 offset: 0
+									  where: [NSPredicate predicateWithFormat:E2_nYearMM @" > 200000"] // 未保存を除外する
+									   sort: sortDesc]; // 最新日付から抽出
+	// NSManagedObject を NSDictionary変換する。　JSON変換できるようにするため
+	NSMutableArray *maE2 = [NSMutableArray new];
+	NSDictionary *dict = [[NSDictionary alloc] initWithObjectsAndKeys:
+						  @"Header",									@"#class",
+						  FILE_HEADER_PREFIX,					@"#header",
+						  utcFromDate([NSDate date]),	@"#update",
+						  @"2",												@"#version",
+						  //----------------------------------------------------------------------------------  iCloud-KVS
+						  azNSNull([kvs objectForKey:Goal_nBpHi_mmHg]),		Goal_nBpHi_mmHg,
+						  azNSNull([kvs objectForKey:Goal_nBpLo_mmHg]),		Goal_nBpLo_mmHg,
+						  azNSNull([kvs objectForKey:Goal_nPulse_bpm]),			Goal_nPulse_bpm,
+						  azNSNull([kvs objectForKey:Goal_nTemp_10c]),			Goal_nTemp_10c,
+						  azNSNull([kvs objectForKey:Goal_nWeight_10Kg]),		Goal_nWeight_10Kg,
+						  azNSNull([kvs objectForKey:Goal_sEquipment]),			Goal_sEquipment,
+						  azNSNull([kvs objectForKey:Goal_sNote1]),					Goal_sNote1,
+						  azNSNull([kvs objectForKey:Goal_sNote2]),					Goal_sNote2,
+						  //----------[0.9]以下追加
+						  azNSNull([kvs objectForKey:Goal_nPedometer]),			Goal_nPedometer,
+						  azNSNull([kvs objectForKey:Goal_nBodyFat_10p]),		Goal_nBodyFat_10p,
+						  azNSNull([kvs objectForKey:Goal_nSkMuscle_10p]),	Goal_nSkMuscle_10p,
+						  //---------------------------------------------------------------------------------- 
+						  nil];
+	[maE2 addObject:dict];	// #class = "Header"
+	// E2record
+	for (E2record *e2 in aE2records) {
+		//NSLog(@"----- e2=%@", e2);
+		@autoreleasepool {
+			NSDictionary *dic = [mocFunc_ dictionaryObject:e2];
+			if (dic) {
+				//NSLog(@"----- ----- dic=%@", dic);
+				[maE2 addObject:dic];	// #class = "E2record"
+			}
+		}
+	}
+	
+	// NSArray --> JSON
+	DBJSON	*js = [DBJSON new];
+	NSError *err = nil;
+	NSString *zJson = [js stringWithObject:maE2 error:&err];
+	if (err) {
+		NSLog(@"tmpFileSave: SBJSON: stringWithObject: (err=%@) zJson=%@", [err description], zJson);
+		GA_TRACK_EVENT_ERROR([err description],0);
+		return [err description];
+	}
+	NSLog(@"tmpFileSave: zJson=%@", zJson);
+	// 書き出す
+	//[zJson writeToFile:zPath atomically:YES]; NG//非推奨になった。
+	[zJson writeToFile:filePath atomically:YES encoding:NSUTF8StringEncoding error:&err];
+	if (err) {
+		NSLog(@"tmpFileSave: writeToFile: (err=%@)", [err description]);
+		GA_TRACK_EVENT_ERROR([err description],0);
+		return [err description];
+	}
+	return nil; //OK
+}
+
+- (NSString*)azDropboxDownAfterFilePath:(NSString*)filePath {	// 未使用
+	return @"NG";
+}
+
+- (void)azDropboxDownCompleated {	// 未使用
+}
+
 
 @end

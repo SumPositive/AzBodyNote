@@ -18,6 +18,13 @@
 #define NFM_REFETCH_ALL_DATA			@"RefetchAllDatabaseData"
 #define NFM_AppDidBecomeActive			@"AppDidBecomeActive"
 
+// Dropbox
+#define DBOX_KEY										@"qq4oke7nx6f8ivj"
+#define DBOX_SECRET								@"dq48qqerkqz9sen"
+#define GD_EXTENSION								@"condition"
+#define FILE_HEADER_PREFIX					@"Condition(C)Azukid"
+
+
 // typedef
 enum {
     AzConditionNote		= 0,
