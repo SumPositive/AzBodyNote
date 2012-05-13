@@ -891,7 +891,7 @@
 		[fmt setCalendar:calendar];
 		if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) 
 		{ // 「書式」で変わる。　「言語」でない
-			[fmt setDateFormat:@"yyyy年M月d日 EE  HH:mm"];
+			[fmt setDateFormat:@"yyyy年M月d日(EE) HH:mm"];
 		}
 		else {
 			[fmt setDateFormat:@"EE, MMM d, yyyy  HH:mm"];

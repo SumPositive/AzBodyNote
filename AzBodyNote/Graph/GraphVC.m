@@ -101,7 +101,7 @@
 								 where: [NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"] // 未保存を除外する
 								  sort: sortDesc]; // 最新日付から抽出
 	
-	if (0 < mPage && [e2recs count] <= iOverLeft + iOverRight) { // 次ページなし
+	if ([e2recs count] <= iOverLeft + iOverRight) { // 次ページなし
 		mPageMax = mPage;  // 最終ページ判明
 		return;
 	}
@@ -118,12 +118,12 @@
 	
 	// スクロール領域				   (                 左余白                 ) + (               レコード               ) + (                 右余白                 ); 
 	rcScrollContent.size.width = (fWhalf - RECORD_WIDTH/2) + (RECORD_WIDTH * iCount) + (fWhalf - RECORD_WIDTH/2);
-	ibScrollView.contentSize = CGSizeMake(rcScrollContent.size.width, rcScrollContent.size.height);
+	ibScrollView.contentSize = CGSizeMake(rcScrollContent.size.width - RECORD_WIDTH, rcScrollContent.size.height);
 	
 	// 描画領域
 	rcScrollContent.origin.x = (fWhalf - RECORD_WIDTH/2) - (RECORD_WIDTH * iOverLeft);  
 	rcScrollContent.size.width = RECORD_WIDTH * iCount;
-	if (mPage==0) {
+	if (mPage==0 && 0 < mPageMax) {		//0ページ目 かつ 51件以上(&& 0 < mPageMax)のとき
 		rcScrollContent.size.width += RECORD_WIDTH;	//＋Goal列
 	}
 	
@@ -140,6 +140,7 @@
 	} else {
 		mGvDate.ppE2records = e2recs;
 		mGvDate.ppPage = mPage;
+		[mGvDate setFrame:rcgv];
 		[mGvDate setNeedsDisplay]; //drawRect:が呼び出される
 	}
 
@@ -315,16 +316,7 @@
 		}
 		rcgv.origin.y += fHeight;
 	}
-/*	// スクロール初期位置
-	if (0 < pageChange) {
-		//＋次ページなので右端へ移動
-		ibScrollView.contentOffset = 
-				CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);
-	} 
-	else if (pageChange < 0) {
-		//ー前ページなので左端へ移動
-		ibScrollView.contentOffset = CGPointMake(0, 0);
-	}*/
+	// スクロール初期位置	// animation_after:にて処理
 }
 
 NSInteger afterPageChange = 0;
@@ -335,8 +327,13 @@ NSInteger afterPageChange = 0;
 	// スクロール初期位置
 	if (0 < afterPageChange) {
 		//＋次ページなので右端へ移動
-		ibScrollView.contentOffset = 
-		CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);
+		if (mPage==0 OR mPage==mPageMax) {
+			ibScrollView.contentOffset = 
+			CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);
+		} else {
+			ibScrollView.contentOffset = 
+			CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width - RECORD_WIDTH, 0);
+		}
 	} 
 	else if (afterPageChange < 0) {
 		//ー前ページなので左端へ移動

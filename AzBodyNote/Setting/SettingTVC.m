@@ -139,15 +139,16 @@
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 			}
 			if ([kvs objectForKey:KVS_CalendarID]) {
+				cell.imageView.image = [UIImage imageNamed:@"Icon32-Calender-ON"];
 				cell.textLabel.text = [NSString stringWithFormat:@"%@: %@",
 									   NSLocalizedString(@"SettCalender",nil), 
 									   [kvs objectForKey:KVS_CalendarTitle]];
 			} else {
+				cell.imageView.image = [UIImage imageNamed:@"Icon32-Calender"];
 				cell.textLabel.text = [NSString stringWithFormat:@"%@: %@",
 									   NSLocalizedString(@"SettCalender",nil), 
 									   NSLocalizedString(@"AZCalendarSelect NON",nil)];
 			}
-			cell.imageView.image = [UIImage imageNamed:@"Icon32-Calender"];
 			cell.detailTextLabel.text = NSLocalizedString(@"SettCalender detail",nil);
 			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 			return cell;
@@ -195,7 +196,7 @@
 			if (cell == nil) {
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 			}
-			cell.imageView.image = [UIImage imageNamed:@"Icon-Store-32"];
+			cell.imageView.image = [UIImage imageNamed:@"AZStore-32"];
 			cell.textLabel.text = AZLocalizedString(@"AZStore",nil);
 			cell.detailTextLabel.text = AZLocalizedString(@"AZStore detail",nil);
 			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -411,6 +412,7 @@
 	// 再読み込み 通知発信---> E1viewController
 	[[NSNotificationCenter defaultCenter] postNotificationName:NFM_REFRESH_ALL_VIEWS
 														object:self userInfo:nil];
+	[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
 }
 
 
