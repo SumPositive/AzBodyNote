@@ -9,20 +9,17 @@
 #import <UIKit/UIKit.h>
 #import <eventkit/EventKit.h>
 
-/*[0.9]広告廃止、制限のみにした
-#import "AdWhirlView.h"
-#import "AdWhirlDelegateProtocol.h"
-#define GAD_SIZE_320x50     CGSizeMake(320, 50)
-#import "MasManagerViewController.h"
-#import "NADView.h"  //AppBank nend
-*/
+// マイナー広告廃止
+// iAd優先 AdMob補助 方式に戻した。 iAdは30秒以上表示するだけでも収益あり
+#import <iAd/iAd.h>
+#import "GADBannerView.h"
 
 #import "Global.h"
 #import "MocEntity.h"
 #import "MocFunctions.h"
 
 
-@interface AppDelegate : NSObject <UIApplicationDelegate>
+@interface AppDelegate : NSObject <UIApplicationDelegate, ADBannerViewDelegate, GADBannerViewDelegate>
 {
 @private
 	NSManagedObjectModel				*moModel_;
@@ -33,9 +30,10 @@
 	UIActivityIndicatorView				*alertIndicator_;
 	BOOL											mAzukiUnlock;	// YES=購入意思ありと見なしてUnlockする
 	
-	//AdWhirlView							*mAdWhirlView;
-	//NADView										*mNendView;
-	//MasManagerViewController		*mMedibaAd; 
+	ADBannerView						*RiAdBanner;
+	GADBannerView						*RoAdMobView;
+	BOOL				bADbannerIsVisible;		// iAd 広告内容があればYES
+	NSInteger		mAdShow;						// (0)非表示 (1)tabBar上 (2)最下部
 }
 
 @property (nonatomic, strong) IBOutlet UIWindow *window;
@@ -58,12 +56,8 @@
 - (void)alertProgressOn:(NSString*)zTitle;
 - (void)alertProgressOff;
 
-//- (void)dropboxView;
-//- (NSString*)tmpFilePath;
-//- (NSString*)tmpFileSave;
-//- (NSString*)tmpFileLoad;
-
 - (NSString *)applicationDocumentsDirectory;
-//- (void)adDealloc;
+
+- (void)adShow:(NSInteger)iShow;
 
 @end

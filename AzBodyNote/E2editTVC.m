@@ -691,20 +691,12 @@
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
+	if (editMode_) {
+		[appDelegate_ adShow: 2];
+	} else {
+		[appDelegate_ adShow: 1];
+	}
 
-/*	if (appDelegate_.app_is_unlock==NO  &&  appDelegate_.adWhirlView) {	// Ad ON
-		[UIView beginAnimations:nil context:NULL];
-		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-		[UIView setAnimationDuration:1.2];
-		if (editMode_) {
-			appDelegate_.adWhirlView.frame = CGRectMake(0, 480-50, 320, 50);  // GAD_SIZE_320x50
-		} else {
-			appDelegate_.adWhirlView.frame = CGRectMake(0, 480-49-50, 320, 50);  // GAD_SIZE_320x50
-		}
-		appDelegate_.adWhirlView.hidden = NO;
-		[UIView commitAnimations];
-	}*/
-	
 #ifdef DEBUGxxxxxx				// テストデータ生成
 	// 全データを削除する
 	//[mocBase deleteAllCoreData];

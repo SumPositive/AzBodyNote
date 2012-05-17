@@ -16,7 +16,7 @@
 //#import "DropboxVC.h"
 
 
-#define CoreData_iCloud_SYNC		NO	// YES or NO
+#define CoreData_iCloud_SYNC		NO		// YES or NO
 
 //@interface AppDelegate (PrivateMethods)
 //- (NSManagedObjectContext *)managedObjectContext;
@@ -212,7 +212,7 @@
 			}
 		}
 #ifdef DEBUG
-		__app_is_unlock = YES;
+		__app_is_unlock = NO;
 #endif
 		if (__app_is_unlock) {	//登録
 			[kvs setBool:YES forKey:STORE_PRODUCTID_UNLOCK];
@@ -239,6 +239,7 @@
 	[kvs synchronize];
 #endif
 	
+/*** AZDropboxへ
 	// Dropbox
 	DBSession* dbSession = [[DBSession alloc]
 							 initWithAppKey: DBOX_KEY
@@ -247,42 +248,45 @@
 	if (dbSession==nil) {
 		GA_TRACK_EVENT_ERROR(@"dbSession==nil",0);
 	}
-	[DBSession setSharedSession:dbSession];
+	[DBSession setSharedSession:dbSession];*/
 
-#ifdef xxxxxNoAdd //広告廃止
 	if (__app_is_unlock==NO) {
-		//CGRect rcAd = CGRectMake(0, self.view.frame.size.height-28-50, 320, 50);  // GAD_SIZE_320x50
-		//--------------------------------------------------------------------------------------------------------- AdWirl
-		if (__pAdWhirlView==nil) {
-			__pAdWhirlView = [AdWhirlView requestAdWhirlViewWithDelegate:self];
-			__pAdWhirlView.frame = CGRectMake(0, 0, 320, 50);
-			//[pTabBarController_.view addSubview:pAdWhirlView_];
-			//[self.window addSubview:pAdWhirlView_];
-			[__window.rootViewController.view addSubview:__pAdWhirlView];
+		@try {
+			CGRect rc = self.window.rootViewController.view.frame;
+			rc.origin.x = 0;
+			rc.origin.y = rc.size.height - 50 - 48;
+			rc.size.height = 50;
+			rc.size.width = 320;
+			//--------------------------------------------------------------------------------------------------------- AdMob
+			if (RoAdMobView==nil) {
+				RoAdMobView = [[GADBannerView alloc] init];
+				RoAdMobView.rootViewController = self.window.rootViewController;
+				RoAdMobView.adUnitID = @"a14ece23da85f5e";	//体調メモ
+				RoAdMobView.frame = rc;
+				RoAdMobView.alpha = 0;
+				GADRequest *request = [GADRequest request];
+				//[request setTesting:YES];
+				[RoAdMobView loadRequest:request];	
+				[self.window.rootViewController.view addSubview:RoAdMobView];
+			}
+			//--------------------------------------------------------------------------------------------------------- iAd
+			// iOS5.0以降のみ
+			assert(NSClassFromString(@"ADBannerView"));
+			RiAdBanner = [[ADBannerView alloc] initWithFrame:CGRectZero];
+			RiAdBanner.delegate = self;
+			RiAdBanner.requiredContentSizeIdentifiers = [NSSet setWithObjects:ADBannerContentSizeIdentifierPortrait, nil];
+			RiAdBanner.currentContentSizeIdentifier = ADBannerContentSizeIdentifierPortrait;
+			RiAdBanner.frame = rc;
+			RiAdBanner.alpha = 0;
+			[self.window.rootViewController.view addSubview:RiAdBanner];
+			bADbannerIsVisible = NO;
+			mAdShow = 0;
 		}
-		
-		if ([NSLocalizedString(@"Country2code",nil) isEqualToString:@"ja"])
-		{	// これにより ja 以外はパスする
-			if (mNendView==nil) {	// AppBank nend
-				mNendView = [[NADView alloc] initWithFrame:CGRectMake(0,0,
-																	  NAD_ADVIEW_SIZE_320x50.width, NAD_ADVIEW_SIZE_320x50.height)];
-				//[nadview setNendID:@"apiKeyを入れてね" spotID:@"広告枠IDを入れてね"];
-				[mNendView setNendID:@"f905d0b348963ffc8834ac59465cfd9488ee646e" spotID:@"6949"]; // Condition
-				[mNendView setDelegate:self];
-				[mNendView setRootViewController:__window.rootViewController];
-				[mNendView load:nil];
-			}
-			if (mMedibaAd==nil) {	// Mediba Ad
-				mMedibaAd = [[MasManagerViewController alloc] init];
-				//[self.view addSubview:pMedibaAd_.view];
-				[mMedibaAd setPosition:kMasMVPosition_bottom];
-				mMedibaAd.view.frame = __pAdWhirlView.bounds; //これが無ければ変にスクロールする
-				mMedibaAd.auID = @"165123";  // Condition
-				[mMedibaAd loadRequest];
-			}
+		@catch (NSException *exception) {
+			NSLog(@"Ad Exception: %@: %@", [exception name], [exception reason]);
+			GA_TRACK_EVENT_ERROR([exception description],0);
 		}
 	}
-#endif
 	
 	if (__eventStore==nil) {
 		__eventStore = [[EKEventStore alloc] init];
@@ -328,21 +332,17 @@
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
-{
-	/*
-	 Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-	 Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
-	 */
+{	//iOS4: アプリケーションがアクティブでなくなる直前に呼ばれる
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
-{
-	//[[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
+{	//iOS4: アプリケーションがバックグラウンドになったら呼ばれる
+	//[self adShow:NO];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
-{
-	//[[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+{	//iOS4: アプリケーションがバックグラウンドから復帰する直前に呼ばれる
+	//[self adShow:YES];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
@@ -357,27 +357,22 @@
 	// iCloud KVS 変更通知の待ち受け解放
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
-/***
-- (void)adDealloc
-{
-	if (mNendView) {
-		mNendView.delegate = nil;
-		mNendView = nil;
-	}
-	if (mMedibaAd) {
-		mMedibaAd.delegate = nil;
-		mMedibaAd = nil;
-	}
-	if (__pAdWhirlView) {
-		__pAdWhirlView.delegate = nil;
-		__pAdWhirlView = nil;
-	}
-}*/
 
 - (void)dealloc
 {
-	//[self adDealloc];
 	__eventStore = nil;
+
+	if (RiAdBanner) {
+		[RiAdBanner cancelBannerViewAction];	// 停止
+		RiAdBanner.delegate = nil;							// 解放メソッドを呼び出さないように　　　[0.4.1]メモリ不足時に落ちた原因
+		[RiAdBanner removeFromSuperview];		// UIView解放		retainCount -1
+		RiAdBanner = nil;	// alloc解放			retainCount -1
+	}
+	
+	if (RoAdMobView) {
+		RoAdMobView.delegate = nil;  //[0.4.20]受信STOP  ＜＜これが無いと破棄後に呼び出されて落ちる
+		RoAdMobView = nil;
+	}
 }
 
 
@@ -588,50 +583,73 @@
 	return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
 }
 
-/*
-#pragma mark - Ads <AdWhirlDelegate>
-- (NSString *)adWhirlApplicationKey
-{	//return @"ここにAdwhirl管理画面のアプリのページ上部に記載されているSDK Keyをコピペ";
-	return @"68f2b24bfca64225a1553bdbc0b31edc"; // Condition
-}
 
-- (UIViewController *)viewControllerForPresentingModalView
-{	//return UIWindow.rootViewController;
-	NSLog(@"AdWhirl - viewControllerForPresentingModalView");
-    return __window.rootViewController;
-}
 
-- (void)adWhirlDidReceiveAd:(AdWhirlView *)adWhirlView
-{	// 広告を受信したとき
-	NSLog(@"AdWhirl - adWhirlDidReceiveAd");
-}
-
-- (void)adWhirlDidFailToReceiveAd:(AdWhirlView *)adWhirlView usingBackup:(BOOL)yesOrNo
-{	// 広告が無いとき
-	NSLog(@"AdWhirl - adWhirlDidFailToReceiveAd");
-	//adWhirlView.alpha = 0;
-	//adWhirlView.hidden = YES;
-}
-
-- (void)performEventAppBank:(AdWhirlView *)adWhirlView 
-{	// AppBank nend
-	NSLog(@"AdWhirl - performEventAppBank");
-	if (mNendView && __app_is_AdShow) {
-		[adWhirlView replaceBannerViewWith:mNendView];
-	}
-}
-- (void)nadViewDidFinishLoad:(NADView *)adView
+#pragma mark - Ad
+// iAd取得できたときに呼ばれる　⇒　表示する
+- (void)bannerViewDidLoadAd:(ADBannerView *)banner
 {
-	NSLog(@"AppBank nend - nadViewDidFinishLoad");
+	NSLog(@"=== iAd: bannerViewDidLoadAd ===");
+	bADbannerIsVisible = YES; // iAd取得成功（広告内容あり）
+	[self adRefresh];
 }
 
-- (void)performEventMedibaAd:(AdWhirlView *)adWhirlView 
-{	// Mediba Ad
-	NSLog(@"AdWhirl - performEventMedibaAd");
-	if (mMedibaAd && __app_is_AdShow) { // これにより ja 以外は、MedibaAd をパスする
-		[adWhirlView replaceBannerViewWith:mMedibaAd.view];
-	}
+// iAd取得できなかったときに呼ばれる　⇒　非表示にする
+- (void)bannerView:(ADBannerView *)banner didFailToReceiveAdWithError:(NSError *)error
+{
+	NSLog(@"=== iAd: didFailToReceiveAdWithError ===");
+	bADbannerIsVisible = NO; // iAd取得失敗（広告内容なし）
+	[self adRefresh];
 }
-*/
+
+// これは、applicationDidEnterBackground:からも呼び出される
+- (void)adShow:(NSInteger)iShow;
+{
+	NSLog(@"=== adShow: %ld ===", (long)iShow);
+	mAdShow = iShow;
+	[self adRefresh];
+}
+
+- (void)adRefresh
+{
+	if (__app_is_unlock  OR  RoAdMobView==nil  OR  RiAdBanner==nil) {
+		return;  //Adなし
+	}
+	NSLog(@"=== adRefresh ===");
+	
+	[UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+	[UIView setAnimationDuration:1.0];
+	
+
+	CGRect rc = RiAdBanner.frame;
+	if (mAdShow==1) {		// tabBarの上部に表示
+		rc.origin.y = self.window.rootViewController.view.frame.size.height - 48 - 50;
+	}
+	else if (mAdShow==2) {	// 最下部に表示
+		rc.origin.y = self.window.rootViewController.view.frame.size.height - 50;
+	}
+
+	if (RiAdBanner) {
+		RiAdBanner.frame = rc;
+		if (0<mAdShow && bADbannerIsVisible) {
+			RiAdBanner.alpha = 1;
+		} else {
+			RiAdBanner.alpha = 0;
+		}
+	}
+	
+	if (RoAdMobView) {
+		RoAdMobView.frame = rc;
+		if (0<mAdShow && (RiAdBanner==nil OR RiAdBanner.alpha==0)) {
+			RoAdMobView.alpha = 1;
+		} else {
+			RoAdMobView.alpha = 0;
+		}
+	}
+	
+	[UIView commitAnimations];
+}
+
 
 @end

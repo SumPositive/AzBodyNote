@@ -475,6 +475,7 @@ NSInteger afterPageChange = 0;
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
+	[mAppDelegate adShow:0];
 	
 	if ([mPanelGraphs count]<1) {
 		azAlertBox(NSLocalizedString(@"Graph NoPanel",nil), NSLocalizedString(@"Graph NoPanel detail",nil), @"OK");

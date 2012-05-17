@@ -186,6 +186,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
+	[appDelegate_ adShow:1];
 	
 /*	if (appDelegate_.adWhirlView) {	// Ad ON
 		[UIView beginAnimations:nil context:NULL];
@@ -478,9 +479,15 @@
 			//AppDelegate *appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
 			//[appDelegate dropboxView];
 			// Dropbox を開ける
-			AZDropboxVC *vc = [[AZDropboxVC alloc] initWithMode:AZDropboxUpload
-													  extension:GD_EXTENSION delegate:self];
-			vc.title = NSLocalizedString(@"Dropbox Upload",nil);
+			AZDropboxVC *vc = [[AZDropboxVC alloc] initWithAppKey: DBOX_KEY
+														appSecret: DBOX_SECRET
+														root: kDBRootAppFolder	//kDBRootAppFolder or kDBRootDropbox
+														rootPath: @"/"
+														mode: AZDropboxUpload
+														extension: GD_EXTENSION 
+														delegate: self];
+							   
+			//vc.title = NSLocalizedString(@"Dropbox Upload",nil);
 			[vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
 			// Set up NEXT Left [Back] buttons.
 			self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
@@ -497,6 +504,8 @@
 			[fm setCalendar:calendar];
 			[fm setDateFormat:@"yyyy-MM"];	//年-月
 			[vc setUpFileName: [fm stringFromDate:[NSDate date]]];
+			//
+			[appDelegate_ adShow:0];
 		}
 	}
 	else {

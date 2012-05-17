@@ -147,6 +147,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
+	[mAppDelegate adShow:0];
 	
 	[self graphViewAnimated:YES];
 }

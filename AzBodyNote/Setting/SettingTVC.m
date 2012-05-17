@@ -53,12 +53,14 @@
 		}
 	}*/
 }
-/*
+
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
+	[mAppDelegate adShow:0];
 }
 
+/*
 - (void)viewDidUnload
 {
     [super viewDidUnload];
@@ -300,9 +302,14 @@
 	
 		case 300: {	// Dropbox - Download
 			// Dropbox を開ける
-			AZDropboxVC *vc = [[AZDropboxVC alloc] initWithMode:AZDropboxDownload
-													  extension:GD_EXTENSION delegate:self];
-			vc.title = NSLocalizedString(@"Dropbox Download",nil);
+			AZDropboxVC *vc = [[AZDropboxVC alloc] initWithAppKey: DBOX_KEY
+														appSecret: DBOX_SECRET
+															 root: kDBRootAppFolder	//kDBRootAppFolder or kDBRootDropbox
+														 rootPath: @"/"
+															 mode: AZDropboxDownload
+														extension: GD_EXTENSION 
+														 delegate: self];
+			//vc.title = NSLocalizedString(@"Dropbox Download",nil);
 			[vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
 			// Set up NEXT Left [Back] buttons.
 			self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
