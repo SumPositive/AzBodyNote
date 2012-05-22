@@ -11,6 +11,7 @@
 #import "AZStoreTVC.h"	//<AZStoreDelegate>
 #import "AZDropboxVC.h"	//<AZDropboxDelegate>
 
+#import "Global.h"
 #import "AppDelegate.h"
 #import "AZCalendarSelect.h"
 #import "SettGraphTVC.h"

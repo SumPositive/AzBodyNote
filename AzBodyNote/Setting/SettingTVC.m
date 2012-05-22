@@ -106,6 +106,16 @@
 	return nil;
 }
 
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
+{
+	switch (section) {
+		case 3:
+			return	@"\n\n\nAzukiSoft Project\n"  COPYRIGHT;
+			break;
+	}
+	return nil;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	static NSString *sysCellSubtitle = @"sysCellSubtitle"; //システム既定セル

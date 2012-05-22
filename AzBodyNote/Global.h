@@ -7,6 +7,8 @@
 //
 #import "AZClass.h"
 
+#define COPYRIGHT		@"©2012 Azukid"
+
 #define GD_PRODUCTNAME	@"AzBodyNote"  // IMPORTANT PRODUCT NAME  和名「健康日記」
 													//↑↑変更禁止！！Keychainの'ServiceName'に使っているので読み出せなくなる。
 
