@@ -57,7 +57,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
-	[mAppDelegate adShow:0];
+	[mAppDelegate adShow:1];
 }
 
 /*
@@ -68,8 +68,14 @@
 */
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{	// 回転した後に呼び出される
+	[mAppDelegate adRefresh];
+}
+
 
 #pragma mark - Table view data source
 

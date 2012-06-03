@@ -155,8 +155,7 @@
 		@catch (NSException *exception) {
 			// 最終行を削除したとき
 			NSLog(@"LOGIC ERROR!!! - indexPathEdit_.row=%ld", (long)indexPathEdit_.row);
-			GA_TRACK_EVENT_ERROR([exception description],0);
-			//assert(NO);
+			GA_TRACK_ERROR([exception description])
 		}
 		@finally {
 			indexPathEdit_ = nil; // Editモード解除
@@ -177,8 +176,7 @@
 		}
 		@catch (NSException *exception) {
 			NSLog(@"LOGIC ERROR!!! - 最終行");
-			GA_TRACK_EVENT_ERROR([exception description],0);
-			assert(NO);
+			GA_TRACK_ERROR([exception description])
 		}
 	}
 }
@@ -210,13 +208,18 @@
     [super viewDidDisappear:animated];
 }
 */
-/*
- // Override to allow orientations other than the default portrait orientation.
+
+// Override to allow orientations other than the default portrait orientation.
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	// Return YES for supported orientations.
-	return (interfaceOrientation == UIInterfaceOrientationPortrait);
+	return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
- */
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{	// 回転した後に呼び出される
+	[appDelegate_ adRefresh];
+}
+
 
 - (void)didReceiveMemoryWarning
 {

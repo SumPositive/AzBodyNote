@@ -142,12 +142,22 @@
 	}
 	ibSpDays.value = iDays;
 	ibLbDays.text = [NSString stringWithFormat:NSLocalizedString(@"Stat Last %ld days",nil), iDays];
+
+	if (mAppDelegate.app_is_unlock==NO) {
+		CGRect rc = ibScrollView.frame;	//繰り返し通っても大丈夫なようにすること。
+		if (iS_iPAD) {
+			rc.size.height = self.view.frame.size.height - rc.origin.y - (66+3);
+		} else {
+			rc.size.height = self.view.frame.size.height - rc.origin.y - (50+3);
+		}
+		ibScrollView.frame = rc;
+	}
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
-	[mAppDelegate adShow:0];
+	[mAppDelegate adShow:1];	//[1.0]ScrollView下端を上げてAd表示する
 	
 	[self graphViewAnimated:YES];
 }
@@ -155,9 +165,16 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait);
 	//return YES; //[0.9]ヨコにすると「血圧の日変動分布」グラフ表示する
 }
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{	// 回転した後に呼び出される
+	[self graphViewAnimated:NO];	//再描画
+	[mAppDelegate adRefresh];
+}
+
 
 - (void)viewDidDisappear:(BOOL)animated
 {	// Called after the view was dismissed, covered or otherwise hidden. Default does nothing

@@ -735,9 +735,13 @@
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    // Return YES for supported orientations
-	return (interfaceOrientation == UIInterfaceOrientationPortrait); // タテ正面のみ
+{   // Return YES for supported orientations
+	return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait); // タテ正面のみ
+}
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{	// 回転した後に呼び出される
+	[appDelegate_ adRefresh];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -830,6 +834,29 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+	if (iS_iPAD) {
+		if (indexPath.row==0) {	// dateTime,
+			return 44;
+		}
+		if (indexPath.row==1) {	// DateOpt
+			return 50;
+		}
+		else if (PANEL_TOP_ROW<=indexPath.row && indexPath.row<PANEL_TOP_ROW+[mPanels count]) 
+		{	// 測定パネル順序に従ってセル表示する
+			assert(PANEL_TOP_ROW <= indexPath.row);
+			NSInteger iPanel = [[mPanels objectAtIndex:indexPath.row-PANEL_TOP_ROW] integerValue];
+			if (iPanel < 0) { // 負ならばグラフ表示ON
+				iPanel *= (-1); // 正にする
+			}
+			switch (iPanel) {
+				case AzConditionNote:
+					return 88 + 10;
+					break;
+			}
+		}
+		return 60 + 10;
+	}
+	
 	switch (indexPath.row) {
 		case 0:	// dateTime
 			return 44;
@@ -844,14 +871,10 @@
     return 88; // Default
 }
 
-/*
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section 
 {	// セクションフッタを応答
-	if (section==0) {
-		return @"(C)2011 Azukid";
-	}
-	return nil;
-} */
+	return [NSString stringWithFormat:@"%@ %@", NSLocalizedString(@"Product Title",nil), COPYRIGHT];
+}
 
 - (UITableViewCell *)cellDate:(UITableView *)tableView
 {
@@ -866,14 +889,24 @@
 	
 	if (kvsGoal_) {  	//if ([moE2edit_.nYearMM integerValue]==E2_nYearMM_GOAL)
 		cell.textLabel.text = NSLocalizedString(@"TheGoal Section",nil);
-		cell.textLabel.font = [UIFont boldSystemFontOfSize:22];
+		/* storyboard定義に従う
+		 if (iS_iPAD) {
+			cell.textLabel.font = [UIFont boldSystemFontOfSize:26];
+		} else {
+			cell.textLabel.font = [UIFont boldSystemFontOfSize:22];
+		}*/
 		cell.textLabel.textAlignment = UITextAlignmentCenter;
 		cell.accessoryType = UITableViewCellAccessoryNone;
 		cell.userInteractionEnabled = NO; // 操作なし
 	}
 	else {
-		cell.textLabel.font = [UIFont boldSystemFontOfSize:18];
-		cell.textLabel.textAlignment = UITextAlignmentLeft;
+		/* storyboard定義に従う
+		if (iS_iPAD) {
+			cell.textLabel.font = [UIFont boldSystemFontOfSize:24];
+		} else {
+			cell.textLabel.font = [UIFont boldSystemFontOfSize:18];
+		}*/
+		cell.textLabel.textAlignment = UITextAlignmentCenter;
 		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 		cell.userInteractionEnabled = YES; // 操作あり
 		

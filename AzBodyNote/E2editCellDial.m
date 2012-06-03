@@ -144,14 +144,24 @@
 		[mDial setDial:val animated:NO];
 	} else {
 		// 新規生成
-		mDial = [[AZDial alloc] initWithFrame:CGRectMake(15, 44, 295, 44)
+		CGRect rc;
+		if (iS_iPAD) {
+			rc = CGRectMake(385, 10, 295, 44);
+		} else {
+			rc = CGRectMake(15, 44, 295, 44);
+		}
+		mDial = [[AZDial alloc] initWithFrame: rc
 									 delegate: self
 										 dial: val
 										  min: valueMin_
 										  max: valueMax_
 										 step: dialStep_
 									stepper: stepperStep_];
-		[self addSubview:mDial];
+		if (ibViewBase) {	//iPad//
+			[ibViewBase addSubview:mDial];
+		} else {
+			[self addSubview:mDial];
+		}
 		mDial.backgroundColor = [UIColor clearColor]; //self.backgroundColor;
 	}
 	

@@ -59,5 +59,6 @@
 - (NSString *)applicationDocumentsDirectory;
 
 - (void)adShow:(NSInteger)iShow;
+- (void)adRefresh;  //回転時に呼び出すため
 
 @end

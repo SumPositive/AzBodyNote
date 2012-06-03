@@ -436,12 +436,6 @@ NSInteger afterPageChange = 0;
 {
     [super viewWillAppear:animated];
 
-/*	mAppDelegate.app_is_AdShow = NO; //これは広告表示しないViewである。 viewWillAppear:以降で定義すること
-	if (mAppDelegate.adWhirlView) {	// Ad OFF
-		//mAppDelegate.adWhirlView.frame = CGRectMake(0, self.view.frame.size.height+100, 320, 50);  //下へ隠す
-		mAppDelegate.adWhirlView.hidden = YES;
-	}*/
-
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	// パネル順序読み込み ⇒ グラフON(-)のパネルだけ抽出する
 	NSMutableArray *mua = [NSMutableArray new];
@@ -459,23 +453,30 @@ NSInteger afterPageChange = 0;
 		mGoalDisp = [kvs boolForKey:KVS_bGoal];
 		//mReDraw = YES; //=YES:設定に変化あり ⇒ クリアして再描画する
 	}
-	//if (mReDraw) {
-		//mReDraw = NO;
-		//[self drawClear];  viewDidDisappear:にてクリア処理
-		
-		mPageMax = 999; // この時点で最終ページは不明
-		mPage = 0;
-		[self graphViewPageChange:0  animated:NO];
-		//右端へ移動
-		ibScrollView.contentOffset = 
-		CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);
-	//}
+	
+	if (mAppDelegate.app_is_unlock==NO) {
+		CGRect rc = ibScrollView.frame;	//繰り返し通っても大丈夫なようにすること。
+		if (iS_iPAD) {
+			rc.size.height = self.view.frame.size.height - rc.origin.y - (66+3);
+		} else {
+			rc.size.height = self.view.frame.size.height - rc.origin.y - (50+3);
+		}
+		ibScrollView.frame = rc;
+	}
+	//NSLog(@"*** self.view.frame.size.width=%.2f", self.view.frame.size.width);
+	
+	mPageMax = 999; // この時点で最終ページは不明
+	mPage = 0;
+	[self graphViewPageChange:0  animated:NO];
+	//右端へ移動
+	ibScrollView.contentOffset = 
+	CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
-	[mAppDelegate adShow:0];
+	[mAppDelegate adShow:1];	//[1.0]ScrollView下端を上げてAd表示する
 	
 	if ([mPanelGraphs count]<1) {
 		azAlertBox(NSLocalizedString(@"Graph NoPanel",nil), NSLocalizedString(@"Graph NoPanel detail",nil), @"OK");
@@ -487,9 +488,16 @@ NSInteger afterPageChange = 0;
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait);
 	//return YES; //[0.9]ヨコにすると「血圧の日変動分布」グラフ表示する
 }
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{	// 回転した後に呼び出される
+	[mAppDelegate adRefresh];
+	[self graphViewPageChange:0  animated:NO];	//再描画
+}
+
 
 - (void)viewDidDisappear:(BOOL)animated
 {

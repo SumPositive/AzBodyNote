@@ -56,10 +56,14 @@
 	CGContextSetRGBFillColor (cgc, 0.75, 0.75, 0.75, 1.0);
 	CGContextFillRect(cgc, rc);
 	
+	CGFloat fZoom = 1.0;
+	if (iS_iPAD) {
+		fZoom = 1.5;
+	}
 	//文字列の設定
 	CGContextSetTextDrawingMode (cgc, kCGTextFill);  //kCGTextFillStroke
 	// "Helvetica"OK   "Optima"NG
-	CGContextSelectFont (cgc, "Helvetica", 12.0, kCGEncodingMacRoman); // ＜＜日本語NG 
+	CGContextSelectFont (cgc, "Helvetica", 12.0*fZoom, kCGEncodingMacRoman); // ＜＜日本語NG 
 	// 文字列 カラー設定(0.0-1.0でRGBAを指定する)
 	CGContextSetRGBFillColor (cgc, 151.0/295, 80.0/295, 77.0/295, 1.0);//Azukid色の薄め
 
@@ -76,7 +80,7 @@
 		//Goal
 		if (bGoal) {
 			cc = [[NSString stringWithString:@"Goal"] UTF8String];
-			CGContextShowTextAtPoint (cgc, po.x-15, po.y+1, cc, strlen(cc));
+			CGContextShowTextAtPoint (cgc, po.x-15*fZoom, po.y+1*fZoom, cc, strlen(cc));
 		}
 		po.x -= RECORD_WIDTH;
 	}
@@ -94,16 +98,16 @@
 			// 月/日
 			cc = [[NSString stringWithFormat:@"%d/%d", comp.month, comp.day] UTF8String];
 			if (4 < strlen(cc)) {
-				CGContextShowTextAtPoint (cgc, po.x-15, po.y+12, cc, strlen(cc));
+				CGContextShowTextAtPoint (cgc, po.x-15*fZoom, po.y+12*fZoom, cc, strlen(cc));
 			} else {
-				CGContextShowTextAtPoint (cgc, po.x-10, po.y+12, cc, strlen(cc));
+				CGContextShowTextAtPoint (cgc, po.x-10*fZoom, po.y+12*fZoom, cc, strlen(cc));
 			}
 			// 時:分
 			cc = [[NSString stringWithFormat:@"%d:%d", comp.hour, comp.minute] UTF8String];
 			if (4 < strlen(cc)) {
-				CGContextShowTextAtPoint (cgc, po.x-15, po.y+1, cc, strlen(cc));
+				CGContextShowTextAtPoint (cgc, po.x-15*fZoom, po.y+1*fZoom, cc, strlen(cc));
 			} else {
-				CGContextShowTextAtPoint (cgc, po.x-10, po.y+1, cc, strlen(cc));
+				CGContextShowTextAtPoint (cgc, po.x-10*fZoom, po.y+1*fZoom, cc, strlen(cc));
 			}
 			po.x -= RECORD_WIDTH;
 		}

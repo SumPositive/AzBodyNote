@@ -15,6 +15,7 @@
 
 @interface E2editCellDial : UITableViewCell <AZDialDelegate>
 {
+	IBOutlet UIView			*ibViewBase;	//iPad//ヨコでセンタリングするため
 	IBOutlet UILabel			*ibLbName;
 	IBOutlet UILabel			*ibLbDetail;
 	IBOutlet UILabel			*ibLbUnit;

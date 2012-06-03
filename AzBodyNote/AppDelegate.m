@@ -258,10 +258,16 @@
 			rc.size.height = 50;
 			rc.size.width = 320;
 			//--------------------------------------------------------------------------------------------------------- AdMob
+			//iPhone//320x50//extern GADAdSize const kGADAdSizeBanner;
+			//iPad//468x60//extern GADAdSize const kGADAdSizeFullBanner;
 			if (RoAdMobView==nil) {
 				RoAdMobView = [[GADBannerView alloc] init];
 				RoAdMobView.rootViewController = self.window.rootViewController;
-				RoAdMobView.adUnitID = @"a14ece23da85f5e";	//体調メモ
+				if (iS_iPAD) {
+					RoAdMobView.adUnitID = @"0dc4518b212344a8";	//iPad//体調メモ iPad
+				} else {
+					RoAdMobView.adUnitID = @"a14ece23da85f5e";	//iPhone//体調メモ
+				}
 				RoAdMobView.frame = rc;
 				RoAdMobView.alpha = 0;
 				GADRequest *request = [GADRequest request];
@@ -270,11 +276,15 @@
 				[self.window.rootViewController.view addSubview:RoAdMobView];
 			}
 			//--------------------------------------------------------------------------------------------------------- iAd
+			//iPhone//320x50//480x32//
+			//iPad//768x66//1024x66//
 			// iOS5.0以降のみ
 			assert(NSClassFromString(@"ADBannerView"));
 			RiAdBanner = [[ADBannerView alloc] initWithFrame:CGRectZero];
 			RiAdBanner.delegate = self;
-			RiAdBanner.requiredContentSizeIdentifiers = [NSSet setWithObjects:ADBannerContentSizeIdentifierPortrait, nil];
+			RiAdBanner.requiredContentSizeIdentifiers = [NSSet setWithObjects:
+														 ADBannerContentSizeIdentifierPortrait,
+														 ADBannerContentSizeIdentifierLandscape, nil];
 			RiAdBanner.currentContentSizeIdentifier = ADBannerContentSizeIdentifierPortrait;
 			RiAdBanner.frame = rc;
 			RiAdBanner.alpha = 0;
@@ -615,21 +625,40 @@
 	if (__app_is_unlock  OR  RoAdMobView==nil  OR  RiAdBanner==nil) {
 		return;  //Adなし
 	}
-	NSLog(@"=== adRefresh ===");
+	//NSLog(@"=== adRefresh ===");
 	
 	[UIView beginAnimations:nil context:NULL];
 	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
 	[UIView setAnimationDuration:1.0];
-	
 
+	if (RiAdBanner) {
+		if (UIInterfaceOrientationIsPortrait(self.window.rootViewController.interfaceOrientation)) {
+			RiAdBanner.currentContentSizeIdentifier = ADBannerContentSizeIdentifierPortrait;
+		} else {
+			RiAdBanner.currentContentSizeIdentifier = ADBannerContentSizeIdentifierLandscape;
+		}
+	}
 	CGRect rc = RiAdBanner.frame;
+
 	if (mAdShow==1) {		// tabBarの上部に表示
-		rc.origin.y = self.window.rootViewController.view.frame.size.height - 48 - 50;
+		if (UIInterfaceOrientationIsPortrait(self.window.rootViewController.interfaceOrientation)) {
+			rc.origin.y = self.window.rootViewController.view.frame.size.height - 48 - RiAdBanner.frame.size.height;
+		} else {
+			rc.origin.y = self.window.rootViewController.view.frame.size.width - 48 - RiAdBanner.frame.size.height;
+		}
 	}
 	else if (mAdShow==2) {	// 最下部に表示
-		rc.origin.y = self.window.rootViewController.view.frame.size.height - 50;
+		if (UIInterfaceOrientationIsPortrait(self.window.rootViewController.interfaceOrientation)) {
+			rc.origin.y = self.window.rootViewController.view.frame.size.height - RiAdBanner.frame.size.height;
+		} else {
+			rc.origin.y = self.window.rootViewController.view.frame.size.width - RiAdBanner.frame.size.height;
+		}
 	}
-
+	NSLog(@"=== adRefresh === rc.origin.y=%.2f", rc.origin.y);
+	
+	//iAd
+	//iPhone//320x50//480x32//
+	//iPad//768x66//1024x66//
 	if (RiAdBanner) {
 		RiAdBanner.frame = rc;
 		if (0<mAdShow && bADbannerIsVisible) {
@@ -639,7 +668,15 @@
 		}
 	}
 	
+	//AdMob
+	//iPhone//320x50//GAD_SIZE_320x50
+	//iPad//468x60//GAD_SIZE_468x60
 	if (RoAdMobView) {
+		if (iS_iPAD) {
+			rc.size = GAD_SIZE_468x60;
+		} else {
+			rc.size = GAD_SIZE_320x50;
+		}
 		RoAdMobView.frame = rc;
 		if (0<mAdShow && (RiAdBanner==nil OR RiAdBanner.alpha==0)) {
 			RoAdMobView.alpha = 1;
