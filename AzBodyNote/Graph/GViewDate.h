@@ -14,10 +14,13 @@
 @interface GViewDate : UIView
 {
 @private
-	//NSUInteger								mGraphDays;
+	CGFloat					mPadScale;	//= iPad / iPhone
 }
 
-@property (nonatomic, retain) NSArray	*ppE2records;
+@property (nonatomic, retain) NSArray		*ppE2records;
 @property (nonatomic, assign) NSInteger	ppPage;
+
+@property (nonatomic, assign) CGFloat		ppRecordWidth;
+//@property (nonatomic, retain) UIFont			*ppFont;
 
 @end

@@ -12,8 +12,7 @@
 
 
 @implementation GViewDate
-@synthesize ppE2records = __E2records;
-@synthesize ppPage = __Page;
+@synthesize ppE2records, ppPage, ppRecordWidth;
 
 
 - (id)initWithFrame:(CGRect)frame
@@ -21,6 +20,11 @@
     self = [super initWithFrame:frame];
     if (self) {
         // Initialization code
+		if (iS_iPAD) {
+			mPadScale = 1.5;
+		} else {
+			mPadScale = 1.0;
+		}
     }
     return self;
 }
@@ -31,7 +35,7 @@
 - (void)drawRect:(CGRect)rect
 {
 	// E2record
-	if ([__E2records count] < 1) {
+	if ([self.ppE2records count] < 1 OR self.ppRecordWidth <10.0) {
 		return;
 	}
 	//NSLog(@"__E2records=%@", __E2records);
@@ -56,14 +60,10 @@
 	CGContextSetRGBFillColor (cgc, 0.75, 0.75, 0.75, 1.0);
 	CGContextFillRect(cgc, rc);
 	
-	CGFloat fZoom = 1.0;
-	if (iS_iPAD) {
-		fZoom = 1.5;
-	}
 	//文字列の設定
 	CGContextSetTextDrawingMode (cgc, kCGTextFill);  //kCGTextFillStroke
-	// "Helvetica"OK   "Optima"NG
-	CGContextSelectFont (cgc, "Helvetica", 12.0*fZoom, kCGEncodingMacRoman); // ＜＜日本語NG 
+	// "Helvetica"OK   "Optima"NG		＜＜日本語NG 
+	CGContextSelectFont (cgc, "Helvetica", 12.0*mPadScale, kCGEncodingMacRoman); // ＜＜日本語NG 
 	// 文字列 カラー設定(0.0-1.0でRGBAを指定する)
 	CGContextSetRGBFillColor (cgc, 151.0/295, 80.0/295, 77.0/295, 1.0);//Azukid色の薄め
 
@@ -73,20 +73,20 @@
 	const char *cc;
 
 	CGPoint po;
-	po.x = self.bounds.size.width - RECORD_WIDTH/2.0;
+	po.x = self.bounds.size.width - self.ppRecordWidth/2.0;
 	po.y = SPACE_Y;
 	
-	if (__Page==0) { 
+	if (self.ppPage==0) { 
 		//Goal
 		if (bGoal) {
 			cc = [[NSString stringWithString:@"Goal"] UTF8String];
-			CGContextShowTextAtPoint (cgc, po.x-15*fZoom, po.y+1*fZoom, cc, strlen(cc));
+			CGContextShowTextAtPoint (cgc, po.x-15*mPadScale, po.y+1*mPadScale, cc, strlen(cc));
 		}
-		po.x -= RECORD_WIDTH;
+		po.x -= self.ppRecordWidth;
 	}
 
 	//Record
-	for (E2record *e2 in __E2records) 
+	for (E2record *e2 in self.ppE2records) 
 	{
 		if (po.x <= 0) break;
 		if ([e2 valueForKey:E2_dateTime]) 
@@ -98,18 +98,18 @@
 			// 月/日
 			cc = [[NSString stringWithFormat:@"%d/%d", comp.month, comp.day] UTF8String];
 			if (4 < strlen(cc)) {
-				CGContextShowTextAtPoint (cgc, po.x-15*fZoom, po.y+12*fZoom, cc, strlen(cc));
+				CGContextShowTextAtPoint (cgc, po.x-15*mPadScale, po.y+12*mPadScale, cc, strlen(cc));
 			} else {
-				CGContextShowTextAtPoint (cgc, po.x-10*fZoom, po.y+12*fZoom, cc, strlen(cc));
+				CGContextShowTextAtPoint (cgc, po.x-10*mPadScale, po.y+12*mPadScale, cc, strlen(cc));
 			}
 			// 時:分
 			cc = [[NSString stringWithFormat:@"%d:%d", comp.hour, comp.minute] UTF8String];
 			if (4 < strlen(cc)) {
-				CGContextShowTextAtPoint (cgc, po.x-15*fZoom, po.y+1*fZoom, cc, strlen(cc));
+				CGContextShowTextAtPoint (cgc, po.x-15*mPadScale, po.y+1*mPadScale, cc, strlen(cc));
 			} else {
-				CGContextShowTextAtPoint (cgc, po.x-10*fZoom, po.y+1*fZoom, cc, strlen(cc));
+				CGContextShowTextAtPoint (cgc, po.x-10*mPadScale, po.y+1*mPadScale, cc, strlen(cc));
 			}
-			po.x -= RECORD_WIDTH;
+			po.x -= self.ppRecordWidth;
 		}
 	}
 }

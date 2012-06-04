@@ -30,10 +30,6 @@
 @private
 	AppDelegate					*mAppDelegate;
 	MocFunctions					*mMocFunc;
-	//UIActivityIndicatorView	*actIndicator_;
-	//NSArray							*mPanelGraphs;
-	//NSUInteger						mStatDays;
-	//BOOL								mGoalDisp;
 	SViewBp							*mSvBp;
 }
 @end

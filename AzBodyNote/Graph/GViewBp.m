@@ -9,14 +9,13 @@
 #import "GraphVC.h"
 
 
-#define SPACE_Y			15.0		// グラフの最大および最小の極限余白 > LINE_WID/2.0
-#define LINE_WID			24.0		// BpHi と BpLo を結ぶ縦線の太さ   < SPACE_Y*2.0
+//#define SPACE_Y			15.0		// グラフの最大および最小の極限余白 > LINE_WID/2.0
+//#define LINE_WID			24.0		// BpHi と BpLo を結ぶ縦線の太さ   < SPACE_Y*2.0
 #define FONT_SIZE			14.0
 
 
 @implementation GViewBp
-@synthesize ppE2records = __E2records;
-@synthesize ppPage = __Page;
+@synthesize ppE2records, ppPage, ppFont, ppRecordWidth;
 
 
 
@@ -39,6 +38,11 @@ NSInteger	pValueCount = 0;
     self = [super initWithFrame:frame];
     if (self) {
         // Initialization code
+		if (iS_iPAD) {
+			mPadScale = 1.5;
+		} else {
+			mPadScale = 1.0;
+		}
     }
     return self;
 }
@@ -96,7 +100,7 @@ NSInteger	pValueCount = 0;
 		CGContextSetGrayFillColor(cgc, 0, 0.7);
 		CGContextFillEllipseInRect(cgc, CGRectMake(po.x-3, po.y-3, 6, 6));	//円Fill
 		// 数値	// 文字列の設定
-		CGContextSelectFont (cgc, "Helvetica", FONT_SIZE, kCGEncodingMacRoman);
+		CGContextSelectFont (cgc, "Helvetica", FONT_SIZE*mPadScale, kCGEncodingMacRoman);
 		CGContextSetTextDrawingMode (cgc, kCGTextFill);
 		CGContextSetGrayFillColor(cgc, 0, 1);
 		// 回転	// 90度
@@ -104,11 +108,11 @@ NSInteger	pValueCount = 0;
 		CGContextSetTextMatrix (cgc, myTextTransform); 
 		if (isHi) {
 			// BpHi
-			po.x += 5.0;
-			po.y -= (7.0 + strlen(cc) * (FONT_SIZE/2.0));
+			po.x += 5.0*mPadScale;
+			po.y -= (7.0 + strlen(cc) * (FONT_SIZE*mPadScale/2.0));
 		} else {
 			// BpLo
-			po.x += 5.0;
+			po.x += 5.0*mPadScale;
 			po.y += 7.0;
 		}
 	CGContextShowTextAtPoint (cgc, po.x, po.y, cc, strlen(cc));
@@ -121,14 +125,15 @@ NSInteger	pValueCount = 0;
 	BOOL bLine;
 	CGFloat fy;
 	CGPoint po;
+	CGFloat fLineW = self.ppRecordWidth / 2.0;
 	
 	//------------------------------------------------------------------------------ BpHi と BpLo を結ぶ縦線
 	//CGContextSetRGBFillColor (cgc, 0.3, 0.3, 0.3, 0.6); // 塗り潰し色　Black
 	CGContextSetLineCap(cgc, kCGLineCapRound);	//線分の端の形状指定: 端を丸くする
-	CGContextSetLineWidth(cgc, LINE_WID); //太さ
+	CGContextSetLineWidth(cgc, fLineW); //太さ
 	CGContextSetGrayStrokeColor(cgc, 0.5, 0.5);
 	
-	if (__Page==0) {
+	if (self.ppPage==0) {
 		//--------------------------------------------------- Goal
 		NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 		if ([kvs boolForKey:KVS_bGoal]) {
@@ -191,7 +196,7 @@ NSInteger	pValueCount = 0;
 		}
 		if (0<pValue[bpHi][ii]) {
 			if (bLine==NO) {
-				CGContextSetLineWidth(cgc, LINE_WID); //太さ
+				CGContextSetLineWidth(cgc, fLineW); //太さ
 				po = poValue[bpHi][ii];
 				CGContextMoveToPoint(cgc, po.x, po.y);
 				fy = po.y;
@@ -208,7 +213,7 @@ NSInteger	pValueCount = 0;
 		}
 		if (0<pValue[bpLo][ii]) {
 			if (bLine==NO) {
-				CGContextSetLineWidth(cgc, LINE_WID); //太さ
+				CGContextSetLineWidth(cgc, fLineW); //太さ
 				po = poValue[bpLo][ii];
 				CGContextMoveToPoint(cgc, po.x, po.y);
 				fy = po.y;
@@ -241,7 +246,7 @@ NSInteger	pValueCount = 0;
 - (void)drawRect:(CGRect)rect
 {
 	// E2record
-	if ([__E2records count] < 1) {
+	if ([self.ppE2records count] < 1) {
 		return;
 	}
 	//NSLog(@"__E2records=%@", __E2records);
@@ -257,7 +262,7 @@ NSInteger	pValueCount = 0;
 	pValMin = E2_nBpHi_MAX;
 	NSInteger valHi, valLo;
 	pValueCount = 0; //Init
-	for (E2record *e2 in __E2records) 
+	for (E2record *e2 in self.ppE2records) 
 	{
 		valHi = [e2.nBpHi_mmHg integerValue];		//=0:未定の場合があることに注意
 		valLo = [e2.nBpLo_mmHg integerValue];	//=0:未定の場合があることに注意
@@ -293,25 +298,26 @@ NSInteger	pValueCount = 0;
 	CGContextSetGrayFillColor(cgc, 0.75, 1.0); // スクロール領域外と同じグレー
 	CGContextFillRect(cgc, rc);
 	
+	CGFloat fSpaceY = self.ppRecordWidth / 2.0;	//縦棒の上下余白
 	//--------------------------------------------------------------------------プロット
-	CGFloat fYstep = (rect.size.height - SPACE_Y*2.0) / (pValMax - pValMin);  //上下余白を考慮したＹ座標スケール
+	CGFloat fYstep = (rect.size.height - fSpaceY*2.0) / (pValMax - pValMin);  //上下余白を考慮したＹ座標スケール
 	CGPoint po;	// 描画範囲(rect)に収まるようにプロットした座標
-	CGFloat	fXstart = self.bounds.size.width - RECORD_WIDTH/2.0;
+	CGFloat	fXstart = self.bounds.size.width - self.ppRecordWidth/2.0;
 	
 	for (bpType bp=0; bp<bpEnd; bp++)
 	{
 		po.x = fXstart;
-		if (__Page==0) {
-			po.y = SPACE_Y + fYstep * (CGFloat)(pValGoal[bp] - pValMin);
+		if (self.ppPage==0) {
+			po.y = fSpaceY + fYstep * (CGFloat)(pValGoal[bp] - pValMin);
 			poValGoal[bp] = po;
-			po.x -= RECORD_WIDTH;	//1日づつ
+			po.x -= self.ppRecordWidth;	//1日づつ
 		}
 		//
 		for (int ii=0; ii<pValueCount; ii++) {
 			if (po.x <= 0) break;
-			po.y = SPACE_Y + fYstep * (CGFloat)(pValue[bp][ ii ] - pValMin);
+			po.y = fSpaceY + fYstep * (CGFloat)(pValue[bp][ ii ] - pValMin);
 			poValue[bp][ii] = po;
-			po.x -= RECORD_WIDTH;	//1日づつ
+			po.x -= self.ppRecordWidth;	//1日づつ
 		}
 	}
 	//ここまでで、pVal**パラメータがセット完了。

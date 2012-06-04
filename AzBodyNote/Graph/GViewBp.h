@@ -25,12 +25,13 @@ typedef NSInteger bpType;
 @interface GViewBp : UIView
 {
 @private
-	//NSUInteger								mGraphDays;
-	//NSDecimalNumberHandler		*mBehaviorDec0; //小数以下0桁＝整数
-	//NSDecimalNumberHandler		*mBehaviorDec1; //小数以下1桁
+	CGFloat					mPadScale;	//= iPad / iPhone
 }
 
 @property (nonatomic, retain) NSArray		*ppE2records;
 @property (nonatomic, assign) NSInteger	ppPage;
+
+@property (nonatomic, assign) CGFloat		ppRecordWidth;
+@property (nonatomic, retain) UIFont			*ppFont;
 
 @end

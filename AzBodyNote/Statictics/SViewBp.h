@@ -32,6 +32,7 @@ typedef NSInteger statType;
 @interface SViewBp : UIView
 {
 @private
+	CGFloat					mPadScale;	//= iPad / iPhone
 }
 
 @property (nonatomic, retain) NSArray		*ppE2records;

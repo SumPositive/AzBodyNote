@@ -21,13 +21,14 @@
 #define GRAPH_PAGE_LIMIT			50		// グラフ表示の最大レコード数　
 #endif
 
-#define RECORD_WIDTH		40.0		// 1レコード分の幅
+//#define RECORD_WIDTH		40.0		// 1レコード分の幅  ibViewRecordの幅参照
 #define SEPARATE_HEIGHT	3.0		// 区切り線の高さ
 
 
 @interface GraphVC : UIViewController <UIScrollViewDelegate>
 {
 	IBOutlet UIScrollView		*ibScrollView;
+	IBOutlet UIView				*ibViewRecord;	//この幅を1レコードの幅とする
 
 @private
 	AppDelegate					*mAppDelegate;
@@ -38,6 +39,7 @@
 	UIActivityIndicatorView	*mActIndicator;
 	NSArray							*mPanelGraphs;
 	BOOL								mGoalDisp;
+	CGFloat							mPadScale;	//= iPad / iPhone
 
 	UIImageView					*mIvSetting;
 	GViewDate						*mGvDate;

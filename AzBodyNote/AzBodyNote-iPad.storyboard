@@ -721,15 +721,15 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" contentMode="scaleToFill" directionalLockEnabled="YES" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" id="Psx-Ti-Y6C">
-                                <rect key="frame" x="0.0" y="36" width="768" height="914"/>
+                                <rect key="frame" x="0.0" y="36" width="768" height="905"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             </scrollView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="GraphDrum.png" id="7kQ-Qr-JYA">
                                 <rect key="frame" x="0.0" y="1" width="768" height="954"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             </imageView>
-                            <view userInteractionEnabled="NO" alpha="0.20000000298023224" contentMode="scaleToFill" id="2fo-eP-myq">
-                                <rect key="frame" x="362" y="36" width="44" height="914"/>
+                            <view userInteractionEnabled="NO" alpha="0.20000000298023224" contentMode="scaleToFill" id="2fo-eP-myq" userLabel="View - Record Width">
+                                <rect key="frame" x="349" y="36" width="70" height="905"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" red="0.20000000000000001" green="0.80000000000000004" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                             </view>
@@ -739,6 +739,7 @@
                     <tabBarItem key="tabBarItem" tag="2" title="Graph" image="Tab32-Graph.png" id="i26-e0-hUD"/>
                     <connections>
                         <outlet property="ibScrollView" destination="Psx-Ti-Y6C" id="UwN-4i-5jY"/>
+                        <outlet property="ibViewRecord" destination="2fo-eP-myq" id="Y8a-ZW-V4P"/>
                     </connections>
                 </viewController>
             </objects>
@@ -915,6 +916,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
             <source key="sourceIdentifier" type="project" relativePath="./Classes/GraphVC.h"/>
             <relationships>
                 <relationship kind="outlet" name="ibScrollView" candidateClass="UIScrollView"/>
+                <relationship kind="outlet" name="ibViewRecord" candidateClass="UIView"/>
             </relationships>
         </class>
         <class className="SettingTVC" superclassName="UITableViewController">

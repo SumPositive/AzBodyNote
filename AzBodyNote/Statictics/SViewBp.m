@@ -14,9 +14,7 @@
 
 
 @implementation SViewBp
-@synthesize ppE2records = __E2records;
-@synthesize ppStatType = __StatType;
-@synthesize ppDays = __Days;
+@synthesize ppE2records, ppStatType, ppDays;
 
 
 NSInteger	pValMin[bpEnd], pValMax[bpEnd];
@@ -31,6 +29,11 @@ NSInteger	pStatCount = 0;
     self = [super initWithFrame:frame];
     if (self) {
         // Initialization code
+		if (iS_iPAD) {
+			mPadScale = 1.5;
+		} else {
+			mPadScale = 1.0;
+		}
     }
     return self;
 }
@@ -38,7 +41,7 @@ NSInteger	pStatCount = 0;
 - (void)drawString:(CGContextRef)cgc  str:(NSString*)str  rect:(CGRect)rect  angle:(float)angle
 {
 	UILabel *lb = [[UILabel alloc] initWithFrame:rect];
-	lb.font = [UIFont systemFontOfSize:10.0];
+	lb.font = [UIFont systemFontOfSize:10.0*mPadScale];
 	lb.text = str;
 	lb.textAlignment = UITextAlignmentRight;
 	lb.textColor = [UIColor whiteColor];
@@ -50,27 +53,27 @@ NSInteger	pStatCount = 0;
 - (void)drawValue:(CGContextRef)cgc  value:(NSInteger)value  po:(CGPoint)po  isX:(BOOL)isX
 {	// XY軸の値を45度傾斜文字列で描画する
 	const char *cc = [[NSString stringWithFormat:@"%ld", (long)value] UTF8String];
-	CGFloat fofs = strlen(cc) * 6.0;  //原点を右上にするためのオフセット
+	CGFloat fofs = strlen(cc) * 6.0*mPadScale;  //原点を右上にするためのオフセット
 	if (isX) {
 		// X軸
-		if (__StatType==statDispersal24Hour && isX) {  // Hour表示だけ水平にするため
+		if (self.ppStatType==statDispersal24Hour && isX) {  // Hour表示だけ水平にするため
 			//po.x -= 2.0;
-			po.y -= 14.0;
+			po.y -= 14.0*mPadScale;
 		} else {
-			po.x -= fofs - 12.0;
-			po.y -= fofs + 7.0;
+			po.x -= fofs - 12.0*mPadScale;
+			po.y -= fofs + 7.0*mPadScale;
 		}
 	} else {
 		// Y軸
-		po.x -= fofs - 1.0;
-		po.y -= fofs - 7.0;
+		po.x -= fofs - 1.0*mPadScale;
+		po.y -= fofs - 7.0*mPadScale;
 	}
 	CGContextSaveGState(cgc); //PUSH
 	{
-		CGContextSelectFont (cgc, "Helvetica", 14.0, kCGEncodingMacRoman);
+		CGContextSelectFont (cgc, "Helvetica", 14.0*mPadScale, kCGEncodingMacRoman);
 		CGContextSetTextDrawingMode (cgc, kCGTextFill);
 		
-		if (__StatType==statDispersal24Hour && isX) {  // Hour表示だけ水平にするため
+		if (self.ppStatType==statDispersal24Hour && isX) {  // Hour表示だけ水平にするため
 			CGContextSetRGBFillColor (cgc, 0, 0, 0, 0.7); // 文字塗り潰し色
 			CGContextSetTextMatrix (cgc, CGAffineTransformMakeRotation( 0 )); // +0 水平
 		} else {
@@ -147,7 +150,7 @@ NSInteger	pStatCount = 0;
 - (void)drawRect:(CGRect)rect
 {
 	// E2record
-	if ([__E2records count] < 1) {
+	if ([self.ppE2records count] < 1) {
 		return;
 	}
 	//NSLog(@"__E2records=%@", __E2records);
@@ -168,14 +171,14 @@ NSInteger	pStatCount = 0;
 	CGPoint	po;
 	pStatCount = 0; //Init
 	iDays = 0;
-	for (E2record *e2 in __E2records) 
+	for (E2record *e2 in self.ppE2records) 
 	{
 		// 日次集計											年 | 月 | 日 | 時 | 分
 		comp = [calendar components: NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit
 				| NSHourCalendarUnit | NSMinuteCalendarUnit  fromDate:e2.dateTime];
 		//NSLog(@"<<<%d : %d>>>[%ld]", comp.hour, comp.minute, (long)pValuesCount);
 		if (iYear != comp.year OR iMM != comp.month OR iDD != comp.day) {
-			if (__Days <= iDays) break;
+			if (self.ppDays <= iDays) break;
 			iDays++;
 			iYear = comp.year, iMM = comp.month, iDD = comp.day;
 		}
@@ -201,7 +204,7 @@ NSInteger	pStatCount = 0;
 		po.y = iHi;
 		poStatHiLo[pStatCount] = po;
 
-		if (__StatType==statDispersal24Hour) {
+		if (self.ppStatType==statDispersal24Hour) {
 			po.x = comp.hour * 60 + comp.minute; //分
 			po.y = iHi;
 			poStat24[bpHi][pStatCount] = po;
@@ -240,14 +243,14 @@ NSInteger	pStatCount = 0;
 	CGContextFillRect(cgc, rect);
 	// プロット領域
 	CGRect rcPlot = rect; //self.bounds;
-	rcPlot.origin.x = 50;
-	rcPlot.origin.y = 50;
-	rcPlot.size.width -= rcPlot.origin.x;
-	rcPlot.size.height -= rcPlot.origin.y;
+	rcPlot.origin.x = 50*mPadScale;
+	rcPlot.origin.y = 50*mPadScale;
+	rcPlot.size.width -= (rcPlot.origin.x + 0);
+	rcPlot.size.height -= (rcPlot.origin.y + 0);
 	
 	CGFloat fXstep, fYstep, fStep;
 	//--------------------------------------------------------------------------座標
-	if (__StatType==statDispersalHiLo) {
+	if (self.ppStatType==statDispersalHiLo) {
 		fXstep = rcPlot.size.width / (pValMax[bpLo] - pValMin[bpLo]);	//BpLo
 		fYstep = rcPlot.size.height / (pValMax[bpHi] - pValMin[bpHi]); //BpHi
 		NSLog(@"rect.size.width=%0.2f, pValMin=%ld, pValMax=%ld", rect.size.width, (long)pValMin, (long)pValMax);
@@ -261,28 +264,30 @@ NSInteger	pStatCount = 0;
 		CGContextFillRect(cgc, rcPlot);
 		// エリア：高血圧 中等症
 		CGContextSetRGBFillColor(cgc, 0.7, 0.7, 0.4, 1);
-		CGContextFillRect(cgc, CGRectMake(50, 50, fStep*(100-pValMin[bpLo]), fStep*(160-pValMin[bpHi])));
+		CGContextFillRect(cgc, CGRectMake(rcPlot.origin.x, rcPlot.origin.y,
+										  fStep*(100-pValMin[bpLo]), fStep*(160-pValMin[bpHi])));
 		// エリア：正常血圧
 		CGContextSetRGBFillColor(cgc, 0.4, 0.7, 0.7, 1);
-		CGContextFillRect(cgc, CGRectMake(50, 50, fStep*(85-pValMin[bpLo]), fStep*(130-pValMin[bpHi])));
+		CGContextFillRect(cgc, CGRectMake(rcPlot.origin.x, rcPlot.origin.y,
+										  fStep*(85-pValMin[bpLo]), fStep*(130-pValMin[bpHi])));
 		// Y軸 ヨコ線 BpHi
 		CGContextSetLineWidth(cgc, 0.5); //太さ
 		CGContextSetRGBStrokeColor(cgc, 1, 0, 0, 0.4);
 		for (NSInteger val=pValMin[bpHi]; val<=pValMax[bpHi]; val += 10) {
-			CGFloat fy = 50 + (val - pValMin[bpHi])*fStep;
-			CGContextMoveToPoint(cgc, 50, fy); //原点
+			CGFloat fy = rcPlot.origin.y + (val - pValMin[bpHi])*fStep;
+			CGContextMoveToPoint(cgc, rcPlot.origin.x, fy); //原点
 			CGContextAddLineToPoint(cgc, rect.size.width, fy);
 			CGContextStrokePath(cgc);
-			[self drawValue:cgc value:val po:CGPointMake(50, fy) isX:NO];
+			[self drawValue:cgc value:val po:CGPointMake(rcPlot.origin.x, fy) isX:NO];
 		}
 		// X軸 タテ線 BpLo
 		CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 0.4);
 		for (NSInteger val=pValMin[bpLo]; val<=pValMax[bpLo]; val += 10) {
-			CGFloat fx = 50 + (val - pValMin[bpLo])*fStep;
-			CGContextMoveToPoint(cgc, fx, 50); //原点
+			CGFloat fx = rcPlot.origin.x + (val - pValMin[bpLo])*fStep;
+			CGContextMoveToPoint(cgc, fx, rcPlot.origin.y); //原点
 			CGContextAddLineToPoint(cgc, fx, rect.size.height);
 			CGContextStrokePath(cgc);
-			[self drawValue:cgc value:val po:CGPointMake(fx, 50) isX:YES];
+			[self drawValue:cgc value:val po:CGPointMake(fx, rcPlot.origin.y) isX:YES];
 		}
 	}
 	else {
@@ -305,30 +310,31 @@ NSInteger	pStatCount = 0;
 		CGContextSetLineWidth(cgc, 0.5); //太さ
 		CGContextSetRGBStrokeColor(cgc, 1, 0, 0, 0.4);
 		for (NSInteger val=pValMin[bpLo]; val<=pValMax[bpHi]; val += 10) {
-			CGFloat fy = 50 + (val - pValMin[bpLo])*fYstep;
-			CGContextMoveToPoint(cgc, 50, fy); //原点
+			CGFloat fy = rcPlot.origin.y + (val - pValMin[bpLo])*fYstep;
+			CGContextMoveToPoint(cgc, rcPlot.origin.x, fy); //原点
 			CGContextAddLineToPoint(cgc, rect.size.width, fy);
 			CGContextStrokePath(cgc);
-			[self drawValue:cgc value:val po:CGPointMake(50, fy) isX:NO];
+			[self drawValue:cgc value:val po:CGPointMake(rcPlot.origin.x, fy) isX:NO];
 		}
 		// X軸 タテ線 24Hour
 		CGContextSetLineWidth(cgc, 0.5); //太さ
 		CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 0.4);
 		for (NSInteger val=0; val<=24*60; val += 60*2) {  // += 2Hour
-			CGFloat fx = 50 + (val - 0)*fXstep;
-			CGContextMoveToPoint(cgc, fx, 50); //原点
+			CGFloat fx = rcPlot.origin.x + (val - 0)*fXstep;
+			CGContextMoveToPoint(cgc, fx, rcPlot.origin.y); //原点
 			CGContextAddLineToPoint(cgc, fx, rect.size.height);
 			CGContextStrokePath(cgc);
 			if (val<24*60) {
-				[self drawValue:cgc value:val/60 po:CGPointMake(fx, 50) isX:YES];
+				[self drawValue:cgc value:val/60 po:CGPointMake(fx, rcPlot.origin.y) isX:YES];
 			}
 		}
 	}
 	// Y軸 ラベル
 	UILabel *lb = [[UILabel alloc] initWithFrame:
-				   CGRectMake(-100+15, self.bounds.size.height-100-100, 200, 30)]; //回転中心を考慮
-	lb.font = [UIFont systemFontOfSize:12];
-	if (__StatType==statDispersalHiLo) {
+				   CGRectMake((-100+15)*mPadScale, (200/2+10)*mPadScale,
+							  200*mPadScale, 14*mPadScale)]; //回転中心を考慮
+	lb.font = [UIFont systemFontOfSize:12*mPadScale];
+	if (self.ppStatType==statDispersalHiLo) {
 		lb.text = NSLocalizedString(@"Stat BpHi",nil);
 	} else {
 		lb.text = NSLocalizedString(@"Stat 24H Bp",nil);
@@ -339,9 +345,11 @@ NSInteger	pStatCount = 0;
 	lb.transform = CGAffineTransformMakeRotation( M_PI/-2.0 ); //矩形中心回転　-90
 	[self addSubview:lb];
 	// X軸 ラベル
-	lb = [[UILabel alloc] initWithFrame:CGRectMake(100, self.bounds.size.height-30 , 200, 20)];
-	lb.font = [UIFont systemFontOfSize:12];
-	if (__StatType==statDispersalHiLo) {
+	lb = [[UILabel alloc] initWithFrame:CGRectMake(self.bounds.size.width-(200+10)*mPadScale,
+												   self.bounds.size.height-30*mPadScale,
+												   200*mPadScale, 14*mPadScale)];
+	lb.font = [UIFont systemFontOfSize:12*mPadScale];
+	if (self.ppStatType==statDispersalHiLo) {
 		lb.text = NSLocalizedString(@"Stat BpLo",nil);
 	} else {
 		lb.text = NSLocalizedString(@"Stat 24H Hour",nil);
@@ -351,47 +359,38 @@ NSInteger	pStatCount = 0;
 	lb.textAlignment = UITextAlignmentRight;
 	//lb.transform = CGAffineTransformMakeScale(1.0, -1.0); //上下反転
 	[self addSubview:lb];
-	// 凡例
-	po.y = 7;
-	po.x = 50;
-	CGContextSetRGBFillColor (cgc, 1.0, 1.0, 0.0, 1); // 塗り潰し色
-	CGContextFillEllipseInRect(cgc, CGRectMake(po.x-2.5, po.y-2.5, 5, 5));	//円Fill
-	lb = [[UILabel alloc] initWithFrame:CGRectMake(po.x+3, self.bounds.size.height-14, 50, 14)];
-	lb.font = [UIFont systemFontOfSize:10];
-	lb.text = NSLocalizedString(@"DateOpt Wake",nil);
-	lb.textColor = [UIColor darkGrayColor];
-	lb.backgroundColor = [UIColor clearColor];
-	[self addSubview:lb];
-
-	po.x = 120;
-	CGContextSetRGBFillColor (cgc, 1.0, 1.0, 1.0, 1); // 塗り潰し色
-	CGContextFillEllipseInRect(cgc, CGRectMake(po.x-2.5, po.y-2.5, 5, 5));	//円Fill
-	lb = [[UILabel alloc] initWithFrame:CGRectMake(po.x+3, self.bounds.size.height-14, 50, 14)];
-	lb.font = [UIFont systemFontOfSize:10];
-	lb.text = NSLocalizedString(@"DateOpt Rest",nil);
-	lb.textColor = [UIColor darkGrayColor];
-	lb.backgroundColor = [UIColor clearColor];
-	[self addSubview:lb];
 	
-	po.x = 190;
-	CGContextSetRGBFillColor (cgc, 0, 0, 1, 1); // 塗り潰し色
-	CGContextFillEllipseInRect(cgc, CGRectMake(po.x-2.5, po.y-2.5, 5, 5));	//円Fill
-	lb = [[UILabel alloc] initWithFrame:CGRectMake(po.x+3, self.bounds.size.height-14, 50, 14)];
-	lb.font = [UIFont systemFontOfSize:10];
-	lb.text = NSLocalizedString(@"DateOpt Down",nil);
-	lb.textColor = [UIColor darkGrayColor];
-	lb.backgroundColor = [UIColor clearColor];
-	[self addSubview:lb];
-	
-	po.x = 260;
-	CGContextSetRGBFillColor (cgc, 0, 0, 0, 1); // 塗り潰し色
-	CGContextFillEllipseInRect(cgc, CGRectMake(po.x-2.5, po.y-2.5, 5, 5));	//円Fill
-	lb = [[UILabel alloc] initWithFrame:CGRectMake(po.x+3, self.bounds.size.height-14, 50, 14)];
-	lb.font = [UIFont systemFontOfSize:10];
-	lb.text = NSLocalizedString(@"DateOpt Sleep",nil);
-	lb.textColor = [UIColor darkGrayColor];
-	lb.backgroundColor = [UIColor clearColor];
-	[self addSubview:lb];
+	//-------------------------------------------------------- 凡例
+	po.y = 5*mPadScale;		//下端
+	po.x = (self.bounds.size.width - (4*70*mPadScale))/2.0;	//センタリングの左端
+	for (DateOpt opt=0; opt<DtOpEnd; opt++) {
+		lb = [[UILabel alloc] initWithFrame:CGRectMake(po.x+12, self.bounds.size.height-14*mPadScale, 
+													   70*mPadScale, 14*mPadScale)];
+		lb.font = [UIFont systemFontOfSize:12*mPadScale];
+		lb.textColor = [UIColor darkGrayColor];
+		lb.backgroundColor = [UIColor clearColor];
+		switch (opt) {
+			case DtOpWake:
+				CGContextSetRGBFillColor (cgc, 1.0, 1.0, 0.0, 1); // 塗り潰し色
+				lb.text = NSLocalizedString(@"DateOpt Wake",nil);
+				break;
+			case DtOpRest:
+				CGContextSetRGBFillColor (cgc, 1.0, 1.0, 1.0, 1); // 塗り潰し色
+				lb.text = NSLocalizedString(@"DateOpt Rest",nil);
+				break;
+			case DtOpDown:
+				CGContextSetRGBFillColor (cgc, 0, 0, 1, 1); // 塗り潰し色
+				lb.text = NSLocalizedString(@"DateOpt Down",nil);
+				break;
+			case DtOpSleep:
+				CGContextSetRGBFillColor (cgc, 0, 0, 0, 1); // 塗り潰し色
+				lb.text = NSLocalizedString(@"DateOpt Sleep",nil);
+				break;
+		}
+		CGContextFillEllipseInRect(cgc, CGRectMake(po.x+3, po.y+1, 6, 6));	//円Fill
+		[self addSubview:lb];
+		po.x += 70*mPadScale;
+	}
 	
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	if ([kvs boolForKey:KVS_SettStatAvgShow] && 2<pStatCount) {
@@ -445,21 +444,23 @@ NSInteger	pStatCount = 0;
 		NSLog(@"Standard deviations: dSdHi=%0.4lf, dSdLo=%0.4lf", dSdHi, dSdLo);
 		//
 		CGContextSetRGBStrokeColor(cgc, 1, 1, 1, 0.3);
-		if (__StatType==statDispersalHiLo) {
+		if (self.ppStatType==statDispersalHiLo) {
 			// BpHi
-			if (0.05 < dSdHi) {
-				CGContextSetLineWidth(cgc, dSdHi); //太さ
+			if (0.05 < dSdHi*mPadScale) {
+				CGContextSetLineWidth(cgc, dSdHi*mPadScale); //太さ
 			} else {
 				CGContextSetLineWidth(cgc, 0.05); //太さ
 			}
-			po.x = 50;
-			po.y = 50 + (dAvgHi - pValMin[bpHi]) * fStep;
+			po.x = 50*mPadScale;
+			po.y = 50*mPadScale + (dAvgHi - pValMin[bpHi]) * fStep;
 			CGContextMoveToPoint(cgc, po.x, po.y);
 			CGContextAddLineToPoint(cgc, rect.size.width, po.y);
 			CGContextStrokePath(cgc);
 			NSString *zz = [NSString stringWithFormat:NSLocalizedString(@"Stat Avg %lf (%lf)",nil), dAvgHi, dSdHi];
 			[self drawString:cgc str:zz
-						rect:CGRectMake(self.bounds.size.width-155, self.bounds.size.height-po.y-12, 150,12)
+						rect:CGRectMake(self.bounds.size.width-155*mPadScale, 
+										self.bounds.size.height-po.y-12*mPadScale, 
+										150*mPadScale,12*mPadScale)
 					   angle:0.0];
 			// BpLo
 			if (0.05 < dSdLo) {
@@ -467,45 +468,46 @@ NSInteger	pStatCount = 0;
 			} else {
 				CGContextSetLineWidth(cgc, 0.05); //太さ
 			}
-			po.x = 50 + (dAvgLo - pValMin[bpLo]) * fStep;
-			po.y = 50;
+			po.x = 50*mPadScale + (dAvgLo - pValMin[bpLo]) * fStep;
+			po.y = 50*mPadScale;
 			CGContextMoveToPoint(cgc, po.x, po.y);
 			CGContextAddLineToPoint(cgc, po.x, rect.size.height);
 			CGContextStrokePath(cgc);
 			zz = [NSString stringWithFormat:NSLocalizedString(@"Stat Avg %lf (%lf)",nil), dAvgLo, dSdLo];
 			[self drawString:cgc str:zz 
-						rect:CGRectMake(po.x-75-6, 75, 150,12)
+						rect:CGRectMake(po.x-(75+6)*mPadScale, 75*mPadScale, 150*mPadScale,12*mPadScale)
 					   angle:-90.0];
 		} else {
 			// BpHi
-			if (0.05 < dSdHi) {
-				CGContextSetLineWidth(cgc, dSdHi); //太さ
+			if (0.05 < dSdHi*mPadScale) {
+				CGContextSetLineWidth(cgc, dSdHi*mPadScale); //太さ
 			} else {
 				CGContextSetLineWidth(cgc, 0.05); //太さ
 			}
-			po.x = 50;
-			po.y = 50 + (dAvgHi - pValMin[bpLo]) * fYstep; //＜＜※[bpLo]で正しい。 [bpHi]は時刻ベース
+			po.x = 50*mPadScale;
+			po.y = 50*mPadScale + (dAvgHi - pValMin[bpLo]) * fYstep; //＜＜※[bpLo]で正しい。 [bpHi]は時刻ベース
 			CGContextMoveToPoint(cgc, po.x, po.y);
 			CGContextAddLineToPoint(cgc, rect.size.width, po.y);
 			CGContextStrokePath(cgc);
 			NSString *zz = [NSString stringWithFormat:NSLocalizedString(@"Stat Avg %lf (%lf)",nil), dAvgHi, dSdHi];
 			[self drawString:cgc str:zz
-						rect:CGRectMake(50, 0, 150,12)
+						rect:CGRectMake(50*mPadScale, 0, 150*mPadScale,12*mPadScale)
 					   angle:0.0];
 			// BpLo
-			if (0.05 < dSdLo) {
-				CGContextSetLineWidth(cgc, dSdLo); //太さ
+			if (0.05 < dSdLo*mPadScale) {
+				CGContextSetLineWidth(cgc, dSdLo*mPadScale); //太さ
 			} else {
 				CGContextSetLineWidth(cgc, 0.05); //太さ
 			}
-			po.x = 50;
-			po.y = 50 + (dAvgLo - pValMin[bpLo]) * fYstep;
+			po.x = 50*mPadScale;
+			po.y = 50*mPadScale + (dAvgLo - pValMin[bpLo]) * fYstep;
 			CGContextMoveToPoint(cgc, po.x, po.y);
 			CGContextAddLineToPoint(cgc, rect.size.width, po.y);
 			CGContextStrokePath(cgc);
 			zz = [NSString stringWithFormat:NSLocalizedString(@"Stat Avg %lf (%lf)",nil), dAvgLo, dSdLo];
 			[self drawString:cgc str:zz 
-						rect:CGRectMake(50, self.bounds.size.height-62, 150,12)
+						rect:CGRectMake(50*mPadScale, self.bounds.size.height-62*mPadScale,
+										150*mPadScale,12*mPadScale)
 					   angle:0.0];
 		}
 	}
@@ -541,7 +543,7 @@ NSInteger	pStatCount = 0;
 				continue;
 				return;
 		}
-		if (__StatType==statDispersalHiLo) {
+		if (self.ppStatType==statDispersalHiLo) {
 			po = poStatHiLo[ii];
 			if (0<po.x && 0<po.y) {
 				po.x = 50 + (po.x - pValMin[bpLo]) * fStep;

@@ -12,13 +12,13 @@
 #define FONT_SIZE			14.0
 
 @implementation GViewLine
-@synthesize ppE2records = __E2records;
-@synthesize ppPage = __Page;
-@synthesize ppEntityKey = __EntityKey;
-@synthesize ppGoalKey = __GoalKey;
-@synthesize ppDec = __Dec;
-@synthesize ppMin = __Min;
-@synthesize ppMax = __Max;
+@synthesize ppE2records, ppPage, ppFont, ppRecordWidth;
+@synthesize ppEntityKey;
+@synthesize ppGoalKey;
+@synthesize ppDec;
+@synthesize ppMin;
+@synthesize ppMax;
+
 
 NSInteger	pValGoal;
 CGPoint		poValGoal;
@@ -33,6 +33,11 @@ NSInteger	pValueCount;
     self = [super initWithFrame:frame];
     if (self) {
         // Initialization code
+		if (iS_iPAD) {
+			mPadScale = 1.5;
+		} else {
+			mPadScale = 1.0;
+		}
     }
     return self;
 }
@@ -58,7 +63,7 @@ NSInteger	pValueCount;
 		CGContextSetGrayFillColor(cgc, 0, 0.7);
 		CGContextFillEllipseInRect(cgc, CGRectMake(po.x-3, po.y-3, 6, 6));	//円Fill
 		// 数値	// 文字列の設定
-		CGContextSelectFont (cgc, "Helvetica", FONT_SIZE, kCGEncodingMacRoman);
+		CGContextSelectFont (cgc, "Helvetica", FONT_SIZE*mPadScale, kCGEncodingMacRoman);
 		CGContextSetTextDrawingMode (cgc, kCGTextFill);
 		CGContextSetGrayFillColor(cgc, 0, 1);
 		// 回転	// 45度
@@ -66,9 +71,9 @@ NSInteger	pValueCount;
 		CGContextSetTextMatrix (cgc, myTextTransform); 
 		// 文字描画
 		size_t  slen = strlen(cc);
-		if (self.bounds.size.height < po.y+10+(FONT_SIZE*slen/2.0)) {	//点の左下へ
-			po.x -= (FONT_SIZE*slen/2.5) - 8.0;
-			po.y -= (FONT_SIZE*slen/2.5) + 10.0;
+		if (self.bounds.size.height < po.y+10+(FONT_SIZE*mPadScale*slen/2.0)) {	//点の左下へ
+			po.x -= (FONT_SIZE*mPadScale*slen/2.5) - 8.0;
+			po.y -= (FONT_SIZE*mPadScale*slen/2.5) + 10.0;
 		} else {	//点の右上へ
 			//po.x += 0.0;
 			po.y += 7.0;
@@ -83,7 +88,7 @@ NSInteger	pValueCount;
 - (void)drawRect:(CGRect)rect
 {
 	// E2record
-	if ([__E2records count] < 1) {
+	if ([self.ppE2records count] < 1) {
 		return;
 	}
 	//NSLog(@"__E2records=%@", __E2records);
@@ -91,11 +96,11 @@ NSInteger	pValueCount;
 	//--------------------------------------------------------------------------------------- iCloud KVS GOAL!
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	BOOL bGoal = [kvs boolForKey:KVS_bGoal];
-	NSInteger iGoal = [[kvs objectForKey: __GoalKey] integerValue];  // NSNullならば "<null>"文字列となり数値化して0になる
+	NSInteger iGoal = [[kvs objectForKey: self.ppGoalKey] integerValue];  // NSNullならば "<null>"文字列となり数値化して0になる
 
 	//--------------------------------------------------------------------------集計しながらMinMaxを求める
 	//Goal
-	if (__Min<=iGoal  &&  iGoal<=__Max) {
+	if (self.ppMin<=iGoal  &&  iGoal<=self.ppMax) {
 		pValMin = iGoal;
 		pValMax = iGoal;
 		pValGoal = iGoal;
@@ -107,9 +112,9 @@ NSInteger	pValueCount;
 	
 	//Record
 	pValueCount = 0;
-	for (E2record *e2 in __E2records) 
+	for (E2record *e2 in self.ppE2records) 
 	{
-		NSInteger iVal = [[e2 valueForKey:__EntityKey] integerValue];
+		NSInteger iVal = [[e2 valueForKey:self.ppEntityKey] integerValue];
 	
 		if (0 < iVal && iVal < pValMin) pValMin = iVal;
 		if (pValMax < iVal) pValMax = iVal;
@@ -144,17 +149,18 @@ NSInteger	pValueCount;
 		pValMax++;
 	}
 
-	CGFloat fYstep = (rect.size.height - SPACE_Y*2) / (pValMax - pValMin);  // 1あたりのポイント数
+	CGFloat fSpaceY = SPACE_Y * mPadScale;	//縦棒の上下余白
+	CGFloat fYstep = (rect.size.height - fSpaceY*2.0) / (pValMax - pValMin);  // 1あたりのポイント数
 	CGPoint po;
-	po.x = self.bounds.size.width - RECORD_WIDTH/2;
+	po.x = self.bounds.size.width - self.ppRecordWidth/2;
 	
-	if (__Page==0) {
+	if (self.ppPage==0) {
 		//Goal
 		if (bGoal && 0 < pValGoal) {
-			po.y = SPACE_Y + fYstep * (CGFloat)(pValGoal - pValMin);
-			[self drawPoint:cgc po:po value:pValGoal valueType:__Dec];
+			po.y = fSpaceY + fYstep * (CGFloat)(pValGoal - pValMin);
+			[self drawPoint:cgc po:po value:pValGoal valueType:self.ppDec];
 		}
-		po.x -= RECORD_WIDTH;
+		po.x -= self.ppRecordWidth;
 	}
 	
 	//Record
@@ -162,12 +168,12 @@ NSInteger	pValueCount;
 	int  iCntLine = 0;
 	for (int ii = 0; ii < pValueCount; ii++) {
 		if (po.x <= 0) break;
-		po.y = SPACE_Y + fYstep * (CGFloat)(pValue[ ii ] - pValMin);
+		po.y = fSpaceY + fYstep * (CGFloat)(pValue[ ii ] - pValMin);
 		if (0 < pValue[ ii ]) { // 有効な点だけにする
 			poLine[iCntLine++] = po;
-			[self drawPoint:cgc po:po value:pValue[ii] valueType:__Dec];
+			[self drawPoint:cgc po:po value:pValue[ii] valueType:self.ppDec];
 		}
-		po.x -= RECORD_WIDTH;
+		po.x -= self.ppRecordWidth;
 	}
 	//------------------------------------------------------------------------------時系列折れ線
 	CGContextSetLineWidth(cgc, 1.0); //太さ

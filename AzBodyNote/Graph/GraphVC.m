@@ -57,13 +57,14 @@
 - (void)labelGraphRect:(CGRect)rect  text:(NSString*)text
 {
 	CGFloat fx = rect.origin.x+rect.size.width;
-	if (mGoalDisp==NO) fx -= (RECORD_WIDTH/2); 	//Goal非表示につき左に寄せる
+	if (mGoalDisp==NO) fx -= (ibViewRecord.frame.size.width/2); 	//Goal非表示につき左に寄せる
 	
-	UILabel *lb = [[UILabel alloc] initWithFrame:CGRectMake(fx, rect.origin.y+rect.size.height-25, 100,20)];
+	UILabel *lb = [[UILabel alloc] initWithFrame:
+				   CGRectMake(fx, rect.origin.y+rect.size.height-25*mPadScale, 100*mPadScale,20*mPadScale)];
 	lb.text = text;
 	lb.backgroundColor = [UIColor clearColor];
 	lb.textColor = [UIColor darkGrayColor];
-	lb.font = [UIFont systemFontOfSize:14];
+	lb.font = [UIFont systemFontOfSize:14*mPadScale];
 	lb.numberOfLines = 1;
 	lb.adjustsFontSizeToFitWidth = YES;
 	lb.minimumFontSize = 10;
@@ -116,15 +117,16 @@
 	int iCount = [e2recs count];
 	if (iCount < 2) iCount = 2; // 1だとスクロール出来なくなる
 	
-	// スクロール領域				   (                 左余白                 ) + (               レコード               ) + (                 右余白                 ); 
-	rcScrollContent.size.width = (fWhalf - RECORD_WIDTH/2) + (RECORD_WIDTH * iCount) + (fWhalf - RECORD_WIDTH/2);
-	ibScrollView.contentSize = CGSizeMake(rcScrollContent.size.width - RECORD_WIDTH, rcScrollContent.size.height);
+	CGFloat fRw = ibViewRecord.frame.size.width;
+	// スクロール領域				   (        余白         ) + (    レコード     ) + (      右余白        ); 
+	rcScrollContent.size.width = (fWhalf - fRw/2) + (fRw * iCount) + (fWhalf - fRw/2);
+	ibScrollView.contentSize = CGSizeMake(rcScrollContent.size.width - fRw, rcScrollContent.size.height);
 	
 	// 描画領域
-	rcScrollContent.origin.x = (fWhalf - RECORD_WIDTH/2) - (RECORD_WIDTH * iOverLeft);  
-	rcScrollContent.size.width = RECORD_WIDTH * iCount;
+	rcScrollContent.origin.x = (fWhalf - fRw/2) - (fRw * iOverLeft);  
+	rcScrollContent.size.width = fRw * iCount;
 	if (mPage==0 && 0 < mPageMax) {		//0ページ目 かつ 51件以上(&& 0 < mPageMax)のとき
-		rcScrollContent.size.width += RECORD_WIDTH;	//＋Goal列
+		rcScrollContent.size.width += fRw;	//＋Goal列
 	}
 	
 	
@@ -136,10 +138,14 @@
 		mGvDate = [[GViewDate alloc] initWithFrame: rcgv]; // 日付専用
 		mGvDate.ppE2records = e2recs;
 		mGvDate.ppPage = mPage;
+		mGvDate.ppRecordWidth = fRw;
+		//mGvDate.ppFont = ibLbFont.font;
 		[ibScrollView addSubview:mGvDate];
 	} else {
 		mGvDate.ppE2records = e2recs;
 		mGvDate.ppPage = mPage;
+		mGvDate.ppRecordWidth = fRw;
+		//mGvDate.ppFont = ibLbFont.font;
 		[mGvDate setFrame:rcgv];
 		[mGvDate setNeedsDisplay]; //drawRect:が呼び出される
 	}
@@ -173,6 +179,8 @@
 					mGvBp = [[GViewBp alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvBp.ppE2records = e2recs;
 					mGvBp.ppPage = mPage;
+					mGvBp.ppRecordWidth = fRw;
+					//mGvBp.ppFont = ibLbFont.font;
 					[ibScrollView addSubview:mGvBp];
 					CGRect rc = rcgv;
 					rc.size.height = 30; //上ラベル位置
@@ -181,6 +189,8 @@
 				} else {
 					mGvBp.ppE2records = e2recs;
 					mGvBp.ppPage = mPage;
+					mGvBp.ppRecordWidth = fRw;
+					//mGvBp.ppFont = ibLbFont.font;
 					[mGvBp setFrame:rcgv];
 					[mGvBp setNeedsDisplay]; //drawRect:が呼び出される
 				}
@@ -194,6 +204,8 @@
 					mGvPuls = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvPuls.ppE2records = e2recs;
 					mGvPuls.ppPage = mPage;
+					mGvPuls.ppRecordWidth = fRw;
+					//mGvPuls.ppFont = ibLbFont.font;
 					mGvPuls.ppEntityKey = E2_nPulse_bpm;
 					mGvPuls.ppGoalKey = Goal_nPulse_bpm;
 					mGvPuls.ppDec = 0;
@@ -204,6 +216,8 @@
 				} else {
 					mGvPuls.ppE2records = e2recs;
 					mGvPuls.ppPage = mPage;
+					mGvPuls.ppRecordWidth = fRw;
+					//mGvPuls.ppFont = ibLbFont.font;
 					[mGvPuls setFrame:rcgv];
 					[mGvPuls setNeedsDisplay]; //drawRect:が呼び出される
 				}
@@ -214,6 +228,7 @@
 					mGvWeight = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvWeight.ppE2records = e2recs;
 					mGvWeight.ppPage = mPage;
+					mGvWeight.ppRecordWidth = fRw;
 					mGvWeight.ppEntityKey = E2_nWeight_10Kg;
 					mGvWeight.ppGoalKey = Goal_nWeight_10Kg;
 					mGvWeight.ppDec = 1;
@@ -224,6 +239,8 @@
 				} else {
 					mGvWeight.ppE2records = e2recs;
 					mGvWeight.ppPage = mPage;
+					mGvWeight.ppRecordWidth = fRw;
+					//mGvWeight.ppFont = ibLbFont.font;
 					[mGvWeight setFrame:rcgv];
 					[mGvWeight setNeedsDisplay]; //drawRect:が呼び出される
 				}
@@ -234,6 +251,8 @@
 					mGvTemp = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvTemp.ppE2records = e2recs;
 					mGvTemp.ppPage = mPage;
+					mGvTemp.ppRecordWidth = fRw;
+					//mGvTemp.ppFont = ibLbFont.font;
 					mGvTemp.ppEntityKey = E2_nTemp_10c;
 					mGvTemp.ppGoalKey = Goal_nTemp_10c;
 					mGvTemp.ppDec = 1;
@@ -244,6 +263,8 @@
 				} else {
 					mGvTemp.ppE2records = e2recs;
 					mGvTemp.ppPage = mPage;
+					mGvTemp.ppRecordWidth = fRw;
+					//mGvTemp.ppFont = ibLbFont.font;
 					[mGvTemp setFrame:rcgv];
 					[mGvTemp setNeedsDisplay]; //drawRect:が呼び出される
 				}
@@ -254,6 +275,8 @@
 					mGvPedo = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvPedo.ppE2records = e2recs;
 					mGvPedo.ppPage = mPage;
+					mGvPedo.ppRecordWidth = fRw;
+					//mGvPedo.ppFont = ibLbFont.font;
 					mGvPedo.ppEntityKey = E2_nPedometer;
 					mGvPedo.ppGoalKey = Goal_nPedometer;
 					mGvPedo.ppDec = 0;
@@ -264,6 +287,8 @@
 				} else {
 					mGvPedo.ppE2records = e2recs;
 					mGvPedo.ppPage = mPage;
+					mGvPedo.ppRecordWidth = fRw;
+					//mGvPedo.ppFont = ibLbFont.font;
 					[mGvPedo setFrame:rcgv];
 					[mGvPedo setNeedsDisplay]; //drawRect:が呼び出される
 				}
@@ -274,6 +299,8 @@
 					mGvFat = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvFat.ppE2records = e2recs;
 					mGvFat.ppPage = mPage;
+					mGvFat.ppRecordWidth = fRw;
+					//mGvFat.ppFont = ibLbFont.font;
 					mGvFat.ppEntityKey = E2_nBodyFat_10p;
 					mGvFat.ppGoalKey = Goal_nBodyFat_10p;
 					mGvFat.ppDec = 1;
@@ -284,6 +311,8 @@
 				} else {
 					mGvFat.ppE2records = e2recs;
 					mGvFat.ppPage = mPage;
+					mGvFat.ppRecordWidth = fRw;
+					//mGvFat.ppFont = ibLbFont.font;
 					[mGvFat setFrame:rcgv];
 					[mGvFat setNeedsDisplay]; //drawRect:が呼び出される
 				}
@@ -294,6 +323,8 @@
 					mGvSkm = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvSkm.ppE2records = e2recs;
 					mGvSkm.ppPage = mPage;
+					mGvSkm.ppRecordWidth = fRw;
+					//mGvSkm.ppFont = ibLbFont.font;
 					mGvSkm.ppEntityKey = E2_nSkMuscle_10p;
 					mGvSkm.ppGoalKey = Goal_nSkMuscle_10p;
 					mGvSkm.ppDec = 1;
@@ -304,6 +335,7 @@
 				} else {
 					mGvSkm.ppE2records = e2recs;
 					mGvSkm.ppPage = mPage;
+					mGvSkm.ppRecordWidth = fRw;
 					[mGvSkm setFrame:rcgv];
 					[mGvSkm setNeedsDisplay]; //drawRect:が呼び出される
 				}
@@ -332,7 +364,8 @@ NSInteger afterPageChange = 0;
 			CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);
 		} else {
 			ibScrollView.contentOffset = 
-			CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width - RECORD_WIDTH, 0);
+			CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width
+																					-  ibViewRecord.frame.size.width, 0);
 		}
 	} 
 	else if (afterPageChange < 0) {
@@ -412,7 +445,12 @@ NSInteger afterPageChange = 0;
 	assert(mAppDelegate);
 	mMocFunc = mAppDelegate.mocBase; // Read Only
 	assert(mMocFunc);
-	//mReDraw = YES;
+	
+	if (iS_iPAD) {
+		mPadScale = 1.5;
+	} else {
+		mPadScale = 1.0;
+	}
 	
 	// listen to our app delegates notification that we might want to refresh our detail view
     [[NSNotificationCenter defaultCenter] addObserver:self 
