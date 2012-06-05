@@ -24,6 +24,7 @@
 
 - (void)setE2recordPrev
 {	// .dateTime より前の値を初期値としてセットする
+	// 新規および変更時にも呼び出されることに注意
 	assert(moE2edit_);
 
 	NSDate *dateNow = moE2edit_.dateTime;	 // 現在編集中の日付
@@ -107,8 +108,7 @@
 									  where:[NSPredicate predicateWithFormat: 
 											 E2_nYearMM @" > 200000 AND " 
 											 E2_nTemp_10c @" > 0 AND " 
-											 E2_dateTime @" < %@ AND "
-											 E2_nDateOpt @" = %ld", dateNow, (long)iDateOpt]
+											 E2_dateTime @" < %@", dateNow]
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 		if ([arFetch count]==1) {
 			e2prev = [arFetch objectAtIndex:0];
@@ -659,7 +659,8 @@
 		}
 	}
 	else if (editMode_==1) {	// Modify
-		if (!buDelete_) { // [Delete]ボタンを 余白セルに置く
+		[self setE2recordPrev];	// 各項目毎にヌルならば、前の値を初期値としてセットする
+		if (!buDelete_) {	// [Delete]ボタンを 余白セルに置く
 			buDelete_ = [UIButton buttonWithType:UIButtonTypeRoundedRect];
 			[buDelete_ setTitle:NSLocalizedString(@"Delete E2",nil) forState:UIControlStateNormal];
 			[buDelete_ setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
