@@ -13,6 +13,7 @@
 #import "MocEntity.h"
 
 #define STAT_DAYS_SAFE		20  //安全帯
+#define ORIGIN_OFFSET				50.0		//グラフ原点オフセット（XYとも)
 
 enum {
 	bpHi		= 0,

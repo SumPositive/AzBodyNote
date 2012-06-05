@@ -6,7 +6,7 @@
 //  Copyright (c) 2012年 __MyCompanyName__. All rights reserved.
 //
 #import "SettingTVC.h"
-
+//#import "PatternImageView.h"
 
 
 @interface SettingTVC (Private)
@@ -34,20 +34,18 @@
 	}
 	assert(mAppDelegate);
 	
-	// TableView 背景
-/*	UIImage *imgTile;
-	if (iS_iPAD) {
-		if (UIInterfaceOrientationIsPortrait(self.interfaceOrientation)) {
-			imgTile = [UIImage imageNamed:@"Default-Portrait~ipad"];
-		} else {
-			imgTile = [UIImage imageNamed:@"Default-Landscape~ipad"];
+/*	// 背景テクスチャ・タイルペイント
+	if (iS_iPAD) {		＜＜＜PatternImageView:が回転に対応できていないので没
+		//self.view.backgroundColor = //iPadでは無効
+		UIView* view = self.tableView.backgroundView;
+		if (view) {
+			PatternImageView *tv = [[PatternImageView alloc] initWithFrame:view.frame
+															  patternImage:[UIImage imageNamed:@"Tx-Back1"]]; // タイルパターン生成
+			[view addSubview:tv];
 		}
 	} else {
-		imgTile = [UIImage imageNamed:@"Default"];
+		self.tableView.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"Tx-Back1"]];
 	}*/
-	// TableView 背景
-	UIImage *imgTile = [UIImage imageNamed:@"Tx-Back1"];
-	self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 
 	self.title = NSLocalizedString(@"TabSettings",nil);
 }

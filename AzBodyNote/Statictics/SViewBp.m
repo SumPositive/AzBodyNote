@@ -243,8 +243,8 @@ NSInteger	pStatCount = 0;
 	CGContextFillRect(cgc, rect);
 	// プロット領域
 	CGRect rcPlot = rect; //self.bounds;
-	rcPlot.origin.x = 50*mPadScale;
-	rcPlot.origin.y = 50*mPadScale;
+	rcPlot.origin.x = ORIGIN_OFFSET*mPadScale;
+	rcPlot.origin.y = ORIGIN_OFFSET*mPadScale;
 	rcPlot.size.width -= (rcPlot.origin.x + 0);
 	rcPlot.size.height -= (rcPlot.origin.y + 0);
 	
@@ -451,8 +451,8 @@ NSInteger	pStatCount = 0;
 			} else {
 				CGContextSetLineWidth(cgc, 0.05); //太さ
 			}
-			po.x = 50*mPadScale;
-			po.y = 50*mPadScale + (dAvgHi - pValMin[bpHi]) * fStep;
+			po.x = ORIGIN_OFFSET*mPadScale;
+			po.y = ORIGIN_OFFSET*mPadScale + (dAvgHi - pValMin[bpHi]) * fStep;
 			CGContextMoveToPoint(cgc, po.x, po.y);
 			CGContextAddLineToPoint(cgc, rect.size.width, po.y);
 			CGContextStrokePath(cgc);
@@ -468,8 +468,8 @@ NSInteger	pStatCount = 0;
 			} else {
 				CGContextSetLineWidth(cgc, 0.05); //太さ
 			}
-			po.x = 50*mPadScale + (dAvgLo - pValMin[bpLo]) * fStep;
-			po.y = 50*mPadScale;
+			po.x = ORIGIN_OFFSET*mPadScale + (dAvgLo - pValMin[bpLo]) * fStep;
+			po.y = ORIGIN_OFFSET*mPadScale;
 			CGContextMoveToPoint(cgc, po.x, po.y);
 			CGContextAddLineToPoint(cgc, po.x, rect.size.height);
 			CGContextStrokePath(cgc);
@@ -484,8 +484,8 @@ NSInteger	pStatCount = 0;
 			} else {
 				CGContextSetLineWidth(cgc, 0.05); //太さ
 			}
-			po.x = 50*mPadScale;
-			po.y = 50*mPadScale + (dAvgHi - pValMin[bpLo]) * fYstep; //＜＜※[bpLo]で正しい。 [bpHi]は時刻ベース
+			po.x = ORIGIN_OFFSET*mPadScale;
+			po.y = ORIGIN_OFFSET*mPadScale + (dAvgHi - pValMin[bpLo]) * fYstep; //＜＜※[bpLo]で正しい。 [bpHi]は時刻ベース
 			CGContextMoveToPoint(cgc, po.x, po.y);
 			CGContextAddLineToPoint(cgc, rect.size.width, po.y);
 			CGContextStrokePath(cgc);
@@ -499,8 +499,8 @@ NSInteger	pStatCount = 0;
 			} else {
 				CGContextSetLineWidth(cgc, 0.05); //太さ
 			}
-			po.x = 50*mPadScale;
-			po.y = 50*mPadScale + (dAvgLo - pValMin[bpLo]) * fYstep;
+			po.x = ORIGIN_OFFSET*mPadScale;
+			po.y = ORIGIN_OFFSET*mPadScale + (dAvgLo - pValMin[bpLo]) * fYstep;
 			CGContextMoveToPoint(cgc, po.x, po.y);
 			CGContextAddLineToPoint(cgc, rect.size.width, po.y);
 			CGContextStrokePath(cgc);
@@ -546,8 +546,8 @@ NSInteger	pStatCount = 0;
 		if (self.ppStatType==statDispersalHiLo) {
 			po = poStatHiLo[ii];
 			if (0<po.x && 0<po.y) {
-				po.x = 50 + (po.x - pValMin[bpLo]) * fStep;
-				po.y = 50 + (po.y - pValMin[bpHi]) * fStep;
+				po.x = ORIGIN_OFFSET*mPadScale + (po.x - pValMin[bpLo]) * fStep;
+				po.y = ORIGIN_OFFSET*mPadScale + (po.y - pValMin[bpHi]) * fStep;
 				CGContextFillEllipseInRect(cgc, CGRectMake(po.x-2.5, po.y-2.5, 5, 5));	//円Fill
 				poBpHi[iCntBpHi++] = po;
 			}
@@ -556,8 +556,8 @@ NSInteger	pStatCount = 0;
 			// Hi
 			po = poStat24[bpHi][ii];
 			if (0<=po.x && 0<po.y) {
-				po.x = 50 + (po.x - 0) * fXstep;
-				po.y = 50 + (po.y - pValMin[bpLo]) * fYstep;
+				po.x = ORIGIN_OFFSET*mPadScale + (po.x - 0) * fXstep;
+				po.y = ORIGIN_OFFSET*mPadScale + (po.y - pValMin[bpLo]) * fYstep;
 				CGContextFillEllipseInRect(cgc, CGRectMake(po.x-2.5, po.y-2.5, 5, 5));	//円Fill
 				poBpHi[iCntBpHi++] = po;
 				if (b24H_Line) {
@@ -568,8 +568,8 @@ NSInteger	pStatCount = 0;
 			// Lo
 			po = poStat24[bpLo][ii];
 			if (0<=po.x && 0<po.y) {
-				po.x = 50 + (po.x - 0) * fXstep;
-				po.y = 50 + (po.y - pValMin[bpLo]) * fYstep;
+				po.x = ORIGIN_OFFSET*mPadScale + (po.x - 0) * fXstep;
+				po.y = ORIGIN_OFFSET*mPadScale + (po.y - pValMin[bpLo]) * fYstep;
 				if (b24H_Line && bLineStart) {
 					bLineStart = NO;
 					CGContextAddLineToPoint(cgc, po.x, po.y);
