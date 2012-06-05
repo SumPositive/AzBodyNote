@@ -59,6 +59,12 @@
 	}
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+	[super viewDidAppear:animated];
+	[mAppDelegate adShow:2];
+}
+
 - (void)viewWillDisappear:(BOOL)animated
 {	// 非表示になる前に呼び出される
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
@@ -111,6 +117,9 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
+	if (section==0 && !mAppDelegate.app_is_unlock) {
+		return @"\n\n\n"; //広告スペース
+	}
 	return nil;
 }
 

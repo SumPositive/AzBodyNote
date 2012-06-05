@@ -507,8 +507,6 @@
 			[fm setCalendar:calendar];
 			[fm setDateFormat:@"yyyy-MM"];	//年-月
 			[vc setUpFileName: [fm stringFromDate:[NSDate date]]];
-			//
-			[appDelegate_ adShow:0];
 		}
 	}
 	else {

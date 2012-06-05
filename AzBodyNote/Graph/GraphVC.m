@@ -615,9 +615,9 @@ NSInteger afterPageChange = 0;
 			vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
 			vc.ppBackGraph = YES;
 			UINavigationController* nc = [[UINavigationController alloc] initWithRootViewController:vc];
-			//nc.modalPresentationStyle = UIModalPresentationFormSheet;
 			nc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
 			[self presentModalViewController:nc animated:YES];
+			//この呼び出しだと広告が表示されない。多分、下に隠れているのではないかと思う
 		}
 	}
 }

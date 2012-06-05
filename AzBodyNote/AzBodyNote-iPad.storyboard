@@ -219,7 +219,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="768" height="97"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="Tx-Brown320x88.png" id="MGu-K3-gjN">
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="E2edit-Panel-700x60.png" id="MGu-K3-gjN">
                                             <rect key="frame" x="34" y="0.0" width="700" height="88"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         </imageView>
@@ -255,7 +255,7 @@
                                             <rect key="frame" x="34" y="0.0" width="700" height="60"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="Tx-Brown320x88.png" id="YHI-aL-Vfg">
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="E2edit-Panel-700x60.png" id="YHI-aL-Vfg">
                                                     <rect key="frame" x="0.0" y="0.0" width="700" height="60"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 </imageView>
@@ -344,7 +344,7 @@
                                             <rect key="frame" x="34" y="0.0" width="700" height="88"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="Tx-Brown320x88.png" id="6Ma-y1-Gm9">
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="E2edit-Panel-700x60.png" id="6Ma-y1-Gm9">
                                                     <rect key="frame" x="0.0" y="0.0" width="700" height="88"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                                 </imageView>
@@ -839,13 +839,13 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
     </scenes>
     <resources>
         <image name="Dropbox-130x44.png" width="16" height="16"/>
+        <image name="E2edit-Panel-700x60.png" width="700" height="60"/>
         <image name="GraphDrum.png" width="320" height="410"/>
         <image name="Icon32-Setting.png" width="32" height="32"/>
         <image name="Tab32-Add.png" width="32" height="32"/>
         <image name="Tab32-Graph.png" width="32" height="32"/>
         <image name="Tab32-List.png" width="32" height="32"/>
         <image name="Tab32-Stat.png" width="32" height="32"/>
-        <image name="Tx-Brown320x88.png" width="320" height="88"/>
     </resources>
     <classes>
         <class className="E2editCellDateOpt" superclassName="UITableViewCell">

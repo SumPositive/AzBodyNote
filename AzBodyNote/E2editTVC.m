@@ -534,7 +534,7 @@
 		{
 			self.title = NSLocalizedString(@"TabAdd",nil);
 			// TableView 背景
-			UIImage *imgTile = [UIImage imageNamed:@"Tx-LzBeige320"];
+			UIImage *imgTile = [UIImage imageNamed:@"Tx-Back1"];
 			self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 			assert(moE2edit_==nil);
 			// moE2edit_ は、viewWillAppear:にて生成する。

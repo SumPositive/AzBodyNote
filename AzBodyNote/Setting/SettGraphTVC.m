@@ -75,6 +75,12 @@
 	}
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+	[super viewDidAppear:animated];
+	[mAppDelegate adShow:2];
+}
+
 - (void)viewWillDisappear:(BOOL)animated
 {	// 非表示になる前に呼び出される
 	// 設定中は、BpLoを取り除き、BpHiだけ ＞＞ 保存時にBpHiの次にBpLoを挿入する
@@ -143,6 +149,9 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
+	if (section==1 && !mAppDelegate.app_is_unlock) {
+		return @"\n\n\n"; //広告スペース
+	}
 	return nil;
 }
 

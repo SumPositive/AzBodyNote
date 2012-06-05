@@ -28,12 +28,27 @@
 
 - (void)viewDidLoad
 {
+    [super viewDidLoad];
 	if (mAppDelegate==nil) {		// initWithStyleではダメ(nil)だった。
 		mAppDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
 	}
 	assert(mAppDelegate);
+	
+	// TableView 背景
+/*	UIImage *imgTile;
+	if (iS_iPAD) {
+		if (UIInterfaceOrientationIsPortrait(self.interfaceOrientation)) {
+			imgTile = [UIImage imageNamed:@"Default-Portrait~ipad"];
+		} else {
+			imgTile = [UIImage imageNamed:@"Default-Landscape~ipad"];
+		}
+	} else {
+		imgTile = [UIImage imageNamed:@"Default"];
+	}*/
+	// TableView 背景
+	UIImage *imgTile = [UIImage imageNamed:@"Tx-Back1"];
+	self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 
-    [super viewDidLoad];
 	self.title = NSLocalizedString(@"TabSettings",nil);
 }
 
@@ -57,7 +72,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
-	[mAppDelegate adShow:1];
+	[mAppDelegate adShow:1];	//(1)TabBarの上へ
 }
 
 /*
@@ -101,6 +116,7 @@
     return 44; // Default
 }
 
+/* 背景画像を生かす為に非表示にした。表示すると背景が分断される*/
 // TableView セクションタイトルを応答
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section 
 {
@@ -121,6 +137,8 @@
 	}
 	return nil;
 }
+
+
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -296,6 +314,7 @@
 			
 			
 		case 200: {	// このアプリについて
+			[mAppDelegate adShow:2];	//(2)Ad下端へ
 			AZAboutVC *vc = [[AZAboutVC alloc] init];
 			vc.ppImgIcon = [UIImage imageNamed:@"Icon57"];
 			vc.ppProductTitle = @"Condition";	// 世界共通名称
@@ -307,6 +326,7 @@
 		}	break;
 			
 		case 201: {	// あずき商店
+			[mAppDelegate adShow:2];	//(2)Ad下端へ
 			AZStoreTVC *vc = [[AZStoreTVC alloc] init];
 			// 商品IDリスト
 			NSSet *pids = [NSSet setWithObjects:STORE_PRODUCTID_UNLOCK, nil]; // 商品が複数ある場合は列記
@@ -317,6 +337,7 @@
 
 	
 		case 300: {	// Dropbox - Download
+			[mAppDelegate adShow:2];	//(2)Ad下端へ
 			// Dropbox を開ける
 			AZDropboxVC *vc = [[AZDropboxVC alloc] initWithAppKey: DBOX_KEY
 														appSecret: DBOX_SECRET

@@ -48,6 +48,13 @@
 	mCalendarID = [kvs objectForKey:KVS_CalendarID];
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+	[super viewDidAppear:animated];
+	[mAppDelegate adShow:2];
+}
+
+
 - (void)viewDidUnload
 {
     [super viewDidUnload];
