@@ -82,7 +82,7 @@ NSInteger	pValueCount = 0;
 }
 
 
-- (void)drawPoint:(CGContextRef)cgc  value:(float)value  po:(CGPoint)po  isHi:(BOOL)isHi
+- (void)drawPoint:(CGContextRef)cgc  value:(float)value  po:(CGPoint)po  isHi:(BOOL)isHi isAngle:(BOOL)isAngle
 {
 	const char *cc;
 	long lg = (long)(value * 10.0);
@@ -103,17 +103,30 @@ NSInteger	pValueCount = 0;
 		CGContextSelectFont (cgc, "Helvetica", FONT_SIZE*mPadScale, kCGEncodingMacRoman);
 		CGContextSetTextDrawingMode (cgc, kCGTextFill);
 		CGContextSetGrayFillColor(cgc, 0, 1);
-		// 回転	// 90度
-		CGAffineTransform  myTextTransform =  CGAffineTransformMakeRotation( 3.1415/2.0 );
+		// 回転
+		CGAffineTransform  myTextTransform;
+		if (isAngle) {
+			myTextTransform =  CGAffineTransformMakeRotation( 3.1415/4.0 );	// 45度
+		} else {	
+			myTextTransform =  CGAffineTransformMakeRotation( 3.1415/2.0 );	// 90度
+		}
 		CGContextSetTextMatrix (cgc, myTextTransform); 
-		if (isHi) {
-			// BpHi
-			po.x += 5.0*mPadScale;
-			po.y -= (7.0 + strlen(cc) * (FONT_SIZE*mPadScale/2.0));
-		} else {
-			// BpLo
-			po.x += 5.0*mPadScale;
-			po.y += 7.0;
+		if (isHi) {	// BpHi
+			if (isAngle) {
+				po.x -= (-2.0 + strlen(cc) * (FONT_SIZE*mPadScale/2.0));
+				po.y -= (3.0 + strlen(cc) * (FONT_SIZE*mPadScale/2.0));
+			} else {	
+				po.x += 5.0*mPadScale;
+				po.y -= (7.0 + strlen(cc) * (FONT_SIZE*mPadScale/2.0));
+			}
+		} else {		// BpLo
+			if (isAngle) {
+				po.x += 5.0*mPadScale;
+				po.y += 3.0;
+			} else {	
+				po.x += 5.0*mPadScale;
+				po.y += 7.0;
+			}
 		}
 	CGContextShowTextAtPoint (cgc, po.x, po.y, cc, strlen(cc));
 	}
@@ -123,9 +136,10 @@ NSInteger	pValueCount = 0;
 - (void)graphDraw:(CGContextRef)cgc 
 {
 	BOOL bLine;
-	CGFloat fy;
+	//CGFloat fy;
 	CGPoint po;
 	CGFloat fLineW = self.ppRecordWidth / 2.0;
+	CGFloat  fGapHiLo;
 	
 	//------------------------------------------------------------------------------ BpHi と BpLo を結ぶ縦線
 	//CGContextSetRGBFillColor (cgc, 0.3, 0.3, 0.3, 0.6); // 塗り潰し色　Black
@@ -141,13 +155,14 @@ NSInteger	pValueCount = 0;
 			{	//文字を上層にすべく、このタテ棒を先に描画する
 				po = poValGoal[bpHi];
 				CGContextMoveToPoint(cgc, po.x, po.y);
-				fy = po.y;
+				fGapHiLo = po.y;
 				po = poValGoal[bpLo];
+				fGapHiLo -= po.y;
 				CGContextAddLineToPoint(cgc, po.x, po.y);
 				CGContextStrokePath(cgc);
-				if (IMAGE_GAP_MIN <= fy - po.y) {
-					po.y += (fy - po.y)/2.0;
-					[self imageGraph:cgc center:po DtOp:DtOpEnd];
+				if (IMAGE_GAP_MIN <= fGapHiLo) {
+					po.y += fGapHiLo/2.0;
+					[self imageGraph:cgc center:po DtOp:DtOpEnd]; //Goal Image
 				}
 				bLine = YES;
 			} else {
@@ -159,7 +174,7 @@ NSInteger	pValueCount = 0;
 					po.y -= IMAGE_GAP_MIN/2.0;
 					[self imageGraph:cgc center:po DtOp:DtOpEnd];
 				}
-				[self drawPoint:cgc value:pValGoal[bpHi] po:poValGoal[bpHi] isHi:YES];
+				[self drawPoint:cgc value:pValGoal[bpHi] po:poValGoal[bpHi] isHi:YES isAngle:NO];
 			}
 			if (0<pValGoal[bpLo]) {
 				if (bLine==NO) {
@@ -167,7 +182,7 @@ NSInteger	pValueCount = 0;
 					po.y += IMAGE_GAP_MIN/2.0;
 					[self imageGraph:cgc center:po DtOp:DtOpEnd];
 				}
-				[self drawPoint:cgc value:pValGoal[bpLo] po:poValGoal[bpLo] isHi:NO];		
+				[self drawPoint:cgc value:pValGoal[bpLo] po:poValGoal[bpLo] isHi:NO isAngle:NO];
 			}
 		}
 	}
@@ -182,12 +197,13 @@ NSInteger	pValueCount = 0;
 		{	//文字を上層にすべく、このタテ棒を先に描画する
 			po = poValue[bpHi][ii];
 			CGContextMoveToPoint(cgc, po.x, po.y);
-			fy = po.y;
+			fGapHiLo = po.y;
 			po = poValue[bpLo][ii];
+			fGapHiLo -= po.y;
 			CGContextAddLineToPoint(cgc, po.x, po.y);
 			CGContextStrokePath(cgc);
-			if (IMAGE_GAP_MIN <= fy - po.y) {
-				po.y += (fy - po.y)/2.0;
+			if (IMAGE_GAP_MIN <= fGapHiLo) {
+				po.y += fGapHiLo/2.0;
 				[self imageGraph:cgc center:po DtOp:pDtOpValue[ii]];
 			}
 			bLine = YES;
@@ -199,34 +215,38 @@ NSInteger	pValueCount = 0;
 				CGContextSetLineWidth(cgc, fLineW); //太さ
 				po = poValue[bpHi][ii];
 				CGContextMoveToPoint(cgc, po.x, po.y);
-				fy = po.y;
+				fGapHiLo = po.y;
 				po.y -= IMAGE_GAP_MIN;
+				fGapHiLo -= po.y;
 				CGContextAddLineToPoint(cgc, po.x, po.y);
 				CGContextStrokePath(cgc);
-				if (IMAGE_GAP_MIN <= fy - po.y) {
-					po.y += (fy - po.y)/2.0;
+				if (IMAGE_GAP_MIN <= fGapHiLo) {
+					po.y += fGapHiLo/2.0;
 					[self imageGraph:cgc center:po DtOp:pDtOpValue[ii]];
 				}
 			}
 			poBpHi[iCntBpHi++] = poValue[bpHi][ii];	//時系列折れ線のため
-			[self drawPoint:cgc value:pValue[bpHi][ii] po:poValue[bpHi][ii] isHi:YES];
+			[self drawPoint:cgc value:pValue[bpHi][ii] po:poValue[bpHi][ii] isHi:YES 
+					  isAngle:(fGapHiLo < VALUE_GAP_MIN)];
 		}
 		if (0<pValue[bpLo][ii]) {
 			if (bLine==NO) {
 				CGContextSetLineWidth(cgc, fLineW); //太さ
 				po = poValue[bpLo][ii];
 				CGContextMoveToPoint(cgc, po.x, po.y);
-				fy = po.y;
+				fGapHiLo = po.y;
 				po.y += IMAGE_GAP_MIN;
+				fGapHiLo -= po.y;
 				CGContextAddLineToPoint(cgc, po.x, po.y);
 				CGContextStrokePath(cgc);
-				if (IMAGE_GAP_MIN <= fy - po.y) {
-					po.y += (fy - po.y)/2.0;
+				if (IMAGE_GAP_MIN <= fGapHiLo) {
+					po.y += fGapHiLo/2.0;
 					[self imageGraph:cgc center:po DtOp:pDtOpValue[ii]];
 				}
 			}
 			poBpLo[iCntBpLo++] = poValue[bpLo][ii];	//時系列折れ線のため
-			[self drawPoint:cgc value:pValue[bpLo][ii] po:poValue[bpLo][ii] isHi:NO];
+			[self drawPoint:cgc value:pValue[bpLo][ii] po:poValue[bpLo][ii] isHi:NO
+					isAngle:(fGapHiLo < VALUE_GAP_MIN)];
 		}
 	}
 	//------------------------------------------------------------------------------時系列折れ線

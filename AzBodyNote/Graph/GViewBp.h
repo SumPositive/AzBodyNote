@@ -12,7 +12,8 @@
 #import "Global.h"
 
 #define GRAPH_DAYS_SAFE		20  //安全帯
-#define IMAGE_GAP_MIN			70.0
+#define IMAGE_GAP_MIN			30.0		// Hi-Lo差がこれ以下になると、Optアイコン非表示にして接触回避する
+#define VALUE_GAP_MIN			70.0		// Hi-Lo差がこれ以下になると、数値を45度傾けて接触回避する
 
 enum {
 	bpHi		= 0,
