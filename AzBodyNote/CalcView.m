@@ -36,14 +36,12 @@
 @interface CalcView (PrivateMethods)
 int levelOperator( NSString *zOpe );  // 演算子の優先順位
 - (NSDecimalNumber *)decimalAnswerFomula:(NSString *)strFomula;	// autorelease
-//- (void)textFieldDidChange:(UITextField *)textField;
-- (void)hide;
+- (id)init;
 - (void)done;
 - (void)cancel;
 @end
 
 @implementation CalcView
-
 
 #pragma mark - Action
 
@@ -193,20 +191,36 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 - (void)show
 {
 	GA_TRACK_PAGE(@"CalcView");
+	
+	[mSubView setFrame: mRectShow]; // 表示位置へ  ＜＜移動を見せないようにした。
+
 	// アニメ準備
 	CGContextRef context = UIGraphicsGetCurrentContext();
 	[UIView beginAnimations:nil context:context];
 	[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //減速
 	[UIView setAnimationDuration:0.4];
 	
-	[self setFrame:mRectShow]; // 表示位置へ
+	//[self setFrame:mRectShow]; // 表示位置へ
+	mSubView.alpha = 1;
 	
 	// Complete the animation
 	[UIView commitAnimations];
 	
+	[self bringSubviewToFront:mSubView];
+	
 	// 丸め設定
 	[NSDecimalNumber setDefaultBehavior:mBehaviorCalc];	// 計算途中の丸め
 }
+
+- (void)show:(CGPoint)point
+{
+	CGRect rc = mRectShow;
+	rc.origin.x = point.x;
+	rc.origin.y = point.y;
+	mRectShow = rc;
+	[self show];
+}
+
 
 - (void)hide_after_dissmiss
 {	// hideアニメ終了後に呼び出されるので破棄する
@@ -220,14 +234,16 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 	// アニメ準備
 	CGContextRef context = UIGraphicsGetCurrentContext();
 	[UIView beginAnimations:nil context:context];
-	[UIView setAnimationDuration:0.8];
+	[UIView setAnimationDuration:0.4];
 	[UIView setAnimationCurve:UIViewAnimationCurveEaseIn];//加速
 	
 	[UIView setAnimationDelegate:self];
 	[UIView setAnimationDidStopSelector:@selector(hide_after_dissmiss)]; //アニメーション終了後に呼び出す＜＜setAnimationDelegate必要
 
 	// アニメ終了位置
-	[self setFrame:mRectHide];	// 隠す位置へ
+	//[self setFrame:mRectHide];	// 隠す位置へ
+	mSubView.alpha = 0;	// 移動を見せず。静かに消えす。
+	//[mSubView setFrame: mRectHide];
 	// 丸め設定
 	[NSDecimalNumber setDefaultBehavior:mBehaviorDefault];
 	
@@ -507,58 +523,41 @@ int levelOperator( NSString *zOpe )  // 演算子の優先順位
 
 #pragma mark - View lifecicle
 
-//- (id)initWithTitle:(NSString*)title  min:(double)min  max:(double)max  decimal:(int)decimal 
-//			 target:(id)target action:(SEL)action
-- (id)initWithTitle:(NSString*)title  min:(double)min  max:(double)max  decimal:(int)decimal  delegate:(id)delegate
+static CalcView	*staticCalcView = nil;
++ (CalcView *)sharedCalcView
 {
-	assert(min < max);
-	assert(-1 <= decimal);	// (-1)通貨専用
-	assert(delegate);
-	
-	//mTarget = target;
-	//mActionSelector = action;
-	delegate_ = delegate;
+	if (!staticCalcView) {
+		staticCalcView = [[CalcView alloc] init];
+	}  
+	return staticCalcView;
+}
 
-	mRectShow = CGRectMake(0, 0, 320, VIEW_HIGHT);  // self.frame;
-	mRectHide = mRectShow;
-	mRectHide.origin.y = mRectHide.size.height; // 下部に隠す為
-
-	self = [super initWithFrame:mRectHide];
+- (id)init	//Private
+{
+	self = [super init];
 	if (self==nil) return nil; // ERROR
 
 	self.backgroundColor = [UIColor clearColor];
-	self.userInteractionEnabled = YES; // このViewがタッチを受ける
+	self.userInteractionEnabled = YES; // 電卓外部のタッチを受ける
 
-	mMin = min;
-	mMax = max;
-	mDecimal = decimal;
 	answer_ = nil;
 	mIsShow = NO;
-	title_ = [title copy];	// [AC]で表示するため保持
 
 	//NSUserDefaults *udef = [NSUserDefaults standardUserDefaults];
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	siCalcMethod = [[kvs objectForKey:KVS_Calc_Method] integerValue];	// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
 
+#warning CalcView　背景が透明、ボタンが押せない
 	//------------------------------------------
 	assert(mSubView==nil);
-	mSubView = [[UIView alloc] initWithFrame:CGRectMake(0, VIEW_HIGHT-250, 320, 250)]; // 縦横固定にする
-	[self addSubview:mSubView];//, [mSubView release];
-	mSubView.backgroundColor = [UIColor blackColor];
-	mSubView.userInteractionEnabled = YES;
-	//[self bringSubviewToFront:mSubView];
 	// この mSubView に以下のパーツを載せる
-	//------------------------------------------
-/*	mLbTitle = [[UILabel alloc] initWithFrame:CGRectMake(5, 5, 100, 30)];
-	mLbTitle.backgroundColor = [UIColor whiteColor];
-	mLbTitle.textColor = [UIColor blackColor];
-	mLbTitle.text = title;
-  	mLbTitle.textAlignment = UITextAlignmentRight;
-	mLbTitle.font = [UIFont boldSystemFontOfSize:28];
-	[mSubView addSubview:mLbTitle], [mLbTitle release]; */
+	mSubView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 250)]; // 縦横固定
+	mSubView.backgroundColor = [UIColor greenColor];
+	mSubView.userInteractionEnabled = YES;
+	[self addSubview:mSubView];
 	//------------------------------------------
 	lbAnswer_ = [[UILabel alloc] initWithFrame:CGRectMake(0, 10, 320, 50)];
-	lbAnswer_.backgroundColor = [UIColor blackColor];
+	lbAnswer_.backgroundColor = [UIColor grayColor];
 	lbAnswer_.textColor = [UIColor whiteColor];
   	lbAnswer_.textAlignment = UITextAlignmentCenter;
 	lbAnswer_.font = [UIFont boldSystemFontOfSize:50];
@@ -570,7 +569,7 @@ int levelOperator( NSString *zOpe )  // 演算子の優先順位
 	lbAnswer_.text = title_;
 	//------------------------------------------
 	lbFormula_ = [[UILabel alloc] initWithFrame:CGRectMake(0, 
-														   lbAnswer_.frame.origin.y + lbAnswer_.frame.size.height - 16, 320, 16)];
+						   lbAnswer_.frame.origin.y + lbAnswer_.frame.size.height - 16, 320, 16)];
 	lbFormula_.backgroundColor = [UIColor brownColor];
 	lbFormula_.textColor = [UIColor whiteColor];
   	lbFormula_.textAlignment = UITextAlignmentCenter;
@@ -711,159 +710,60 @@ int levelOperator( NSString *zOpe )  // 演算子の優先順位
     return self;
 }
 
-/*
-- (void)drawRect:(CGRect)rect 
-{    // Drawing code
-	float fxGap = 2;	// Xボタン間隔
-	float fyGap;		// Yボタン間隔
-	float fx;
-	float fy;
-	float fyTop;
-	float fW;
-	float fH;
-
-	// タテ
-	fy = rect.size.height - HEIGHT_TATE + 5;
-	
-	fx = 10;
-	mLbTitle.frame = CGRectMake(fx,fy, 100,30);
-	fx += 100 + 10;
-	mLbAnswer.frame = CGRectMake(fx,fy, 310-fx,30);
-	
-	fy += 32;
-
-	fx = 10;
-	mLbFormula.frame = CGRectMake(fx,fy, 310-fx,20);
-	
-	fy += 22;
-	fx = fxGap;
-	fW = (320 - fxGap) / 5 - fxGap; // 1ページ5列
-	fyGap = 5;	// Yボタン間隔
-	fH = fW / GOLDENPER; // 黄金比
-	fyTop = fy + fyGap;
-
-	NSInteger iIndex = 0;
-	for (int iCol=0; iCol<5; iCol++)
-	{
-		fy = fyTop;
-		for (int iRow=0; iRow<4; iRow++)
-		{
-			UIButton *bu = [mKeyButtons objectAtIndex:iIndex++];
-			if (bu) {
-				bu.frame = CGRectMake(fx,fy, fW,fH);
-				//[bu setFrame:CGRectMake(fx,fy, fW,fH)];
-			}
-			fy += (fH + fyGap);
-		}
-		fx += (fW + fxGap);
-	}
-}
-*/
-
-/*
-- (void)viewDesign:(CGRect)rect
+- (void)setRootViewController:(UIViewController*)rvc
 {
-	AzLOG(@"viewDesign:rect (x,y)=(%f,%f) (w,h)=(%f,%f)", rect.origin.x,rect.origin.y, rect.size.width,rect.size.height);
-	
-	float fxGap = 2;	// Xボタン間隔
-	float fyGap;		// Yボタン間隔
-	float fx = fxGap;
-	float fy;
-	float fyTop;
-	float fW;
-	float fH;
-	
-#ifdef AzPAD
-	if (Re3edit) {
-		fy = 90;
-	} else {
-		fy = 113;
+	mRootViewController = rvc;
+	CGRect rc = rvc.view.frame;
+	if (UIInterfaceOrientationIsLandscape(rvc.interfaceOrientation)) {
+		CGFloat f = rc.size.width;
+		rc.size.width = rc.size.height;
+		rc.size.height = f;
 	}
-	MlbFormula.frame = CGRectMake(5,fy, rect.size.width-10,30);	// 1行
-	fy += MlbFormula.frame.size.height;
-	MscrollView.frame = CGRectMake(5,fy, rect.size.width-10, 214);
-	fW = (rect.size.width-10 - fxGap) / 6 - fxGap; //Pad//6列まで全部表示
-	MscrollView.contentSize = MscrollView.frame.size; //同じ＝1ページのみ固定
-	// 以下、MscrollView座標
-	fyGap = 5;	// Yボタン間隔
-	fy = 0;
-	fH = fW / GOLDENPER; // 黄金比
-	fyTop = fy + fyGap;
-#else
-	if (rect.size.width < rect.size.height)
-	{	// タテ
-		//MlbCalc.frame = CGRectMake(fx,fy, 320-fx-fx,20);	// 3行
-		fy = 95;
-		mLbFormula.frame = CGRectMake(5,fy, 320-10,30);	// 1行
-		fy += mLbFormula.frame.size.height;
-		MscrollView.frame = CGRectMake(0,fy, 320,220);
-		//fW = (320 - fxGap) / 4 - fxGap; // 1ページ4列まで表示、5列目は2ページ目へ
-		fW = (320 - fxGap) / 5 - fxGap; // 1ページ5列まで表示、6列目は2ページ目へ
-																								  //↓2ページ目の列数=1
-		MscrollView.contentSize = CGSizeMake(320+(fW+fxGap)*1, MscrollView.frame.size.height);
-		// 以下、MscrollView座標
-		fyGap = 5;	// Yボタン間隔
-		fy = 0;
-		//fH = (MscrollView.frame.size.height - fyGap) / 4 - fyGap;
-		//fH = fW / GOLDENPER; // 黄金比
-		fH = fW / 1.30;
-		fyTop = fy + fyGap;
-	}
-	else {	// ヨコ
-		//MlbCalc.frame = CGRectMake(fx,fy, 480-fx-fx,20);	// 1行
-		fy = 40;
-		mLbFormula.frame = CGRectMake(5,fy, 480-10,30);	// 1行
-		fy += mLbFormula.frame.size.height;
-		MscrollView.frame = CGRectMake(0,fy, 480,180);
-		//fW = (480 - fxGap) / 5 - fxGap; // 5列まで表示
-		MscrollView.contentSize = MscrollView.frame.size;
-		// 以下、MscrollView座標
-		fyGap = 4;	// Yボタン間隔
-		fy = 0;
-		fH = (MscrollView.frame.size.height - fyGap) / 4 - fyGap;
-		fW = fH * GOLDENPER; // 黄金比
-		fx = (480 - (fxGap + (fW+fxGap)*6 + fxGap)) / 2;
-		fx += fxGap;
-		fyTop = fy + fyGap;
-	}
-#endif
-	
-	NSInteger iIndex = 0;
-	for (int iCol=0; iCol<6; iCol++)
-	{
-		fy = fyTop;
-		for (int iRow=0; iRow<4; iRow++)
-		{
-			UIButton *bu = [mKeyButtons objectAtIndex:iIndex++];
-			if (bu) {
-				bu.frame = CGRectMake(fx,fy, fW,fH);
-				//[bu setFrame:CGRectMake(fx,fy, fW,fH)];
-			}
-			fy += (fH + fyGap);
-		}
-		fx += (fW + fxGap);
-	}
+	self.frame = rc;
 }
-*/
 
-/***** UIView には回転は無い！！！
- - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
- */
-
-/*
-#pragma mark  Unload - dealloc
-- (void)dealloc 
+- (void)setTitle:(NSString*)title
 {
-	[mBehaviorCalc release];
-	[mBehaviorDefault release];
-	[mTitle release], mTitle = nil;
-	[mAnswer release], mAnswer = nil;
-	[super dealloc];
+	title_ = [title copy];	// [AC]で表示するため保持
+	[lbAnswer_ setText: title_];
+}
+- (void)setMin:(double)min
+{
+	mMin = min;
+}
+- (void)setMax:(double)max
+{
+	mMax = max;
+}
+- (void)setDecimal:(int)decimal
+{
+	assert(-1 <= decimal);	// (-1)通貨専用
+	mDecimal = decimal;
+}
+- (void)setDelegate:(id)delegate
+{
+	assert(delegate);
+	delegate_ = delegate;
+}
+- (void)setPointShow:(CGPoint)po
+{
+	//mRectShow = CGRectMake(0, 0, 320, VIEW_HIGHT);  // self.frame;
+	CGRect rc = mRectShow;
+	rc.origin.x = po.x;
+	rc.origin.y = po.y;
+	mRectShow = rc;
+}
+/*
+- (void)setPointHide:(CGPoint)po
+{
+	CGRect rc = mRectHide;
+	rc.origin.x = po.x;
+	rc.origin.y = po.y;
+	mRectHide = rc;
 }*/
 
 
 #pragma mark - <Touches>
-
 // タッチイベント
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event 
 {	//Cancel
@@ -872,8 +772,6 @@ int levelOperator( NSString *zOpe )  // 演算子の優先順位
 		[self hide];
 	}
 }
-
-
 
 
 @end

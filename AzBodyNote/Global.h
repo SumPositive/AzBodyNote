@@ -56,12 +56,16 @@ typedef NSUInteger AzConditionItems;
 #define KVS_bGSpread							@"KVS_bGSpread"
 #define KVS_CalendarID							@"KVS_CalendarID"
 #define KVS_CalendarTitle						@"KVS_CalendarTitle"
+
 #define KVS_SettGraphs						@"KVS_SettGraphs"	//UserDef保存につき変更禁止 NSArrey型 
+#define KVS_SettGraphOneWid				@"KVS_SettGraphOneWid"
+
 #define KVS_SettStatType					@"KVS_SettStatType"
 #define KVS_SettStatDays					@"KVS_SettStatDays"
 #define KVS_SettStatAvgShow				@"KVS_SettStatAvgShow"
 #define KVS_SettStatTimeLine				@"KVS_SettStatTimeLine"
 #define KVS_SettStat24H_Line			@"KVS_SettStat24H_Line"
+
 
 //この時刻の前後2時間を判定している
 #define KVS_DateOptWake_HOUR		@"KVS_DateOptWake_HOUR"

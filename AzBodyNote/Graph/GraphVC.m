@@ -155,7 +155,7 @@
 			mIvSetting = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Icon32-Sett_Right"]];
 			[ibScrollView addSubview:mIvSetting];
 		}
-		mIvSetting.frame = CGRectMake(ibScrollView.contentSize.width-30, 20, 32, 32);
+		mIvSetting.frame = CGRectMake(ibScrollView.contentSize.width-30, 10, 32, 32);
 		mIvSetting.hidden = NO;
 	} else {
 		mIvSetting.hidden = YES;
@@ -447,7 +447,7 @@ NSInteger afterPageChange = 0;
 	assert(mMocFunc);
 	
 	if (iS_iPAD) {
-		mPadScale = 1.5;
+		mPadScale = 1.4;
 	} else {
 		mPadScale = 1.0;
 	}
@@ -468,6 +468,30 @@ NSInteger afterPageChange = 0;
 		[mActIndicator stopAnimating];
 		[ibScrollView addSubview:mActIndicator];
 	}
+
+	if (mSliderOneWidth==nil) {
+		mSliderOneWidth = [[UISlider alloc] init];
+		mSliderOneWidth.minimumValue = ONE_WID_MIN;
+		mSliderOneWidth.maximumValue = ONE_WID_MAX;
+		mSliderOneWidth.continuous = NO; //移動が終わったときだけ通知
+		[mSliderOneWidth addTarget:self action:@selector(sliderOneWidth:) 
+				  forControlEvents:UIControlEventValueChanged];
+		[self.view addSubview:mSliderOneWidth];
+	}
+}
+
+- (void)sliderOneWidth:(UISlider*)sender
+{
+	CGRect rc = ibViewRecord.frame;
+	rc.size.width = sender.value * mPadScale;
+	rc.origin.x = (self.view.frame.size.width - rc.size.width) / 2.0;
+	ibViewRecord.frame = rc;
+	// 再描画
+	[self drawClear];
+	[self graphViewPageChange:0  animated:YES];
+	//
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	[kvs setObject:[NSNumber numberWithInteger:(NSInteger)sender.value] forKey:KVS_SettGraphOneWid];
 }
 
 - (void)viewWillAppear:(BOOL)animated 
@@ -490,6 +514,17 @@ NSInteger afterPageChange = 0;
 	if (mGoalDisp != [kvs boolForKey:KVS_bGoal]) {
 		mGoalDisp = [kvs boolForKey:KVS_bGoal];
 		//mReDraw = YES; //=YES:設定に変化あり ⇒ クリアして再描画する
+	}
+
+	if (mSliderOneWidth) {
+		//注意// 回転対応のため、同じものが didRotateFromInterfaceOrientation:にもある
+		mSliderOneWidth.frame = CGRectMake(-14+(self.view.frame.size.width+ONE_WID_MIN*mPadScale)/2.0, 10,
+									  (ONE_WID_MAX-ONE_WID_MIN)*2.0*mPadScale, 20);		//幅2倍にして操作しやすくした
+		NSInteger iVal = [[kvs objectForKey:KVS_SettGraphOneWid] integerValue];
+		if (iVal<ONE_WID_MIN OR ONE_WID_MAX<iVal) {
+			iVal = ONE_WID_MIN;
+		}
+		mSliderOneWidth.value = iVal;
 	}
 	
 	if (mAppDelegate.app_is_unlock==NO) {
@@ -533,6 +568,10 @@ NSInteger afterPageChange = 0;
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {	// 回転した後に呼び出される
 	[mAppDelegate adRefresh];
+	if (mSliderOneWidth) {
+		mSliderOneWidth.frame = CGRectMake(-14+(self.view.frame.size.width+ONE_WID_MIN*mPadScale)/2.0, 10,
+										   (ONE_WID_MAX-ONE_WID_MIN)*2.0*mPadScale, 20);		//幅2倍にして操作しやすくした
+	}
 	[self graphViewPageChange:0  animated:NO];	//再描画
 }
 

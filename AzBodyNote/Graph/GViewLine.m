@@ -66,18 +66,30 @@ NSInteger	pValueCount;
 		CGContextSelectFont (cgc, "Helvetica", FONT_SIZE*mPadScale, kCGEncodingMacRoman);
 		CGContextSetTextDrawingMode (cgc, kCGTextFill);
 		CGContextSetGrayFillColor(cgc, 0, 1);
+		
+		size_t  slen = strlen(cc);
+#ifdef NG_SLANT_TYPE
 		// 回転	// 45度
 		CGAffineTransform  myTextTransform =  CGAffineTransformMakeRotation( 3.1415/4.0 );
 		CGContextSetTextMatrix (cgc, myTextTransform); 
-		// 文字描画
-		size_t  slen = strlen(cc);
-		if (self.bounds.size.height < po.y+10+(FONT_SIZE*mPadScale*slen/2.0)) {	//点の左下へ
-			po.x -= (FONT_SIZE*mPadScale*slen/2.5) - 8.0;
-			po.y -= (FONT_SIZE*mPadScale*slen/2.5) + 10.0;
+		// 文字原点
+		if (self.bounds.size.height < po.y+(10+(FONT_SIZE*slen/2.0))*mPadScale) {	//点の左下へ
+			po.x -= ((FONT_SIZE*slen/2.5) - 8.0)*mPadScale;
+			po.y -= ((FONT_SIZE*slen/2.5) + 10.0)*mPadScale;
 		} else {	//点の右上へ
 			//po.x += 0.0;
-			po.y += 7.0;
+			po.y += 7.0*mPadScale;
 		}
+#else
+		//[0.10] 水平のみにした。＜＜文字が傾くのは見難いとの要望より
+		// 文字原点
+		po.x -= ((FONT_SIZE*slen/4.0) + 2.0)*mPadScale;
+		if (self.bounds.size.height < po.y+14.0*mPadScale) {	//点の下へ
+			po.y -= 15.0*mPadScale;
+		} else {	//点の上へ
+			po.y += 5.0*mPadScale;
+		}
+#endif
 		CGContextShowTextAtPoint (cgc, po.x, po.y, cc, slen);
 	}
 	CGContextRestoreGState(cgc); //POP
@@ -97,7 +109,7 @@ NSInteger	pValueCount;
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	BOOL bGoal = [kvs boolForKey:KVS_bGoal];
 	NSInteger iGoal = [[kvs objectForKey: self.ppGoalKey] integerValue];  // NSNullならば "<null>"文字列となり数値化して0になる
-
+	
 	//--------------------------------------------------------------------------集計しながらMinMaxを求める
 	//Goal
 	if (self.ppMin<=iGoal  &&  iGoal<=self.ppMax) {

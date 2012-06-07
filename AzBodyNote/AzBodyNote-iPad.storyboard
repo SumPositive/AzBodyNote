@@ -17,7 +17,7 @@
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" id="kLc-qu-PRW">
                                 <rect key="frame" x="0.0" y="102" width="768" height="853"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" heightSizable="YES"/>
                             </scrollView>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" id="Y0S-SI-eqd">
                                 <rect key="frame" x="119" y="5" width="531" height="44"/>
@@ -183,6 +183,9 @@
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 </view>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <segue destination="fv6-dq-0C5" kind="push" identifier="pushDate" id="2di-4b-xXS"/>
+                                </connections>
                             </tableViewCell>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" shouldIndentWhileEditing="NO" reuseIdentifier="E2editCellDateOpt" rowHeight="50" id="LMK-2z-ksm" userLabel="Cell - E2editCellDateOpt" customClass="E2editCellDateOpt">
                                 <rect key="frame" x="0.0" y="66" width="768" height="50"/>
@@ -721,15 +724,15 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" contentMode="scaleToFill" directionalLockEnabled="YES" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" id="Psx-Ti-Y6C">
-                                <rect key="frame" x="0.0" y="36" width="768" height="905"/>
+                                <rect key="frame" x="0.0" y="20" width="768" height="916"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             </scrollView>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="GraphDrum.png" id="7kQ-Qr-JYA">
-                                <rect key="frame" x="0.0" y="1" width="768" height="954"/>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="GraphRoll-768x120.png" id="7kQ-Qr-JYA">
+                                <rect key="frame" x="0.0" y="0.0" width="768" height="956"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             </imageView>
                             <view userInteractionEnabled="NO" alpha="0.20000000298023224" contentMode="scaleToFill" id="2fo-eP-myq" userLabel="View - Record Width">
-                                <rect key="frame" x="349" y="36" width="70" height="905"/>
+                                <rect key="frame" x="364" y="20" width="40" height="916"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" red="0.20000000000000001" green="0.80000000000000004" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                             </view>
@@ -773,12 +776,12 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Uwa-9W-fIq" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController storyboardIdentifier="E2editDate" title="E2editDate" id="fv6-dq-0C5" customClass="EditDateVC" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="1F0-k5-CFf">
-                        <rect key="frame" x="0.0" y="20" width="320" height="300"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <rect key="frame" x="0.0" y="64" width="540" height="507"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" id="3G4-3P-ySV">
-                                <rect key="frame" x="0.0" y="75" width="320" height="216"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <rect key="frame" x="110" y="75" width="320" height="216"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <date key="date" timeIntervalSinceReferenceDate="340459436.93700099">
                                     <!--2011-10-16 12:03:56 +0000-->
                                 </date>
@@ -809,7 +812,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                 </timeZone>
                             </datePicker>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="pVe-Aq-vqD">
-                                <rect key="frame" x="124" y="20" width="72" height="40"/>
+                                <rect key="frame" x="234" y="20" width="72" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Now">
@@ -824,114 +827,29 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                 </connections>
                             </button>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
                     </view>
                     <navigationItem key="navigationItem" id="AeO-Dj-m7i"/>
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="blackTranslucent"/>
-                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <modalFormSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <connections>
                         <outlet property="ibDatePicker" destination="3G4-3P-ySV" id="LBD-uz-B8K"/>
                     </connections>
                 </viewController>
             </objects>
-            <point key="canvasLocation" x="3369" y="-1183"/>
+            <point key="canvasLocation" x="3334" y="-1175"/>
         </scene>
     </scenes>
     <resources>
         <image name="Dropbox-130x44.png" width="16" height="16"/>
         <image name="E2edit-Panel-700x60.png" width="700" height="60"/>
-        <image name="GraphDrum.png" width="320" height="410"/>
+        <image name="GraphRoll-768x120.png" width="768" height="120"/>
         <image name="Icon32-Setting.png" width="32" height="32"/>
         <image name="Tab32-Add.png" width="32" height="32"/>
         <image name="Tab32-Graph.png" width="32" height="32"/>
         <image name="Tab32-List.png" width="32" height="32"/>
         <image name="Tab32-Stat.png" width="32" height="32"/>
     </resources>
-    <classes>
-        <class className="E2editCellDateOpt" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2editCellDateOpt.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibSegment" candidateClass="UISegmentedControl"/>
-            </relationships>
-        </class>
-        <class className="E2editCellDial" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2editCellDial.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibLbDetail" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbName" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbUnit" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbValue" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibViewBase" candidateClass="UIView"/>
-            </relationships>
-        </class>
-        <class className="E2editCellNote" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2editCellNote.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibTfNote1" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="ibTfNote2" candidateClass="UITextField"/>
-            </relationships>
-        </class>
-        <class className="E2editTVC" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2editTVC.h"/>
-        </class>
-        <class className="E2listCell" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2listCell.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibIvDateOpt" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="ibLbBodyFat" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbBpHi" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbBpLo" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbDate" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbNote1" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbPedo" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbPuls" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbSkMuscle" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbTemp" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbWeight" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-        <class className="E2listTVC" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2listTVC.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibLbBodyFat" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbBpHi" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbBpLo" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbDate" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbPedo" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbPuls" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbSkMuscle" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbTemp" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbTime" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbWeight" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-        <class className="EditDateVC" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/EditDateVC.h"/>
-            <relationships>
-                <relationship kind="action" name="ibBuToday:" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="ibDatePicker" candidateClass="UIDatePicker"/>
-            </relationships>
-        </class>
-        <class className="GraphVC" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/GraphVC.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibScrollView" candidateClass="UIScrollView"/>
-                <relationship kind="outlet" name="ibViewRecord" candidateClass="UIView"/>
-            </relationships>
-        </class>
-        <class className="SettingTVC" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/SettingTVC.h"/>
-        </class>
-        <class className="StatisticsVC" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/StatisticsVC.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibLbDays" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibScrollView" candidateClass="UIScrollView"/>
-                <relationship kind="outlet" name="ibSegment" candidateClass="UISegmentedControl"/>
-                <relationship kind="outlet" name="ibSpDays" candidateClass="UIStepper"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>

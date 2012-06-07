@@ -16,6 +16,7 @@
 #import "E2editCellDateOpt.h"
 #import "E2editCellDial.h"
 #import "E2editCellNote.h"
+#import "CalcView.h"
 
 #define PANEL_TOP_ROW		2
 

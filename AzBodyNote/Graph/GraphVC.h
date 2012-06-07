@@ -21,6 +21,9 @@
 #define GRAPH_PAGE_LIMIT			50		// グラフ表示の最大レコード数　
 #endif
 
+#define ONE_WID_MIN		30	//1レコードの幅 Min
+#define ONE_WID_MAX		80	//1レコードの幅 Max
+
 //#define RECORD_WIDTH		40.0		// 1レコード分の幅  ibViewRecordの幅参照
 #define SEPARATE_HEIGHT	3.0		// 区切り線の高さ
 
@@ -50,6 +53,8 @@
 	GViewLine						*mGvPedo;
 	GViewLine						*mGvFat;
 	GViewLine						*mGvSkm;
+	
+	UISlider								*mSliderOneWidth;	//グラフ1本の間隔調整
 }
 
 @end

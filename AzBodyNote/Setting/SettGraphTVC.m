@@ -184,6 +184,7 @@
 		}
 	}
 	
+	//section==1 パネル並び替え
     assert(indexPath.section==1);
 	if (indexPath.row<0 OR AzConditionCount<=indexPath.row) return nil;
 
@@ -341,47 +342,7 @@
 		//bCheck = NO;
 	}
 	[mPanels replaceObjectAtIndex:indexPath.row withObject:num]; //置換
-
-/*** BpHiのみ代表方式にしたので不要になった。
-	// BpHi と BpLo を同調させる
-	if (abs(item)==AzConditionBpHi) {
-		// BpLoを更新する
-		for (int iRow=0; iRow<[mPanels count]; iRow++) {
-			item = [[mPanels objectAtIndex:iRow] integerValue];
-			if (abs(item)==AzConditionBpLo) {
-				NSIndexPath *ipLo = [NSIndexPath indexPathForRow:iRow inSection:indexPath.section];
-				cell = [tableView cellForRowAtIndexPath:ipLo];
-				if (bCheck) {
-					cell.accessoryType = UITableViewCellAccessoryCheckmark;	// グラフ表示ON
-					num = [NSNumber numberWithInteger: AzConditionBpLo * (-1)]; //Lo ON
-				} else {
-					cell.accessoryType = UITableViewCellAccessoryNone;			// グラフ表示OFF
-					num = [NSNumber numberWithInteger: AzConditionBpLo]; //Lo OFF
-				}
-				[mPanels replaceObjectAtIndex:iRow withObject:num]; //置換
-				break;
-			}
-		}
-	}
-	else if (abs(item)==AzConditionBpLo) {
-		// BpHiを更新する
-		for (int iRow=0; iRow<[mPanels count]; iRow++) {
-			item = [[mPanels objectAtIndex:iRow] integerValue];
-			if (abs(item)==AzConditionBpHi) {
-				NSIndexPath *ipHi = [NSIndexPath indexPathForRow:iRow inSection:indexPath.section];
-				cell = [tableView cellForRowAtIndexPath:ipHi];
-				if (bCheck) {
-					cell.accessoryType = UITableViewCellAccessoryCheckmark;	// グラフ表示ON
-					num = [NSNumber numberWithInteger: AzConditionBpHi * (-1)]; //Hi ON
-				} else {
-					cell.accessoryType = UITableViewCellAccessoryNone;			// グラフ表示OFF
-					num = [NSNumber numberWithInteger: AzConditionBpHi]; //Hi OFF
-				}
-				[mPanels replaceObjectAtIndex:iRow withObject:num]; //置換
-				break;
-			}
-		}
-	}*/
 }
+
 
 @end

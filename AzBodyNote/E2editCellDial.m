@@ -84,14 +84,25 @@
 	}
 	double dMin = (double)valueMin_ / dPow;
 	double dMax = (double)valueMax_ / dPow;
-	//CalcView *calc = [[CalcView alloc] initWithTitle: ibLbName.text  min: dMin  max: dMax  decimal: valueDec_
-	//										  target:self	  action:@selector(calcDone:)];
-	CalcView *calc = [[CalcView alloc] initWithTitle: ibLbName.text  min: dMin  max: dMax  decimal: valueDec_ delegate:self];
-	//[viewParent_ addSubview:calc];
-	//広告やTabBarよりも上に出すため。
+	
+	CalcView *calc = [CalcView sharedCalcView];
+	[calc setRootViewController: self.window.rootViewController];
+	[calc setTitle: ibLbName.text];
+	[calc setMin: dMin];
+	[calc setMax: dMax];
+	[calc setDecimal: valueDec_];
+	[calc setDelegate: self];
 	[viewParent_.window.rootViewController.view  addSubview:calc];
+	if (iS_iPAD) {
+		CGPoint po = button.frame.origin;
+		po.x += button.frame.size.width + 60;
+		po.y = 500;
+		[calc setPointShow: po];
+	} else {	
+		//広告やTabBarよりも上に出すため。
+		[calc setPointShow: CGPointMake(0, 240)];
+	}
 	[calc show];
-	//[calc release];
 }
 
 - (IBAction)ibBuClear:(UIButton *)button

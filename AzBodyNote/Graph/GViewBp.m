@@ -103,6 +103,9 @@ NSInteger	pValueCount = 0;
 		CGContextSelectFont (cgc, "Helvetica", FONT_SIZE*mPadScale, kCGEncodingMacRoman);
 		CGContextSetTextDrawingMode (cgc, kCGTextFill);
 		CGContextSetGrayFillColor(cgc, 0, 1);
+		
+		size_t  slen = strlen(cc);
+#ifdef NG_SLANT_TYPE
 		// 回転
 		CGAffineTransform  myTextTransform;
 		if (isAngle) {
@@ -113,22 +116,32 @@ NSInteger	pValueCount = 0;
 		CGContextSetTextMatrix (cgc, myTextTransform); 
 		if (isHi) {	// BpHi
 			if (isAngle) {
-				po.x -= (-2.0 + strlen(cc) * (FONT_SIZE*mPadScale/2.0));
-				po.y -= (3.0 + strlen(cc) * (FONT_SIZE*mPadScale/2.0));
+				po.x -= (-2.0 + slen * (FONT_SIZE/2.0))*mPadScale;
+				po.y -= (3.0 + slen * (FONT_SIZE/2.0))*mPadScale;
 			} else {	
 				po.x += 5.0*mPadScale;
-				po.y -= (7.0 + strlen(cc) * (FONT_SIZE*mPadScale/2.0));
+				po.y -= (7.0 + slen * (FONT_SIZE/2.0))*mPadScale;
 			}
 		} else {		// BpLo
 			if (isAngle) {
 				po.x += 5.0*mPadScale;
-				po.y += 3.0;
+				po.y += 3.0*mPadScale;
 			} else {	
 				po.x += 5.0*mPadScale;
-				po.y += 7.0;
+				po.y += 7.0*mPadScale;
 			}
 		}
-	CGContextShowTextAtPoint (cgc, po.x, po.y, cc, strlen(cc));
+#else
+		//[0.10] 水平のみにした。＜＜文字が傾くのは見難いとの要望より
+		// 文字原点
+		po.x -= ((FONT_SIZE*slen/4.0) + 2.0)*mPadScale;
+		if (isHi) {	// BpHi	//点の上側へ
+			po.y += 5.0*mPadScale;
+		} else {		// BpLo	//点の下側へ
+			po.y -= 15.0*mPadScale;
+		}
+#endif
+		CGContextShowTextAtPoint (cgc, po.x, po.y, cc, strlen(cc));
 	}
 	CGContextRestoreGState(cgc); //POP
 }
@@ -138,7 +151,7 @@ NSInteger	pValueCount = 0;
 	BOOL bLine;
 	//CGFloat fy;
 	CGPoint po;
-	CGFloat fLineW = self.ppRecordWidth / 2.0;
+	CGFloat fLineW = 1.0;  //self.ppRecordWidth / 2.0;		//Hi-Loを結ぶタテ棒の太さ
 	CGFloat  fGapHiLo;
 	
 	//------------------------------------------------------------------------------ BpHi と BpLo を結ぶ縦線

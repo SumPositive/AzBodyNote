@@ -187,11 +187,15 @@
 		[kvs setBool:YES		forKey:KVS_SettStatAvgShow];	// YES=平均±標準偏差を表示する
 		[kvs setBool:NO		forKey:KVS_SettStatTimeLine];	// YES=時系列線で結ぶ
 		[kvs setBool:NO		forKey:KVS_SettStat24H_Line];	// YES=24Hourタテ結線する
-		[kvs synchronize];
 	}
+	
+	if (![kvs objectForKey:KVS_Calc_Method])		[kvs setObject:@"0" forKey:KVS_Calc_Method];
+	if (![kvs boolForKey:KVS_Calc_Method])			[kvs setBool:YES		forKey:KVS_Calc_Method];
 
-	if (![kvs objectForKey:KVS_Calc_Method])	[kvs setObject:@"0" forKey:KVS_Calc_Method];
-	if (![kvs boolForKey:KVS_Calc_Method])		[kvs setBool:YES		forKey:KVS_Calc_Method];
+	if (![kvs objectForKey:KVS_SettGraphOneWid])		//[0.10]Graph1本の幅(iPhoneサイズ基準)の初期値
+			[kvs setObject:[NSNumber numberWithInt:40] forKey:KVS_SettGraphOneWid];
+	
+	[kvs synchronize];
 	
 	if (__app_is_unlock==NO) {
 		__app_is_unlock = [kvs boolForKey:STORE_PRODUCTID_UNLOCK];
@@ -212,7 +216,7 @@
 			}
 		}
 #ifdef DEBUG
-		__app_is_unlock = NO;
+		__app_is_unlock = YES;
 #endif
 		if (__app_is_unlock) {	//登録
 			[kvs setBool:YES forKey:STORE_PRODUCTID_UNLOCK];

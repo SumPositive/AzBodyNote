@@ -221,7 +221,11 @@
 			cell.imageView.image = [UIImage imageNamed:@"Icon32"];
 			cell.textLabel.text = AZLocalizedString(@"AZAbout",nil);
 			cell.detailTextLabel.text = nil;
-			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+			if (iS_iPAD) {
+				cell.accessoryType = UITableViewCellAccessoryNone;
+			} else {
+				cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+			}
 			return cell;
 		}	break;
 
@@ -233,7 +237,11 @@
 			cell.imageView.image = [UIImage imageNamed:@"AZStore-32"];
 			cell.textLabel.text = AZLocalizedString(@"AZStore",nil);
 			cell.detailTextLabel.text = AZLocalizedString(@"AZStore detail",nil);
-			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+			if (iS_iPAD) {
+				cell.accessoryType = UITableViewCellAccessoryNone;
+			} else {
+				cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+			}
 			return cell;
 		}	break;
 			
@@ -246,7 +254,11 @@
 			cell.imageView.image = [UIImage imageNamed:@"AZDropbox-32"];
 			cell.textLabel.text = NSLocalizedString(@"Dropbox Download",nil);
 			cell.detailTextLabel.text = nil;
-			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+			if (iS_iPAD) {
+				cell.accessoryType = UITableViewCellAccessoryNone;
+			} else {
+				cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+			}
 			return cell;
 		}	break;
 	}
@@ -312,15 +324,24 @@
 			
 			
 		case 200: {	// このアプリについて
-			[mAppDelegate adShow:2];	//(2)Ad下端へ
 			AZAboutVC *vc = [[AZAboutVC alloc] init];
 			vc.ppImgIcon = [UIImage imageNamed:@"Icon57"];
 			vc.ppProductTitle = @"Condition";	// 世界共通名称
 			vc.ppProductSubtitle = NSLocalizedString(@"Product Title",nil); // ローカル名称
 			vc.ppProductYear = @"2011";	// Copyright初年度
 			vc.ppSupportSite = @"http://condition.azukid.com";
-			vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
-			[self.navigationController pushViewController:vc animated:YES];
+			//vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
+			//[self.navigationController pushViewController:vc animated:YES];
+			if (iS_iPAD) {
+				UINavigationController* nc = [[UINavigationController alloc] initWithRootViewController:vc];
+				nc.modalPresentationStyle = UIModalPresentationFormSheet; // iPad画面1/4サイズ
+				nc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+				[self presentModalViewController:nc animated:YES];
+			} else {
+				[mAppDelegate adShow:2];	//(2)Ad下端へ
+				[vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
+				[self.navigationController pushViewController:vc animated:YES];
+			}
 		}	break;
 			
 		case 201: {	// あずき商店
@@ -329,13 +350,22 @@
 			// 商品IDリスト
 			NSSet *pids = [NSSet setWithObjects:STORE_PRODUCTID_UNLOCK, nil]; // 商品が複数ある場合は列記
 			[vc setProductIDs:pids];
-			vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
-			[self.navigationController pushViewController:vc animated:YES];
+			//vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
+			//[self.navigationController pushViewController:vc animated:YES];
+			if (iS_iPAD) {
+				UINavigationController* nc = [[UINavigationController alloc] initWithRootViewController:vc];
+				nc.modalPresentationStyle = UIModalPresentationFormSheet; // iPad画面1/4サイズ
+				nc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+				[self presentModalViewController:nc animated:YES];
+			} else {
+				[mAppDelegate adShow:2];	//(2)Ad下端へ
+				[vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
+				[self.navigationController pushViewController:vc animated:YES];
+			}
 		}	break;
 
 	
 		case 300: {	// Dropbox - Download
-			[mAppDelegate adShow:2];	//(2)Ad下端へ
 			// Dropbox を開ける
 			AZDropboxVC *vc = [[AZDropboxVC alloc] initWithAppKey: DBOX_KEY
 														appSecret: DBOX_SECRET
@@ -352,7 +382,17 @@
 													 style:UIBarButtonItemStylePlain
 													 target:nil  action:nil];
 			//表示開始
-			[self.navigationController pushViewController:vc animated:YES];
+			//[self.navigationController pushViewController:vc animated:YES];
+			if (iS_iPAD) {
+				UINavigationController* nc = [[UINavigationController alloc] initWithRootViewController:vc];
+				nc.modalPresentationStyle = UIModalPresentationFormSheet; // iPad画面1/4サイズ
+				nc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+				[self presentModalViewController:nc animated:YES];
+			} else {
+				[mAppDelegate adShow:2];	//(2)Ad下端へ
+				[vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
+				[self.navigationController pushViewController:vc animated:YES];
+			}
 			//表示開始後にsetする
 			[vc setCryptHidden:YES	 Enabled:NO];////表示後にセットすること
 		}	break;

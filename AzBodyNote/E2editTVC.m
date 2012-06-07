@@ -206,6 +206,17 @@
 	return DtOpRest;		//デフォルト
 }
 
+
+- (void)modify:(BOOL)modify		//=YES:変更あり
+{
+	self.navigationItem.rightBarButtonItem.enabled = modify;	//[保存]ボタン有効
+	//[self.navigationController setToolbarHidden: modify animated:YES]; // ツールバー消す
+	// TabBarを有効にする ＞＞＞ 変更あれば無効にしてView遷移禁止する
+	for (UIViewController *vc in self.tabBarController.viewControllers) {
+		vc.tabBarItem.enabled = !modify;	// タブバー無効
+	}
+}
+
 - (void)actionClear
 {	// 直前値なければ初期値をセットする
 	assert(editMode_==0);
@@ -227,8 +238,8 @@
 	moE2edit_.nSkMuscle_10p = nil;
 	[self setAutoDateOpt];	//.dateTimeに最適な.nDateOptをセットする
 	[self setE2recordPrev];	// 各項目毎にヌルならば、前の値を初期値としてセットする
-	
-	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
+	// 表示更新
+	[self modify:NO];
 	[self.tableView reloadData];
 }
 
@@ -398,7 +409,8 @@
 - (void)actionSave
 {
 	GA_TRACK_METHOD
-	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
+	//self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
+	[self modify:NO]; // TabBar有効化
 
 	if (editMode_==0) { // AddNewのとき
 		appDelegate_.app_e2record_count = [mocFunc_ e2record_count];
@@ -509,6 +521,12 @@
 	}
 	assert(mocFunc_);
 	
+	// Set up NEXT Left [Back] buttons.
+	self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
+											 initWithTitle: NSLocalizedString(@"Back", nil)
+											 style:UIBarButtonItemStylePlain
+											 target:nil  action:nil];
+
 	// listen to our app delegates notification that we might want to refresh our detail view
     [[NSNotificationCenter defaultCenter] addObserver:self 
 											 selector:@selector(refreshAllViews:) 
@@ -534,7 +552,7 @@
 		{
 			self.title = NSLocalizedString(@"TabAdd",nil);
 			// TableView 背景
-			UIImage *imgTile = [UIImage imageNamed:@"Tx-Back1"];
+			UIImage *imgTile = [UIImage imageNamed: @"Tx-Back1"];   //@"Tx-Back1"
 			self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 			assert(moE2edit_==nil);
 			// moE2edit_ は、viewWillAppear:にて生成する。
@@ -594,6 +612,7 @@
 											   initWithBarButtonSystemItem:UIBarButtonSystemItemSave
 											  target:self action:@selector(actionSave)];// autorelease];
 	self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
+	//[self modify:NO];
 
 	// TableView
 	self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone; // セル区切り線なし
@@ -739,9 +758,13 @@
 {   // Return YES for supported orientations
 	return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait); // タテ正面のみ
 }
-
+- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation 
+								duration:(NSTimeInterval)duration
+{	// 回転前
+	[[CalcView sharedCalcView] hide];	//回転すれば電卓消す
+}
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{	// 回転した後に呼び出される
+{	// 回転後
 	[appDelegate_ adRefresh];
 }
 
@@ -874,8 +897,14 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section 
 {	// セクションフッタを応答
-	return [NSString stringWithFormat:@"%@ %@", NSLocalizedString(@"Product Title",nil), COPYRIGHT];
+	if (iS_iPAD) {
+		//return [NSString stringWithFormat:@"%@ %@", NSLocalizedString(@"Product Title",nil), COPYRIGHT];
+		return @"Condition " COPYRIGHT;
+	} else {
+		return nil;
+	}
 }
+
 
 - (UITableViewCell *)cellDate:(UITableView *)tableView
 {
@@ -1238,6 +1267,7 @@
 		editDate.delegate = self;	// [Done]にて editDateDone: を呼び出すため
 		editDate.CdateSource = moE2edit_.dateTime;
 		bEditDate_ = YES;
+		[editDate setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
 	}
 }
 
@@ -1251,7 +1281,8 @@
 		[self setAutoDateOpt];	//.dateTimeに最適な.nDateOptをセットする
 		[self setE2recordPrev]; // .dateTime より前の値を初期値としてセットする
 		[self.tableView reloadData];
-		self.navigationItem.rightBarButtonItem.enabled = YES; // 変更あればYESにする
+		//self.navigationItem.rightBarButtonItem.enabled = YES; // 変更あればYESにする
+		[self modify:YES];
 	}
 }
 
@@ -1259,14 +1290,16 @@
 #pragma mark - <delegate>
 - (void)delegateEditChange
 {
-	self.navigationItem.rightBarButtonItem.enabled = YES; // 変更あればYESにする
+	//self.navigationItem.rightBarButtonItem.enabled = YES; // 変更あればYESにする
 	//NG//self.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
+	[self modify:YES];
 }
 
 - (void)delegateDateOptChange
 {
 	if (editMode_) {
-		self.navigationItem.rightBarButtonItem.enabled = YES; // 変更
+		//self.navigationItem.rightBarButtonItem.enabled = YES; // 変更
+		[self modify:YES];
 	}
 	//.nDateOptを優先する
 	[self setE2recordPrev];	// 各項目毎にヌルならば、前の値を初期値としてセットする

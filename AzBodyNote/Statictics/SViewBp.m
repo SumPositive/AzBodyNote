@@ -443,13 +443,13 @@ NSInteger	pStatCount = 0;
 		dSdLo = sqrt( dSdLo / (iCntLo * (iCntLo-1)) );
 		NSLog(@"Standard deviations: dSdHi=%0.4lf, dSdLo=%0.4lf", dSdHi, dSdLo);
 		//
-		CGContextSetRGBStrokeColor(cgc, 1, 1, 1, 0.3);
+		CGContextSetRGBStrokeColor(cgc, 1, 1, 1, 0.2);
 		if (self.ppStatType==statDispersalHiLo) {
 			// BpHi
-			if (0.05 < dSdHi*mPadScale) {
-				CGContextSetLineWidth(cgc, dSdHi*mPadScale); //太さ
+			if (0.1 < dSdHi*3.0*mPadScale) {
+				CGContextSetLineWidth(cgc, dSdHi*3.0*mPadScale); //太さ
 			} else {
-				CGContextSetLineWidth(cgc, 0.05); //太さ
+				CGContextSetLineWidth(cgc, 0.1); //太さ
 			}
 			po.x = ORIGIN_OFFSET*mPadScale;
 			po.y = ORIGIN_OFFSET*mPadScale + (dAvgHi - pValMin[bpHi]) * fStep;
@@ -463,10 +463,10 @@ NSInteger	pStatCount = 0;
 										150*mPadScale,12*mPadScale)
 					   angle:0.0];
 			// BpLo
-			if (0.05 < dSdLo) {
-				CGContextSetLineWidth(cgc, dSdLo); //太さ
+			if (0.1 < dSdLo*3.0*mPadScale) {
+				CGContextSetLineWidth(cgc, dSdLo*3.0*mPadScale); //太さ
 			} else {
-				CGContextSetLineWidth(cgc, 0.05); //太さ
+				CGContextSetLineWidth(cgc, 0.1); //太さ
 			}
 			po.x = ORIGIN_OFFSET*mPadScale + (dAvgLo - pValMin[bpLo]) * fStep;
 			po.y = ORIGIN_OFFSET*mPadScale;
@@ -479,10 +479,10 @@ NSInteger	pStatCount = 0;
 					   angle:-90.0];
 		} else {
 			// BpHi
-			if (0.05 < dSdHi*mPadScale) {
-				CGContextSetLineWidth(cgc, dSdHi*mPadScale); //太さ
+			if (0.1 < dSdHi*3.0*mPadScale) {
+				CGContextSetLineWidth(cgc, dSdHi*3.0*mPadScale); //太さ
 			} else {
-				CGContextSetLineWidth(cgc, 0.05); //太さ
+				CGContextSetLineWidth(cgc, 0.1); //太さ
 			}
 			po.x = ORIGIN_OFFSET*mPadScale;
 			po.y = ORIGIN_OFFSET*mPadScale + (dAvgHi - pValMin[bpLo]) * fYstep; //＜＜※[bpLo]で正しい。 [bpHi]は時刻ベース
@@ -494,10 +494,10 @@ NSInteger	pStatCount = 0;
 						rect:CGRectMake(50*mPadScale, 0, 150*mPadScale,12*mPadScale)
 					   angle:0.0];
 			// BpLo
-			if (0.05 < dSdLo*mPadScale) {
-				CGContextSetLineWidth(cgc, dSdLo*mPadScale); //太さ
+			if (0.1 < dSdLo*3.0*mPadScale) {
+				CGContextSetLineWidth(cgc, dSdLo*3.0*mPadScale); //太さ
 			} else {
-				CGContextSetLineWidth(cgc, 0.05); //太さ
+				CGContextSetLineWidth(cgc, 0.1); //太さ
 			}
 			po.x = ORIGIN_OFFSET*mPadScale;
 			po.y = ORIGIN_OFFSET*mPadScale + (dAvgLo - pValMin[bpLo]) * fYstep;

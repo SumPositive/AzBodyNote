@@ -16,15 +16,15 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" contentMode="scaleToFill" directionalLockEnabled="YES" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" id="WwL-HN-1Ng">
-                                <rect key="frame" x="0.0" y="3" width="320" height="400"/>
+                                <rect key="frame" x="0.0" y="10" width="320" height="390"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </scrollView>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="GraphDrum.png" id="HSy-0I-XRk">
-                                <rect key="frame" x="0.0" y="1" width="320" height="410"/>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="GraphRoll-320x50.png" id="HSy-0I-XRk">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="410"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
                             <view userInteractionEnabled="NO" alpha="0.20000000000000015" contentMode="scaleToFill" id="JCq-go-u0F" userLabel="View - Record Width">
-                                <rect key="frame" x="140" y="16" width="40" height="384"/>
+                                <rect key="frame" x="140" y="10" width="40" height="390"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.20000000000000001" green="0.80000000000000004" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                             </view>
@@ -787,7 +787,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                 </connections>
                             </button>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
                     </view>
                     <navigationItem key="navigationItem" id="bVr-dO-pdJ"/>
                     <connections>
@@ -839,7 +839,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
     <resources>
         <image name="Dropbox-130x44.png" width="130" height="44"/>
         <image name="E2edit-Panel-310x88.png" width="310" height="88"/>
-        <image name="GraphDrum.png" width="320" height="410"/>
+        <image name="GraphRoll-320x50.png" width="320" height="50"/>
         <image name="Icon32-Setting.png" width="32" height="32"/>
         <image name="Tab32-Add.png" width="32" height="32"/>
         <image name="Tab32-Graph.png" width="32" height="32"/>

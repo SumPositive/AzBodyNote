@@ -51,12 +51,12 @@
 {
     [super loadView];
 
-#ifdef AzPAD
-	self.view.backgroundColor = [UIColor lightGrayColor];
-#else
-	self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
-	[self.navigationController setToolbarHidden:YES animated:NO]; // ツールバー消す
-#endif
+	if (iS_iPAD) {
+		self.view.backgroundColor = [UIColor lightGrayColor];
+	} else {
+		self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
+		[self.navigationController setToolbarHidden:YES animated:NO]; // ツールバー消す
+	}
 
 	// DONEボタンを右側に追加する
 	// 前画面に[SAVE]があるから、この[DONE]を無くして戻るだけで更新するように試してみたが、
@@ -91,7 +91,7 @@
 		GA_TRACK_EVENT_ERROR(@"LOGIC ERROR CdateSource==nil",0);
 		CdateSource = [NSDate date];
 	}
-	[ibDatePicker setDate:CdateSource animated:YES];
+	[ibDatePicker setDate:CdateSource animated:NO];
 }
 
 

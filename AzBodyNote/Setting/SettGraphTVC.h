@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "AZDial.h"
 
 #import "AppDelegate.h"
 

@@ -22,6 +22,8 @@
 @interface CalcView : UIView //<UITextFieldDelegate>
 {
 @private
+	UIViewController				*mRootViewController;
+	
 	NSString							*title_;		// [AC]で表示するため
 	NSDecimalNumber 		*answer_;	// 結果
 	
@@ -41,16 +43,22 @@
 	NSInteger			mRoundingScale;
 	BOOL					mIsShow;
 	int						mFunc;		// (0)Non (-4)+ (-5)- (-6)* (-7)/
-	CGRect				mRectHide;		// 表示定位置
-	CGRect				mRectShow;	// 隠れ位置
+	CGRect				mRectHide;		// 隠れ位置
+	CGRect				mRectShow;	// 表示定位置
 }
 
 // 公開メソッド
-//- (id)initWithTitle:(NSString*)title  min:(double)min  max:(double)max  decimal:(int)decimal  
-//			 target:(__strong id)target action:(SEL)action;
-- (id)initWithTitle:(NSString*)title  min:(double)min  max:(double)max  decimal:(int)decimal  delegate:(id)delegate;
-
++ (CalcView *)sharedCalcView;
+//内部//- (id)init;
+- (void)setRootViewController:(UIViewController*)rvc;
+- (void)setTitle:(NSString*)title;
+- (void)setMin:(double)min;
+- (void)setMax:(double)max;
+- (void)setDecimal:(int)decimal;
+- (void)setDelegate:(id)delegate;
+- (void)setPointShow:(CGPoint)po;
 - (void)show;
+- (void)hide;
 
 @end
 
