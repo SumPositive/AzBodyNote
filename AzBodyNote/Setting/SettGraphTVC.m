@@ -46,7 +46,7 @@
 			// 設定中は、BpLoを取り除き、BpHiだけにする ＞＞ 保存時にBpHiの次にBpLoを挿入する
 			for (int iRow=0; iRow<[mPanels count]; iRow++) {
 				NSInteger item = [[mPanels objectAtIndex:iRow] integerValue];
-				if (abs(item)==AzConditionBpLo) {
+				if (abs(item)==EnumConditionBpLo) {
 					[mPanels removeObjectAtIndex:iRow];	//BpLo削除
 					break;
 				}
@@ -73,6 +73,13 @@
 												 style:UIBarButtonItemStyleBordered
 												 target:self action:@selector(actionBack)];
 	}
+	
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	mHeight = [[kvs objectForKey:KVS_SettGraphHeight] integerValue];
+	if (mHeight<BMI_Height_MIN OR BMI_Height_MAX<mHeight) {
+		mHeight = 0; // BMI非表示
+	}
+	[self refreshBMI_Height];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -86,11 +93,11 @@
 	// 設定中は、BpLoを取り除き、BpHiだけ ＞＞ 保存時にBpHiの次にBpLoを挿入する
 	for (int iRow=0; iRow<[mPanels count]; iRow++) {
 		NSInteger item = [[mPanels objectAtIndex:iRow] integerValue];
-		if (abs(item)==AzConditionBpHi) {
+		if (abs(item)==EnumConditionBpHi) {
 			if (item < 0) {
-				item = AzConditionBpLo * (-1); //Lo ON
+				item = EnumConditionBpLo * (-1); //Lo ON
 			} else {
-				item = AzConditionBpLo; //Lo OFF
+				item = EnumConditionBpLo; //Lo OFF
 			}
 			// BpHiの次にBpLoを挿入する
 			[mPanels insertObject:[NSNumber numberWithInteger:item] atIndex:iRow+1];
@@ -125,7 +132,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
 	if (section==0) {
-		return 1;
+		return 4;
 	}
 	assert(section==1);
     return [mPanels count];
@@ -134,6 +141,7 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	if (indexPath.section==0) {
+		if (indexPath.row==3 && !iS_iPAD) return 88; // BMI Height
 		return 44;
 	}
     return 44; // Default
@@ -155,10 +163,21 @@
 	return nil;
 }
 
+- (void)refreshBMI_Height
+{
+	if (mLbHeight) {
+		if (mHeight<BMI_Height_MIN) {
+			mLbHeight.text = NSLocalizedString(@"SettGraph BMI Hide",nil);
+		} else {
+			mLbHeight.text = [NSString stringWithFormat:@"%ldcm", (long)mHeight];
+		}
+	}
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	static NSString *sysCellSubtitle = @"sysCellSubtitle"; //システム既定セル
-	//static NSString *sysCellDial = @"sysCellDial";
+	static NSString *sysCellDial = @"sysCellDial";
 
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	
@@ -181,12 +200,81 @@
 				}
 				return cell;
 			}	break;
+			case 1: {	// 平均血圧
+				UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
+				if (cell == nil) {
+					cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
+				}
+				//cell.imageView.image = [UIImage imageNamed:@"Icon20-Goal"];
+				cell.textLabel.text = NSLocalizedString(@"SettGraph BpMean",nil);
+				if ([kvs boolForKey:KVS_SettGraphBpMean]) {
+					cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				} else {
+					cell.accessoryType = UITableViewCellAccessoryNone;
+				}
+				return cell;
+			}	break;
+			case 2: {	// 脈圧
+				UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
+				if (cell == nil) {
+					cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
+				}
+				//cell.imageView.image = [UIImage imageNamed:@"Icon20-Goal"];
+				cell.textLabel.text = NSLocalizedString(@"SettGraph BpPress",nil);
+				if ([kvs boolForKey:KVS_SettGraphBpPress]) {
+					cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				} else {
+					cell.accessoryType = UITableViewCellAccessoryNone;
+				}
+				return cell;
+			}	break;
+			case 3: {	// BMI 身長
+				UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellDial];
+				if (cell == nil) {
+					cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellDial];
+					// Label
+					UILabel *lb = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, 180, 25)];
+					lb.font = [UIFont boldSystemFontOfSize:20];
+					lb.adjustsFontSizeToFitWidth = YES;
+					lb.minimumFontSize = 10;
+					lb.backgroundColor = [UIColor clearColor];
+					lb.text = NSLocalizedString(@"SettGraph BMI Height",nil);
+					[cell.contentView addSubview:lb];
+					// Label
+					mLbHeight = [[UILabel alloc] initWithFrame:CGRectMake(200, 8, 80, 30)];
+					mLbHeight.font = [UIFont systemFontOfSize:26];
+					mLbHeight.adjustsFontSizeToFitWidth = YES;
+					mLbHeight.minimumFontSize = 10;
+					mLbHeight.textAlignment = UITextAlignmentRight;
+					mLbHeight.backgroundColor = [UIColor clearColor];
+					[cell.contentView addSubview:mLbHeight];
+					// AZDial
+					CGRect rc;
+					if (iS_iPAD) {
+						rc = CGRectMake(300, 0, 280, 44);
+					} else {
+						rc = CGRectMake(15, 40, 280, 44);
+					}
+					mDialHeight = [[AZDial alloc] initWithFrame:rc
+													 delegate: self
+														 dial: mHeight
+														  min: BMI_Height_MIN-1  //(-1)未満にて非表示
+														  max: BMI_Height_MAX
+														 step: 1
+													  stepper: 1];
+					[cell.contentView addSubview:mDialHeight];
+					mDialHeight.backgroundColor = [UIColor clearColor]; //self.backgroundColor;
+				}
+				cell.selectionStyle = UITableViewCellSelectionStyleNone; // 選択時ハイライトなし
+				[self refreshBMI_Height];
+				return cell;
+			}	break;
 		}
 	}
 	
 	//section==1 パネル並び替え
     assert(indexPath.section==1);
-	if (indexPath.row<0 OR AzConditionCount<=indexPath.row) return nil;
+	if (indexPath.row<0 OR EnumConditionCount<=indexPath.row) return nil;
 
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
 	if (cell == nil) {
@@ -204,33 +292,33 @@
 	assert(0<=item);
 	// パネル名称
 	switch (item) {
-		case AzConditionNote:
+		case EnumConditionNote:
 			cell.textLabel.text = NSLocalizedString(@"SettGraph Note",nil);
 			//cell.userInteractionEnabled = NO; //NG//Moveできない
 			cell.selectionStyle = UITableViewCellSelectionStyleNone; // 選択時ハイライトなし
 			break;
-		case AzConditionBpHi:
+		case EnumConditionBpHi:
 			cell.textLabel.text = NSLocalizedString(@"SettGraph Bp",nil);
 			break;
-		case AzConditionBpLo: //ここではBpHiのみ代表として使用
+		case EnumConditionBpLo: //ここではBpHiのみ代表として使用
 			assert(NO);
 			break;
-		case AzConditionPuls:
+		case EnumConditionPuls:
 			cell.textLabel.text = NSLocalizedString(@"SettGraph Pulse",nil);
 			break;
-		case AzConditionTemp:
+		case EnumConditionTemp:
 			cell.textLabel.text = NSLocalizedString(@"SettGraph Temp",nil);
 			break;
-		case AzConditionWeight:
+		case EnumConditionWeight:
 			cell.textLabel.text = NSLocalizedString(@"SettGraph Weight",nil);
 			break;
-		case AzConditionPedo:
+		case EnumConditionPedo:
 			cell.textLabel.text = NSLocalizedString(@"SettGraph Pedo",nil);
 			break;
-		case AzConditionFat:
+		case EnumConditionFat:
 			cell.textLabel.text = NSLocalizedString(@"SettGraph Fat",nil);
 			break;
-		case AzConditionSkm:
+		case EnumConditionSkm:
 			cell.textLabel.text = NSLocalizedString(@"SettGraph Skm",nil);
 			break;
 	}
@@ -324,6 +412,30 @@
 				}
 				[kvs synchronize];
 			} break;
+			case 1: {  // 平均血圧
+				NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+				UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+				if ([kvs boolForKey:KVS_SettGraphBpMean]) {
+					[kvs setBool: NO forKey:KVS_SettGraphBpMean];
+					cell.accessoryType = UITableViewCellAccessoryNone;
+				} else {
+					[kvs setBool: YES forKey:KVS_SettGraphBpMean];
+					cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				}
+				[kvs synchronize];
+			} break;
+			case 2: {  // 脈圧
+				NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+				UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+				if ([kvs boolForKey:KVS_SettGraphBpPress]) {
+					[kvs setBool: NO forKey:KVS_SettGraphBpPress];
+					cell.accessoryType = UITableViewCellAccessoryNone;
+				} else {
+					[kvs setBool: YES forKey:KVS_SettGraphBpPress];
+					cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				}
+				[kvs synchronize];
+			} break;
 		}
 		return;
 	}
@@ -342,6 +454,23 @@
 		//bCheck = NO;
 	}
 	[mPanels replaceObjectAtIndex:indexPath.row withObject:num]; //置換
+}
+
+
+#pragma mark - <AZDialDelegate>
+- (void)dialChanged:(id)sender dial:(NSInteger)dial
+{	// dialが変位したとき
+	mHeight = dial;
+	[self refreshBMI_Height];
+}
+
+- (void)dialDone:(id)sender dial:(NSInteger)dial
+{	// dial変位が停止したとき
+	mHeight = dial;
+	[self refreshBMI_Height];
+	
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	[kvs setObject:[NSNumber numberWithInteger:mHeight] forKey:KVS_SettGraphHeight];
 }
 
 

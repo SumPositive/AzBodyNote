@@ -82,7 +82,7 @@ NSInteger	pValueCount = 0;
 }
 
 
-- (void)drawPoint:(CGContextRef)cgc  value:(float)value  po:(CGPoint)po  isHi:(BOOL)isHi isAngle:(BOOL)isAngle
+- (void)drawPoint:(CGContextRef)cgc  value:(float)value  po:(CGPoint)po  upper:(BOOL)upper		
 {
 	const char *cc;
 	long lg = (long)(value * 10.0);
@@ -98,7 +98,8 @@ NSInteger	pValueCount = 0;
 	{
 		// 端点
 		CGContextSetGrayFillColor(cgc, 0, 0.7);
-		CGContextFillEllipseInRect(cgc, CGRectMake(po.x-3, po.y-3, 6, 6));	//円Fill
+		//CGContextFillEllipseInRect(cgc, CGRectMake(po.x-3, po.y-3, 6, 6));	//円Fill
+		CGContextFillEllipseInRect(cgc, CGRectMake(po.x-2, po.y-2, 4, 4));	//円Fill
 		// 数値	// 文字列の設定
 		CGContextSelectFont (cgc, "Helvetica", FONT_SIZE*mPadScale, kCGEncodingMacRoman);
 		CGContextSetTextDrawingMode (cgc, kCGTextFill);
@@ -135,7 +136,7 @@ NSInteger	pValueCount = 0;
 		//[0.10] 水平のみにした。＜＜文字が傾くのは見難いとの要望より
 		// 文字原点
 		po.x -= ((FONT_SIZE*slen/4.0) + 2.0)*mPadScale;
-		if (isHi) {	// BpHi	//点の上側へ
+		if (upper) {	// BpHi	//点の上側へ
 			po.y += 5.0*mPadScale;
 		} else {		// BpLo	//点の下側へ
 			po.y -= 15.0*mPadScale;
@@ -151,8 +152,8 @@ NSInteger	pValueCount = 0;
 	BOOL bLine;
 	//CGFloat fy;
 	CGPoint po;
-	CGFloat fLineW = 1.0;  //self.ppRecordWidth / 2.0;		//Hi-Loを結ぶタテ棒の太さ
-	CGFloat  fGapHiLo;
+	CGFloat fLineW = self.ppRecordWidth / 4.0;		//Hi-Loを結ぶタテ棒の太さ
+	//CGFloat  fGapHiLo;
 	
 	//------------------------------------------------------------------------------ BpHi と BpLo を結ぶ縦線
 	//CGContextSetRGBFillColor (cgc, 0.3, 0.3, 0.3, 0.6); // 塗り潰し色　Black
@@ -168,34 +169,43 @@ NSInteger	pValueCount = 0;
 			{	//文字を上層にすべく、このタテ棒を先に描画する
 				po = poValGoal[bpHi];
 				CGContextMoveToPoint(cgc, po.x, po.y);
-				fGapHiLo = po.y;
+				//fGapHiLo = po.y;
 				po = poValGoal[bpLo];
-				fGapHiLo -= po.y;
+				//fGapHiLo -= po.y;
 				CGContextAddLineToPoint(cgc, po.x, po.y);
 				CGContextStrokePath(cgc);
-				if (IMAGE_GAP_MIN <= fGapHiLo) {
+			/*	if (IMAGE_GAP_MIN <= fGapHiLo) {
 					po.y += fGapHiLo/2.0;
 					[self imageGraph:cgc center:po DtOp:DtOpEnd]; //Goal Image
-				}
+				}*/
+				po = poValGoal[bpHi];
+				po.y = self.frame.size.height - 10;
+				[self imageGraph:cgc center:po DtOp:DtOpEnd]; //Goal Image
 				bLine = YES;
 			} else {
 				bLine = NO;
 			}
 			if (0<pValGoal[bpHi]) {
 				if (bLine==NO) {
+					//po = poValGoal[bpHi];
+					//po.y -= IMAGE_GAP_MIN/2.0;
+					//[self imageGraph:cgc center:po DtOp:DtOpEnd];
 					po = poValGoal[bpHi];
-					po.y -= IMAGE_GAP_MIN/2.0;
-					[self imageGraph:cgc center:po DtOp:DtOpEnd];
+					po.y = self.frame.size.height - 10;
+					[self imageGraph:cgc center:po DtOp:DtOpEnd]; //Goal Image
 				}
-				[self drawPoint:cgc value:pValGoal[bpHi] po:poValGoal[bpHi] isHi:YES isAngle:NO];
+				[self drawPoint:cgc value:pValGoal[bpHi] po:poValGoal[bpHi] upper:YES];
 			}
 			if (0<pValGoal[bpLo]) {
 				if (bLine==NO) {
+					//po = poValGoal[bpLo];
+					//po.y += IMAGE_GAP_MIN/2.0;
+					//[self imageGraph:cgc center:po DtOp:DtOpEnd];
 					po = poValGoal[bpLo];
-					po.y += IMAGE_GAP_MIN/2.0;
-					[self imageGraph:cgc center:po DtOp:DtOpEnd];
+					po.y = self.frame.size.height - 10;
+					[self imageGraph:cgc center:po DtOp:DtOpEnd]; //Goal Image
 				}
-				[self drawPoint:cgc value:pValGoal[bpLo] po:poValGoal[bpLo] isHi:NO isAngle:NO];
+				[self drawPoint:cgc value:pValGoal[bpLo] po:poValGoal[bpLo] upper:NO];
 			}
 		}
 	}
@@ -203,22 +213,27 @@ NSInteger	pValueCount = 0;
 	//--------------------------------------------------- Record
 	CGPoint	poBpHi[GRAPH_PAGE_LIMIT+GRAPH_DAYS_SAFE+1];
 	CGPoint	poBpLo[GRAPH_PAGE_LIMIT+GRAPH_DAYS_SAFE+1];
-	int  iCntBpHi = 0, iCntBpLo = 0;
+	CGPoint	poBpMean[GRAPH_PAGE_LIMIT+GRAPH_DAYS_SAFE+1];
+	CGPoint	poBpPress[GRAPH_PAGE_LIMIT+GRAPH_DAYS_SAFE+1];
+	int  iCntBpHi=0, iCntBpLo=0, iCntBpPress=0, iCntBpMean=0;
 	for (int ii=0; ii<pValueCount; ii++) 
 	{
 		if (0<pValue[bpHi][ii] && 0<pValue[bpLo][ii])
 		{	//文字を上層にすべく、このタテ棒を先に描画する
 			po = poValue[bpHi][ii];
 			CGContextMoveToPoint(cgc, po.x, po.y);
-			fGapHiLo = po.y;
+			//fGapHiLo = po.y;
 			po = poValue[bpLo][ii];
-			fGapHiLo -= po.y;
+			//fGapHiLo -= po.y;
 			CGContextAddLineToPoint(cgc, po.x, po.y);
 			CGContextStrokePath(cgc);
-			if (IMAGE_GAP_MIN <= fGapHiLo) {
+		/*	if (IMAGE_GAP_MIN <= fGapHiLo) {
 				po.y += fGapHiLo/2.0;
 				[self imageGraph:cgc center:po DtOp:pDtOpValue[ii]];
-			}
+			}*/
+			po = poValue[bpHi][ii];
+			po.y = self.frame.size.height - 10;
+			[self imageGraph:cgc center:po DtOp:pDtOpValue[ii]];
 			bLine = YES;
 		} else {
 			bLine = NO;
@@ -228,50 +243,75 @@ NSInteger	pValueCount = 0;
 				CGContextSetLineWidth(cgc, fLineW); //太さ
 				po = poValue[bpHi][ii];
 				CGContextMoveToPoint(cgc, po.x, po.y);
-				fGapHiLo = po.y;
+				//fGapHiLo = po.y;
 				po.y -= IMAGE_GAP_MIN;
-				fGapHiLo -= po.y;
+				//fGapHiLo -= po.y;
 				CGContextAddLineToPoint(cgc, po.x, po.y);
 				CGContextStrokePath(cgc);
-				if (IMAGE_GAP_MIN <= fGapHiLo) {
+			/*	if (IMAGE_GAP_MIN <= fGapHiLo) {
 					po.y += fGapHiLo/2.0;
 					[self imageGraph:cgc center:po DtOp:pDtOpValue[ii]];
-				}
+				}*/
+				po = poValue[bpHi][ii];
+				po.y = self.frame.size.height - 10;
+				[self imageGraph:cgc center:po DtOp:pDtOpValue[ii]];
 			}
 			poBpHi[iCntBpHi++] = poValue[bpHi][ii];	//時系列折れ線のため
-			[self drawPoint:cgc value:pValue[bpHi][ii] po:poValue[bpHi][ii] isHi:YES 
-					  isAngle:(fGapHiLo < VALUE_GAP_MIN)];
+			[self drawPoint:cgc value:pValue[bpHi][ii] po:poValue[bpHi][ii] upper:YES];
 		}
 		if (0<pValue[bpLo][ii]) {
 			if (bLine==NO) {
 				CGContextSetLineWidth(cgc, fLineW); //太さ
 				po = poValue[bpLo][ii];
 				CGContextMoveToPoint(cgc, po.x, po.y);
-				fGapHiLo = po.y;
+				//fGapHiLo = po.y;
 				po.y += IMAGE_GAP_MIN;
-				fGapHiLo -= po.y;
+				//fGapHiLo -= po.y;
 				CGContextAddLineToPoint(cgc, po.x, po.y);
 				CGContextStrokePath(cgc);
-				if (IMAGE_GAP_MIN <= fGapHiLo) {
+			/*	if (IMAGE_GAP_MIN <= fGapHiLo) {
 					po.y += fGapHiLo/2.0;
 					[self imageGraph:cgc center:po DtOp:pDtOpValue[ii]];
-				}
+				}*/
+				po = poValue[bpLo][ii];
+				po.y = self.frame.size.height - 10;
+				[self imageGraph:cgc center:po DtOp:pDtOpValue[ii]];
 			}
 			poBpLo[iCntBpLo++] = poValue[bpLo][ii];	//時系列折れ線のため
-			[self drawPoint:cgc value:pValue[bpLo][ii] po:poValue[bpLo][ii] isHi:NO
-					isAngle:(fGapHiLo < VALUE_GAP_MIN)];
+			[self drawPoint:cgc value:pValue[bpLo][ii] po:poValue[bpLo][ii] upper:NO];
+		}
+		
+		if (mBpMean && 0<pValue[bpMean][ii]) {	//平均血圧
+			poBpMean[iCntBpMean++] = poValue[bpMean][ii];	//時系列折れ線のため
+			[self drawPoint:cgc value:pValue[bpMean][ii] po:poValue[bpMean][ii] upper:YES];
+		}
+		if (mBpPress && 0<pValue[bpPress][ii]) {	//脈圧
+			poBpPress[iCntBpPress++] = poValue[bpPress][ii];	//時系列折れ線のため
+			[self drawPoint:cgc value:pValue[bpPress][ii] po:poValue[bpPress][ii] upper:NO];
 		}
 	}
 	//------------------------------------------------------------------------------時系列折れ線
 	//BpHi
 	CGContextSetLineWidth(cgc, 1.0); //太さ
-	CGContextSetRGBStrokeColor(cgc, 1, 0, 0, 0.6);
+	CGContextSetRGBStrokeColor(cgc, 1, 0, 0, 0.8);
 	CGContextAddLines(cgc, poBpHi, iCntBpHi);
 	CGContextStrokePath(cgc);
 	// BpLo
-	CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 0.6);
+	CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 0.8);
 	CGContextAddLines(cgc, poBpLo, iCntBpLo);
 	CGContextStrokePath(cgc);
+	// BpPp
+	if (mBpPress) {
+		CGContextSetRGBStrokeColor(cgc, 1, 1, 1, 0.6);
+		CGContextAddLines(cgc, poBpPress, iCntBpPress);
+		CGContextStrokePath(cgc);
+	}
+	// BpMp
+	if (mBpMean) {
+		CGContextSetRGBStrokeColor(cgc, 1, 1, 1, 0.6);
+		CGContextAddLines(cgc, poBpMean, iCntBpMean);
+		CGContextStrokePath(cgc);
+	}
 }
 
 // Only override drawRect: if you perform custom drawing.
@@ -289,6 +329,9 @@ NSInteger	pValueCount = 0;
 	pValGoal[bpHi] = [[kvs objectForKey: Goal_nBpHi_mmHg] integerValue];  // NSNullならば "<null>"文字列となり数値化して0になる
 	pValGoal[bpLo] = [[kvs objectForKey: Goal_nBpLo_mmHg] integerValue];
 	
+	mBpPress = [kvs boolForKey:@"KVS_SettGraphBpPress"];
+	mBpMean = [kvs boolForKey:@"KVS_SettGraphBpMean"];
+	
 	//--------------------------------------------------------------------------日次集計
 	// Record
 	pValMax = E2_nBpLo_MIN;
@@ -305,6 +348,18 @@ NSInteger	pValueCount = 0;
 		//
 		pValue[bpHi][pValueCount] = valHi;
 		pValue[bpLo][pValueCount] = valLo;
+
+		if (0<valLo && valLo<valHi) {
+			if (mBpMean) {
+				pValue[bpMean][pValueCount] = (valHi + valLo + valLo) / 3.0;	// 平均血圧
+				if (pValue[bpMean][pValueCount] < pValMin) pValMin = pValue[bpMean][pValueCount];
+			}
+			if (mBpPress) {
+				pValue[bpPress][pValueCount] = valHi - valLo;		// 脈圧
+				if (pValue[bpPress][pValueCount] < pValMin) pValMin = pValue[bpPress][pValueCount];
+			}
+		}
+		
 		pDtOpValue[pValueCount] = [e2.nDateOpt integerValue];	
 		pValueCount++;
 		//NG//if (GRAPH_PAGE_LIMIT <= pValueCount) break; // OK

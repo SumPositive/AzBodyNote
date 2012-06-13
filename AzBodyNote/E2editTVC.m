@@ -164,7 +164,7 @@
 	}
 }
 
-- (AzConditionItems)integerDateOpt:(NSDate *)date
+- (EnumConditions)integerDateOpt:(NSDate *)date
 {	// 保存時に自動学習(記録更新)する
 	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
 	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
@@ -873,7 +873,7 @@
 				iPanel *= (-1); // 正にする
 			}
 			switch (iPanel) {
-				case AzConditionNote:
+				case EnumConditionNote:
 					return 88 + 10;
 					break;
 			}
@@ -1055,7 +1055,7 @@
 			iPanel *= (-1); // 正にする
 		}
 		switch (iPanel) {
-			case AzConditionNote: {
+			case EnumConditionNote: {
 				E2editCellNote *cell = [self cellNote:tableView];
 				cell.Re2record = moE2edit_;
 				//NG//[cell setNeedsDisplay]; // コンテンツ描画  drawRect:が呼ばれる
@@ -1063,7 +1063,7 @@
 				return cell;
 			}	break;
 				
-			case AzConditionBpHi: {
+			case EnumConditionBpHi: {
 				E2editCellDial *cell = [self cellDial:tableView];
 				cell.ibLbName.text = NSLocalizedString(@"BpHi Name",nil);
 				cell.ibLbDetail.text = NSLocalizedString(@"BpHi Detail",nil);
@@ -1080,7 +1080,7 @@
 				return cell;
 			}	break;
 				
-			case AzConditionBpLo: {
+			case EnumConditionBpLo: {
 				E2editCellDial *cell = [self cellDial:tableView];
 				cell.ibLbName.text = NSLocalizedString(@"BpLo Name",nil);
 				cell.ibLbDetail.text = NSLocalizedString(@"BpLo Detail",nil);
@@ -1097,7 +1097,7 @@
 				return cell;
 			}	break;
 				
-			case AzConditionPuls: {
+			case EnumConditionPuls: {
 				E2editCellDial *cell = [self cellDial:tableView];
 				cell.ibLbName.text = NSLocalizedString(@"Pulse Name",nil);
 				cell.ibLbDetail.text = NSLocalizedString(@"Pulse Detail",nil);
@@ -1114,7 +1114,7 @@
 				return cell;
 			}	break;
 				
-			case AzConditionWeight: {
+			case EnumConditionWeight: {
 				E2editCellDial *cell = [self cellDial:tableView];
 				cell.ibLbName.text = NSLocalizedString(@"Weight Name",nil);
 				cell.ibLbDetail.text = NSLocalizedString(@"Weight Detail",nil);
@@ -1131,7 +1131,7 @@
 				return cell;
 			}	break;
 				
-			case AzConditionTemp: {
+			case EnumConditionTemp: {
 				E2editCellDial *cell = [self cellDial:tableView];
 				cell.ibLbName.text = NSLocalizedString(@"Temp Name",nil);
 				cell.ibLbDetail.text = NSLocalizedString(@"Temp Detail",nil);
@@ -1148,7 +1148,7 @@
 				return cell;
 			}	break;
 				
-			case AzConditionPedo: {
+			case EnumConditionPedo: {
 				E2editCellDial *cell = [self cellDial:tableView];
 				cell.ibLbName.text = NSLocalizedString(@"Pedo Name",nil);
 				cell.ibLbDetail.text = NSLocalizedString(@"Pedo Detail",nil);
@@ -1165,7 +1165,7 @@
 				return cell;
 			}	break;
 				
-			case AzConditionFat: {
+			case EnumConditionFat: {
 				E2editCellDial *cell = [self cellDial:tableView];
 				cell.ibLbName.text = NSLocalizedString(@"BodyFat Name",nil);
 				cell.ibLbDetail.text = NSLocalizedString(@"BodyFat Detail",nil);
@@ -1182,7 +1182,7 @@
 				return cell;
 			}	break;
 				
-			case AzConditionSkm: {
+			case EnumConditionSkm: {
 				E2editCellDial *cell = [self cellDial:tableView];
 				cell.ibLbName.text = NSLocalizedString(@"SkMuscle Name",nil);
 				cell.ibLbDetail.text = NSLocalizedString(@"SkMuscle Detail",nil);

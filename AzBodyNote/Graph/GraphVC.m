@@ -173,7 +173,7 @@
 		rcgv.size.height = fHeight;
 		switch ([num integerValue] * (-1)) 
 		{
-			case AzConditionBpHi:
+			case EnumConditionBpHi:
 				rcgv.size.height *= 2.0;
 				if (mGvBp==nil) {
 					mGvBp = [[GViewBp alloc] initWithFrame: rcgv]; // 1値汎用
@@ -195,11 +195,11 @@
 					[mGvBp setNeedsDisplay]; //drawRect:が呼び出される
 				}
 				break;
-			case AzConditionBpLo:
+			case EnumConditionBpLo:
 				//この後、rcgv.origin.y += fHeight; のみ通す
-				break; //AzConditionBpHi:にて処理済み
+				break; //EnumConditionBpHi:にて処理済み
 				
-			case AzConditionPuls:
+			case EnumConditionPuls:
 				if (mGvPuls==nil) {
 					mGvPuls = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvPuls.ppE2records = e2recs;
@@ -223,7 +223,7 @@
 				}
 				break;
 				
-			case AzConditionWeight:		//------------------------------------------------------体重
+			case EnumConditionWeight:		//------------------------------------------------------体重
 				if (mGvWeight==nil) {
 					mGvWeight = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvWeight.ppE2records = e2recs;
@@ -246,7 +246,7 @@
 				}
 				break;
 				
-			case AzConditionTemp:			//------------------------------------------------------体温
+			case EnumConditionTemp:			//------------------------------------------------------体温
 				if (mGvTemp==nil) {
 					mGvTemp = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvTemp.ppE2records = e2recs;
@@ -270,7 +270,7 @@
 				}
 				break;
 				
-			case AzConditionPedo:		//------------------------------------------------------歩数
+			case EnumConditionPedo:		//------------------------------------------------------歩数
 				if (mGvPedo==nil) {
 					mGvPedo = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvPedo.ppE2records = e2recs;
@@ -294,7 +294,7 @@
 				}
 				break;
 				
-			case AzConditionFat:			//------------------------------------------------------体脂肪率
+			case EnumConditionFat:			//------------------------------------------------------体脂肪率
 				if (mGvFat==nil) {
 					mGvFat = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvFat.ppE2records = e2recs;
@@ -318,7 +318,7 @@
 				}
 				break;
 				
-			case AzConditionSkm:			//------------------------------------------------------骨格筋率
+			case EnumConditionSkm:			//------------------------------------------------------骨格筋率
 				if (mGvSkm==nil) {
 					mGvSkm = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
 					mGvSkm.ppE2records = e2recs;
@@ -342,7 +342,7 @@
 				break;
 				
 			default: //ERROR
-				GA_TRACK_EVENT_ERROR(@"LOGIC ERROR No AzConditionItems",0);
+				GA_TRACK_EVENT_ERROR(@"LOGIC ERROR No EnumConditions",0);
 				assert(NO);
 				break;
 		}

@@ -168,15 +168,15 @@
 	if ([kvs objectForKey:KVS_SettGraphs]==nil)		//[0.9.0]NEW
 	{	// 測定パネル順序設定の初期値				※BpHiの次がBpLoになること。
 		NSArray *aPanels = [[NSArray alloc] initWithObjects:
-							[NSNumber numberWithInteger: AzConditionBpHi	* (-1)],		//*(-1):Graph表示する
-							[NSNumber numberWithInteger: AzConditionBpLo	* (-1)],		//*(-1):Graph表示する
-							[NSNumber numberWithInteger: AzConditionPuls	* (-1)],		//*(-1):Graph表示する
-							[NSNumber numberWithInteger: AzConditionNote],
-							[NSNumber numberWithInteger: AzConditionTemp],
-							[NSNumber numberWithInteger: AzConditionWeight],
-							[NSNumber numberWithInteger: AzConditionPedo],
-							[NSNumber numberWithInteger: AzConditionFat],
-							[NSNumber numberWithInteger: AzConditionSkm],
+							[NSNumber numberWithInteger: EnumConditionBpHi	* (-1)],		//*(-1):Graph表示する
+							[NSNumber numberWithInteger: EnumConditionBpLo	* (-1)],		//*(-1):Graph表示する
+							[NSNumber numberWithInteger: EnumConditionPuls	* (-1)],		//*(-1):Graph表示する
+							[NSNumber numberWithInteger: EnumConditionNote],
+							[NSNumber numberWithInteger: EnumConditionTemp],
+							[NSNumber numberWithInteger: EnumConditionWeight],
+							[NSNumber numberWithInteger: EnumConditionPedo],
+							[NSNumber numberWithInteger: EnumConditionFat],
+							[NSNumber numberWithInteger: EnumConditionSkm],
 							nil];
 		[kvs setObject:aPanels	forKey:KVS_SettGraphs];
 		[kvs setBool:NO		forKey:KVS_bTweet];		// YES=新規保存後ツイート

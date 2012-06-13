@@ -104,7 +104,7 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	if (indexPath.section==0) {
-		if (indexPath.row==0) return 88; // Days
+		if (indexPath.row==0 && !iS_iPAD) return 88; // Days
 		return 44;
 	}
     return 44; // Default
@@ -126,7 +126,8 @@
 - (void)refreshStatDays
 {
 	if (mLbValueDays) {
-		mLbValueDays.text = [NSString stringWithFormat:@"%ld", (long)mValueDays];
+		mLbValueDays.text = [NSString stringWithFormat:@"%ld%@",
+							 (long)mValueDays, NSLocalizedString(@"days",nil)];
 	}
 }
 
@@ -150,13 +151,21 @@
 				lb.text = NSLocalizedString(@"SettStat Days",nil);
 				[cell.contentView addSubview:lb];
 				// Label
-				mLbValueDays = [[UILabel alloc] initWithFrame:CGRectMake(200, 8, 70, 30)];
+				mLbValueDays = [[UILabel alloc] initWithFrame:CGRectMake(200, 8, 80, 30)];
 				mLbValueDays.font = [UIFont systemFontOfSize:26];
+				mLbValueDays.adjustsFontSizeToFitWidth = YES;
+				mLbValueDays.minimumFontSize = 10;
 				mLbValueDays.textAlignment = UITextAlignmentRight;
 				mLbValueDays.backgroundColor = [UIColor clearColor];
 				[cell.contentView addSubview:mLbValueDays];
 				// AZDial
-				mDialDays = [[AZDial alloc] initWithFrame:CGRectMake(15, 40, 280, 44)
+				CGRect rc;
+				if (iS_iPAD) {
+					rc = CGRectMake(300, 0, 280, 44);
+				} else {
+					rc = CGRectMake(15, 40, 280, 44);
+				}
+				mDialDays = [[AZDial alloc] initWithFrame:rc
 												 delegate: self
 													 dial: mValueDays
 													  min: 1
@@ -166,6 +175,7 @@
 				[cell.contentView addSubview:mDialDays];
 				mDialDays.backgroundColor = [UIColor clearColor]; //self.backgroundColor;
 			}
+			cell.selectionStyle = UITableViewCellSelectionStyleNone; // 選択時ハイライトなし
 			[self refreshStatDays];
 			return cell;
 		}	break;

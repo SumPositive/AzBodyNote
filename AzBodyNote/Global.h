@@ -29,18 +29,31 @@
 
 // typedef
 enum {
-    AzConditionNote		= 0,
-    AzConditionBpHi		= 1,
-    AzConditionBpLo	= 2,
-    AzConditionPuls		= 3,
-    AzConditionTemp	= 4,
-    AzConditionWeight	= 5,
-    AzConditionPedo		= 6,
-    AzConditionFat		= 7,
-    AzConditionSkm		= 8,
-    AzConditionCount	= 9 //End count
+    EnumConditionNote		= 0,
+    EnumConditionBpHi		= 1,
+    EnumConditionBpLo		= 2,
+    EnumConditionPuls			= 3,
+    EnumConditionTemp		= 4,
+    EnumConditionWeight	= 5,
+    EnumConditionPedo		= 6,
+    EnumConditionFat			= 7,
+    EnumConditionSkm			= 8,
+    EnumConditionCount		= 9 //End count
 };
-typedef NSUInteger AzConditionItems;
+typedef NSUInteger EnumConditions;
+
+enum {
+    EnumGraphBp			= 0,
+    EnumGraphBpAvg	= 1,
+    EnumGraphPuls		= 2,
+    EnumGraphTemp	= 3,
+    EnumGraphWeight	= 4,
+    EnumGraphPedo		= 5,
+    EnumGraphFat		= 6,
+    EnumGraphSkm		= 7,
+    EnumGraphCount	= 8 //End count
+};
+typedef NSUInteger EnumGraphs;
 
 #define TABBAR_CHANGE_TIME				0.5		// TabBar切替時のディゾルブ時間(s)
 #define DateOpt_AroundHOUR						2			// 前後許容時間
@@ -59,6 +72,9 @@ typedef NSUInteger AzConditionItems;
 
 #define KVS_SettGraphs						@"KVS_SettGraphs"	//UserDef保存につき変更禁止 NSArrey型 
 #define KVS_SettGraphOneWid				@"KVS_SettGraphOneWid"
+#define KVS_SettGraphBpPress				@"KVS_SettGraphBpPress"	// 脈圧	Puls pressure
+#define KVS_SettGraphBpMean				@"KVS_SettGraphBpMean"	// 平均血圧　　Mean blood pressure
+#define KVS_SettGraphHeight				@"KVS_SettGraphHeight"		// 身長(cm)
 
 #define KVS_SettStatType					@"KVS_SettStatType"
 #define KVS_SettStatDays					@"KVS_SettStatDays"
