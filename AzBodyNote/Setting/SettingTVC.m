@@ -15,6 +15,14 @@
 @implementation SettingTVC
 
 
+#pragma mark - iCloud
+- (void)refreshAllViews:(NSNotification*)note 
+{	// iCloud-CoreData に変更があれば呼び出される
+	[self.tableView reloadData];
+}
+
+
+#pragma mark - View
 - (id)initWithStyle:(UITableViewStyle)style;
 {
     self = [super initWithStyle:UITableViewStyleGrouped];
@@ -48,6 +56,12 @@
 	}*/
 
 	self.title = NSLocalizedString(@"TabSettings",nil);
+
+	// iCloud KVS 変更通知を受け取る
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(refreshAllViews:) 
+												 name:NSUbiquitousKeyValueStoreDidChangeExternallyNotification 
+											   object:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -469,23 +483,27 @@
 	//---------------------------------------------------------------------------------- 
 	
 	// E2record 全クリア
-	[mAppDelegate.mocBase deleteAllCoreData];
+	//[mAppDelegate.mocBase deleteAllCoreData];
+	[[MocFunctions sharedMocFunctions] deleteAllCoreData];
 	// E2record 生成
 	for (NSDictionary *dict in ary)
 	{
 		NSString *zClass = [dict objectForKey:@"#class"];
 		
 		if ([zClass isEqualToString:E2_ENTITYNAME]) {
-			[mAppDelegate.mocBase insertNewObjectForDictionary:dict];
+			[[MocFunctions sharedMocFunctions] insertNewObjectForDictionary:dict];
 		}
 		//else if ([zClass isEqualToString:@"E1body"]) {
 		//	[mocBase insertNewObjectForDictionary:dict];
 		//}
 	}
 	// コミット
-	[mAppDelegate.mocBase commit];
+	[[MocFunctions sharedMocFunctions] commit];
 	// E2 件数
-	mAppDelegate.app_e2record_count = [mAppDelegate.mocBase e2record_count];
+	mAppDelegate.app_e2record_count = [[MocFunctions sharedMocFunctions] e2record_count];
+	// E2listなどへ再フェッチ要求
+	[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFETCH_ALL_DATA
+														object:self userInfo:nil];
 	return nil; //OK
 }
 

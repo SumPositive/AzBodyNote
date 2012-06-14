@@ -445,7 +445,7 @@ NSInteger afterPageChange = 0;
 
 	mAppDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
 	assert(mAppDelegate);
-	mMocFunc = mAppDelegate.mocBase; // Read Only
+	mMocFunc = [MocFunctions sharedMocFunctions]; //mAppDelegate.mocBase; // Read Only
 	assert(mMocFunc);
 	
 	if (iS_iPAD) {

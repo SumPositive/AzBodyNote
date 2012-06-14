@@ -458,7 +458,7 @@
                                     <subviews>
                                         <view opaque="NO" userInteractionEnabled="NO" contentMode="center" id="Rrr-aE-bpb" userLabel="View for Center">
                                             <rect key="frame" x="2" y="0.0" width="744" height="60"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" id="P96-tD-PhN" userLabel="Image View - DateOpt">
                                                     <rect key="frame" x="141" y="9" width="28" height="28"/>
@@ -556,36 +556,27 @@
                                     <segue destination="OLi-Ry-mMo" kind="push" identifier="pushE2edit" id="5Ok-DM-GZE"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell userInteractionEnabled="NO" contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" shouldIndentWhileEditing="NO" reuseIdentifier="E2listBasic" textLabel="trd-eT-EQc" rowHeight="60" style="IBUITableViewCellStyleDefault" id="jzN-lA-KCe" userLabel="Cell - E2listBasic" customClass="E2listCell">
+                            <tableViewCell userInteractionEnabled="NO" contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" shouldIndentWhileEditing="NO" reuseIdentifier="E2listBasic" textLabel="trd-eT-EQc" detailTextLabel="lzB-aj-eKS" rowHeight="60" style="IBUITableViewCellStyleSubtitle" id="jzN-lA-KCe" userLabel="Cell - E2listBasic" customClass="E2listCell">
                                 <rect key="frame" x="0.0" y="82" width="768" height="60"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                     <rect key="frame" x="0.0" y="0.0" width="768" height="59"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="trd-eT-EQc">
-                                            <rect key="frame" x="10" y="0.0" width="748" height="59"/>
+                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" enabled="NO" adjustsFontSizeToFit="NO" id="trd-eT-EQc">
+                                            <rect key="frame" x="10" y="9" width="42" height="24"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="26"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <color key="highlightedColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         </label>
-                                    </subviews>
-                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                </view>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            </tableViewCell>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" shouldIndentWhileEditing="NO" reuseIdentifier="E2listDropbox" rowHeight="60" id="Msz-7J-47j" userLabel="Cell - E2listDropbox" customClass="E2listCell">
-                                <rect key="frame" x="0.0" y="142" width="768" height="60"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="0.0" y="0.0" width="748" height="59"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="Dropbox-130x44.png" id="usE-MY-wqf">
-                                            <rect key="frame" x="85" y="8" width="130" height="44"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        </imageView>
+                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" enabled="NO" adjustsFontSizeToFit="NO" id="lzB-aj-eKS">
+                                            <rect key="frame" x="10" y="33" width="47" height="18"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" red="0.59215686270000001" green="0.31372549020000001" blue="0.30196078430000001" alpha="1" colorSpace="calibratedRGB"/>
+                                            <color key="highlightedColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                        </label>
                                     </subviews>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 </view>
@@ -601,17 +592,17 @@
                         <nil key="title"/>
                         <view key="titleView" contentMode="scaleToFill" id="SVx-Ln-J9y">
                             <rect key="frame" x="12" y="6" width="744" height="33"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
-                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="時刻" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="0E1-j8-atK">
-                                    <rect key="frame" x="43" y="14" width="70" height="18"/>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="日" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="zZl-0F-kPn">
+                                    <rect key="frame" x="14" y="14" width="27" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="日" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="zZl-0F-kPn">
-                                    <rect key="frame" x="14" y="14" width="27" height="18"/>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="時刻" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="0E1-j8-atK">
+                                    <rect key="frame" x="43" y="14" width="70" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -677,6 +668,18 @@
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                         </view>
                     </navigationItem>
+                    <connections>
+                        <outlet property="ibLbTitleBodyFat" destination="VuN-28-Ds7" id="uXu-cz-PQH"/>
+                        <outlet property="ibLbTitleBpHi" destination="aBo-fF-z9S" id="21R-Hw-Nl3"/>
+                        <outlet property="ibLbTitleBpLo" destination="WaK-BT-NX4" id="RVL-Hn-a6a"/>
+                        <outlet property="ibLbTitleDay" destination="zZl-0F-kPn" id="4ks-mA-PPW"/>
+                        <outlet property="ibLbTitlePedo" destination="xDt-Mh-Hal" id="9Vx-zy-7r2"/>
+                        <outlet property="ibLbTitlePuls" destination="Me9-RD-a6B" id="Jdu-Q1-9q3"/>
+                        <outlet property="ibLbTitleSkMuscle" destination="rPL-4h-p1f" id="ZHU-Nq-1CU"/>
+                        <outlet property="ibLbTitleTemp" destination="hC1-ng-av0" id="HcP-AE-aFM"/>
+                        <outlet property="ibLbTitleTime" destination="0E1-j8-atK" id="EUQ-27-W3K"/>
+                        <outlet property="ibLbTitleWeight" destination="5k4-hS-MvG" id="FKc-NE-MBw"/>
+                    </connections>
                 </tableViewController>
             </objects>
             <point key="canvasLocation" x="1354" y="-57"/>
@@ -841,7 +844,6 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         </scene>
     </scenes>
     <resources>
-        <image name="Dropbox-130x44.png" width="16" height="16"/>
         <image name="E2edit-Panel-700x60.png" width="700" height="60"/>
         <image name="GraphRoll-768x120.png" width="768" height="120"/>
         <image name="Icon32-Setting.png" width="32" height="32"/>
@@ -850,91 +852,6 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         <image name="Tab32-List.png" width="32" height="32"/>
         <image name="Tab32-Stat.png" width="32" height="32"/>
     </resources>
-    <classes>
-        <class className="E2editCellDateOpt" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2editCellDateOpt.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibSegment" candidateClass="UISegmentedControl"/>
-            </relationships>
-        </class>
-        <class className="E2editCellDial" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2editCellDial.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibLbDetail" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbName" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbUnit" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbValue" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibViewBase" candidateClass="UIView"/>
-            </relationships>
-        </class>
-        <class className="E2editCellNote" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2editCellNote.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibTfNote1" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="ibTfNote2" candidateClass="UITextField"/>
-            </relationships>
-        </class>
-        <class className="E2editTVC" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2editTVC.h"/>
-        </class>
-        <class className="E2listCell" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2listCell.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibIvDateOpt" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="ibLbBodyFat" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbBpHi" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbBpLo" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbDate" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbNote1" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbPedo" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbPuls" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbSkMuscle" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbTemp" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbWeight" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-        <class className="E2listTVC" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2listTVC.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibLbBodyFat" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbBpHi" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbBpLo" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbDate" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbPedo" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbPuls" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbSkMuscle" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbTemp" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbTime" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbWeight" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-        <class className="EditDateVC" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/EditDateVC.h"/>
-            <relationships>
-                <relationship kind="action" name="ibBuToday:" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="ibDatePicker" candidateClass="UIDatePicker"/>
-            </relationships>
-        </class>
-        <class className="GraphVC" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/GraphVC.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibScrollView" candidateClass="UIScrollView"/>
-                <relationship kind="outlet" name="ibViewRecord" candidateClass="UIView"/>
-            </relationships>
-        </class>
-        <class className="SettingTVC" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/SettingTVC.h"/>
-        </class>
-        <class className="StatisticsVC" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/StatisticsVC.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibLbDays" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibScrollView" candidateClass="UIScrollView"/>
-                <relationship kind="outlet" name="ibSegment" candidateClass="UISegmentedControl"/>
-                <relationship kind="outlet" name="ibSpDays" candidateClass="UIStepper"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>

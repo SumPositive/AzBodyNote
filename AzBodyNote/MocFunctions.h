@@ -21,10 +21,11 @@
 }
 
 // ＋ クラスメソッド
++ (MocFunctions *)sharedMocFunctions;
 + (NSDate*)dateGoal;
 
 // − インスタンスメソッド
-- (id)initWithMoc:(NSManagedObjectContext*)moc;
+//- (id)initWithMoc:(NSManagedObjectContext*)moc;
 - (void)setMoc:(NSManagedObjectContext *)moc;
 - (NSManagedObjectContext*)getMoc;
 - (id)insertAutoEntity:(NSString *)zEntityName;

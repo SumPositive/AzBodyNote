@@ -18,6 +18,7 @@
 
 @interface E2listTVC : UITableViewController <UITableViewDelegate, UITableViewDataSource, NSFetchedResultsControllerDelegate, AZDropboxDelegate>
 {
+	/* E3listCell.h へ
 	IBOutlet UILabel				*ibLbDate;
 	IBOutlet UILabel				*ibLbTime;
 	IBOutlet UILabel				*ibLbBpHi;
@@ -29,7 +30,19 @@
 	IBOutlet UILabel				*ibLbPedo;
 	IBOutlet UILabel				*ibLbBodyFat;
 	IBOutlet UILabel				*ibLbSkMuscle;
-	
+	 */
+	// 見出し　　多言語対応のため
+	IBOutlet UILabel				*ibLbTitleDay;
+	IBOutlet UILabel				*ibLbTitleTime;
+	IBOutlet UILabel				*ibLbTitleBpHi;
+	IBOutlet UILabel				*ibLbTitleBpLo;
+	IBOutlet UILabel				*ibLbTitlePuls;
+	IBOutlet UILabel				*ibLbTitleWeight;
+	IBOutlet UILabel				*ibLbTitleTemp;
+	IBOutlet UILabel				*ibLbTitlePedo;
+	IBOutlet UILabel				*ibLbTitleBodyFat;
+	IBOutlet UILabel				*ibLbTitleSkMuscle;
+
 @private
 	AppDelegate					*appDelegate_;
 	MocFunctions					*mocFunc_;

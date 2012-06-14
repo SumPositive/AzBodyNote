@@ -316,34 +316,25 @@
                                     <segue destination="g6r-81-43n" kind="push" identifier="pushE2edit" id="I2k-aE-IVK"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" shouldIndentWhileEditing="NO" reuseIdentifier="E2listDropbox" rowHeight="60" id="EOD-Bg-ZzF" userLabel="E2list Cell - E2listDropbox" customClass="E2listCell">
+                            <tableViewCell userInteractionEnabled="NO" contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" shouldIndentWhileEditing="NO" reuseIdentifier="E2listBasic" textLabel="cFY-fd-CKH" detailTextLabel="I7t-QM-sS8" rowHeight="60" style="IBUITableViewCellStyleSubtitle" id="EIK-0y-lmh" userLabel="E2list Cell - E2listBasic" customClass="E2listCell">
                                 <rect key="frame" x="0.0" y="82" width="320" height="60"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="0.0" y="0.0" width="300" height="59"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="Dropbox-130x44.png" id="ZhJ-y3-Y46">
-                                            <rect key="frame" x="85" y="8" width="130" height="44"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        </imageView>
-                                    </subviews>
-                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                </view>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            </tableViewCell>
-                            <tableViewCell userInteractionEnabled="NO" contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" shouldIndentWhileEditing="NO" reuseIdentifier="E2listBasic" textLabel="cFY-fd-CKH" rowHeight="60" style="IBUITableViewCellStyleDefault" id="EIK-0y-lmh" userLabel="E2list Cell - E2listBasic" customClass="E2listCell">
-                                <rect key="frame" x="0.0" y="142" width="320" height="60"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="59"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="cFY-fd-CKH">
-                                            <rect key="frame" x="10" y="0.0" width="300" height="59"/>
+                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" enabled="NO" adjustsFontSizeToFit="NO" id="cFY-fd-CKH">
+                                            <rect key="frame" x="10" y="9" width="42" height="24"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <color key="highlightedColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                        </label>
+                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" enabled="NO" adjustsFontSizeToFit="NO" id="I7t-QM-sS8">
+                                            <rect key="frame" x="10" y="33" width="47" height="18"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" red="0.59215686270000001" green="0.31372549020000001" blue="0.30196078430000001" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="highlightedColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         </label>
                                     </subviews>
@@ -445,16 +436,16 @@
                         </view>
                     </navigationItem>
                     <connections>
-                        <outlet property="ibLbBodyFat" destination="Ql4-Y3-mtx" id="pK2-gf-xSG"/>
-                        <outlet property="ibLbBpHi" destination="Pyg-hM-X4T" id="iHP-dW-gm6"/>
-                        <outlet property="ibLbBpLo" destination="vUo-sG-OdT" id="9ue-yM-Ydo"/>
-                        <outlet property="ibLbDate" destination="596-DV-iiT" id="RJs-mf-icU"/>
-                        <outlet property="ibLbPedo" destination="n0W-Md-fxA" id="pFZ-eC-qZB"/>
-                        <outlet property="ibLbPuls" destination="i19-iy-5nm" id="NXt-F0-Bra"/>
-                        <outlet property="ibLbSkMuscle" destination="qjA-8Z-HDB" id="0Fa-qt-HwZ"/>
-                        <outlet property="ibLbTemp" destination="JnW-Tl-omj" id="JoB-Fm-7X9"/>
-                        <outlet property="ibLbTime" destination="pAe-bA-3EX" id="vc0-7Y-ixb"/>
-                        <outlet property="ibLbWeight" destination="Cs4-fg-BPI" id="Xtq-rZ-oXZ"/>
+                        <outlet property="ibLbTitleBodyFat" destination="Ql4-Y3-mtx" id="tOA-Nb-ipd"/>
+                        <outlet property="ibLbTitleBpHi" destination="Pyg-hM-X4T" id="wdT-Vg-Eb2"/>
+                        <outlet property="ibLbTitleBpLo" destination="vUo-sG-OdT" id="5wG-1Q-emw"/>
+                        <outlet property="ibLbTitleDay" destination="596-DV-iiT" id="L7k-7Q-BpZ"/>
+                        <outlet property="ibLbTitlePedo" destination="n0W-Md-fxA" id="tac-5u-Y5i"/>
+                        <outlet property="ibLbTitlePuls" destination="i19-iy-5nm" id="EPJ-AN-d4W"/>
+                        <outlet property="ibLbTitleSkMuscle" destination="qjA-8Z-HDB" id="7wz-Tu-Mib"/>
+                        <outlet property="ibLbTitleTemp" destination="JnW-Tl-omj" id="e3z-aA-5hh"/>
+                        <outlet property="ibLbTitleTime" destination="pAe-bA-3EX" id="atJ-su-rby"/>
+                        <outlet property="ibLbTitleWeight" destination="Cs4-fg-BPI" id="2s2-Nd-d8W"/>
                     </connections>
                 </tableViewController>
             </objects>
@@ -837,7 +828,6 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         </scene>
     </scenes>
     <resources>
-        <image name="Dropbox-130x44.png" width="130" height="44"/>
         <image name="E2edit-Panel-310x88.png" width="310" height="88"/>
         <image name="GraphRoll-320x50.png" width="320" height="50"/>
         <image name="Icon32-Setting.png" width="32" height="32"/>

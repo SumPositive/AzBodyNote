@@ -14,6 +14,15 @@
 
 #pragma mark - ＋ クラスメソッド
 
+static MocFunctions	*staticMocFunctions= nil;
++ (MocFunctions *)sharedMocFunctions 
+{
+	if (!staticMocFunctions) {
+		staticMocFunctions = [[MocFunctions alloc] init];
+	}  
+	return staticMocFunctions;
+}
+
 static NSDate *dateGoal_ = nil;
 + (NSDate*)dateGoal
 {	// .dateTime のための 固有日付(dateGoal)を求める
@@ -30,7 +39,7 @@ static NSDate *dateGoal_ = nil;
 
 
 #pragma mark - ー インスタンスメソッド
-
+/*sharedMocFunctions:
 - (id)initWithMoc:(NSManagedObjectContext*)moc
 {
 	self = [super init];
@@ -39,7 +48,7 @@ static NSDate *dateGoal_ = nil;
 	assert(moc);
 	moc_ = moc;
 	return self;
-}
+}*/
 
 - (void)setMoc:(NSManagedObjectContext *)moc
 {

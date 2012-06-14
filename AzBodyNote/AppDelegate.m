@@ -16,7 +16,7 @@
 //#import "DropboxVC.h"
 
 
-#define CoreData_iCloud_SYNC		NO		// YES or NO
+#define CoreData_iCloud_SYNC		YES		// YES or NO
 
 //@interface AppDelegate (PrivateMethods)
 //- (NSManagedObjectContext *)managedObjectContext;
@@ -24,7 +24,7 @@
 
 @implementation AppDelegate
 @synthesize window = __window;
-@synthesize mocBase = __mocBase;
+//@synthesize mocBase = __mocBase;
 @synthesize tabBarController = __tabBarController;
 //@synthesize adWhirlView = __pAdWhirlView;
 //@synthesize app_is_sponsor = __app_is_sponsor;
@@ -131,10 +131,14 @@
   **/	
 	
 	// Moc初期化
-	if (__mocBase==nil) {
+/*	if (__mocBase==nil) {
 		__mocBase = [[MocFunctions alloc] initWithMoc:[self	 managedObjectContext]]; //iCloud同期に使用される
-	}
+	}*/
 	// TabBar画面毎にMOCを生成して個別にrollbackしたかったが、MOC間の変更反映が面倒だったので単一に戻した。
+	//[1.0]shard化
+	MocFunctions *mf = [MocFunctions sharedMocFunctions];
+	[mf setMoc:[self managedObjectContext]];
+	
 	
 	// デバイス、ＯＳ確認
 	if ([[[UIDevice currentDevice] systemVersion] compare:@"5.0"]==NSOrderedAscending) { // ＜ "5.0"

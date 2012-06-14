@@ -40,7 +40,7 @@
 @property (nonatomic, strong) IBOutlet UITabBarController *tabBarController;
 
 @property (nonatomic, strong, readonly) NSManagedObjectContext	*managedObjectContext;
-@property (nonatomic, strong, readonly) MocFunctions							*mocBase;
+//@property (nonatomic, strong, readonly) MocFunctions							*mocBase;
 //@property (nonatomic, strong, readonly) AdWhirlView							*adWhirlView;
 @property (nonatomic, strong, readonly) EKEventStore							*eventStore;
 

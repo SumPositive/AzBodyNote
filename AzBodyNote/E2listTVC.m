@@ -67,7 +67,7 @@
 	if (!mocFunc_) {
 		//  AddNew と Edit が別々に発する rollback の影響を避けるため、別々のContext上で処理する。
 		//mocFunc_ = [[MocFunctions alloc] initWithMoc:[appDelegate_ managedObjectContext]];
-		mocFunc_ = appDelegate_.mocBase; // Read Only
+		mocFunc_ = [MocFunctions sharedMocFunctions]; //appDelegate_.mocBase; // Read Only
 	}
 	assert(mocFunc_);
 	
@@ -79,16 +79,16 @@
 											 initWithTitle:NSLocalizedString(@"Cancel",nil)
 											 style:UIBarButtonItemStylePlain target:nil action:nil];
 
-	ibLbDate.text = NSLocalizedString(@"List_Date",nil); 
-	ibLbTime.text = NSLocalizedString(@"List_Time",nil);
-	ibLbBpHi.text = NSLocalizedString(@"List_BpHi",nil);
-	ibLbBpLo.text = NSLocalizedString(@"List_BpLo",nil);
-	ibLbPuls.text = NSLocalizedString(@"List_Puls",nil);
-	ibLbWeight.text = NSLocalizedString(@"List_Weight",nil);
-	ibLbTemp.text = NSLocalizedString(@"List_Temp",nil);
-	ibLbPedo.text = NSLocalizedString(@"List_Pedo",nil);
-	ibLbBodyFat.text = NSLocalizedString(@"List_BodyFat",nil);
-	ibLbSkMuscle.text = NSLocalizedString(@"List_SkMuscle",nil);
+	ibLbTitleDay.text = NSLocalizedString(@"List_Date",nil); 
+	ibLbTitleTime.text = NSLocalizedString(@"List_Time",nil);
+	ibLbTitleBpHi.text = NSLocalizedString(@"List_BpHi",nil);
+	ibLbTitleBpLo.text = NSLocalizedString(@"List_BpLo",nil);
+	ibLbTitlePuls.text = NSLocalizedString(@"List_Puls",nil);
+	ibLbTitleWeight.text = NSLocalizedString(@"List_Weight",nil);
+	ibLbTitleTemp.text = NSLocalizedString(@"List_Temp",nil);
+	ibLbTitlePedo.text = NSLocalizedString(@"List_Pedo",nil);
+	ibLbTitleBodyFat.text = NSLocalizedString(@"List_BodyFat",nil);
+	ibLbTitleSkMuscle.text = NSLocalizedString(@"List_SkMuscle",nil);
 
 	// TableView
 	//self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone; // セル区切り線なし
@@ -112,7 +112,7 @@
 	// 再読み込み
     [self reloadFetchedResults:nil];
 	
-	// observe the app delegate telling us when it's finished asynchronously setting up the persistent store
+	// Dropbox Download後など、再フェッチを要求する通知が届く
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadFetchedResults:) 
 												 name:NFM_REFETCH_ALL_DATA
 											   object:nil];
@@ -358,7 +358,6 @@
 			}	break;
 
 			case 1: {	// Dropbox  "esuslogo101409"
-				//static NSString *Cid = @"E2listDropbox"; // .storyboard定義名
 				static NSString *Cid = @"E2listBasic";  //== Class名
 				UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
 				if (cell == nil) {
@@ -367,6 +366,9 @@
 				}
 				cell.imageView.image = [UIImage imageNamed:@"AZDropbox-32"];
 				cell.textLabel.text = NSLocalizedString(@"Dropbox Upload",nil);
+				cell.textLabel.textColor = [UIColor blackColor];
+				cell.detailTextLabel.text = NSLocalizedString(@"Dropbox Upload detail",nil);
+				cell.detailTextLabel.textColor = [UIColor brownColor];
 				cell.userInteractionEnabled = YES;
 				cell.selectionStyle = UITableViewCellSelectionStyleBlue;
 				cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;

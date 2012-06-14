@@ -517,7 +517,7 @@
 	
 	if (!mocFunc_) {
 		//  AddNew と Edit が別々に発する rollback の影響を避けるため、別々のContext上で処理する。
-		mocFunc_ = appDelegate_.mocBase; // Read Only
+		mocFunc_ = [MocFunctions sharedMocFunctions]; //appDelegate_.mocBase; // Read Only
 	}
 	assert(mocFunc_);
 	
