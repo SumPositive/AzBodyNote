@@ -234,12 +234,14 @@
 					mGvWeight.ppDec = 1;
 					mGvWeight.ppMin = E2_nWeight_MIN;
 					mGvWeight.ppMax = E2_nWeight_MAX;
+					mGvWeight.ppBMI_Tall = mBMI_Tall;
 					[ibScrollView addSubview:mGvWeight];
 					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph Weight",nil)];
 				} else {
 					mGvWeight.ppE2records = e2recs;
 					mGvWeight.ppPage = mPage;
 					mGvWeight.ppRecordWidth = fRw;
+					mGvWeight.ppBMI_Tall = mBMI_Tall;
 					//mGvWeight.ppFont = ibLbFont.font;
 					[mGvWeight setFrame:rcgv];
 					[mGvWeight setNeedsDisplay]; //drawRect:が呼び出される
@@ -514,6 +516,12 @@ NSInteger afterPageChange = 0;
 	if (mGoalDisp != [kvs boolForKey:KVS_bGoal]) {
 		mGoalDisp = [kvs boolForKey:KVS_bGoal];
 		//mReDraw = YES; //=YES:設定に変化あり ⇒ クリアして再描画する
+	}
+
+	// BMI
+	mBMI_Tall = [[kvs objectForKey:KVS_SettGraphBMITall] integerValue];
+	if (mBMI_Tall < Graph_BMI_Tall_MIN OR Graph_BMI_Tall_MAX < mBMI_Tall) {
+		mBMI_Tall = 0;		//BMI非表示
 	}
 
 	if (mSliderOneWidth) {

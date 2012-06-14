@@ -75,9 +75,9 @@
 	}
 	
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	mHeight = [[kvs objectForKey:KVS_SettGraphHeight] integerValue];
-	if (mHeight<BMI_Height_MIN OR BMI_Height_MAX<mHeight) {
-		mHeight = 0; // BMI非表示
+	mBMI_Tall = [[kvs objectForKey:KVS_SettGraphBMITall] integerValue];
+	if (mBMI_Tall<Graph_BMI_Tall_MIN OR Graph_BMI_Tall_MAX<mBMI_Tall) {
+		mBMI_Tall = 0; // BMI非表示
 	}
 	[self refreshBMI_Height];
 }
@@ -165,11 +165,11 @@
 
 - (void)refreshBMI_Height
 {
-	if (mLbHeight) {
-		if (mHeight<BMI_Height_MIN) {
-			mLbHeight.text = NSLocalizedString(@"SettGraph BMI Hide",nil);
+	if (mLbTall) {
+		if (mBMI_Tall < Graph_BMI_Tall_MIN) {
+			mLbTall.text = NSLocalizedString(@"SettGraph BMI Hide",nil);
 		} else {
-			mLbHeight.text = [NSString stringWithFormat:@"%ldcm", (long)mHeight];
+			mLbTall.text = [NSString stringWithFormat:@"%ldcm", (long)mBMI_Tall];
 		}
 	}
 }
@@ -241,13 +241,13 @@
 					lb.text = NSLocalizedString(@"SettGraph BMI Height",nil);
 					[cell.contentView addSubview:lb];
 					// Label
-					mLbHeight = [[UILabel alloc] initWithFrame:CGRectMake(200, 8, 80, 30)];
-					mLbHeight.font = [UIFont systemFontOfSize:26];
-					mLbHeight.adjustsFontSizeToFitWidth = YES;
-					mLbHeight.minimumFontSize = 10;
-					mLbHeight.textAlignment = UITextAlignmentRight;
-					mLbHeight.backgroundColor = [UIColor clearColor];
-					[cell.contentView addSubview:mLbHeight];
+					mLbTall = [[UILabel alloc] initWithFrame:CGRectMake(200, 8, 80, 30)];
+					mLbTall.font = [UIFont systemFontOfSize:26];
+					mLbTall.adjustsFontSizeToFitWidth = YES;
+					mLbTall.minimumFontSize = 10;
+					mLbTall.textAlignment = UITextAlignmentRight;
+					mLbTall.backgroundColor = [UIColor clearColor];
+					[cell.contentView addSubview:mLbTall];
 					// AZDial
 					CGRect rc;
 					if (iS_iPAD) {
@@ -255,15 +255,15 @@
 					} else {
 						rc = CGRectMake(15, 40, 280, 44);
 					}
-					mDialHeight = [[AZDial alloc] initWithFrame:rc
+					mDialTall = [[AZDial alloc] initWithFrame:rc
 													 delegate: self
-														 dial: mHeight
-														  min: BMI_Height_MIN-1  //(-1)未満にて非表示
-														  max: BMI_Height_MAX
+														 dial: mBMI_Tall
+														  min: Graph_BMI_Tall_MIN-1  //(-1)未満にて非表示
+														  max: Graph_BMI_Tall_MAX
 														 step: 1
 													  stepper: 1];
-					[cell.contentView addSubview:mDialHeight];
-					mDialHeight.backgroundColor = [UIColor clearColor]; //self.backgroundColor;
+					[cell.contentView addSubview:mDialTall];
+					mDialTall.backgroundColor = [UIColor clearColor]; //self.backgroundColor;
 				}
 				cell.selectionStyle = UITableViewCellSelectionStyleNone; // 選択時ハイライトなし
 				[self refreshBMI_Height];
@@ -306,11 +306,11 @@
 		case EnumConditionPuls:
 			cell.textLabel.text = NSLocalizedString(@"SettGraph Pulse",nil);
 			break;
-		case EnumConditionTemp:
-			cell.textLabel.text = NSLocalizedString(@"SettGraph Temp",nil);
-			break;
 		case EnumConditionWeight:
 			cell.textLabel.text = NSLocalizedString(@"SettGraph Weight",nil);
+			break;
+		case EnumConditionTemp:
+			cell.textLabel.text = NSLocalizedString(@"SettGraph Temp",nil);
 			break;
 		case EnumConditionPedo:
 			cell.textLabel.text = NSLocalizedString(@"SettGraph Pedo",nil);
@@ -460,17 +460,17 @@
 #pragma mark - <AZDialDelegate>
 - (void)dialChanged:(id)sender dial:(NSInteger)dial
 {	// dialが変位したとき
-	mHeight = dial;
+	mBMI_Tall = dial;
 	[self refreshBMI_Height];
 }
 
 - (void)dialDone:(id)sender dial:(NSInteger)dial
 {	// dial変位が停止したとき
-	mHeight = dial;
+	mBMI_Tall = dial;
 	[self refreshBMI_Height];
 	
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	[kvs setObject:[NSNumber numberWithInteger:mHeight] forKey:KVS_SettGraphHeight];
+	[kvs setObject:[NSNumber numberWithInteger:mBMI_Tall] forKey:KVS_SettGraphBMITall];
 }
 
 

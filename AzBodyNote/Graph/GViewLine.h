@@ -34,5 +34,6 @@
 @property (nonatomic, assign) NSInteger	ppDec;
 @property (nonatomic, assign) NSInteger	ppMin;
 @property (nonatomic, assign) NSInteger	ppMax;
+@property (nonatomic, assign) NSInteger	ppBMI_Tall;	//BMI 身長(cm)
 
 @end

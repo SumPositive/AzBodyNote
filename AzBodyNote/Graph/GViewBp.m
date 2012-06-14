@@ -179,7 +179,7 @@ NSInteger	pValueCount = 0;
 					[self imageGraph:cgc center:po DtOp:DtOpEnd]; //Goal Image
 				}*/
 				po = poValGoal[bpHi];
-				po.y = self.frame.size.height - 10;
+				po.y = self.frame.size.height - 12;
 				[self imageGraph:cgc center:po DtOp:DtOpEnd]; //Goal Image
 				bLine = YES;
 			} else {
@@ -191,7 +191,7 @@ NSInteger	pValueCount = 0;
 					//po.y -= IMAGE_GAP_MIN/2.0;
 					//[self imageGraph:cgc center:po DtOp:DtOpEnd];
 					po = poValGoal[bpHi];
-					po.y = self.frame.size.height - 10;
+					po.y = self.frame.size.height - 12;
 					[self imageGraph:cgc center:po DtOp:DtOpEnd]; //Goal Image
 				}
 				[self drawPoint:cgc value:pValGoal[bpHi] po:poValGoal[bpHi] upper:YES];
@@ -202,7 +202,7 @@ NSInteger	pValueCount = 0;
 					//po.y += IMAGE_GAP_MIN/2.0;
 					//[self imageGraph:cgc center:po DtOp:DtOpEnd];
 					po = poValGoal[bpLo];
-					po.y = self.frame.size.height - 10;
+					po.y = self.frame.size.height - 12;
 					[self imageGraph:cgc center:po DtOp:DtOpEnd]; //Goal Image
 				}
 				[self drawPoint:cgc value:pValGoal[bpLo] po:poValGoal[bpLo] upper:NO];
@@ -300,16 +300,16 @@ NSInteger	pValueCount = 0;
 	CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 0.8);
 	CGContextAddLines(cgc, poBpLo, iCntBpLo);
 	CGContextStrokePath(cgc);
-	// BpPp
-	if (mBpPress) {
-		CGContextSetRGBStrokeColor(cgc, 1, 1, 1, 0.6);
-		CGContextAddLines(cgc, poBpPress, iCntBpPress);
-		CGContextStrokePath(cgc);
-	}
-	// BpMp
+	// BpMean 平均血圧
 	if (mBpMean) {
 		CGContextSetRGBStrokeColor(cgc, 1, 1, 1, 0.6);
 		CGContextAddLines(cgc, poBpMean, iCntBpMean);
+		CGContextStrokePath(cgc);
+	}
+	// BpPress　脈圧
+	if (mBpPress) {
+		CGContextSetRGBStrokeColor(cgc, 1, 1, 1, 0.6);
+		CGContextAddLines(cgc, poBpPress, iCntBpPress);
 		CGContextStrokePath(cgc);
 	}
 }
@@ -391,6 +391,17 @@ NSInteger	pValueCount = 0;
 	CGFloat fYstep = (rect.size.height - fSpaceY*2.0) / (pValMax - pValMin);  //上下余白を考慮したＹ座標スケール
 	CGPoint po;	// 描画範囲(rect)に収まるようにプロットした座標
 	CGFloat	fXstart = self.bounds.size.width - self.ppRecordWidth/2.0;
+	
+	if (mBpMean) {
+		CGContextSetRGBFillColor (cgc, 0.3, 0.6, 1.0, 0.1); //平均血圧の適正領域(70〜100)
+		CGContextFillRect(cgc, CGRectMake(0, fSpaceY + fYstep * (CGFloat)(70 - pValMin), 
+										  fXstart-self.ppRecordWidth/2, fYstep*30));
+	}
+	if (mBpPress) {
+		CGContextSetRGBFillColor (cgc, 0.3, 0.6, 1.0, 0.1); //平均血圧の適正領域(30〜60)
+		CGContextFillRect(cgc, CGRectMake(0, fSpaceY + fYstep * (CGFloat)(30 - pValMin), 
+										  fXstart-self.ppRecordWidth/2, fYstep*30));
+	}
 	
 	for (bpType bp=0; bp<bpEnd; bp++)
 	{

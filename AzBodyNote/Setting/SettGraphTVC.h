@@ -11,18 +11,16 @@
 
 #import "AppDelegate.h"
 
-#define BMI_Height_MIN	50	//これ未満ならば非表示
-#define BMI_Height_MAX	250
-
 
 @interface SettGraphTVC : UITableViewController <AZDialDelegate>
 {
 @private
 	AppDelegate					*mAppDelegate;
 	NSMutableArray				*mPanels;	//ここではBpLoを除外
-	UILabel							*mLbHeight;
-	AZDial								*mDialHeight;
-	NSInteger						mHeight;
+	
+	UILabel							*mLbTall;
+	AZDial								*mDialTall;
+	NSInteger						mBMI_Tall;
 }
 
 @property (nonatomic, assign) BOOL		ppBackGraph;

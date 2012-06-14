@@ -172,8 +172,8 @@
 							[NSNumber numberWithInteger: EnumConditionBpLo	* (-1)],		//*(-1):Graph表示する
 							[NSNumber numberWithInteger: EnumConditionPuls	* (-1)],		//*(-1):Graph表示する
 							[NSNumber numberWithInteger: EnumConditionNote],
-							[NSNumber numberWithInteger: EnumConditionTemp],
 							[NSNumber numberWithInteger: EnumConditionWeight],
+							[NSNumber numberWithInteger: EnumConditionTemp],
 							[NSNumber numberWithInteger: EnumConditionPedo],
 							[NSNumber numberWithInteger: EnumConditionFat],
 							[NSNumber numberWithInteger: EnumConditionSkm],

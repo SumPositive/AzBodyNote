@@ -18,6 +18,7 @@
 @synthesize ppDec;
 @synthesize ppMin;
 @synthesize ppMax;
+@synthesize ppBMI_Tall;
 
 
 NSInteger	pValGoal;
@@ -61,7 +62,7 @@ NSInteger	pValueCount;
 	{
 		// 端点
 		CGContextSetGrayFillColor(cgc, 0, 0.7);
-		CGContextFillEllipseInRect(cgc, CGRectMake(po.x-3, po.y-3, 6, 6));	//円Fill
+		CGContextFillEllipseInRect(cgc, CGRectMake(po.x-2, po.y-2, 4, 4));	//円Fill
 		// 数値	// 文字列の設定
 		CGContextSelectFont (cgc, "Helvetica", FONT_SIZE*mPadScale, kCGEncodingMacRoman);
 		CGContextSetTextDrawingMode (cgc, kCGTextFill);
@@ -122,6 +123,12 @@ NSInteger	pValueCount;
 		pValGoal = 0;
 	}
 	
+	float fBMI_TallSq = 0.0;
+	if (Graph_BMI_Tall_MIN <= self.ppBMI_Tall) {
+		fBMI_TallSq = (float)self.ppBMI_Tall / 100; //cm⇒m
+		fBMI_TallSq *= fBMI_TallSq; //2乗
+	}
+
 	//Record
 	pValueCount = 0;
 	for (E2record *e2 in self.ppE2records) 
@@ -130,10 +137,11 @@ NSInteger	pValueCount;
 	
 		if (0 < iVal && iVal < pValMin) pValMin = iVal;
 		if (pValMax < iVal) pValMax = iVal;
-		
 		pValue[pValueCount] = iVal;
 		pValueCount++;
-		//NG//if (GRAPH_PAGE_LIMIT <= pValueCount) break; // OK
+	}
+	if (0.0 < fBMI_TallSq) {
+		pValMin -= (pValMax - pValMin)/3.0;  //体重領域(高さ)の1/3をBMI領域にする
 	}
 
 	// 描画開始
@@ -166,6 +174,18 @@ NSInteger	pValueCount;
 	CGPoint po;
 	po.x = self.bounds.size.width - self.ppRecordWidth/2;
 	
+	//BMI 成人の適正領域を描く
+	CGFloat fBMI_Min = 999.9;
+	if (0 < fBMI_TallSq) {
+		for (int ii = 0; ii < pValueCount; ii++) {	//最小値を求める
+			CGFloat fBMI = pValue[ii] / fBMI_TallSq;
+			if (0<fBMI && fBMI<fBMI_Min) fBMI_Min = fBMI;
+		}
+		CGContextSetRGBFillColor (cgc, 0.3, 0.6, 1.0, 0.1); //BMI 成人の適正領域(22〜25)
+		CGContextFillRect(cgc, CGRectMake(0, fSpaceY + fYstep * (220 - fBMI_Min),   //10倍値
+										  po.x - self.ppRecordWidth/2, fYstep*30));
+	}
+
 	if (self.ppPage==0) {
 		//Goal
 		if (bGoal && 0 < pValGoal) {
@@ -175,6 +195,7 @@ NSInteger	pValueCount;
 		po.x -= self.ppRecordWidth;
 	}
 	
+	CGFloat fXstart = po.x;  //BMI// 開始点
 	//Record
 	CGPoint	poLine[GRAPH_PAGE_LIMIT+GRAPH_DAYS_SAFE+1];
 	int  iCntLine = 0;
@@ -189,9 +210,30 @@ NSInteger	pValueCount;
 	}
 	//------------------------------------------------------------------------------時系列折れ線
 	CGContextSetLineWidth(cgc, 1.0); //太さ
-	CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 0.4);
+	CGContextSetRGBStrokeColor(cgc, 0, 0, 0, 0.5);
 	CGContextAddLines(cgc, poLine, iCntLine);
 	CGContextStrokePath(cgc);
+
+	//------------------------------------------------------------------------------BMI ＜for Weight＞
+	if (0 < fBMI_TallSq) {
+		//BMI領域(高さ)は、(pValMax - pValMin)の下部1/3である。
+		po.x = fXstart;
+		iCntLine = 0;
+		for (int ii = 0; ii < pValueCount; ii++) {
+			if (po.x <= 0) break;
+			CGFloat fBMI = pValue[ii] / fBMI_TallSq;
+			po.y = fSpaceY + fYstep * (fBMI - fBMI_Min);
+			if (0 < fBMI) { // 有効な点だけにする
+				poLine[iCntLine++] = po;
+				[self drawPoint:cgc po:po value:fBMI valueType:self.ppDec];
+			}
+			po.x -= self.ppRecordWidth;
+		}
+		CGContextSetLineWidth(cgc, 1.0); //太さ
+		CGContextSetRGBStrokeColor(cgc, 1, 1, 1, 0.5);
+		CGContextAddLines(cgc, poLine, iCntLine);
+		CGContextStrokePath(cgc);
+	}
 }
 
 

@@ -53,6 +53,7 @@
 	GViewLine						*mGvPedo;
 	GViewLine						*mGvFat;
 	GViewLine						*mGvSkm;
+	NSInteger						mBMI_Tall;
 	
 	UISlider								*mSliderOneWidth;	//グラフ1本の間隔調整
 }

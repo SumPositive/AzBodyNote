@@ -58,6 +58,7 @@ typedef NSUInteger EnumGraphs;
 #define TABBAR_CHANGE_TIME				0.5		// TabBar切替時のディゾルブ時間(s)
 #define DateOpt_AroundHOUR						2			// 前後許容時間
 
+
 // Key-Value-Store ------------------------------------- Settings		【注意】リリース後は変更厳禁！
 //0.9//#define GUD_bPaid									@"GUD_bPaid"
 //0.9//#define GUD_bUnlock								@"GUD_bUnlock"
@@ -72,9 +73,9 @@ typedef NSUInteger EnumGraphs;
 
 #define KVS_SettGraphs						@"KVS_SettGraphs"	//UserDef保存につき変更禁止 NSArrey型 
 #define KVS_SettGraphOneWid				@"KVS_SettGraphOneWid"
-#define KVS_SettGraphBpPress				@"KVS_SettGraphBpPress"	// 脈圧	Puls pressure
 #define KVS_SettGraphBpMean				@"KVS_SettGraphBpMean"	// 平均血圧　　Mean blood pressure
-#define KVS_SettGraphHeight				@"KVS_SettGraphHeight"		// 身長(cm)
+#define KVS_SettGraphBpPress				@"KVS_SettGraphBpPress"	// 脈圧	Pulse pressure
+#define KVS_SettGraphBMITall				@"KVS_SettGraphBMITall"		// 身長(cm)
 
 #define KVS_SettStatType					@"KVS_SettStatType"
 #define KVS_SettStatDays					@"KVS_SettStatDays"

@@ -15,6 +15,9 @@
 #define IMAGE_GAP_MIN			30.0		// Hi-Lo差がこれ以下になると、Optアイコン非表示にして接触回避する
 #define VALUE_GAP_MIN			70.0		// Hi-Lo差がこれ以下になると、数値を45度傾けて接触回避する
 
+#define Graph_BMI_Tall_MIN			50	//これ未満ならば非表示
+#define Graph_BMI_Tall_MAX		250
+
 enum {
 	bpHi			= 0,
 	bpLo		= 1,
