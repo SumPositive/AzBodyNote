@@ -860,10 +860,10 @@
 {
 	if (iS_iPAD) {
 		if (indexPath.row==0) {	// dateTime,
-			return 44;
+			return 80;
 		}
 		if (indexPath.row==1) {	// DateOpt
-			return 50;
+			return 60;
 		}
 		else if (PANEL_TOP_ROW<=indexPath.row && indexPath.row<PANEL_TOP_ROW+[mPanels count]) 
 		{	// 測定パネル順序に従ってセル表示する
@@ -894,17 +894,15 @@
 	}
     return 88; // Default
 }
-
-- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section 
-{	// セクションフッタを応答
+/*
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
 	if (iS_iPAD) {
-		//return [NSString stringWithFormat:@"%@ %@", NSLocalizedString(@"Product Title",nil), COPYRIGHT];
 		return @"Condition " COPYRIGHT;
 	} else {
 		return nil;
 	}
-}
-
+}*/
 
 - (UITableViewCell *)cellDate:(UITableView *)tableView
 {
@@ -954,8 +952,10 @@
 		if (moE2edit_.dateTime==nil) {
 			moE2edit_.dateTime = [NSDate date];
 		}
-		cell.textLabel.text = [NSString stringWithFormat:@"%@   %@", NSLocalizedString(@"DateTime",nil), 
-							   [fmt stringFromDate:moE2edit_.dateTime]];
+		//cell.textLabel.text = [NSString stringWithFormat:@"%@   %@", NSLocalizedString(@"DateTime",nil), 
+		//					   [fmt stringFromDate:moE2edit_.dateTime]];
+		cell.textLabel.text = [fmt stringFromDate:moE2edit_.dateTime];
+		cell.textLabel.textAlignment = UITextAlignmentCenter;
 	}
 	return cell;
 }

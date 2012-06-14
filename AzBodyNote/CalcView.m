@@ -42,40 +42,42 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 @end
 
 @implementation CalcView
+@synthesize ppOwnPopover;
+
 
 #pragma mark - Action
 
 // zFomula を計算し、答えを RdecAnswer に保持しながら mLbAnswer.text に表示する
 - (void)finalAnswer:(NSString *)zFormula
 {
-	answer_ = nil;
+	mAnswer = nil;
 
 	if ([zFormula length]<=0) {
-		lbAnswer_.text = @"";
+		mLbAnswer.text = @"";
 		return;
 	}
 	
-	if (lbFormula_.hidden) {  // 数値文字列
+	if (mLbFormula.hidden) {  // 数値文字列
 		if (12 < [zFormula length]) {
-			lbAnswer_.text = @"Game Over";
+			mLbAnswer.text = @"Game Over";
 		} else {
-			lbAnswer_.text = zFormula; // 小数以下[0]を入れたとき表示されるように、入力のままにした。
-			answer_ = [[NSDecimalNumber alloc] initWithString:zFormula];
+			mLbAnswer.text = zFormula; // 小数以下[0]を入れたとき表示されるように、入力のままにした。
+			mAnswer = [[NSDecimalNumber alloc] initWithString:zFormula];
 		}
 		return;
 	}
 	else {	// 計算式文字列 <<< 演算子が入った
 		if (100 < [zFormula length]) {
-			lbAnswer_.text = @"Game Over";
+			mLbAnswer.text = @"Game Over";
 			return;
 		}
 		else {
 			// 計算し、答えを MdecAnswer に保持しながら Rlabel.text に表示する
-			answer_ = [self decimalAnswerFomula:zFormula];
-			if (answer_) {
-				if (ANSWER_MAX < fabs([answer_ doubleValue])) {
-					lbAnswer_.text = @"Game Over";
-					answer_ = [[NSDecimalNumber alloc] initWithString:@"0.0"];
+			mAnswer = [self decimalAnswerFomula:zFormula];
+			if (mAnswer) {
+				if (ANSWER_MAX < fabs([mAnswer doubleValue])) {
+					mLbAnswer.text = @"Game Over";
+					mAnswer = [[NSDecimalNumber alloc] initWithString:@"0.0"];
 					// textField.text は、そのままなので計算続行可能。
 					return;
 				}
@@ -84,11 +86,11 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 				[formatter setPositiveFormat:@"#,##0.####"];
 				[formatter setNegativeFormat:@"-#,##0.####"];
 				// 表示のみ　Rentity更新はしない
-				lbAnswer_.text = [formatter stringFromNumber:answer_];
+				mLbAnswer.text = [formatter stringFromNumber:mAnswer];
 				return;
 			}
 			else {
-				lbAnswer_.text = @"?";
+				mLbAnswer.text = @"?";
 			}
 		}
 	}
@@ -97,23 +99,31 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 
 - (void)formulaShow
 {
-	if (lbFormula_.hidden==YES) {
-		lbFormula_.hidden = NO;
-		CGRect rc = lbAnswer_.frame;
-		rc.size.height = 50 - lbFormula_.frame.size.height;
-		lbAnswer_.frame = rc;
-		lbAnswer_.font = [UIFont boldSystemFontOfSize:34];
+	if (mLbFormula.hidden==YES) {
+		mLbFormula.hidden = NO;
+		CGRect rc = mLbAnswer.frame;
+		rc.size.height = 60 - mLbFormula.frame.size.height;
+		mLbAnswer.frame = rc;
+		mLbAnswer.font = [UIFont boldSystemFontOfSize:36];
 	}
 }
 - (void)formulaHide
 {
-	if (lbFormula_.hidden==NO) {
-		lbFormula_.hidden = YES;
-		CGRect rc = lbAnswer_.frame;
-		rc.size.height = 50;
-		lbAnswer_.frame = rc;
-		lbAnswer_.font = [UIFont boldSystemFontOfSize:50];
+	if (mLbFormula.hidden==NO) {
+		mLbFormula.hidden = YES;
+		CGRect rc = mLbAnswer.frame;
+		rc.size.height = 60;
+		mLbAnswer.frame = rc;
+		mLbAnswer.font = [UIFont boldSystemFontOfSize:50];
 	}
+}
+
+- (void)AllClear
+{	//[AC]
+	mAnswer = nil;
+	mLbAnswer.text = mAnswerTitle;		mLbAnswer.tag = 0; // Title
+	[self formulaHide];
+	mLbFormula.text = @"";
 }
 
 - (void)buttonCalc:(UIButton *)button
@@ -124,40 +134,36 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 	//AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
 	//[appDelegate audioPlayer:@"Tock.caf"];  // キークリック音
 	
-	if (lbAnswer_.tag==0) {
-		lbAnswer_.text = @"";
-		lbAnswer_.tag = 1; // Answer
+	if (mLbAnswer.tag==0) {
+		mLbAnswer.text = @"";
+		mLbAnswer.tag = 1; // Answer
 	}
 	
 	switch (button.tag) 
 	{
 		case 1: { // 数値  ＜＜常時 Formulaの方へ書き込み、書式化したものを Answerへ表示する
-			lbFormula_.text = [lbFormula_.text stringByAppendingString:button.titleLabel.text];
+			mLbFormula.text = [mLbFormula.text stringByAppendingString:button.titleLabel.text];
 		}	break;
 			
 		case 2: { // 演算子
-			lbFormula_.text = [lbFormula_.text stringByAppendingString:button.titleLabel.text];
+			mLbFormula.text = [mLbFormula.text stringByAppendingString:button.titleLabel.text];
 			[self formulaShow];
 		} break;
 			
 		case 4: { // AC
-			//[mAnswer release], 
-			answer_ = nil;
-			lbAnswer_.text = title_;		lbAnswer_.tag = 0; // Title
-			[self formulaHide];
-			lbFormula_.text = @"";
+			[self AllClear];
 		} return;
 			
 		case 5: { // BS
-				int iLen = [lbFormula_.text length];
+				int iLen = [mLbFormula.text length];
 				if (1 <= iLen) {
-					lbFormula_.text = [lbFormula_.text substringToIndex:iLen-1];
+					mLbFormula.text = [mLbFormula.text substringToIndex:iLen-1];
 				} else {
 					//[AC]と同じ
 					//[mAnswer release], mAnswer = nil;
-					lbAnswer_.text = title_;		lbAnswer_.tag = 0; // Title
+					mLbAnswer.text = mAnswerTitle;		mLbAnswer.tag = 0; // Title
 					[self formulaHide];
-					lbFormula_.text = @"";
+					mLbFormula.text = @"";
 				}
 		} break;
 			
@@ -174,7 +180,7 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 			break;
 			
 		case 9: // [Done]
-			NSLog(@"CalcView: [Done] answer_=%@", answer_);
+			NSLog(@"CalcView: [Done] answer_=%@", mAnswer);
 			[self done];
 			return;
 			
@@ -185,13 +191,14 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 	}
 	
 	// mLbFormula.text を計算し、その結果を mLbAnswer に表示する
-	[self finalAnswer:lbFormula_.text];
+	[self finalAnswer:mLbFormula.text];
 }
 
 - (void)show
 {
 	GA_TRACK_PAGE(@"CalcView");
 	
+	[self AllClear];	//[AC]
 	[mSubView setFrame: mRectShow]; // 表示位置へ  ＜＜移動を見せないようにした。
 
 	// アニメ準備
@@ -229,7 +236,10 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 
 - (void)hide		// 閉じて破棄する
 {
-	//[mAnswer release], mAnswer = nil;
+	if (self.ppOwnPopover && iS_iPAD) {
+		[self.ppOwnPopover dismissPopoverAnimated:YES];
+		return;
+	}
 
 	// アニメ準備
 	CGContextRef context = UIGraphicsGetCurrentContext();
@@ -258,19 +268,15 @@ int levelOperator( NSString *zOpe );  // 演算子の優先順位
 
 - (void)done	// E3recordDetailTVCの中から呼び出されることがある
 {
-	if (answer_)
+	if (mAnswer)
 	{
 		//AzRETAIN_CHECK(@"save: RdecAnswer", RdecAnswer, 0);
 		// デフォルト丸め処理
-		answer_ = [answer_ decimalNumberByRoundingAccordingToBehavior:mBehaviorDefault];
-/*
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-performSelector-leaks"			// Warning除去
-		[mTarget performSelector:mActionSelector withObject:mAnswer];  // 受け取った側でreleaseすること
-#pragma clang diagnostic pop
-*/
-		if ([delegate_ respondsToSelector:@selector(calcDone:answer:)]) {
-			[delegate_ calcDone:self  answer:answer_];	// 決定
+		NSLog(@"-1- mAnswer=%lf", [mAnswer doubleValue]);
+		mAnswer = [mAnswer decimalNumberByRoundingAccordingToBehavior:mBehaviorDefault];
+		NSLog(@"-2- mAnswer=%lf", [mAnswer doubleValue]);
+		if ([mDelegate respondsToSelector:@selector(calcDone:answer:)]) {
+			[mDelegate calcDone:self  answer:mAnswer];	// 決定
 		}
 	}
 	[self hide];
@@ -519,6 +525,42 @@ int levelOperator( NSString *zOpe )  // 演算子の優先順位
 	return decAns;
 }
 
+- (void)behaviorDecimal:(int)decimal	//小数部桁数
+{
+	assert(-1 <= decimal);	// (-1)通貨専用
+	
+	// 丸め方法
+	NSUInteger uiRound = NSRoundPlain; //　四捨五入
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	if ([kvs boolForKey:KVS_Calc_RoundBankers]) {
+		uiRound = NSRoundBankers; // 偶数丸め
+	}
+	if (decimal < 0) {
+		// 通貨型に合った丸め位置を取得
+		if ([[[NSLocale currentLocale] objectForKey:NSLocaleIdentifier] isEqualToString:@"ja_JP"]) { // 言語 + 国、地域
+			mRoundingScale = 0;
+		} else {
+			mRoundingScale = 2;
+		}
+	} else {
+		mRoundingScale = decimal;
+	}
+	// 計算結果の丸め設定　show にてデフォルト設定
+	mBehaviorCalc = [[NSDecimalNumberHandler alloc] initWithRoundingMode:uiRound				// 丸め
+																   scale:mRoundingScale + 2	// 丸めた後の桁数
+														raiseOnExactness:YES					// 精度
+														 raiseOnOverflow:YES					// オーバーフロー
+														raiseOnUnderflow:YES					// アンダーフロー
+													 raiseOnDivideByZero:YES ];					// アンダーフロー
+	
+	// 答えの丸め　hide にてデフォルト設定
+	mBehaviorDefault = [[NSDecimalNumberHandler alloc] initWithRoundingMode:uiRound			// 丸め
+																	  scale:mRoundingScale	// 丸めた後の桁数
+														   raiseOnExactness:YES				// 精度
+															raiseOnOverflow:YES				// オーバーフロー
+														   raiseOnUnderflow:YES				// アンダーフロー
+														raiseOnDivideByZero:YES ];			// アンダーフロー
+}
 
 
 #pragma mark - View lifecicle
@@ -527,7 +569,7 @@ static CalcView	*staticCalcView = nil;
 + (CalcView *)sharedCalcView
 {
 	if (!staticCalcView) {
-		staticCalcView = [[CalcView alloc] init];
+		staticCalcView = [[CalcView alloc] init];	//static//永続Object//解放されない
 	}  
 	return staticCalcView;
 }
@@ -537,49 +579,52 @@ static CalcView	*staticCalcView = nil;
 	self = [super init];
 	if (self==nil) return nil; // ERROR
 
+	mRectShow = CGRectMake(0, 0, 320, 250);
+	//mRectHide = mRectShow;
+	//mRectHide.origin.y = self.frame.size.height; // 下部に隠す為
+	
 	self.backgroundColor = [UIColor clearColor];
 	self.userInteractionEnabled = YES; // 電卓外部のタッチを受ける
 
-	answer_ = nil;
+	mAnswer = nil;
 	mIsShow = NO;
 
-	//NSUserDefaults *udef = [NSUserDefaults standardUserDefaults];
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	siCalcMethod = [[kvs objectForKey:KVS_Calc_Method] integerValue];	// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
 
-#warning CalcView　背景が透明、ボタンが押せない
 	//------------------------------------------
 	assert(mSubView==nil);
 	// この mSubView に以下のパーツを載せる
-	mSubView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 250)]; // 縦横固定
-	mSubView.backgroundColor = [UIColor greenColor];
+	mSubView = [[UIView alloc] initWithFrame: mRectShow]; // 縦横固定
+	mSubView.backgroundColor = [UIColor blackColor];
+	mSubView.alpha = 1;
 	mSubView.userInteractionEnabled = YES;
 	[self addSubview:mSubView];
 	//------------------------------------------
-	lbAnswer_ = [[UILabel alloc] initWithFrame:CGRectMake(0, 10, 320, 50)];
-	lbAnswer_.backgroundColor = [UIColor grayColor];
-	lbAnswer_.textColor = [UIColor whiteColor];
-  	lbAnswer_.textAlignment = UITextAlignmentCenter;
-	lbAnswer_.font = [UIFont boldSystemFontOfSize:50];
-	lbAnswer_.minimumFontSize = 16;
-	lbAnswer_.adjustsFontSizeToFitWidth = YES;
-	lbAnswer_.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
-	[mSubView addSubview:lbAnswer_];//, [mLbAnswer release];
-	lbAnswer_.tag = 0;	// (0)title  (1)answer
-	lbAnswer_.text = title_;
+	mLbAnswer = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 60)];
+	mLbAnswer.backgroundColor = [UIColor darkGrayColor];
+	mLbAnswer.textColor = [UIColor whiteColor];
+  	mLbAnswer.textAlignment = UITextAlignmentCenter;
+	mLbAnswer.font = [UIFont boldSystemFontOfSize:50];
+	mLbAnswer.minimumFontSize = 16;
+	mLbAnswer.adjustsFontSizeToFitWidth = YES;
+	mLbAnswer.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
+	[mSubView addSubview:mLbAnswer];//, [mLbAnswer release];
+	mLbAnswer.tag = 0;	// (0)title  (1)answer
+	mLbAnswer.text = mAnswerTitle;
 	//------------------------------------------
-	lbFormula_ = [[UILabel alloc] initWithFrame:CGRectMake(0, 
-						   lbAnswer_.frame.origin.y + lbAnswer_.frame.size.height - 16, 320, 16)];
-	lbFormula_.backgroundColor = [UIColor brownColor];
-	lbFormula_.textColor = [UIColor whiteColor];
-  	lbFormula_.textAlignment = UITextAlignmentCenter;
-	lbFormula_.font = [UIFont boldSystemFontOfSize:14];
-	lbFormula_.minimumFontSize = 10;
-	lbFormula_.adjustsFontSizeToFitWidth = YES;
-	lbFormula_.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
-	[mSubView addSubview:lbFormula_];//, [mLbFormula release];
-	lbFormula_.hidden = YES;
-	lbFormula_.text = @"";
+	mLbFormula = [[UILabel alloc] initWithFrame:CGRectMake(0, 
+						   mLbAnswer.frame.origin.y + mLbAnswer.frame.size.height - 20, 320, 20)];
+	mLbFormula.backgroundColor = [UIColor brownColor];
+	mLbFormula.textColor = [UIColor whiteColor];
+  	mLbFormula.textAlignment = UITextAlignmentCenter;
+	mLbFormula.font = [UIFont boldSystemFontOfSize:16];
+	mLbFormula.minimumFontSize = 10;
+	mLbFormula.adjustsFontSizeToFitWidth = YES;
+	mLbFormula.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
+	[mSubView addSubview:mLbFormula];//, [mLbFormula release];
+	mLbFormula.hidden = YES;
+	mLbFormula.text = @"";
 	
 	//------------------------------------------
 	float fxGap = 2;	// Xボタン間隔
@@ -590,7 +635,7 @@ static CalcView	*staticCalcView = nil;
 	float fW;
 	float fH;
 
-	fy = lbAnswer_.frame.origin.y + lbAnswer_.frame.size.height + 2;
+	fy = mLbAnswer.frame.origin.y + mLbAnswer.frame.size.height + 2;
 	fx = fxGap;
 	fW = (320 - fxGap) / 5 - fxGap; // 1ページ5列
 	fyGap = 5;	// Yボタン間隔
@@ -676,37 +721,9 @@ static CalcView	*staticCalcView = nil;
 	
 	// Calc 初期化
 	mFunc = 0;
-	
 	// 丸め方法
-	NSUInteger uiRound = NSRoundPlain; //　四捨五入
-	if ([kvs boolForKey:KVS_Calc_RoundBankers]) {
-		uiRound = NSRoundBankers; // 偶数丸め
-	}
-	if (mDecimal < 0) {
-		// 通貨型に合った丸め位置を取得
-		if ([[[NSLocale currentLocale] objectForKey:NSLocaleIdentifier] isEqualToString:@"ja_JP"]) { // 言語 + 国、地域
-			mRoundingScale = 0;
-		} else {
-			mRoundingScale = 2;
-		}
-	} else {
-		mRoundingScale = mDecimal;
-	}
-	// 計算結果の丸め設定　show にてデフォルト設定
-	mBehaviorCalc = [[NSDecimalNumberHandler alloc] initWithRoundingMode:uiRound				// 丸め
-																   scale:mRoundingScale + 2	// 丸めた後の桁数
-														raiseOnExactness:YES					// 精度
-														 raiseOnOverflow:YES					// オーバーフロー
-														raiseOnUnderflow:YES					// アンダーフロー
-													 raiseOnDivideByZero:YES ];					// アンダーフロー
+	[self behaviorDecimal:(-1)];	//(-1)通貨設定
 
-	// 答えの丸め　hide にてデフォルト設定
-	mBehaviorDefault = [[NSDecimalNumberHandler alloc] initWithRoundingMode:uiRound			// 丸め
-																	  scale:mRoundingScale	// 丸めた後の桁数
-														   raiseOnExactness:YES				// 精度
-															raiseOnOverflow:YES				// オーバーフロー
-														   raiseOnUnderflow:YES				// アンダーフロー
-														raiseOnDivideByZero:YES ];			// アンダーフロー
     return self;
 }
 
@@ -724,8 +741,8 @@ static CalcView	*staticCalcView = nil;
 
 - (void)setTitle:(NSString*)title
 {
-	title_ = [title copy];	// [AC]で表示するため保持
-	[lbAnswer_ setText: title_];
+	mAnswerTitle = [title copy];	// [AC]で表示するため保持
+	[mLbAnswer setText: mAnswerTitle];
 }
 - (void)setMin:(double)min
 {
@@ -735,15 +752,17 @@ static CalcView	*staticCalcView = nil;
 {
 	mMax = max;
 }
+
 - (void)setDecimal:(int)decimal
 {
 	assert(-1 <= decimal);	// (-1)通貨専用
-	mDecimal = decimal;
+	[self behaviorDecimal:decimal];
 }
+
 - (void)setDelegate:(id)delegate
 {
 	assert(delegate);
-	delegate_ = delegate;
+	mDelegate = delegate;
 }
 - (void)setPointShow:(CGPoint)po
 {

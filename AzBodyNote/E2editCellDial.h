@@ -25,6 +25,7 @@
 	//NSInteger		mSliderBase;
 	NSInteger		mValue;
 	AZDial				*mDial;
+	UIPopoverController	*mPopover;
 }
 
 @property (nonatomic, unsafe_unretained) id			delegate;	// delegateEditChange 更新通知のため

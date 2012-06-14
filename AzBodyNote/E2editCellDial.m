@@ -86,19 +86,36 @@
 	double dMax = (double)valueMax_ / dPow;
 	
 	CalcView *calc = [CalcView sharedCalcView];
-	[calc setRootViewController: self.window.rootViewController];
 	[calc setTitle: ibLbName.text];
 	[calc setMin: dMin];
 	[calc setMax: dMax];
 	[calc setDecimal: valueDec_];
 	[calc setDelegate: self];
-	[viewParent_.window.rootViewController.view  addSubview:calc];
+
 	if (iS_iPAD) {
-		CGPoint po = button.frame.origin;
-		po.x += button.frame.size.width + 60;
-		po.y = 500;
-		[calc setPointShow: po];
-	} else {	
+		CGRect rc = button.frame;
+		rc.origin.x += rc.size.width + button.superview.frame.origin.x - 10;
+		rc.size.width = 5;
+		rc.origin.y += 10;	rc.size.height -= 20;
+		// calcをUIViewControllerに貼付けて、Popover表示する
+		if (mPopover) {
+			[mPopover dismissPopoverAnimated:NO];
+			mPopover = nil;
+		}
+		UIViewController *vc = [[UIViewController alloc] init];
+		vc.view.frame = CGRectMake(0, 0, 320, 235);
+		vc.contentSizeForViewInPopover = CGSizeMake(320, 235);
+		[calc setPointShow:CGPointMake(0, 0)];
+		[vc.view addSubview:calc];
+		[calc setRootViewController: vc]; //これが無いとタッチ無視される（範囲外のため？）
+		mPopover = [[UIPopoverController alloc] initWithContentViewController:vc];
+		calc.ppOwnPopover = mPopover; //内側から閉じる為
+		[mPopover presentPopoverFromRect:rc inView:self 
+				permittedArrowDirections:UIPopoverArrowDirectionLeft animated:YES];
+	}
+	else {	//iPhone
+		[calc setRootViewController: self.window.rootViewController];
+		[viewParent_.window.rootViewController.view  addSubview:calc];
 		//広告やTabBarよりも上に出すため。
 		[calc setPointShow: CGPointMake(0, 240)];
 	}

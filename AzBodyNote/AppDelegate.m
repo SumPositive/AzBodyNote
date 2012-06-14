@@ -96,46 +96,7 @@
 
 	mAzukiUnlock = NO;	// YES=購入意思ありと見なしてUnlockする
 	
-	/**[0.9.0]以降、kvsへ移行統一する
-	NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	//-------------------------------------------------Setting Defult
-	// User Defaultsを使い，キー値を変更したり読み出す前に，NSUserDefaultsクラスのインスタンスメソッド
-	// registerDefaultsメソッドを使い，初期値を指定します。
-	// ここで，appDefaultsは環境設定で初期値となるキー・バリューペアのNSDictonaryオブジェクトです。
-	// このメソッドは，すでに同じキーの環境設定が存在する場合，上書きしないので，環境設定の初期値を定めることに使えます。
-	NSDictionary *dicDef = [[NSDictionary alloc] initWithObjectsAndKeys: // 直後にreleaseしている
-							@"0",				GUD_Calc_Method,					// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
-							@"YES",			GUD_Calc_RoundBankers,		// YES=偶数丸め  NO=四捨五入
-							@"NO",			STORE_PRODUCTID_UNLOCK,		// YES=AppStore In-App Purchase ProductIdentifier
-							@"NO",			GUD_bTweet,							// YES=新規保存後ツイート
-							@"YES",			GUD_bGoal,								// YES=GOAL表示する
-							@"NO",			GUD_bCalender,						// YES=カレンダーへ記録
-							[NSNumber numberWithInt:14],	GUD_SettGraphDays,
-							 nil];
-	[userDefaults registerDefaults:dicDef];	// 未定義のKeyのみ更新される
-
-	// 画面表示に関係する Option Setting を取得する
-	//__app_is_sponsor = [userDefaults boolForKey:STORE_PRODUCTID_UNLOCK]; //GUD_bPaid
-	__app_is_unlock = [userDefaults boolForKey:STORE_PRODUCTID_UNLOCK];  //GUD_bUnlock
-
-	//[0.8]以前に対応するため
-	if (__app_is_unlock==NO) {
-		__app_is_unlock = [userDefaults boolForKey:@"GUD_bPaid"];  //[0.8]以前の定義
-		if (__app_is_unlock==NO) {
-			__app_is_unlock = [userDefaults boolForKey:@"GUD_bUnlock"];  //[0.8]以前の定義
-		}
-		// UDへ登録
-		[userDefaults setBool:__app_is_unlock forKey:STORE_PRODUCTID_UNLOCK];
-	}
-	[userDefaults synchronize]; // plistへ書き出す
-  **/	
-	
-	// Moc初期化
-/*	if (__mocBase==nil) {
-		__mocBase = [[MocFunctions alloc] initWithMoc:[self	 managedObjectContext]]; //iCloud同期に使用される
-	}*/
-	// TabBar画面毎にMOCを生成して個別にrollbackしたかったが、MOC間の変更反映が面倒だったので単一に戻した。
-	//[1.0]shard化
+	// Moc初期化	//[1.0]shard化
 	MocFunctions *mf = [MocFunctions sharedMocFunctions];
 	[mf setMoc:[self managedObjectContext]];
 	
@@ -220,7 +181,7 @@
 			}
 		}
 #ifdef DEBUG
-		__app_is_unlock = YES;
+		__app_is_unlock = NO;
 #endif
 		if (__app_is_unlock) {	//登録
 			[kvs setBool:YES forKey:STORE_PRODUCTID_UNLOCK];
@@ -269,13 +230,14 @@
 			//iPhone//320x50//extern GADAdSize const kGADAdSizeBanner;
 			//iPad//468x60//extern GADAdSize const kGADAdSizeFullBanner;
 			if (RoAdMobView==nil) {
-				RoAdMobView = [[GADBannerView alloc] init];
-				RoAdMobView.rootViewController = self.window.rootViewController;
 				if (iS_iPAD) {
+					RoAdMobView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeFullBanner];	//468x60
 					RoAdMobView.adUnitID = @"0dc4518b212344a8";	//iPad//体調メモ iPad
 				} else {
+					RoAdMobView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeBanner];		//320x50
 					RoAdMobView.adUnitID = @"a14ece23da85f5e";	//iPhone//体調メモ
 				}
+				RoAdMobView.rootViewController = self.window.rootViewController;
 				RoAdMobView.frame = rc;
 				RoAdMobView.alpha = 0;
 				GADRequest *request = [GADRequest request];

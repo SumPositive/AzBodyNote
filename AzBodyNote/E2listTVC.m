@@ -366,12 +366,14 @@
 				}
 				cell.imageView.image = [UIImage imageNamed:@"AZDropbox-32"];
 				cell.textLabel.text = NSLocalizedString(@"Dropbox Upload",nil);
-				cell.textLabel.textColor = [UIColor blackColor];
 				cell.detailTextLabel.text = NSLocalizedString(@"Dropbox Upload detail",nil);
-				cell.detailTextLabel.textColor = [UIColor brownColor];
 				cell.userInteractionEnabled = YES;
 				cell.selectionStyle = UITableViewCellSelectionStyleBlue;
-				cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+				if (iS_iPAD) {
+					cell.accessoryType = UITableViewCellAccessoryNone;
+				} else {
+					cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+				}
 				return cell;
 			}	break;
 				
@@ -387,6 +389,7 @@
 				}
 				cell.imageView.image = nil;
 				cell.textLabel.text = @"";
+				cell.detailTextLabel.text = @"";
 				cell.userInteractionEnabled = NO;
 				cell.selectionStyle = UITableViewCellSelectionStyleNone;
 				cell.accessoryType = UITableViewCellAccessoryNone;
@@ -500,7 +503,17 @@
 													 style:UIBarButtonItemStylePlain
 													 target:nil  action:nil];
 			//表示開始
-			[self.navigationController pushViewController:vc animated:YES];
+			//[self.navigationController pushViewController:vc animated:YES];
+			if (iS_iPAD) {
+				UINavigationController* nc = [[UINavigationController alloc] initWithRootViewController:vc];
+				nc.modalPresentationStyle = UIModalPresentationFormSheet; // iPad画面1/4サイズ
+				nc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+				[self presentModalViewController:nc animated:YES];
+			} else {
+				[appDelegate_ adShow:2];	//(2)Ad下端へ
+				[vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
+				[self.navigationController pushViewController:vc animated:YES];
+			}
 			//表示開始後にsetする
 			[vc setCryptHidden:YES	 Enabled:NO];////表示後にセットすること
 			NSDateFormatter *fm = [[NSDateFormatter alloc] init];

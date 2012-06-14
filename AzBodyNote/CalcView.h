@@ -24,28 +24,28 @@
 @private
 	UIViewController				*mRootViewController;
 	
-	NSString							*title_;		// [AC]で表示するため
-	NSDecimalNumber 		*answer_;	// 結果
+	NSString							*mAnswerTitle;		// [AC]で表示するため
+	NSDecimalNumber 		*mAnswer;	// 結果
 	
 	double						mMin;
 	double						mMax;
-	int							mDecimal;		// 小数桁数
-	
-	id								delegate_;
+	id								mDelegate;
 	
 	UIView				*mSubView;
 	NSDecimalNumberHandler	*mBehaviorDefault;	// 通貨既定の丸め処理
 	NSDecimalNumberHandler	*mBehaviorCalc;		// 計算途中の丸め処理
 	
-	UILabel				*lbAnswer_;	// 結果表示
-	UILabel				*lbFormula_;	// 計算式表示
+	UILabel				*mLbAnswer;	// 結果表示
+	UILabel				*mLbFormula;	// 計算式表示
 	
 	NSInteger			mRoundingScale;
 	BOOL					mIsShow;
 	int						mFunc;		// (0)Non (-4)+ (-5)- (-6)* (-7)/
-	CGRect				mRectHide;		// 隠れ位置
+	//CGRect				mRectHide;		// 隠れ位置
 	CGRect				mRectShow;	// 表示定位置
 }
+
+@property (nonatomic, retain) UIPopoverController*	ppOwnPopover;
 
 // 公開メソッド
 + (CalcView *)sharedCalcView;
