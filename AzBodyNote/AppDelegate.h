@@ -56,6 +56,7 @@
 - (void)alertProgressOn:(NSString*)zTitle;
 - (void)alertProgressOff;
 
+- (void)iCloudAllClear;
 - (NSString *)applicationDocumentsDirectory;
 
 - (void)adShow:(NSInteger)iShow;

@@ -54,7 +54,7 @@
 	NSLog(@"ibScrollView.subviews={%@}", ibScrollView.subviews);
 }
 
-- (void)labelGraphRect:(CGRect)rect  text:(NSString*)text
+- (void)labelGraphRect:(CGRect)rect  text:(NSString*)text  color:(UIColor*)color
 {
 	CGFloat fx = rect.origin.x+rect.size.width;
 	if (mGoalDisp==NO) fx -= (ibViewRecord.frame.size.width/2); 	//Goal非表示につき左に寄せる
@@ -62,8 +62,8 @@
 	UILabel *lb = [[UILabel alloc] initWithFrame:
 				   CGRectMake(fx, rect.origin.y+rect.size.height-25*mPadScale, 100*mPadScale,20*mPadScale)];
 	lb.text = text;
+	lb.textColor = color;
 	lb.backgroundColor = [UIColor clearColor];
-	lb.textColor = [UIColor darkGrayColor];
 	lb.font = [UIFont systemFontOfSize:14*mPadScale];
 	lb.numberOfLines = 1;
 	lb.adjustsFontSizeToFitWidth = YES;
@@ -77,6 +77,9 @@
 	if (mPageMax < mPage + pageChange) return;
 	//if (mPage + pageChange < 0) return;
 	mPage += pageChange;
+	
+	// 既存オブジェクト クリア
+	[self drawClear];
 	
 	// Sort条件
 	NSSortDescriptor *sort1 = [[NSSortDescriptor alloc] initWithKey:E2_dateTime ascending:NO];
@@ -129,11 +132,15 @@
 		rcScrollContent.size.width += fRw;	//＋Goal列
 	}
 	
+	//--------------------------------------------------------------------------------------- iCloud KVS GOAL!
+	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	BOOL bBpMean = [kvs boolForKey:@"KVS_SettGraphBpMean"];	//平均
+	BOOL bBpPress = [kvs boolForKey:@"KVS_SettGraphBpPress"];	//脈圧
 	
 	//------------------------------------------------------日付
 	CGRect rcgv = rcScrollContent;
-	rcgv.origin.y = 10;
-	rcgv.size.height = 40;
+	rcgv.origin.y = 3;
+	rcgv.size.height = 60;
 	if (mGvDate==nil) {
 		mGvDate = [[GViewDate alloc] initWithFrame: rcgv]; // 日付専用
 		mGvDate.ppE2records = e2recs;
@@ -162,30 +169,48 @@
 	}
 	
 	//------------------------------------------------------ グラフ
-	rcgv.origin.y += rcgv.size.height;
-	CGFloat fHeight = ibScrollView.bounds.size.height - rcgv.origin.y - 8;  // 日付と下の余白を除く
+	CGRect rcGraphFrame = rcgv;
+	rcGraphFrame.origin.y += rcGraphFrame.size.height;
+	CGFloat fHeight = ibScrollView.bounds.size.height - rcGraphFrame.origin.y - 8;  // 日付と下の余白を除く
 	NSInteger iPs = [mPanelGraphs count];
 	assert(0<iPs);
 	fHeight /= iPs;	// 1パネルあたりの高さ
 	
 	for (NSNumber *num in mPanelGraphs) 
 	{
-		rcgv.size.height = fHeight;
+		rcGraphFrame.size.height = fHeight;
 		switch ([num integerValue] * (-1)) 
 		{
 			case EnumConditionBpHi:
-				rcgv.size.height *= 2.0;
+				rcGraphFrame.size.height *= 2.0;
 				if (mGvBp==nil) {
-					mGvBp = [[GViewBp alloc] initWithFrame: rcgv]; // 1値汎用
+					mGvBp = [[GViewBp alloc] initWithFrame: rcGraphFrame]; // 1値汎用
 					mGvBp.ppE2records = e2recs;
 					mGvBp.ppPage = mPage;
 					mGvBp.ppRecordWidth = fRw;
 					//mGvBp.ppFont = ibLbFont.font;
 					[ibScrollView addSubview:mGvBp];
-					CGRect rc = rcgv;
-					rc.size.height = 30; //上ラベル位置
-					[self labelGraphRect:rc  text:NSLocalizedString(@"Graph BpHi",nil)];
-					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph BpLo",nil)];
+					CGRect rc = rcGraphFrame;
+					NSLog(@"rcGraphFrame.size.height=%.02f", rcGraphFrame.size.height);
+					//上ラベル
+					rc.origin.y += 5;
+					rc.size.height = 30;
+					[self labelGraphRect:rc  text:NSLocalizedString(@"Graph BpHi",nil) color:[UIColor redColor]];
+					if (bBpMean) {	//平均血圧
+						rc.origin.y += (rcGraphFrame.size.height/4.0);
+						if (95 < rcGraphFrame.size.height) {  //衝突回避
+							[self labelGraphRect:rc  text:NSLocalizedString(@"Graph BpMean",nil) color:[UIColor whiteColor]];
+						}
+					}
+					//下ラベル
+					rc.origin.y = rcGraphFrame.origin.y + rcGraphFrame.size.height - 35;
+					if (bBpPress) {	//脈圧
+						if (70 < rcGraphFrame.size.height) {  //衝突回避
+							[self labelGraphRect:rc  text:NSLocalizedString(@"Graph BpPress",nil) color:[UIColor whiteColor]];
+						}
+						rc.origin.y -= (rcGraphFrame.size.height/4.0);
+					}
+					[self labelGraphRect:rc  text:NSLocalizedString(@"Graph BpLo",nil) color:[UIColor blueColor]];
 				} else {
 					mGvBp.ppE2records = e2recs;
 					mGvBp.ppPage = mPage;
@@ -196,12 +221,12 @@
 				}
 				break;
 			case EnumConditionBpLo:
-				//この後、rcgv.origin.y += fHeight; のみ通す
+				//この後、rcGraphFrame.origin.y += fHeight; のみ通す
 				break; //EnumConditionBpHi:にて処理済み
 				
 			case EnumConditionPuls:
 				if (mGvPuls==nil) {
-					mGvPuls = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
+					mGvPuls = [[GViewLine alloc] initWithFrame: rcGraphFrame]; // 1値汎用
 					mGvPuls.ppE2records = e2recs;
 					mGvPuls.ppPage = mPage;
 					mGvPuls.ppRecordWidth = fRw;
@@ -212,20 +237,20 @@
 					mGvPuls.ppMin = E2_nPuls_MIN;
 					mGvPuls.ppMax = E2_nPuls_MAX;
 					[ibScrollView addSubview:mGvPuls];
-					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph Pulse",nil)];
+					[self labelGraphRect:rcGraphFrame  text:NSLocalizedString(@"Graph Pulse",nil) color:[UIColor darkGrayColor]];
 				} else {
 					mGvPuls.ppE2records = e2recs;
 					mGvPuls.ppPage = mPage;
 					mGvPuls.ppRecordWidth = fRw;
 					//mGvPuls.ppFont = ibLbFont.font;
-					[mGvPuls setFrame:rcgv];
+					[mGvPuls setFrame:rcGraphFrame];
 					[mGvPuls setNeedsDisplay]; //drawRect:が呼び出される
 				}
 				break;
 				
 			case EnumConditionWeight:		//------------------------------------------------------体重
 				if (mGvWeight==nil) {
-					mGvWeight = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
+					mGvWeight = [[GViewLine alloc] initWithFrame: rcGraphFrame]; // 1値汎用
 					mGvWeight.ppE2records = e2recs;
 					mGvWeight.ppPage = mPage;
 					mGvWeight.ppRecordWidth = fRw;
@@ -236,21 +261,28 @@
 					mGvWeight.ppMax = E2_nWeight_MAX;
 					mGvWeight.ppBMI_Tall = mBMI_Tall;
 					[ibScrollView addSubview:mGvWeight];
-					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph Weight",nil)];
+					CGRect rc = rcGraphFrame;
+					if (0 < mBMI_Tall) {	//BMI
+						if (70 < rcGraphFrame.size.height) {  //衝突回避
+							[self labelGraphRect:rc  text:NSLocalizedString(@"Graph BMI",nil) color:[UIColor whiteColor]];
+							rc.origin.y -= (rcGraphFrame.size.height/4.0);
+						}
+					}
+					[self labelGraphRect:rc text:NSLocalizedString(@"Graph Weight",nil) color:[UIColor darkGrayColor]];
 				} else {
 					mGvWeight.ppE2records = e2recs;
 					mGvWeight.ppPage = mPage;
 					mGvWeight.ppRecordWidth = fRw;
 					mGvWeight.ppBMI_Tall = mBMI_Tall;
 					//mGvWeight.ppFont = ibLbFont.font;
-					[mGvWeight setFrame:rcgv];
+					[mGvWeight setFrame:rcGraphFrame];
 					[mGvWeight setNeedsDisplay]; //drawRect:が呼び出される
 				}
 				break;
 				
 			case EnumConditionTemp:			//------------------------------------------------------体温
 				if (mGvTemp==nil) {
-					mGvTemp = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
+					mGvTemp = [[GViewLine alloc] initWithFrame: rcGraphFrame]; // 1値汎用
 					mGvTemp.ppE2records = e2recs;
 					mGvTemp.ppPage = mPage;
 					mGvTemp.ppRecordWidth = fRw;
@@ -261,20 +293,20 @@
 					mGvTemp.ppMin = E2_nTemp_MIN;
 					mGvTemp.ppMax = E2_nTemp_MAX;
 					[ibScrollView addSubview:mGvTemp];
-					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph Temp",nil)];
+					[self labelGraphRect:rcGraphFrame  text:NSLocalizedString(@"Graph Temp",nil) color:[UIColor darkGrayColor]];
 				} else {
 					mGvTemp.ppE2records = e2recs;
 					mGvTemp.ppPage = mPage;
 					mGvTemp.ppRecordWidth = fRw;
 					//mGvTemp.ppFont = ibLbFont.font;
-					[mGvTemp setFrame:rcgv];
+					[mGvTemp setFrame:rcGraphFrame];
 					[mGvTemp setNeedsDisplay]; //drawRect:が呼び出される
 				}
 				break;
 				
 			case EnumConditionPedo:		//------------------------------------------------------歩数
 				if (mGvPedo==nil) {
-					mGvPedo = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
+					mGvPedo = [[GViewLine alloc] initWithFrame: rcGraphFrame]; // 1値汎用
 					mGvPedo.ppE2records = e2recs;
 					mGvPedo.ppPage = mPage;
 					mGvPedo.ppRecordWidth = fRw;
@@ -285,20 +317,20 @@
 					mGvPedo.ppMin = E2_nPedometer_MIN;
 					mGvPedo.ppMax = E2_nPedometer_MAX;
 					[ibScrollView addSubview:mGvPedo];
-					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph Pedo",nil)];
+					[self labelGraphRect:rcGraphFrame  text:NSLocalizedString(@"Graph Pedo",nil) color:[UIColor darkGrayColor]];
 				} else {
 					mGvPedo.ppE2records = e2recs;
 					mGvPedo.ppPage = mPage;
 					mGvPedo.ppRecordWidth = fRw;
 					//mGvPedo.ppFont = ibLbFont.font;
-					[mGvPedo setFrame:rcgv];
+					[mGvPedo setFrame:rcGraphFrame];
 					[mGvPedo setNeedsDisplay]; //drawRect:が呼び出される
 				}
 				break;
 				
 			case EnumConditionFat:			//------------------------------------------------------体脂肪率
 				if (mGvFat==nil) {
-					mGvFat = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
+					mGvFat = [[GViewLine alloc] initWithFrame: rcGraphFrame]; // 1値汎用
 					mGvFat.ppE2records = e2recs;
 					mGvFat.ppPage = mPage;
 					mGvFat.ppRecordWidth = fRw;
@@ -309,20 +341,20 @@
 					mGvFat.ppMin = E2_nBodyFat_MIN;
 					mGvFat.ppMax = E2_nBodyFat_MAX;
 					[ibScrollView addSubview:mGvFat];
-					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph Fat",nil)];
+					[self labelGraphRect:rcGraphFrame  text:NSLocalizedString(@"Graph Fat",nil) color:[UIColor darkGrayColor]];
 				} else {
 					mGvFat.ppE2records = e2recs;
 					mGvFat.ppPage = mPage;
 					mGvFat.ppRecordWidth = fRw;
 					//mGvFat.ppFont = ibLbFont.font;
-					[mGvFat setFrame:rcgv];
+					[mGvFat setFrame:rcGraphFrame];
 					[mGvFat setNeedsDisplay]; //drawRect:が呼び出される
 				}
 				break;
 				
 			case EnumConditionSkm:			//------------------------------------------------------骨格筋率
 				if (mGvSkm==nil) {
-					mGvSkm = [[GViewLine alloc] initWithFrame: rcgv]; // 1値汎用
+					mGvSkm = [[GViewLine alloc] initWithFrame: rcGraphFrame]; // 1値汎用
 					mGvSkm.ppE2records = e2recs;
 					mGvSkm.ppPage = mPage;
 					mGvSkm.ppRecordWidth = fRw;
@@ -333,12 +365,12 @@
 					mGvSkm.ppMin = E2_nSkMuscle_MIN;
 					mGvSkm.ppMax = E2_nSkMuscle_MAX;
 					[ibScrollView addSubview:mGvSkm];
-					[self labelGraphRect:rcgv  text:NSLocalizedString(@"Graph Skm",nil)];
+					[self labelGraphRect:rcGraphFrame  text:NSLocalizedString(@"Graph Skm",nil) color:[UIColor darkGrayColor]];
 				} else {
 					mGvSkm.ppE2records = e2recs;
 					mGvSkm.ppPage = mPage;
 					mGvSkm.ppRecordWidth = fRw;
-					[mGvSkm setFrame:rcgv];
+					[mGvSkm setFrame:rcGraphFrame];
 					[mGvSkm setNeedsDisplay]; //drawRect:が呼び出される
 				}
 				break;
@@ -348,7 +380,7 @@
 				assert(NO);
 				break;
 		}
-		rcgv.origin.y += fHeight;
+		rcGraphFrame.origin.y += fHeight;
 	}
 	// スクロール初期位置	// animation_after:にて処理
 }
@@ -377,7 +409,7 @@ NSInteger afterPageChange = 0;
 
 	// アニメ準備
 	[UIView beginAnimations:nil context:NULL];
-	[UIView setAnimationDuration: 0.7];
+	[UIView setAnimationDuration: 0.8];
 	[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
 	
 	ibScrollView.alpha = 1;
@@ -387,25 +419,26 @@ NSInteger afterPageChange = 0;
 }
 
 - (void)graphViewPageChange:(NSInteger)pageChange animated:(BOOL)animated
-{
+{	// アニメ： 消してから書く
 	afterPageChange = pageChange;
 	if (animated) {
+		ibScrollView.alpha = 0;
 		// アニメ準備
 		[UIView beginAnimations:nil context:NULL];
-		[UIView setAnimationDuration: 0.7];
+		[UIView setAnimationDuration: 0.3];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
 		[UIView setAnimationDelegate:self];
 		[UIView setAnimationDidStopSelector:@selector(animation_after)]; //アニメーション終了後に呼び出す＜＜setAnimationDelegate必要
 	}
-	// アニメ終了状態
-	ibScrollView.alpha = 0.1;
-	[self graphViewPageChange:pageChange];// この中で、mPageが更新される
 	
+	// アニメ終了状態
+	ibScrollView.alpha = 0;
+	[self graphViewPageChange:pageChange];// この中で、mPageが更新される
+
 	if (animated) {
 		// アニメ実行
 		[UIView commitAnimations];
 	} else {
-		[mActIndicator stopAnimating];
 		[self animation_after]; //アニメーション終了後に呼び出す
 	}
 }
@@ -463,6 +496,7 @@ NSInteger afterPageChange = 0;
 	ibScrollView.delegate = self; // <UIScrollViewDelegate>
 	ibScrollView.directionalLockEnabled = YES;
 	ibScrollView.pagingEnabled = NO;
+	ibScrollView.alpha = 0;
 	
 	if (mActIndicator==nil) {
 		mActIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
@@ -489,7 +523,6 @@ NSInteger afterPageChange = 0;
 	rc.origin.x = (self.view.frame.size.width - rc.size.width) / 2.0;
 	ibViewRecord.frame = rc;
 	// 再描画
-	[self drawClear];
 	[self graphViewPageChange:0  animated:YES];
 	//
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
@@ -526,8 +559,11 @@ NSInteger afterPageChange = 0;
 
 	if (mSliderOneWidth) {
 		//注意// 回転対応のため、同じものが didRotateFromInterfaceOrientation:にもある
-		mSliderOneWidth.frame = CGRectMake(-14+(self.view.frame.size.width+ONE_WID_MIN*mPadScale)/2.0, 10,
-									  (ONE_WID_MAX-ONE_WID_MIN)*2.0*mPadScale, 20);		//幅2倍にして操作しやすくした
+		mSliderOneWidth.frame =
+					CGRectMake(-14+(self.view.frame.size.width+ONE_WID_MIN*mPadScale)/2.0,
+				   0,
+				   (ONE_WID_MAX-ONE_WID_MIN)*2.0*mPadScale,
+					20);		//幅2倍にして操作しやすくした
 		NSInteger iVal = [[kvs objectForKey:KVS_SettGraphOneWid] integerValue];
 		if (iVal<ONE_WID_MIN OR ONE_WID_MAX<iVal) {
 			iVal = ONE_WID_MIN;
@@ -548,7 +584,7 @@ NSInteger afterPageChange = 0;
 	
 	mPageMax = 999; // この時点で最終ページは不明
 	mPage = 0;
-	[self graphViewPageChange:0  animated:NO];
+	[self graphViewPageChange:0  animated:YES];
 	//右端へ移動
 	ibScrollView.contentOffset = 
 	CGPointMake(ibScrollView.contentSize.width - ibScrollView.bounds.size.width, 0);
@@ -573,6 +609,24 @@ NSInteger afterPageChange = 0;
 	//return YES; //[0.9]ヨコにすると「血圧の日変動分布」グラフ表示する
 }
 
+- (void)slowHide
+{
+	// アニメ準備
+	[UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationDuration: 0.3];
+	[UIView setAnimationCurve:UIViewAnimationCurveEaseIn];	//Slow start.
+	// アニメ終了状態
+	ibScrollView.alpha = 0;
+	
+	// アニメ実行
+	[UIView commitAnimations];
+}
+
+- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{	// 回転開始、表示を消す
+	[self slowHide];
+}
+
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {	// 回転した後に呼び出される
 	[mAppDelegate adRefresh];
@@ -580,12 +634,13 @@ NSInteger afterPageChange = 0;
 		mSliderOneWidth.frame = CGRectMake(-14+(self.view.frame.size.width+ONE_WID_MIN*mPadScale)/2.0, 10,
 										   (ONE_WID_MAX-ONE_WID_MIN)*2.0*mPadScale, 20);		//幅2倍にして操作しやすくした
 	}
-	[self graphViewPageChange:0  animated:NO];	//再描画
+	[self graphViewPageChange:0 animated:YES];	//再描画
 }
 
 
 - (void)viewDidDisappear:(BOOL)animated
 {
+	[self slowHide];
 	[self drawClear];
 	[super viewDidDisappear:animated];
 }

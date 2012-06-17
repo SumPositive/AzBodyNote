@@ -16,9 +16,9 @@
 #define STORE_PRODUCTID_UNLOCK		@"com.azukid.AzBodyNote.Unlock"
 
 // NSNotification messages
-#define NFM_REFRESH_ALL_VIEWS			@"RefreshAllViews"
-#define NFM_REFETCH_ALL_DATA			@"RefetchAllDatabaseData"
-#define NFM_AppDidBecomeActive			@"AppDidBecomeActive"
+#define NFM_REFRESH_ALL_VIEWS			@"RefreshAllViews"					//表示のみ更新要求
+#define NFM_REFETCH_ALL_DATA			@"RefetchAllDatabaseData"		//リロード更新要求
+#define NFM_AppDidBecomeActive			@"AppDidBecomeActive"			//バックグランドから戻った
 
 // Dropbox
 #define DBOX_KEY										@"qq4oke7nx6f8ivj"

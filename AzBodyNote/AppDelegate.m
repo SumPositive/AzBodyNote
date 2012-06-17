@@ -16,7 +16,7 @@
 //#import "DropboxVC.h"
 
 
-#define CoreData_iCloud_SYNC		YES		// YES or NO
+#define CoreData_iCloud_SYNC		NO		// YES or NO
 
 //@interface AppDelegate (PrivateMethods)
 //- (NSManagedObjectContext *)managedObjectContext;
@@ -135,9 +135,9 @@
 		NSArray *aPanels = [[NSArray alloc] initWithObjects:
 							[NSNumber numberWithInteger: EnumConditionBpHi	* (-1)],		//*(-1):Graph表示する
 							[NSNumber numberWithInteger: EnumConditionBpLo	* (-1)],		//*(-1):Graph表示する
-							[NSNumber numberWithInteger: EnumConditionPuls	* (-1)],		//*(-1):Graph表示する
+							[NSNumber numberWithInteger: EnumConditionPuls],
 							[NSNumber numberWithInteger: EnumConditionNote],
-							[NSNumber numberWithInteger: EnumConditionWeight],
+							[NSNumber numberWithInteger: EnumConditionWeight	* (-1)],	 //*(-1):Graph表示する
 							[NSNumber numberWithInteger: EnumConditionTemp],
 							[NSNumber numberWithInteger: EnumConditionPedo],
 							[NSNumber numberWithInteger: EnumConditionFat],
@@ -160,6 +160,9 @@
 	if (![kvs objectForKey:KVS_SettGraphOneWid])		//[0.10]Graph1本の幅(iPhoneサイズ基準)の初期値
 			[kvs setObject:[NSNumber numberWithInt:40] forKey:KVS_SettGraphOneWid];
 	
+	if (![kvs boolForKey:KVS_SettGraphBpMean])	[kvs setBool:YES		forKey:KVS_SettGraphBpMean]; //平均
+	if (![kvs boolForKey:KVS_SettGraphBpPress])	[kvs setBool:YES		forKey:KVS_SettGraphBpPress]; //脈圧
+
 	[kvs synchronize];
 	
 	if (__app_is_unlock==NO) {
@@ -365,12 +368,26 @@
 
 #pragma mark - iCloud
 
+// iCloud完全クリアする　＜＜＜同期矛盾が生じたときや構造変更時に使用
+- (void)iCloudAllClear
+{
+	// iCloudサーバー上のゴミデータ削除
+	NSURL *icloudURL = [[NSFileManager defaultManager] URLForUbiquityContainerIdentifier:nil];
+	NSError *err;
+	[[NSFileManager defaultManager] removeItemAtURL:icloudURL error:&err];
+	if (err) {
+		GA_TRACK_ERROR([err localizedDescription])
+	} else {
+		NSLog(@"iCloud: Removed %@", icloudURL);
+	}
+}
+
 - (void)mergeiCloudChanges:(NSNotification*)notification forContext:(NSManagedObjectContext*)moc 
 {
 	NSLog(@"mergeiCloudChanges: notification=%@", notification);
     [moc mergeChangesFromContextDidSaveNotification:notification]; 
 	
-    NSNotification* refreshNotification = [NSNotification notificationWithName:NFM_REFRESH_ALL_VIEWS
+    NSNotification* refreshNotification = [NSNotification notificationWithName:NFM_REFETCH_ALL_DATA
 																		object:self  userInfo:[notification userInfo]];
     [[NSNotificationCenter defaultCenter] postNotification:refreshNotification];
 }
@@ -443,18 +460,42 @@
 			//@"5C2UYK6F45.com.azukid.*"  ＜＜＜<individual ID>は、<Company ID>と同じ契約固有コード。
 			NSURL *cloudURL = [fileManager URLForUbiquityContainerIdentifier:nil]; //.entitlementsから自動取得されるようになった。
 			NSLog(@"cloudURL=1=%@", cloudURL);
+			NSURL *tlogURL = nil;
 			if (cloudURL) {
 				// アプリ内のコンテンツ名付加：["coredata"]　＜＜＜変わると共有できない。
 				//NSString* coreDataCloudContent = [[cloudURL path] stringByAppendingPathComponent:@"coredata"];
 				//cloudURL = [NSURL fileURLWithPath:coreDataCloudContent];
-				cloudURL = [cloudURL URLByAppendingPathComponent:@"coredata"];
+				cloudURL = [cloudURL URLByAppendingPathComponent:@"Documents" isDirectory:YES];
+				tlogURL = [cloudURL URLByAppendingPathComponent:@"TLOG" isDirectory:YES];
 				NSLog(@"cloudURL=2=%@", cloudURL);
+				NSLog(@"tlogURL=2=%@", tlogURL);
 
+				BOOL exists, isDir;
+				[fileManager createDirectoryAtURL:cloudURL withIntermediateDirectories:NO attributes:nil error:nil];
+				exists = [fileManager fileExistsAtPath:[cloudURL relativePath] isDirectory:&isDir];
+				if (exists && isDir) {
+					[fileManager createDirectoryAtURL:tlogURL withIntermediateDirectories:NO attributes:nil error:nil];   
+					exists = [fileManager fileExistsAtPath:[tlogURL relativePath] isDirectory:&isDir];
+					//directory exists
+					if (exists && isDir) {
+					} else{
+						tlogURL = nil;
+						GA_TRACK_ERROR(@"tlogURL==nil;")
+					}
+				} else{
+					tlogURL = nil;
+					GA_TRACK_ERROR(@"tlogURL==nil;")
+				}
+			} else{
+				GA_TRACK_ERROR(@"cloudURL==nil;")
+			}
+			
+			if (cloudURL && tlogURL) {
 				options = [NSDictionary dictionaryWithObjectsAndKeys:
 						   [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
 						   [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption,
 						   @"com.azukid.AzBodyNote.sqlog", NSPersistentStoreUbiquitousContentNameKey,		//【重要】リリース後変更禁止
-						   cloudURL, NSPersistentStoreUbiquitousContentURLKey,													//【重要】リリース後変更禁止
+						   tlogURL, NSPersistentStoreUbiquitousContentURLKey,													//【重要】リリース後変更禁止
 						   nil];
 			} else {
 				// iCloud is not available
@@ -472,7 +513,7 @@
 			if (![psc addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeUrl options:options error:&error]) 
 			{
 				NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-				GA_TRACK_EVENT_ERROR([error description],0);
+				GA_TRACK_ERROR([error localizedDescription]);
 				abort();
 			}
 			[psc unlock];

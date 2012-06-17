@@ -8,8 +8,6 @@
 #import "GViewDate.h"
 #import "GraphVC.h"
 
-#define SPACE_Y				5.0
-
 
 @implementation GViewDate
 @synthesize ppE2records, ppPage, ppRecordWidth;
@@ -29,6 +27,38 @@
     return self;
 }
 
+- (void)imageGraph:(CGContextRef)cgc center:(CGPoint)po  DtOp:(DateOpt)dtop
+{
+	UIImage *img = nil;
+	switch (dtop) {
+		case DtOpWake:
+			img = [UIImage imageNamed:@"Icon20-Wake"];
+			break;
+		case DtOpRest:
+			img = [UIImage imageNamed:@"Icon20-Rest"];
+			break;
+		case DtOpDown:
+			img = [UIImage imageNamed:@"Icon20-Down"];
+			break;
+		case DtOpSleep:
+			img = [UIImage imageNamed:@"Icon20-Sleep"];
+			break;
+		case DtOpEnd: // GOAL
+			img = [UIImage imageNamed:@"Icon20-Goal"];
+			break;
+		default:
+			return;
+	}
+	CGRect rc = CGRectMake(po.x-img.size.width/2.0, po.y-img.size.height/2.0, 
+						   img.size.width, img.size.height);
+	
+	CGContextSaveGState(cgc); //PUSH
+	{
+		CGContextSetAlpha(cgc, 0.7);
+		CGContextDrawImage(cgc, rc, img.CGImage);
+	}
+	CGContextRestoreGState(cgc); //POP
+}
 
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.
@@ -74,13 +104,17 @@
 
 	CGPoint po;
 	po.x = self.bounds.size.width - self.ppRecordWidth/2.0;
-	po.y = SPACE_Y;
+	po.y = 2.0;	//Base Line
 	
 	if (self.ppPage==0) { 
 		//Goal
 		if (bGoal) {
 			cc = [[NSString stringWithString:@"Goal"] UTF8String];
-			CGContextShowTextAtPoint (cgc, po.x-15*mPadScale, po.y+1*mPadScale, cc, strlen(cc));
+			CGContextShowTextAtPoint (cgc, po.x-15*mPadScale, po.y+22, cc, strlen(cc));
+			//アイコン
+			CGPoint poImg = po;
+			poImg.y += 10;
+			[self imageGraph:cgc center:poImg DtOp:DtOpEnd]; //Goal Image
 		}
 		po.x -= self.ppRecordWidth;
 	}
@@ -98,17 +132,22 @@
 			// 月/日
 			cc = [[NSString stringWithFormat:@"%d/%d", comp.month, comp.day] UTF8String];
 			if (4 < strlen(cc)) {
-				CGContextShowTextAtPoint (cgc, po.x-15*mPadScale, po.y+12*mPadScale, cc, strlen(cc));
+				CGContextShowTextAtPoint (cgc, po.x-15*mPadScale, po.y+22+12*mPadScale, cc, strlen(cc));
 			} else {
-				CGContextShowTextAtPoint (cgc, po.x-10*mPadScale, po.y+12*mPadScale, cc, strlen(cc));
+				CGContextShowTextAtPoint (cgc, po.x-10*mPadScale, po.y+22+12*mPadScale, cc, strlen(cc));
 			}
 			// 時:分
 			cc = [[NSString stringWithFormat:@"%d:%d", comp.hour, comp.minute] UTF8String];
 			if (4 < strlen(cc)) {
-				CGContextShowTextAtPoint (cgc, po.x-15*mPadScale, po.y+1*mPadScale, cc, strlen(cc));
+				CGContextShowTextAtPoint (cgc, po.x-15*mPadScale, po.y+22, cc, strlen(cc));
 			} else {
-				CGContextShowTextAtPoint (cgc, po.x-10*mPadScale, po.y+1*mPadScale, cc, strlen(cc));
+				CGContextShowTextAtPoint (cgc, po.x-10*mPadScale, po.y+22, cc, strlen(cc));
 			}
+			//アイコン
+			CGPoint poImg = po;
+			poImg.y += 10;
+			[self imageGraph:cgc center:poImg DtOp:[e2.nDateOpt integerValue]];
+			
 			po.x -= self.ppRecordWidth;
 		}
 	}

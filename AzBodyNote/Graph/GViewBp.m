@@ -29,7 +29,7 @@ CGPoint		poValGoal[bpEnd ];
 NSInteger	pValMin, pValMax;
 NSInteger	pValue[bpEnd][GRAPH_PAGE_LIMIT+GRAPH_DAYS_SAFE+1];
 CGPoint		poValue[bpEnd][GRAPH_PAGE_LIMIT+GRAPH_DAYS_SAFE+1];
-DateOpt		pDtOpValue[GRAPH_PAGE_LIMIT+GRAPH_DAYS_SAFE+1];
+//DateOpt		pDtOpValue[GRAPH_PAGE_LIMIT+GRAPH_DAYS_SAFE+1];
 NSInteger	pValueCount = 0;
 
 
@@ -47,42 +47,8 @@ NSInteger	pValueCount = 0;
     return self;
 }
 
-
-- (void)imageGraph:(CGContextRef)cgc center:(CGPoint)po  DtOp:(DateOpt)dtop
-{
-	UIImage *img = nil;
-	switch (dtop) {
-		case DtOpWake:
-			img = [UIImage imageNamed:@"Icon20-Wake"];
-			break;
-		case DtOpRest:
-			img = [UIImage imageNamed:@"Icon20-Rest"];
-			break;
-		case DtOpDown:
-			img = [UIImage imageNamed:@"Icon20-Down"];
-			break;
-		case DtOpSleep:
-			img = [UIImage imageNamed:@"Icon20-Sleep"];
-			break;
-		case DtOpEnd: // GOAL
-			img = [UIImage imageNamed:@"Icon20-Goal"];
-			break;
-		default:
-			return;
-	}
-	CGRect rc = CGRectMake(po.x-img.size.width/2.0, po.y-img.size.height/2.0, 
-						   img.size.width, img.size.height);
-	
-	CGContextSaveGState(cgc); //PUSH
-	{
-		CGContextSetAlpha(cgc, 0.7);
-		CGContextDrawImage(cgc, rc, img.CGImage);
-	}
-	CGContextRestoreGState(cgc); //POP
-}
-
-
-- (void)drawPoint:(CGContextRef)cgc  value:(float)value  po:(CGPoint)po  upper:(BOOL)upper		
+- (void)drawPoint:(CGContextRef)cgc  value:(float)value  po:(CGPoint)po  upper:(BOOL)upper
+				R:(CGFloat)pRed  G:(CGFloat)pGreen  B:(CGFloat)pBlue  A:(CGFloat)pAlpha
 {
 	const char *cc;
 	long lg = (long)(value * 10.0);
@@ -103,7 +69,8 @@ NSInteger	pValueCount = 0;
 		// 数値	// 文字列の設定
 		CGContextSelectFont (cgc, "Helvetica", FONT_SIZE*mPadScale, kCGEncodingMacRoman);
 		CGContextSetTextDrawingMode (cgc, kCGTextFill);
-		CGContextSetGrayFillColor(cgc, 0, 1);
+		//CGContextSetGrayFillColor(cgc, 0, 1);
+		CGContextSetRGBFillColor (cgc, pRed, pGreen, pBlue, pAlpha); //文字色
 		
 		size_t  slen = strlen(cc);
 #ifdef NG_SLANT_TYPE
@@ -178,9 +145,9 @@ NSInteger	pValueCount = 0;
 					po.y += fGapHiLo/2.0;
 					[self imageGraph:cgc center:po DtOp:DtOpEnd]; //Goal Image
 				}*/
-				po = poValGoal[bpHi];
+			/*	po = poValGoal[bpHi];
 				po.y = self.frame.size.height - 12;
-				[self imageGraph:cgc center:po DtOp:DtOpEnd]; //Goal Image
+				[self imageGraph:cgc center:po DtOp:DtOpEnd]; //Goal Image*/
 				bLine = YES;
 			} else {
 				bLine = NO;
@@ -190,22 +157,22 @@ NSInteger	pValueCount = 0;
 					//po = poValGoal[bpHi];
 					//po.y -= IMAGE_GAP_MIN/2.0;
 					//[self imageGraph:cgc center:po DtOp:DtOpEnd];
-					po = poValGoal[bpHi];
+				/*	po = poValGoal[bpHi];
 					po.y = self.frame.size.height - 12;
-					[self imageGraph:cgc center:po DtOp:DtOpEnd]; //Goal Image
+					[self imageGraph:cgc center:po DtOp:DtOpEnd]; //Goal Image*/
 				}
-				[self drawPoint:cgc value:pValGoal[bpHi] po:poValGoal[bpHi] upper:YES];
+				[self drawPoint:cgc value:pValGoal[bpHi] po:poValGoal[bpHi] upper:YES  R:1 G:0 B:0 A:0.8];
 			}
 			if (0<pValGoal[bpLo]) {
 				if (bLine==NO) {
 					//po = poValGoal[bpLo];
 					//po.y += IMAGE_GAP_MIN/2.0;
 					//[self imageGraph:cgc center:po DtOp:DtOpEnd];
-					po = poValGoal[bpLo];
+				/*	po = poValGoal[bpLo];
 					po.y = self.frame.size.height - 12;
-					[self imageGraph:cgc center:po DtOp:DtOpEnd]; //Goal Image
+					[self imageGraph:cgc center:po DtOp:DtOpEnd]; //Goal Image*/
 				}
-				[self drawPoint:cgc value:pValGoal[bpLo] po:poValGoal[bpLo] upper:NO];
+				[self drawPoint:cgc value:pValGoal[bpLo] po:poValGoal[bpLo] upper:NO  R:0 G:0 B:1 A:0.8];
 			}
 		}
 	}
@@ -231,9 +198,9 @@ NSInteger	pValueCount = 0;
 				po.y += fGapHiLo/2.0;
 				[self imageGraph:cgc center:po DtOp:pDtOpValue[ii]];
 			}*/
-			po = poValue[bpHi][ii];
+		/*	po = poValue[bpHi][ii];
 			po.y = self.frame.size.height - 10;
-			[self imageGraph:cgc center:po DtOp:pDtOpValue[ii]];
+			[self imageGraph:cgc center:po DtOp:pDtOpValue[ii]];*/
 			bLine = YES;
 		} else {
 			bLine = NO;
@@ -252,12 +219,12 @@ NSInteger	pValueCount = 0;
 					po.y += fGapHiLo/2.0;
 					[self imageGraph:cgc center:po DtOp:pDtOpValue[ii]];
 				}*/
-				po = poValue[bpHi][ii];
+			/*	po = poValue[bpHi][ii];
 				po.y = self.frame.size.height - 10;
-				[self imageGraph:cgc center:po DtOp:pDtOpValue[ii]];
+				[self imageGraph:cgc center:po DtOp:pDtOpValue[ii]];*/
 			}
 			poBpHi[iCntBpHi++] = poValue[bpHi][ii];	//時系列折れ線のため
-			[self drawPoint:cgc value:pValue[bpHi][ii] po:poValue[bpHi][ii] upper:YES];
+			[self drawPoint:cgc value:pValue[bpHi][ii] po:poValue[bpHi][ii] upper:YES  R:1 G:0 B:0 A:0.8];
 		}
 		if (0<pValue[bpLo][ii]) {
 			if (bLine==NO) {
@@ -273,42 +240,43 @@ NSInteger	pValueCount = 0;
 					po.y += fGapHiLo/2.0;
 					[self imageGraph:cgc center:po DtOp:pDtOpValue[ii]];
 				}*/
-				po = poValue[bpLo][ii];
+			/*	po = poValue[bpLo][ii];
 				po.y = self.frame.size.height - 10;
-				[self imageGraph:cgc center:po DtOp:pDtOpValue[ii]];
+				[self imageGraph:cgc center:po DtOp:pDtOpValue[ii]];*/
 			}
 			poBpLo[iCntBpLo++] = poValue[bpLo][ii];	//時系列折れ線のため
-			[self drawPoint:cgc value:pValue[bpLo][ii] po:poValue[bpLo][ii] upper:NO];
+			[self drawPoint:cgc value:pValue[bpLo][ii] po:poValue[bpLo][ii] upper:NO  R:0 G:0 B:1 A:0.8];
 		}
 		
 		if (mBpMean && 0<pValue[bpMean][ii]) {	//平均血圧
 			poBpMean[iCntBpMean++] = poValue[bpMean][ii];	//時系列折れ線のため
-			[self drawPoint:cgc value:pValue[bpMean][ii] po:poValue[bpMean][ii] upper:YES];
+			[self drawPoint:cgc value:pValue[bpMean][ii] po:poValue[bpMean][ii] upper:YES  R:1 G:1 B:1 A:0.6];
 		}
 		if (mBpPress && 0<pValue[bpPress][ii]) {	//脈圧
 			poBpPress[iCntBpPress++] = poValue[bpPress][ii];	//時系列折れ線のため
-			[self drawPoint:cgc value:pValue[bpPress][ii] po:poValue[bpPress][ii] upper:NO];
+			[self drawPoint:cgc value:pValue[bpPress][ii] po:poValue[bpPress][ii] upper:NO  R:1 G:1 B:1 A:0.6];
 		}
 	}
+
 	//------------------------------------------------------------------------------時系列折れ線
 	//BpHi
 	CGContextSetLineWidth(cgc, 1.0); //太さ
-	CGContextSetRGBStrokeColor(cgc, 1, 0, 0, 0.8);
+	CGContextSetRGBStrokeColor(cgc, 1, 0, 0, 0.8);	//赤
 	CGContextAddLines(cgc, poBpHi, iCntBpHi);
 	CGContextStrokePath(cgc);
 	// BpLo
-	CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 0.8);
+	CGContextSetRGBStrokeColor(cgc, 0, 0, 1, 0.8);	//青
 	CGContextAddLines(cgc, poBpLo, iCntBpLo);
 	CGContextStrokePath(cgc);
 	// BpMean 平均血圧
 	if (mBpMean) {
-		CGContextSetRGBStrokeColor(cgc, 1, 1, 1, 0.6);
+		CGContextSetRGBStrokeColor(cgc, 1, 1, 1, 0.6);	//白
 		CGContextAddLines(cgc, poBpMean, iCntBpMean);
 		CGContextStrokePath(cgc);
 	}
 	// BpPress　脈圧
 	if (mBpPress) {
-		CGContextSetRGBStrokeColor(cgc, 1, 1, 1, 0.6);
+		CGContextSetRGBStrokeColor(cgc, 1, 1, 1, 0.6);	//白
 		CGContextAddLines(cgc, poBpPress, iCntBpPress);
 		CGContextStrokePath(cgc);
 	}
@@ -360,7 +328,7 @@ NSInteger	pValueCount = 0;
 			}
 		}
 		
-		pDtOpValue[pValueCount] = [e2.nDateOpt integerValue];	
+		//pDtOpValue[pValueCount] = [e2.nDateOpt integerValue];	
 		pValueCount++;
 		//NG//if (GRAPH_PAGE_LIMIT <= pValueCount) break; // OK
 	}
@@ -386,7 +354,7 @@ NSInteger	pValueCount = 0;
 	CGContextSetGrayFillColor(cgc, 0.75, 1.0); // スクロール領域外と同じグレー
 	CGContextFillRect(cgc, rc);
 	
-	CGFloat fSpaceY = self.ppRecordWidth / 2.0;	//縦棒の上下余白
+	CGFloat fSpaceY = 16 * mPadScale;	//self.ppRecordWidth / 2.0;	//縦棒の上下余白
 	//--------------------------------------------------------------------------プロット
 	CGFloat fYstep = (rect.size.height - fSpaceY*2.0) / (pValMax - pValMin);  //上下余白を考慮したＹ座標スケール
 	CGPoint po;	// 描画範囲(rect)に収まるようにプロットした座標

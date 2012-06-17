@@ -49,7 +49,8 @@
 	ibScrollView.delegate = self; // <UIScrollViewDelegate>
 	ibScrollView.directionalLockEnabled = NO;
 	ibScrollView.pagingEnabled = NO;
-
+	ibScrollView.alpha = 0;
+	
 	[ibSegment setTitle:NSLocalizedString(@"Stat Seg0 Hi-Lo",nil) forSegmentAtIndex:0];
 	[ibSegment setTitle:NSLocalizedString(@"Stat Seg1 24H",nil) forSegmentAtIndex:1];
 	ibSegment.selectedSegmentIndex = [[kvs objectForKey:KVS_SettStatType] integerValue];
@@ -91,35 +92,20 @@
 	[ibScrollView addSubview:mSvBp];
 }
 
-- (void)animation_after
-{
-	//[mActIndicator stopAnimating];
-	
-	// アニメ準備
-	[UIView beginAnimations:nil context:NULL];
-	[UIView setAnimationDuration: 0.7];
-	[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
-	
-	ibScrollView.alpha = 1;
-	
-	// アニメ実行
-	[UIView commitAnimations];
-}
-
 - (void)graphViewAnimated:(BOOL)animated
 {
 	if (animated) {
-		ibScrollView.alpha = 0.2;
+		ibScrollView.alpha = 0;
 		// アニメ準備
 		[UIView beginAnimations:nil context:NULL];
-		[UIView setAnimationDuration:1.2];
+		[UIView setAnimationDuration: 1.6];
 		[UIView setAnimationCurve:UIViewAnimationCurveEaseOut]; //Slow at End.
 		//[UIView setAnimationDelegate:self];
 		//[UIView setAnimationDidStopSelector:@selector(animation_after)]; //アニメーション終了後に呼び出す＜＜setAnimationDelegate必要
 	}
 	// アニメ終了状態
-	ibScrollView.alpha = 1.0;
 	[self graphView];// この中で、uiActivePage_が更新される
+	ibScrollView.alpha = 1.0;
 	
 	if (animated) {
 		// アニメ実行
@@ -169,15 +155,35 @@
 	//return YES; //[0.9]ヨコにすると「血圧の日変動分布」グラフ表示する
 }
 
+- (void)slowHide
+{
+	// アニメ準備
+	[UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationDuration: 0.4];
+	[UIView setAnimationCurve:UIViewAnimationCurveEaseIn];	//Slow start.
+	// アニメ終了状態
+	ibScrollView.alpha = 0;
+	
+	// アニメ実行
+	[UIView commitAnimations];
+}
+
+- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{	// 回転開始、表示を消す
+	[self slowHide];
+}
+
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {	// 回転した後に呼び出される
-	[self graphViewAnimated:NO];	//再描画
+	[self graphViewAnimated:YES];	//再描画
 	[mAppDelegate adRefresh];
 }
 
 
 - (void)viewDidDisappear:(BOOL)animated
 {	// Called after the view was dismissed, covered or otherwise hidden. Default does nothing
+	[self slowHide];
+
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	[kvs synchronize];
 

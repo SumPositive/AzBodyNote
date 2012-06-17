@@ -8,7 +8,6 @@
 #import "GViewLine.h"
 #import "GraphVC.h"
 
-#define SPACE_Y			10.0		// グラフの最大および最小の極限余白
 #define FONT_SIZE			14.0
 
 @implementation GViewLine
@@ -47,6 +46,7 @@ NSInteger	pValueCount;
 		   po:(CGPoint)po
 		   value:(NSInteger)value  
 		valueType:(int)valueType		// 0=Integer  1=Temp(999⇒99.9℃)　　2=Weight(999999g⇒999.99Kg)
+				R:(CGFloat)pRed  G:(CGFloat)pGreen  B:(CGFloat)pBlue  A:(CGFloat)pAlpha
 {
 	const char *cc;
 	switch (valueType) {
@@ -66,7 +66,8 @@ NSInteger	pValueCount;
 		// 数値	// 文字列の設定
 		CGContextSelectFont (cgc, "Helvetica", FONT_SIZE*mPadScale, kCGEncodingMacRoman);
 		CGContextSetTextDrawingMode (cgc, kCGTextFill);
-		CGContextSetGrayFillColor(cgc, 0, 1);
+		//CGContextSetGrayFillColor(cgc, 0, 1);
+		CGContextSetRGBFillColor (cgc, pRed, pGreen, pBlue, pAlpha); //文字色
 		
 		size_t  slen = strlen(cc);
 #ifdef NG_SLANT_TYPE
@@ -84,7 +85,7 @@ NSInteger	pValueCount;
 #else
 		//[0.10] 水平のみにした。＜＜文字が傾くのは見難いとの要望より
 		// 文字原点
-		po.x -= ((FONT_SIZE*slen/4.0) + 2.0)*mPadScale;
+		po.x -= ((FONT_SIZE*slen/3.0) - 0.0)*mPadScale;
 		if (self.bounds.size.height < po.y+14.0*mPadScale) {	//点の下へ
 			po.y -= 15.0*mPadScale;
 		} else {	//点の上へ
@@ -113,7 +114,7 @@ NSInteger	pValueCount;
 	
 	//--------------------------------------------------------------------------集計しながらMinMaxを求める
 	//Goal
-	if (self.ppMin<=iGoal  &&  iGoal<=self.ppMax) {
+	if (bGoal && self.ppMin<=iGoal  &&  iGoal<=self.ppMax) {
 		pValMin = iGoal;
 		pValMax = iGoal;
 		pValGoal = iGoal;
@@ -169,7 +170,7 @@ NSInteger	pValueCount;
 		pValMax++;
 	}
 
-	CGFloat fSpaceY = SPACE_Y * mPadScale;	//縦棒の上下余白
+	CGFloat fSpaceY = 16 * mPadScale;	//上下余白
 	CGFloat fYstep = (rect.size.height - fSpaceY*2.0) / (pValMax - pValMin);  // 1あたりのポイント数
 	CGPoint po;
 	po.x = self.bounds.size.width - self.ppRecordWidth/2;
@@ -190,7 +191,7 @@ NSInteger	pValueCount;
 		//Goal
 		if (bGoal && 0 < pValGoal) {
 			po.y = fSpaceY + fYstep * (CGFloat)(pValGoal - pValMin);
-			[self drawPoint:cgc po:po value:pValGoal valueType:self.ppDec];
+			[self drawPoint:cgc po:po value:pValGoal valueType:self.ppDec  R:0 G:0 B:0 A:0.8];
 		}
 		po.x -= self.ppRecordWidth;
 	}
@@ -204,7 +205,7 @@ NSInteger	pValueCount;
 		po.y = fSpaceY + fYstep * (CGFloat)(pValue[ ii ] - pValMin);
 		if (0 < pValue[ ii ]) { // 有効な点だけにする
 			poLine[iCntLine++] = po;
-			[self drawPoint:cgc po:po value:pValue[ii] valueType:self.ppDec];
+			[self drawPoint:cgc po:po value:pValue[ii] valueType:self.ppDec  R:0 G:0 B:0 A:0.8];
 		}
 		po.x -= self.ppRecordWidth;
 	}
@@ -225,7 +226,7 @@ NSInteger	pValueCount;
 			po.y = fSpaceY + fYstep * (fBMI - fBMI_Min);
 			if (0 < fBMI) { // 有効な点だけにする
 				poLine[iCntLine++] = po;
-				[self drawPoint:cgc po:po value:fBMI valueType:self.ppDec];
+				[self drawPoint:cgc po:po value:fBMI valueType:self.ppDec  R:1 G:1 B:1 A:0.6];
 			}
 			po.x -= self.ppRecordWidth;
 		}
