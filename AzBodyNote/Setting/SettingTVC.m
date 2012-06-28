@@ -57,6 +57,12 @@
 
 	self.title = NSLocalizedString(@"TabSettings",nil);
 
+	// Set up NEXT Left [Back] buttons.
+	self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
+											 initWithTitle: NSLocalizedString(@"Back", nil)
+											 style:UIBarButtonItemStylePlain
+											 target:nil  action:nil];
+
 	// iCloud KVS 変更通知を受け取る
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(refreshAllViews:) 
@@ -390,11 +396,6 @@
 														 delegate: self];
 			//vc.title = NSLocalizedString(@"Dropbox Download",nil);
 			[vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
-			// Set up NEXT Left [Back] buttons.
-			self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
-													 initWithTitle: NSLocalizedString(@"Back", nil)
-													 style:UIBarButtonItemStylePlain
-													 target:nil  action:nil];
 			//表示開始
 			//[self.navigationController pushViewController:vc animated:YES];
 			if (iS_iPAD) {

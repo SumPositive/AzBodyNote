@@ -32,8 +32,8 @@
 	
 	//ADBannerView						*RiAdBanner;
 	//GADBannerView						*RoAdMobView;
-	BOOL				bADbannerIsVisible;		// iAd 広告内容があればYES
-	NSInteger		mAdShow;						// (0)非表示 (1)tabBar上 (2)最下部  (-1)破棄
+	//BOOL				bADbannerIsVisible;		// iAd 広告内容があればYES
+	//NSInteger		mAdShow;						// (0)非表示 (1)tabBar上 (2)最下部  (-1)破棄
 }
 
 @property (nonatomic, strong) IBOutlet UIWindow *window;
