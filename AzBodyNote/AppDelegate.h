@@ -11,15 +11,15 @@
 
 // マイナー広告廃止
 // iAd優先 AdMob補助 方式に戻した。 iAdは30秒以上表示するだけでも収益あり
-#import <iAd/iAd.h>
-#import "GADBannerView.h"
+//#import <iAd/iAd.h>
+//#import "GADBannerView.h"
 
 #import "Global.h"
 #import "MocEntity.h"
 #import "MocFunctions.h"
 
 
-@interface AppDelegate : NSObject <UIApplicationDelegate, ADBannerViewDelegate, GADBannerViewDelegate>
+@interface AppDelegate : NSObject <UIApplicationDelegate>
 {
 @private
 	NSManagedObjectModel				*moModel_;
@@ -30,8 +30,8 @@
 	UIActivityIndicatorView				*alertIndicator_;
 	BOOL											mAzukiUnlock;	// YES=購入意思ありと見なしてUnlockする
 	
-	ADBannerView						*RiAdBanner;
-	GADBannerView						*RoAdMobView;
+	//ADBannerView						*RiAdBanner;
+	//GADBannerView						*RoAdMobView;
 	BOOL				bADbannerIsVisible;		// iAd 広告内容があればYES
 	NSInteger		mAdShow;						// (0)非表示 (1)tabBar上 (2)最下部  (-1)破棄
 }
@@ -39,7 +39,7 @@
 @property (nonatomic, strong) IBOutlet UIWindow *window;
 @property (nonatomic, strong) IBOutlet UITabBarController *tabBarController;
 
-@property (nonatomic, strong, readonly) NSManagedObjectContext	*managedObjectContext;
+//@property (nonatomic, strong, readonly) NSManagedObjectContext	*managedObjectContext;
 //@property (nonatomic, strong, readonly) MocFunctions							*mocBase;
 //@property (nonatomic, strong, readonly) AdWhirlView							*adWhirlView;
 @property (nonatomic, strong, readonly) EKEventStore							*eventStore;
@@ -59,7 +59,7 @@
 - (void)iCloudAllClear;
 - (NSString *)applicationDocumentsDirectory;
 
-- (void)adShow:(NSInteger)iShow;
-- (void)adRefresh;  //回転時に呼び出すため
+//- (void)adShow:(NSInteger)iShow;
+//- (void)adRefresh;  //回転時に呼び出すため
 
 @end

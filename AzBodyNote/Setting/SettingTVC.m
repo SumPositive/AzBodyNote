@@ -84,7 +84,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
-	[mAppDelegate adShow:1];	//(1)TabBarの上へ
+	//[mAppDelegate adShow:1];	//(1)TabBarの上へ
 }
 
 /*
@@ -100,7 +100,7 @@
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {	// 回転した後に呼び出される
-	[mAppDelegate adRefresh];
+	//[mAppDelegate adRefresh];
 }
 
 
@@ -352,7 +352,7 @@
 				nc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
 				[self presentModalViewController:nc animated:YES];
 			} else {
-				[mAppDelegate adShow:2];	//(2)Ad下端へ
+				//[mAppDelegate adShow:2];	//(2)Ad下端へ
 				[vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
 				[self.navigationController pushViewController:vc animated:YES];
 			}
@@ -372,7 +372,7 @@
 				nc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
 				[self presentModalViewController:nc animated:YES];
 			} else {
-				[mAppDelegate adShow:2];	//(2)Ad下端へ
+				//[mAppDelegate adShow:2];	//(2)Ad下端へ
 				[vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
 				[self.navigationController pushViewController:vc animated:YES];
 			}
@@ -403,7 +403,7 @@
 				nc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
 				[self presentModalViewController:nc animated:YES];
 			} else {
-				[mAppDelegate adShow:2];	//(2)Ad下端へ
+				//[mAppDelegate adShow:2];	//(2)Ad下端へ
 				[vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
 				[self.navigationController pushViewController:vc animated:YES];
 			}
@@ -421,7 +421,7 @@
 	if ([productID isEqualToString:STORE_PRODUCTID_UNLOCK]) {
 		mAppDelegate.app_is_unlock = YES; //購入済み
 		//Ad非表示
-		[mAppDelegate adShow:-1]; //-1=破棄
+		//[mAppDelegate adShow:-1]; //-1=破棄
 	}
 	
 	// NFM_REFRESH_ALL_VIEWS 通知

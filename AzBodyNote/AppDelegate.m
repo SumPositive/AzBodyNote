@@ -18,37 +18,15 @@
 
 #define CoreData_iCloud_SYNC		NO		// YES or NO
 
-//@interface AppDelegate (PrivateMethods)
-//- (NSManagedObjectContext *)managedObjectContext;
-//@end
 
 @implementation AppDelegate
 @synthesize window = __window;
-//@synthesize mocBase = __mocBase;
 @synthesize tabBarController = __tabBarController;
-//@synthesize adWhirlView = __pAdWhirlView;
-//@synthesize app_is_sponsor = __app_is_sponsor;
 @synthesize app_is_unlock = __app_is_unlock;
 @synthesize app_e2record_count = __app_e2record_count;
-//@synthesize app_is_AdShow = __app_is_AdShow;
 @synthesize app_is_iPad = __app_is_iPad;
 @synthesize eventStore = __eventStore;
 
-/*
-- (void)saveContext
-{
-    NSError *error = nil;
-    NSManagedObjectContext *managedObjectContext = self.managedObjectContext;
-    if (managedObjectContext != nil)
-    {
-        if ([managedObjectContext hasChanges] && ![managedObjectContext save:&error])
-        {
-            NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-            abort();
-        } 
-    }
-}
-*/
 
 #pragma mark - alertProgressOn/Off
 
@@ -213,17 +191,8 @@
 	[kvs synchronize];
 #endif
 	
-/*** AZDropboxへ
-	// Dropbox
-	DBSession* dbSession = [[DBSession alloc]
-							 initWithAppKey: DBOX_KEY
-							 appSecret: DBOX_SECRET
-							 root:kDBRootAppFolder]; // either kDBRootAppFolder or kDBRootDropbox
-	if (dbSession==nil) {
-		GA_TRACK_EVENT_ERROR(@"dbSession==nil",0);
-	}
-	[DBSession setSharedSession:dbSession];*/
 
+#ifdef xxxxxxxxxxxxNoAddxxxxxxxxxxxx
 	if (__app_is_unlock==NO) {
 		@try {
 			//--------------------------------------------------------------------------------------------------------- AdMob
@@ -246,7 +215,6 @@
 				[RoAdMobView loadRequest:request];	
 				[self.window.rootViewController.view addSubview:RoAdMobView];
 			}
-#ifndef DEBUG
 			//--------------------------------------------------------------------------------------------------------- iAd
 			//iPhone//320x50//480x32//
 			//iPad//768x66//1024x66//
@@ -264,7 +232,6 @@
 			[self.window.rootViewController.view addSubview:RiAdBanner];
 			bADbannerIsVisible = NO;
 			mAdShow = 0;
-#endif
 		}
 		@catch (NSException *exception) {
 			NSLog(@"Ad Exception: %@: %@", [exception name], [exception reason]);
@@ -279,6 +246,7 @@
 			GA_TRACK_EVENT_ERROR(@"__eventStore==nil",0);
 		}
 	}
+#endif
 	
     return YES;
 }
@@ -342,6 +310,7 @@
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+/*
 - (void)adUnload
 {
 	if (RiAdBanner) {
@@ -357,12 +326,12 @@
 		RoAdMobView.delegate = nil;  //[0.4.20]受信STOP  ＜＜これが無いと破棄後に呼び出されて落ちる
 		RoAdMobView = nil;
 	}
-}
+}*/
 
 - (void)dealloc
 {
 	__eventStore = nil;
-	[self adUnload];
+	//[self adUnload];
 }
 
 - (void)awakeFromNib
@@ -611,7 +580,7 @@
 }
 
 
-
+/**** 件数制限で十分！！！！！　Ad完全撤廃
 #pragma mark - Ad
 // iAd取得できたときに呼ばれる　⇒　表示する
 - (void)bannerViewDidLoadAd:(ADBannerView *)banner
@@ -727,6 +696,6 @@
 
 	[UIView commitAnimations];
 }
-
+*/
 
 @end

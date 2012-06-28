@@ -593,7 +593,7 @@ NSInteger afterPageChange = 0;
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
-	[mAppDelegate adShow:1];	//[1.0]ScrollView下端を上げてAd表示する
+	//[mAppDelegate adShow:1];	//[1.0]ScrollView下端を上げてAd表示する
 	
 	if ([mPanelGraphs count]<1) {
 		azAlertBox(NSLocalizedString(@"Graph NoPanel",nil), NSLocalizedString(@"Graph NoPanel detail",nil), @"OK");
@@ -629,7 +629,7 @@ NSInteger afterPageChange = 0;
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {	// 回転した後に呼び出される
-	[mAppDelegate adRefresh];
+	//[mAppDelegate adRefresh];
 	if (mSliderOneWidth) {
 		mSliderOneWidth.frame = CGRectMake(-14+(self.view.frame.size.width+ONE_WID_MIN*mPadScale)/2.0, 10,
 										   (ONE_WID_MAX-ONE_WID_MIN)*2.0*mPadScale, 20);		//幅2倍にして操作しやすくした

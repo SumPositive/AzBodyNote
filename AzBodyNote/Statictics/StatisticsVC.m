@@ -143,7 +143,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
-	[mAppDelegate adShow:1];	//[1.0]ScrollView下端を上げてAd表示する
+	//[mAppDelegate adShow:1];	//[1.0]ScrollView下端を上げてAd表示する
 	
 	[self graphViewAnimated:YES];
 }
@@ -176,7 +176,7 @@
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {	// 回転した後に呼び出される
 	[self graphViewAnimated:YES];	//再描画
-	[mAppDelegate adRefresh];
+	//[mAppDelegate adRefresh];
 }
 
 

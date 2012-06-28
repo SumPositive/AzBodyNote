@@ -85,7 +85,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
-	[mAppDelegate adShow:2];
+	//[mAppDelegate adShow:2];
 }
 
 - (void)viewWillDisappear:(BOOL)animated

@@ -184,7 +184,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
-	[appDelegate_ adShow:1];
+	//[appDelegate_ adShow:1];
 	
 /*	if (appDelegate_.adWhirlView) {	// Ad ON
 		[UIView beginAnimations:nil context:NULL];
@@ -217,7 +217,7 @@
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {	// 回転した後に呼び出される
-	[appDelegate_ adRefresh];
+	//[appDelegate_ adRefresh];
 }
 
 
@@ -510,7 +510,7 @@
 				nc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
 				[self presentModalViewController:nc animated:YES];
 			} else {
-				[appDelegate_ adShow:2];	//(2)Ad下端へ
+				//[appDelegate_ adShow:2];	//(2)Ad下端へ
 				[vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
 				[self.navigationController pushViewController:vc animated:YES];
 			}

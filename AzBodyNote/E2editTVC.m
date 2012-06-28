@@ -713,11 +713,11 @@
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
-	if (editMode_) {
+/*	if (editMode_) {
 		[appDelegate_ adShow: 2];
 	} else {
 		[appDelegate_ adShow: 1];
-	}
+	}*/
 
 #ifdef DEBUGxxxxxx				// テストデータ生成
 	// 全データを削除する
@@ -767,7 +767,7 @@
 }
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {	// 回転後
-	[appDelegate_ adRefresh];
+	//[appDelegate_ adRefresh];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
