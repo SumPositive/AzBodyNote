@@ -359,8 +359,8 @@
 		}	break;
 			
 		case 201: {	// あずき商店
-			[mAppDelegate adShow:2];	//(2)Ad下端へ
 			AZStoreTVC *vc = [[AZStoreTVC alloc] init];
+			vc.delegate = self; //<AZStoreDelegate> azStorePurchesed:呼び出すため
 			// 商品IDリスト
 			NSSet *pids = [NSSet setWithObjects:STORE_PRODUCTID_UNLOCK, nil]; // 商品が複数ある場合は列記
 			[vc setProductIDs:pids];
@@ -420,7 +420,10 @@
 	GA_TRACK_EVENT(@"AZStore", @"azStorePurchesed", productID,1);
 	if ([productID isEqualToString:STORE_PRODUCTID_UNLOCK]) {
 		mAppDelegate.app_is_unlock = YES; //購入済み
+		//Ad非表示
+		[mAppDelegate adShow:-1]; //-1=破棄
 	}
+	
 	// NFM_REFRESH_ALL_VIEWS 通知
 	NSNotification* refreshNotification = [NSNotification notificationWithName:NFM_REFRESH_ALL_VIEWS
 																		object:self  userInfo:nil];

@@ -185,6 +185,8 @@
 		}
 #ifdef DEBUG
 		__app_is_unlock = NO;
+		[kvs setBool:__app_is_unlock forKey:STORE_PRODUCTID_UNLOCK];
+		[kvs synchronize]; // plistへ書き出す
 #endif
 		if (__app_is_unlock) {	//登録
 			[kvs setBool:YES forKey:STORE_PRODUCTID_UNLOCK];
@@ -224,11 +226,6 @@
 
 	if (__app_is_unlock==NO) {
 		@try {
-			CGRect rc = self.window.rootViewController.view.frame;
-			rc.origin.x = 0;
-			rc.origin.y = rc.size.height - 50 - 48;
-			rc.size.height = 50;
-			rc.size.width = 320;
 			//--------------------------------------------------------------------------------------------------------- AdMob
 			//iPhone//320x50//extern GADAdSize const kGADAdSizeBanner;
 			//iPad//468x60//extern GADAdSize const kGADAdSizeFullBanner;
@@ -241,13 +238,15 @@
 					RoAdMobView.adUnitID = @"a14ece23da85f5e";	//iPhone//体調メモ
 				}
 				RoAdMobView.rootViewController = self.window.rootViewController;
-				RoAdMobView.frame = rc;
+				//rc.origin.x = (rc.size.width - RoAdMobView.frame.size.width) / 2.0;
+				//RoAdMobView.frame = rc;
 				RoAdMobView.alpha = 0;
 				GADRequest *request = [GADRequest request];
 				//[request setTesting:YES];
 				[RoAdMobView loadRequest:request];	
 				[self.window.rootViewController.view addSubview:RoAdMobView];
 			}
+#ifndef DEBUG
 			//--------------------------------------------------------------------------------------------------------- iAd
 			//iPhone//320x50//480x32//
 			//iPad//768x66//1024x66//
@@ -259,11 +258,13 @@
 														 ADBannerContentSizeIdentifierPortrait,
 														 ADBannerContentSizeIdentifierLandscape, nil];
 			RiAdBanner.currentContentSizeIdentifier = ADBannerContentSizeIdentifierPortrait;
-			RiAdBanner.frame = rc;
+			//rc.origin.x = 0;
+			//RiAdBanner.frame = rc;
 			RiAdBanner.alpha = 0;
 			[self.window.rootViewController.view addSubview:RiAdBanner];
 			bADbannerIsVisible = NO;
 			mAdShow = 0;
+#endif
 		}
 		@catch (NSException *exception) {
 			NSLog(@"Ad Exception: %@: %@", [exception name], [exception reason]);
@@ -341,11 +342,10 @@
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)dealloc
+- (void)adUnload
 {
-	__eventStore = nil;
-
 	if (RiAdBanner) {
+		RiAdBanner.alpha = 0;
 		[RiAdBanner cancelBannerViewAction];	// 停止
 		RiAdBanner.delegate = nil;							// 解放メソッドを呼び出さないように　　　[0.4.1]メモリ不足時に落ちた原因
 		[RiAdBanner removeFromSuperview];		// UIView解放		retainCount -1
@@ -353,11 +353,17 @@
 	}
 	
 	if (RoAdMobView) {
+		RoAdMobView.alpha = 0;
 		RoAdMobView.delegate = nil;  //[0.4.20]受信STOP  ＜＜これが無いと破棄後に呼び出されて落ちる
 		RoAdMobView = nil;
 	}
 }
 
+- (void)dealloc
+{
+	__eventStore = nil;
+	[self adUnload];
+}
 
 - (void)awakeFromNib
 {
@@ -629,11 +635,15 @@
 	NSLog(@"=== adShow: %ld ===", (long)iShow);
 	mAdShow = iShow;
 	[self adRefresh];
+	
+	if (iShow < 0) {	// 破棄　　＜＜購入後の処理
+		[self adUnload];
+	}
 }
 
 - (void)adRefresh
 {
-	if (__app_is_unlock  OR  RoAdMobView==nil  OR  RiAdBanner==nil) {
+	if (__app_is_unlock  OR  (RoAdMobView==nil  &&  RiAdBanner==nil)) {
 		return;  //Adなし
 	}
 	//NSLog(@"=== adRefresh ===");
@@ -642,35 +652,39 @@
 	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
 	[UIView setAnimationDuration:1.0];
 
+	CGFloat fHeight;
+	CGFloat fWidth;
+	if (UIInterfaceOrientationIsPortrait(self.window.rootViewController.interfaceOrientation)) {
+		fWidth = self.window.rootViewController.view.frame.size.width;
+		fHeight = self.window.rootViewController.view.frame.size.height;
+	} else {
+		fWidth = self.window.rootViewController.view.frame.size.height;
+		fHeight = self.window.rootViewController.view.frame.size.width;
+	}
+
 	if (RiAdBanner) {
+		//iAd
+		//iPhone//320x50//480x32//
+		//iPad//768x66//1024x66//
 		if (UIInterfaceOrientationIsPortrait(self.window.rootViewController.interfaceOrientation)) {
 			RiAdBanner.currentContentSizeIdentifier = ADBannerContentSizeIdentifierPortrait;
 		} else {
 			RiAdBanner.currentContentSizeIdentifier = ADBannerContentSizeIdentifierLandscape;
 		}
-	}
-	CGRect rc = RiAdBanner.frame;
-
-	if (mAdShow==1) {		// tabBarの上部に表示
-		if (UIInterfaceOrientationIsPortrait(self.window.rootViewController.interfaceOrientation)) {
-			rc.origin.y = self.window.rootViewController.view.frame.size.height - 48 - RiAdBanner.frame.size.height;
-		} else {
-			rc.origin.y = self.window.rootViewController.view.frame.size.width - 48 - RiAdBanner.frame.size.height;
+		CGRect rc = RiAdBanner.frame;
+		rc.origin.x = 0;
+		switch (mAdShow) {
+			case -1:	// 破棄
+			case 0:	// 非表示		画面下部へ隠す
+				rc.origin.y = fHeight + 100;
+				break;
+			case 1:	// tabBarの上部に表示
+				rc.origin.y = fHeight - 48 - RiAdBanner.frame.size.height;
+				break;
+			case 2:	// tabBarの最下部に表示
+				rc.origin.y = fHeight - RiAdBanner.frame.size.height;
+				break;
 		}
-	}
-	else if (mAdShow==2) {	// 最下部に表示
-		if (UIInterfaceOrientationIsPortrait(self.window.rootViewController.interfaceOrientation)) {
-			rc.origin.y = self.window.rootViewController.view.frame.size.height - RiAdBanner.frame.size.height;
-		} else {
-			rc.origin.y = self.window.rootViewController.view.frame.size.width - RiAdBanner.frame.size.height;
-		}
-	}
-	NSLog(@"=== adRefresh === rc.origin.y=%.2f", rc.origin.y);
-	
-	//iAd
-	//iPhone//320x50//480x32//
-	//iPad//768x66//1024x66//
-	if (RiAdBanner) {
 		RiAdBanner.frame = rc;
 		if (0<mAdShow && bADbannerIsVisible) {
 			RiAdBanner.alpha = 1;
@@ -679,14 +693,29 @@
 		}
 	}
 	
-	//AdMob
-	//iPhone//320x50//GAD_SIZE_320x50
-	//iPad//468x60//GAD_SIZE_468x60
 	if (RoAdMobView) {
+		//AdMob
+		//iPhone//320x50//GAD_SIZE_320x50
+		//iPad//468x60//GAD_SIZE_468x60
+		CGRect rc = CGRectZero;
 		if (iS_iPAD) {
 			rc.size = GAD_SIZE_468x60;
+			rc.origin.x = (fWidth - rc.size.width)/2.0;		//中央寄せ
 		} else {
 			rc.size = GAD_SIZE_320x50;
+			rc.origin.x = 0;
+		}
+		switch (mAdShow) {
+			case -1:	// 破棄
+			case 0:	// 非表示		画面下部へ隠す
+				rc.origin.y = fHeight + 100;
+				break;
+			case 1:	// tabBarの上部に表示
+				rc.origin.y = fHeight - 48 - rc.size.height;
+				break;
+			case 2:	// tabBarの最下部に表示
+				rc.origin.y = fHeight - rc.size.height;
+				break;
 		}
 		RoAdMobView.frame = rc;
 		if (0<mAdShow && (RiAdBanner==nil OR RiAdBanner.alpha==0)) {
@@ -695,7 +724,7 @@
 			RoAdMobView.alpha = 0;
 		}
 	}
-	
+
 	[UIView commitAnimations];
 }
 
