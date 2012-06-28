@@ -210,10 +210,12 @@
 - (void)modify:(BOOL)modify		//=YES:変更あり
 {
 	self.navigationItem.rightBarButtonItem.enabled = modify;	//[保存]ボタン有効
-	//[self.navigationController setToolbarHidden: modify animated:YES]; // ツールバー消す
-	// TabBarを有効にする ＞＞＞ 変更あれば無効にしてView遷移禁止する
-	for (UIViewController *vc in self.tabBarController.viewControllers) {
-		vc.tabBarItem.enabled = !modify;	// タブバー無効
+
+	if (editMode_==0) {	//Addのときだけ、Edit時にはタブバー非表示だから
+		// TabBarを有効にする ＞＞＞ 変更あれば無効にしてView遷移禁止する
+		for (UIViewController *vc in self.tabBarController.viewControllers) {
+			vc.tabBarItem.enabled = !modify;	// タブバー無効
+		}
 	}
 }
 
