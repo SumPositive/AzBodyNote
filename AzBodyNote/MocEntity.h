@@ -67,6 +67,8 @@ typedef NSInteger DateOpt;
 #define E2_dateTime					@"dateTime"
 #define E2_nDateOpt					@"nDateOpt"
 #define E2_nYearMM					@"nYearMM"
+#define E2_sEventID					@"sEventID"
+#define E2_sGSpreadID				@"sGSpreadID"
 #define E2_sNote1						@"sNote1"
 #define E2_sNote2						@"sNote2"
 #define E2_sEquipment				@"sEquipment"

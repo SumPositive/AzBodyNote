@@ -79,16 +79,6 @@
 	[mf setMoc:[self managedObjectContext]];
 	
 	
-	// デバイス、ＯＳ確認
-	if ([[[UIDevice currentDevice] systemVersion] compare:@"5.0"]==NSOrderedAscending) { // ＜ "5.0"
-		// iOS5.0より前
-		azAlertBox(@"! STOP !", @"Need more iOS 5.0", nil);
-		exit(0);
-	}
-	//NG//app_is_iPad_ = [[[UIDevice currentDevice] model] hasPrefix:@"iPad"];	// iPad
-	//app_is_iPad_ = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad);
-	//NSLog(@"app_is_iPad_=%d,  app_is_Ad_=%d,  __app_is_unlock=%d", app_is_iPad_, app_is_Ad_, __app_is_unlock);
-
 	//  iCloud KVS     [0.9.0]以降、userDefaultsを廃して、kvsへ移行統一
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	if (kvs==nil) {
@@ -181,6 +171,16 @@
 	}
 	__app_is_iPad = [[[UIDevice currentDevice] model] hasPrefix:@"iPad"];	// iPad
 
+
+	//-------------------------------------------------カレンダー
+	if (__eventStore==nil) {
+		__eventStore = [[EKEventStore alloc] init];
+		//NSLog(@"[__eventStore calendars]={%@}", [__eventStore calendars]);
+	}
+	if (__eventStore==nil) {
+		GA_TRACK_ERROR(@"__eventStore==nil");
+	}
+	
 	
 #ifdef DEBUGxxxxxxxx
 	// DEBUG : 購入テストするため、強制的にFreeモードにする。
@@ -190,7 +190,6 @@
 	[kvs setBool:gud_bPaid_ forKey:GUD_bPaid];
 	[kvs synchronize];
 #endif
-	
 
 #ifdef xxxxxxxxxxxxNoAddxxxxxxxxxxxx
 	if (__app_is_unlock==NO) {
@@ -238,16 +237,8 @@
 			GA_TRACK_EVENT_ERROR([exception description],0);
 		}
 	}
-	
-	if (__eventStore==nil) {
-		__eventStore = [[EKEventStore alloc] init];
-		//NSLog(@"[__eventStore calendars]={%@}", [__eventStore calendars]);
-		if (__eventStore==nil) {
-			GA_TRACK_EVENT_ERROR(@"__eventStore==nil",0);
-		}
-	}
 #endif
-	
+
     return YES;
 }
 /*
@@ -546,7 +537,7 @@
 				// 同期がおかしくなったときには、[設定]-[iCloud]-[ストレージとバックアップ]-[ストレージを管理]-[健康日記]-[編集]-[すべて削除] する。
 				//[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy]; // 変更した方を優先(Default)
 				//[moc setMergePolicy:NSOverwriteMergePolicy]; // 上書き
-				//[moc setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy]; // ストアを優先　＜＜＜ＯＫ
+				[moc setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy]; // ストアを優先　＜＜＜ＯＫ
 				
 				[[NSNotificationCenter defaultCenter]addObserver:self 
 														selector:@selector(mergeChangesFrom_iCloud:) 

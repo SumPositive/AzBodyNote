@@ -1,3 +1,4 @@
+
 //
 //  E2editTVC.m
 //  AzBodyNote
@@ -444,7 +445,7 @@
 		// Save & Commit
 		[mocFunc_ commit];
 
-		//自動学習(記録更新)する
+		//時間帯を自動学習(記録更新)する
 		NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 		switch ([moE2edit_.nDateOpt integerValue]) {
 			case DtOpWake:
@@ -644,9 +645,14 @@
 
 	// カレンダー設定
 	if ([kvs objectForKey:KVS_CalendarID]) {
+		//NSLog(@"E2editTVC: appDelegate_.eventStore={%@}", appDelegate_.eventStore);
+		//NSLog(@"E2editTVC: [kvs objectForKey:KVS_CalendarID]={%@}", [kvs objectForKey:KVS_CalendarID]);
 		mEKCalendar = [appDelegate_.eventStore 
 					   calendarWithIdentifier: [kvs objectForKey:KVS_CalendarID]];
 		NSLog(@"E2editTVC: mEKCalendar={%@}", mEKCalendar);
+		if (mEKCalendar==nil) {
+			GA_TRACK_ERROR(@"mEKCalendar==nil");
+		}
 	} else {
 		mEKCalendar = nil;
 	}

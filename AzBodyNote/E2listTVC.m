@@ -154,8 +154,9 @@
 		}
 		@catch (NSException *exception) {
 			// 最終行を削除したとき
-			NSLog(@"LOGIC ERROR!!! - indexPathEdit_.row=%ld", (long)indexPathEdit_.row);
-			GA_TRACK_ERROR([exception description])
+			NSString *zz = [NSString stringWithFormat:
+						   @"LOGIC ERROR - indexPathEdit_.row=%ld", (long)indexPathEdit_.row];
+			GA_TRACK_ERROR(zz);
 		}
 		@finally {
 			indexPathEdit_ = nil; // Editモード解除
@@ -175,8 +176,8 @@
 			[self.tableView reloadRowsAtIndexPaths: aPaths withRowAnimation:UITableViewRowAnimationFade];
 		}
 		@catch (NSException *exception) {
-			NSLog(@"LOGIC ERROR!!! - 最終行");
-			GA_TRACK_ERROR([exception description])
+			GA_TRACK_ERROR(@"LOGIC ERROR - Bottom line --> reloadData")
+			[self.tableView reloadData]; //1.0.1//List表示が消える現象の回避策
 		}
 	}
 }
