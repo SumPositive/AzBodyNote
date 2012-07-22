@@ -162,6 +162,7 @@
 {
 	static NSString *sysCellSubtitle = @"sysCellSubtitle"; //システム既定セル
 
+	NSUserDefaults *udef = [NSUserDefaults standardUserDefaults];
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
     
 	switch (indexPath.section*100 + indexPath.row) 
@@ -192,11 +193,11 @@
 			if (cell == nil) {
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 			}
-			if ([kvs objectForKey:KVS_CalendarID]) {
+			if ([udef objectForKey:UDEF_CalendarID]) {
 				cell.imageView.image = [UIImage imageNamed:@"Icon32-Calender-ON"];
 				cell.textLabel.text = [NSString stringWithFormat:@"%@: %@",
 									   NSLocalizedString(@"SettCalender",nil), 
-									   [kvs objectForKey:KVS_CalendarTitle]];
+									   [udef objectForKey:UDEF_CalendarTitle]];
 			} else {
 				cell.imageView.image = [UIImage imageNamed:@"Icon32-Calender"];
 				cell.textLabel.text = [NSString stringWithFormat:@"%@: %@",
@@ -367,6 +368,12 @@
 		case 201: {	// あずき商店
 			AZStoreTVC *vc = [[AZStoreTVC alloc] init];
 			vc.delegate = self; //<AZStoreDelegate> azStorePurchesed:呼び出すため
+
+			// Important note about In-App Purchase Receipt Validation on iOS
+			// クラッキング対策：非消費型でもレシートチェックが必要になった。
+			// [Manage In-App Purchase]-[View or generate a shared secret]-[Generate]から取得した文字列をセットする
+			vc.ppSharedSecret = @"062e76976c5a468a82bda70683326208";	//Condition
+			
 			// 商品IDリスト
 			NSSet *pids = [NSSet setWithObjects:STORE_PRODUCTID_UNLOCK, nil]; // 商品が複数ある場合は列記
 			[vc setProductIDs:pids];

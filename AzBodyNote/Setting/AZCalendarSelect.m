@@ -43,9 +43,10 @@
 	}
 	NSLog(@"mCalendars={%@}", mCalendars);
 	
-	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	mCalendarID = [kvs objectForKey:KVS_CalendarID];
+	//NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	//mCalendarID = [kvs objectForKey:KVS_CalendarID];
+	NSUserDefaults *udef = [NSUserDefaults standardUserDefaults];
+	mCalendarID = [udef objectForKey:UDEF_CalendarID];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -94,6 +95,7 @@
 		switch (calendar.type) {
 			case EKCalendarTypeLocal:
 				cell.detailTextLabel.text = NSLocalizedString(@"AZCalendarSelect EKCalendarTypeLocal",nil);
+				cell.textLabel.text = cell.detailTextLabel.text;
 				break;
 			case EKCalendarTypeCalDAV:
 				cell.detailTextLabel.text = NSLocalizedString(@"AZCalendarSelect EKCalendarTypeCalDAV",nil);
@@ -174,7 +176,8 @@
 {
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];	// 選択状態を解除する
 	
-	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	//NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+	NSUserDefaults *udef = [NSUserDefaults standardUserDefaults];
 
 	if (0 < indexPath.row && indexPath.row<=[mCalendars count]) {
 		EKCalendar* calendar = [mCalendars objectAtIndex:indexPath.row - 1];
@@ -189,15 +192,16 @@
 		UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
 		cell.accessoryType = UITableViewCellAccessoryCheckmark;
 		//
-		mCalendarID = calendar.calendarIdentifier;
+		mCalendarID = calendar.calendarIdentifier;	//1.0.1//デバイス固有値である
 		NSLog(@"mCalendarID={%@}", mCalendarID);
-		[kvs setObject:calendar.calendarIdentifier forKey:KVS_CalendarID];
-		[kvs setObject:calendar.title forKey:KVS_CalendarTitle];
-	} else {
-		[kvs removeObjectForKey:KVS_CalendarID]; // なし
-		[kvs removeObjectForKey:KVS_CalendarTitle]; // なし
+		[udef setObject:calendar.calendarIdentifier forKey:UDEF_CalendarID];
+		[udef setObject:cell.textLabel.text forKey:UDEF_CalendarTitle];
 	}
-	[kvs synchronize];
+	else {
+		[udef removeObjectForKey:UDEF_CalendarID]; // なし
+		[udef removeObjectForKey:UDEF_CalendarTitle]; // なし
+	}
+	[udef synchronize];
 	
 	[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
 }

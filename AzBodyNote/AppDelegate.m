@@ -130,7 +130,7 @@
 	
 	if (![kvs boolForKey:KVS_SettGraphBpMean])	[kvs setBool:YES		forKey:KVS_SettGraphBpMean]; //平均
 	if (![kvs boolForKey:KVS_SettGraphBpPress])	[kvs setBool:YES		forKey:KVS_SettGraphBpPress]; //脈圧
-
+	
 	[kvs synchronize];
 	
 	if (__app_is_unlock==NO) {
@@ -161,7 +161,20 @@
 			[kvs synchronize]; // plistへ書き出す
 		}
 	}
+	
+	// NSUserDefaults
+	NSUserDefaults *udef = [NSUserDefaults standardUserDefaults];
+	if ([udef objectForKey:UDEF_CalendarID]==nil && [kvs objectForKey:KVS_CalendarID]) 
+	{ //1.0.0以前からの移行//CalendarIDはデバイス固有値であるため、UDEF記録に変更
+		[udef setObject:[kvs objectForKey:KVS_CalendarID] forKey:UDEF_CalendarID];
+		[udef setObject:[kvs objectForKey:KVS_CalendarTitle] forKey:UDEF_CalendarTitle];
+		[udef synchronize];
+		[kvs removeObjectForKey:KVS_CalendarID];
+		[kvs removeObjectForKey:KVS_CalendarTitle];
+		[kvs synchronize]; // plistへ書き出す
+	}
 
+	
 	//-------------------------------------------------デバイス、ＯＳ確認
 	if ([[[UIDevice currentDevice] systemVersion] compare:@"5.0"]==NSOrderedAscending) { // ＜ "5.0"
 		// iOS5.0より前

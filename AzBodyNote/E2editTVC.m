@@ -644,14 +644,13 @@
 	}
 
 	// カレンダー設定
-	if ([kvs objectForKey:KVS_CalendarID]) {
-		//NSLog(@"E2editTVC: appDelegate_.eventStore={%@}", appDelegate_.eventStore);
-		//NSLog(@"E2editTVC: [kvs objectForKey:KVS_CalendarID]={%@}", [kvs objectForKey:KVS_CalendarID]);
+	NSUserDefaults *udef = [NSUserDefaults standardUserDefaults];
+	if ([udef objectForKey:UDEF_CalendarID]) {	//1.0.1//でバイス固有値であるため
 		mEKCalendar = [appDelegate_.eventStore 
-					   calendarWithIdentifier: [kvs objectForKey:KVS_CalendarID]];
+					   calendarWithIdentifier: [udef objectForKey:UDEF_CalendarID]];
 		NSLog(@"E2editTVC: mEKCalendar={%@}", mEKCalendar);
 		if (mEKCalendar==nil) {
-			GA_TRACK_ERROR(@"mEKCalendar==nil");
+			GA_TRACK_ERROR(@"UDEF: mEKCalendar==nil");
 		}
 	} else {
 		mEKCalendar = nil;

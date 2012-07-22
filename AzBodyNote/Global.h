@@ -59,17 +59,20 @@ typedef NSUInteger EnumGraphs;
 #define DateOpt_AroundHOUR						2			// 前後許容時間
 
 
-// Key-Value-Store ------------------------------------- Settings		【注意】リリース後は変更厳禁！
-//0.9//#define GUD_bPaid									@"GUD_bPaid"
-//0.9//#define GUD_bUnlock								@"GUD_bUnlock"
-#define KVS_Calc_Method						@"KVS_Calc_Method"		// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
+// User Default : デバイス別 ------------------------------------- Settings		【注意】リリース後は変更厳禁！
+#define UDEF_CalendarID						@"UDEF_CalendarID"	//同じカレンダーでもデバイス毎にIDが異なる
+#define UDEF_CalendarTitle					@"UDEF_CalendarTitle"
+
+
+// Key-Value-Store : 全デバイス共通 ----------------------------- Settings		【注意】リリース後は変更厳禁！
+#define KVS_Calc_Method						@"KVS_Calc_Method"	// 0=電卓式(2+2x2=8)　　1=計算式(2+2x2=6)
 #define KVS_Calc_RoundBankers			@"KVS_Calc_RoundBankers"
 #define KVS_bTweet								@"KVS_bTweet"
 #define KVS_bGoal									@"KVS_bGoal"
 #define KVS_bCalender							@"KVS_bCalender"
 #define KVS_bGSpread							@"KVS_bGSpread"
-#define KVS_CalendarID							@"KVS_CalendarID"
-#define KVS_CalendarTitle						@"KVS_CalendarTitle"
+#define KVS_CalendarID							@"KVS_CalendarID"		//1.0.1//UDEF_CalendarIDへ移行
+#define KVS_CalendarTitle						@"KVS_CalendarTitle"	//1.0.1//UDEF_CalendarTitleへ移行
 
 #define KVS_SettGraphs						@"KVS_SettGraphs"	//UserDef保存につき変更禁止 NSArrey型 
 #define KVS_SettGraphOneWid				@"KVS_SettGraphOneWid"
