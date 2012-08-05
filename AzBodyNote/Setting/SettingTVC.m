@@ -349,7 +349,7 @@
 			vc.ppImgIcon = [UIImage imageNamed:@"Icon57"];
 			vc.ppProductTitle = @"Condition";	// 世界共通名称
 			vc.ppProductSubtitle = NSLocalizedString(@"Product Title",nil); // ローカル名称
-			vc.ppProductYear = @"2011";	// Copyright初年度
+			//vc.ppProductYear = @"2011";	// Copyright初年度
 			vc.ppSupportSite = @"http://condition.azukid.com";
 			//vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
 			//[self.navigationController pushViewController:vc animated:YES];

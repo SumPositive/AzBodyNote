@@ -32,34 +32,34 @@
 
 - (void)alertProgressOff
 {
-	[alertIndicator_ stopAnimating];
-	[alertProgress_ dismissWithClickedButtonIndex:alertProgress_.cancelButtonIndex animated:YES];
+	[mAlertIndicator stopAnimating];
+	[mAlertProgress dismissWithClickedButtonIndex:mAlertProgress.cancelButtonIndex animated:YES];
 }
 
 - (void)alertProgressOn:(NSString*)zTitle
 {
-	if (alertProgress_==nil) {
+	if (mAlertProgress==nil) {
 		// alertIndicatorOn/Off: のための準備
-		alertProgress_ = [[UIAlertView alloc] initWithTitle:zTitle  message:@" " delegate:nil cancelButtonTitle:nil otherButtonTitles:nil];
-		alertIndicator_ = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+		mAlertProgress = [[UIAlertView alloc] initWithTitle:zTitle  message:@" " delegate:nil cancelButtonTitle:nil otherButtonTitles:nil];
+		mAlertIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
 		//alertIndicator_.frame = CGRectMake(320/2, 0, 50, 50);
-		[alertProgress_  addSubview:alertIndicator_];
+		[mAlertProgress  addSubview:mAlertIndicator];
 	}
 
-	[alertProgress_ setTitle:zTitle];
-	[alertProgress_ show];
+	[mAlertProgress setTitle:zTitle];
+	[mAlertProgress show];
 	
 	/*
 	NSLog(@"*** frame  x=%f  y=%f  width=%f  height=%f", alertProgress_.frame.origin.x, alertProgress_.frame.origin.y,
 		  alertProgress_.frame.size.width, alertProgress_.frame.size.height);
 	*/
-	 NSLog(@"*** bounds  x=%f  y=%f  width=%f  height=%f", alertProgress_.bounds.origin.x, alertProgress_.bounds.origin.y,
-		  alertProgress_.bounds.size.width, alertProgress_.bounds.size.height);
+	 NSLog(@"*** bounds  x=%f  y=%f  width=%f  height=%f", mAlertProgress.bounds.origin.x, mAlertProgress.bounds.origin.y,
+		  mAlertProgress.bounds.size.width, mAlertProgress.bounds.size.height);
 
 	// タイトルが変わるとサイズが変わり、インジケータの位置が変わるため、毎回以下の処理する必要あり
-	[alertIndicator_ setFrame:CGRectMake((	alertProgress_.bounds.size.width-50)/2, 
-																		alertProgress_.bounds.size.height-75, 50, 50)];
-	[alertIndicator_ startAnimating];
+	[mAlertIndicator setFrame:CGRectMake((	mAlertProgress.bounds.size.width-50)/2, 
+																		mAlertProgress.bounds.size.height-75, 50, 50)];
+	[mAlertIndicator startAnimating];
 }
 
 
@@ -393,13 +393,13 @@
  */
 - (NSManagedObjectModel *)managedObjectModel
 {
-    if (moModel_) {
-        return moModel_;
+    if (mMocModel) {
+        return mMocModel;
     }
 	
-	moModel_ = [NSManagedObjectModel mergedModelFromBundles:nil];
+	mMocModel = [NSManagedObjectModel mergedModelFromBundles:nil];
 	
-	return moModel_;
+	return mMocModel;
 }
 
 /**
@@ -408,8 +408,8 @@
  */
 - (NSPersistentStoreCoordinator *)persistentStoreCoordinator
 {
-    if (persistentStoreCoordinator_) {
-        return persistentStoreCoordinator_;
+    if (mMocPsc) {
+        return mMocPsc;
     }
     
 /*    NSURL *storeUrl = [[self applicationDocumentsDirectory] 
@@ -424,7 +424,7 @@
 	// this leverages a behavior in Core Data where you can create NSManagedObjectContext and fetch requests
 	// even if the PSC has no stores.  Fetch requests return empty arrays until the persistent store is added
 	// so it's possible to bring up the UI and then fill in the results later
-    persistentStoreCoordinator_ = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
+    mMocPsc = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
 	
 	if (CoreData_iCloud_SYNC  && IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
 		// do this asynchronously since if this is the first time this particular device is syncing with preexisting
@@ -486,7 +486,7 @@
 			NSLog(@"options=%@", options);
 			
 			// prep the store path and bundle stuff here since NSBundle isn't totally thread safe
-			NSPersistentStoreCoordinator* psc = persistentStoreCoordinator_;
+			NSPersistentStoreCoordinator* psc = mMocPsc;
 			NSError *error = nil;
 			[psc lock];
 			if (![psc addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeUrl options:options error:&error]) 
@@ -515,7 +515,7 @@
 								 nil];
 		
 		NSError *error = nil;
-		if (![persistentStoreCoordinator_ addPersistentStoreWithType:NSSQLiteStoreType
+		if (![mMocPsc addPersistentStoreWithType:NSSQLiteStoreType
 														configuration:nil  URL:storeUrl  options:options  error:&error])
 		{
 			NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
@@ -523,7 +523,7 @@
 			abort();
 		}
 	}
-    return persistentStoreCoordinator_;
+    return mMocPsc;
 }
 
 /**
@@ -532,8 +532,8 @@
 **/
 - (NSManagedObjectContext *)managedObjectContext
 {
-	if (managedObjectContext_) {
-		return managedObjectContext_;
+	if (mMoc) {
+		return mMoc;
 	}
     
     NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
@@ -564,8 +564,8 @@
         }
     }
 	//
-	managedObjectContext_ = moc;
-    return	managedObjectContext_;
+	mMoc = moc;
+    return	mMoc;
 }
 
 

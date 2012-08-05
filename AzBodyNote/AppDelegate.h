@@ -22,12 +22,12 @@
 @interface AppDelegate : NSObject <UIApplicationDelegate>
 {
 @private
-	NSManagedObjectModel				*moModel_;
-	NSPersistentStoreCoordinator		*persistentStoreCoordinator_;
-	NSManagedObjectContext				*managedObjectContext_;
+	NSManagedObjectModel				*mMocModel;
+	NSPersistentStoreCoordinator		*mMocPsc;
+	NSManagedObjectContext				*mMoc;
 	
-	UIAlertView									*alertProgress_;
-	UIActivityIndicatorView				*alertIndicator_;
+	UIAlertView									*mAlertProgress;
+	UIActivityIndicatorView				*mAlertIndicator;
 	BOOL											mAzukiUnlock;	// YES=購入意思ありと見なしてUnlockする
 	
 	//ADBannerView						*RiAdBanner;

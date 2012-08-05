@@ -109,7 +109,7 @@
 	if (self.ppPage==0) { 
 		//Goal
 		if (bGoal) {
-			cc = [[NSString stringWithString:@"Goal"] UTF8String];
+			cc = [@"Goal" UTF8String];
 			CGContextShowTextAtPoint (cgc, po.x-15*mPadScale, po.y+22, cc, strlen(cc));
 			//アイコン
 			CGPoint poImg = po;

@@ -41,12 +41,12 @@
 		if (iDec<=0) {
 			//ibLbValue.text = [NSString stringWithFormat:@"%ld", iInt];
 			switch (valueDec_) {
-				case 1: ibLbValue.text =  [NSString stringWithFormat:@"%ld.0", iInt]; break;
-				case 2: ibLbValue.text =  [NSString stringWithFormat:@"%ld.00", iInt]; break;
-				default: ibLbValue.text =  [NSString stringWithFormat:@"%ld", iInt]; break;
+				case 1: ibLbValue.text =  [NSString stringWithFormat:@"%d.0", iInt]; break;
+				case 2: ibLbValue.text =  [NSString stringWithFormat:@"%d.00", iInt]; break;
+				default: ibLbValue.text =  [NSString stringWithFormat:@"%d", iInt]; break;
 			}
 		} else {
-			ibLbValue.text = [NSString stringWithFormat:@"%ld.%ld", iInt, iDec];
+			ibLbValue.text = [NSString stringWithFormat:@"%d.%d", iInt, iDec];
 		}
 	}
 }
