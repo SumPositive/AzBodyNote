@@ -25,11 +25,11 @@
 
 - (void)refreshAllViews:(NSNotification*)note 
 {	// iCloud-CoreData に変更があれば呼び出される
-	if ([appDelegate_ app_is_unlock]==NO) {
+	if ([appDelegate_ ppApp_is_unlock]==NO) {
 		NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 		[kvs synchronize]; // 最新同期
-		if ([kvs boolForKey:STORE_PRODUCTID_UNLOCK] && appDelegate_.app_is_unlock==NO) {
-			appDelegate_.app_is_unlock = YES;
+		if ([kvs boolForKey:STORE_PRODUCTID_UNLOCK] && appDelegate_.ppApp_is_unlock==NO) {
+			appDelegate_.ppApp_is_unlock = YES;
 		}
 	}
 	[self.tableView reloadData];
@@ -102,16 +102,13 @@
 	}
 	lbPagePrev_.textAlignment = UITextAlignmentCenter;
 	lbPagePrev_.backgroundColor = [UIColor clearColor];
-	if (appDelegate_.app_is_unlock) {
+	if (appDelegate_.ppApp_is_unlock) {
 		lbPagePrev_.text = NSLocalizedString(@"List Top",nil);
 	} else {
 		lbPagePrev_.text = NSLocalizedString(@"List Limit",nil);
 	}
 	[self.tableView addSubview:lbPagePrev_];
 
-	// 再読み込み
-    [self reloadFetchedResults:nil];
-	
 	// Dropbox Download後など、再フェッチを要求する通知が届く
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadFetchedResults:) 
 												 name:NFM_REFETCH_ALL_DATA
@@ -143,7 +140,7 @@
 //	appDelegate_.app_is_AdShow = YES; //これは広告表示可能なViewである。 viewWillAppear:以降で定義すること
 
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	appDelegate_.app_is_unlock = [kvs boolForKey:STORE_PRODUCTID_UNLOCK];
+	appDelegate_.ppApp_is_unlock = [kvs boolForKey:STORE_PRODUCTID_UNLOCK];
 
 	// 表示行調整
 	if (indexPathEdit_) { // E2editTVC:から戻ったとき、
@@ -163,6 +160,8 @@
 		}
 	}
 	else { 
+		// 再読み込み
+		[self reloadFetchedResults:nil];
 		// 最終行を表示する
 		@try {	// 範囲オーバーで落ちる可能性があるため。 
 			NSIndexPath* ipGoal = [NSIndexPath indexPathForRow:0 inSection: [[__fetchedRc sections] count]];
@@ -219,6 +218,11 @@
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {	// 回転した後に呼び出される
 	//[appDelegate_ adRefresh];
+/*	if (iS_iPAD) {
+		CGRect rc = ibViewTitle.frame;
+		rc.origin.x = (self.navigationController.navigationBar.bounds.size.width - rc.size.width) / 2.0;
+		ibViewTitle.frame = rc;
+	}*/
 }
 
 
@@ -284,7 +288,7 @@
 		return [sectionInfo numberOfObjects];
 	}
 	// GOALセクション
-	if (appDelegate_.app_is_unlock) {
+	if (appDelegate_.ppApp_is_unlock) {
 		return 2;
 	} else {
 		return 3; // Goal + Dropbox + Ad
@@ -673,7 +677,7 @@
 		// 前ページへ予告表示
 		if (lbPagePrev_.tag != 1) {
 			lbPagePrev_.tag = 1;
-			if (appDelegate_.app_is_unlock) {
+			if (appDelegate_.ppApp_is_unlock) {
 				lbPagePrev_.text = NSLocalizedString(@"List Top",nil);
 			} else {
 				lbPagePrev_.text = NSLocalizedString(@"List Paid",nil);
@@ -682,7 +686,7 @@
 	} else {
 		if (lbPagePrev_.tag != 0) {
 			lbPagePrev_.tag = 0;
-			if (appDelegate_.app_is_unlock) {
+			if (appDelegate_.ppApp_is_unlock) {
 				lbPagePrev_.text = NSLocalizedString(@"List Top",nil);
 			} else {
 				lbPagePrev_.text = NSLocalizedString(@"List Limit",nil);
