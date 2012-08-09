@@ -9,10 +9,6 @@
 #import "PatternImageView.h"
 
 @implementation PatternImageView
-{
-@private
-    UIImage		*image_;
-}
 
 
 - (id)initWithFrame:(CGRect)frame  patternImage:(UIImage*)image 
@@ -20,14 +16,14 @@
 	self = [super init];
 	if (self) {
 		self.frame = frame;
-		image_ = image;
+		mImage = image;
 	}
 	return self;
 }
 
 - (void)drawRect:(CGRect)rect 
 {
-	[image_ drawAsPatternInRect:self.bounds];	// タイル描画
+	[mImage drawAsPatternInRect:self.bounds];	// タイル描画
 }
 
 @end

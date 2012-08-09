@@ -181,7 +181,7 @@
 
 	if (0 < indexPath.row && indexPath.row<=[mCalendars count]) {
 		EKCalendar* calendar = [mCalendars objectAtIndex:indexPath.row - 1];
-		if (mAppDelegate.app_is_unlock==NO) {	// Free制限
+		if (mAppDelegate.ppApp_is_unlock==NO) {	// Free制限
 			if (calendar.type != EKCalendarTypeLocal) {
 				// Freeでは「ローカルカレンダー」だけに制限する
 				azAlertBox(NSLocalizedString(@"FreeLock",nil), 

@@ -129,7 +129,7 @@
 	ibSpDays.value = iDays;
 	ibLbDays.text = [NSString stringWithFormat:NSLocalizedString(@"Stat Last %ld days",nil), iDays];
 
-	if (mAppDelegate.app_is_unlock==NO) {
+	if (mAppDelegate.ppApp_is_unlock==NO) {
 		CGRect rc = ibScrollView.frame;	//繰り返し通っても大丈夫なようにすること。
 		if (iS_iPAD) {
 			rc.size.height = self.view.frame.size.height - rc.origin.y - (66+3);
@@ -237,7 +237,7 @@
 {	// iOS5以降
 	NSLog(@"actionStepperChange: sender.value=%.2lf  (.stepValue=%.2lf)", sender.value, sender.stepValue);
 
-	if (mAppDelegate.app_is_unlock==NO && STAT_DAYS_FREE < ibSpDays.value) {
+	if (mAppDelegate.ppApp_is_unlock==NO && STAT_DAYS_FREE < ibSpDays.value) {
 		ibSpDays.value = STAT_DAYS_FREE;
 		azAlertBox(NSLocalizedString(@"FreeLock",nil), 
 				 NSLocalizedString(@"FreeLock StatLimit",nil), @"OK");

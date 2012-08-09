@@ -258,7 +258,7 @@
 	// 添付画像
     //[tweetVC addImage: [UIImage imageNamed:@"Icon57"]];
 	// 添付ＵＲＬ
-	if (appDelegate_.app_is_unlock==NO) {
+	if (appDelegate_.ppApp_is_unlock==NO) {
 		[mTweetVC addURL:[NSURL URLWithString: NSLocalizedString(@"Tweet URL",nil)]];
 	}
 	
@@ -281,7 +281,7 @@
 {
 	//NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	if (appDelegate_.eventStore==nil OR mEKCalendar==nil) {
+	if (appDelegate_.ppEventStore==nil OR mEKCalendar==nil) {
 		if ([kvs boolForKey:KVS_bTweet]==NO) return;
 	}
 	
@@ -350,15 +350,15 @@
 	NSLog(@"actionSave: zTweet={%@}", zTweet);
 	
 	// Calendar Export  ＜＜常にローカル記録されるためオフライン対応は考えなくて良い。
-	if (appDelegate_.eventStore && mEKCalendar) {
+	if (appDelegate_.ppEventStore && mEKCalendar) {
 		EKEvent *event = nil;
 		if (10<[moE2edit_.sEventID length]) {	// 既存につき更新する
 			// ID検索  見つからなければ nil
-			event = [appDelegate_.eventStore eventWithIdentifier:moE2edit_.sEventID];
+			event = [appDelegate_.ppEventStore eventWithIdentifier:moE2edit_.sEventID];
 		}
 		if (event==nil) {	
 			// 新規
-			event = [EKEvent eventWithEventStore:appDelegate_.eventStore];
+			event = [EKEvent eventWithEventStore:appDelegate_.ppEventStore];
 		}
 		event.title = zTweet;
 		event.location = moE2edit_.sEquipment;
@@ -370,7 +370,7 @@
 		// イベントをカレンダーデータベースに保存
 		NSError *error;
 		//削除 [appDelegate_.eventStore removeEvent:event span:EKSpanThisEvent error:&error];
-		[appDelegate_.eventStore saveEvent:event span:EKSpanThisEvent error:&error]; // 保存
+		[appDelegate_.ppEventStore saveEvent:event span:EKSpanThisEvent error:&error]; // 保存
 		if (error) {
 			GA_TRACK_EVENT_ERROR([error localizedDescription],0);
 			NSLog(@"saveEvent: error={%@}", [error localizedDescription]);
@@ -416,7 +416,7 @@
 	[self modify:NO]; // TabBar有効化
 
 	if (editMode_==0) { // AddNewのとき
-		appDelegate_.app_e2record_count = [mocFunc_ e2record_count];
+		appDelegate_.ppApp_e2record_count = [mocFunc_ e2record_count];
 	}
 	
 	if (kvsGoal_) {
@@ -635,7 +635,7 @@
 //	appDelegate_.app_is_AdShow = YES; //これは広告表示可能なViewである。 viewWillAppear:以降で定義すること
 	
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	appDelegate_.app_is_unlock = [kvs boolForKey:STORE_PRODUCTID_UNLOCK];
+	appDelegate_.ppApp_is_unlock = [kvs boolForKey:STORE_PRODUCTID_UNLOCK];
 	
 	// Tweet設定
 	if (mTweetVC==nil && [kvs boolForKey:KVS_bTweet]) {
@@ -646,7 +646,7 @@
 	// カレンダー設定
 	NSUserDefaults *udef = [NSUserDefaults standardUserDefaults];
 	if ([udef objectForKey:UDEF_CalendarID]) {	//1.0.1//でバイス固有値であるため
-		mEKCalendar = [appDelegate_.eventStore 
+		mEKCalendar = [appDelegate_.ppEventStore 
 					   calendarWithIdentifier: [udef objectForKey:UDEF_CalendarID]];
 		NSLog(@"E2editTVC: mEKCalendar={%@}", mEKCalendar);
 		if (mEKCalendar==nil) {
@@ -840,11 +840,11 @@
 
 - (void)refreshAllViews:(NSNotification*)note 
 {	// iCloud-CoreData に変更があれば呼び出される
-	if ([appDelegate_ app_is_unlock]==NO) {
+	if ([appDelegate_ ppApp_is_unlock]==NO) {
 		NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 		[kvs synchronize]; // 最新同期
-		if ([kvs boolForKey:STORE_PRODUCTID_UNLOCK] && appDelegate_.app_is_unlock==NO) {
-			appDelegate_.app_is_unlock = YES;
+		if ([kvs boolForKey:STORE_PRODUCTID_UNLOCK] && appDelegate_.ppApp_is_unlock==NO) {
+			appDelegate_.ppApp_is_unlock = YES;
 		}
 	}
 	[self.tableView reloadData];
@@ -1322,16 +1322,16 @@
 		case ALERT_TAG_DeleteE2: {	// この記録を削除する
 			if (10<[moE2edit_.sEventID length]) {
 				// カレンダー削除する
-				if (appDelegate_.eventStore && mEKCalendar) {
+				if (appDelegate_.ppEventStore && mEKCalendar) {
 					EKEvent *event = nil;
 					// ID検索  見つからなければ nil
-					event = [appDelegate_.eventStore eventWithIdentifier:moE2edit_.sEventID];
+					event = [appDelegate_.ppEventStore eventWithIdentifier:moE2edit_.sEventID];
 					if (event) {	
 						// イベントが関連付けられるカレンダーを設定
 						[event setCalendar:mEKCalendar];
 						NSError *error;
 						// イベントをカレンダーから削除する
-						[appDelegate_.eventStore removeEvent:event span:EKSpanThisEvent error:&error];
+						[appDelegate_.ppEventStore removeEvent:event span:EKSpanThisEvent error:&error];
 						if (error) {
 							NSLog(@"removeEvent: error={%@}", [error localizedDescription]);
 							GA_TRACK_EVENT_ERROR([error localizedDescription],0);

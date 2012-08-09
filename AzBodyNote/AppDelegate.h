@@ -36,21 +36,14 @@
 	//NSInteger		mAdShow;						// (0)非表示 (1)tabBar上 (2)最下部  (-1)破棄
 }
 
-@property (nonatomic, strong) IBOutlet UIWindow *window;
-@property (nonatomic, strong) IBOutlet UITabBarController *tabBarController;
-
-//@property (nonatomic, strong, readonly) NSManagedObjectContext	*managedObjectContext;
-//@property (nonatomic, strong, readonly) MocFunctions							*mocBase;
-//@property (nonatomic, strong, readonly) AdWhirlView							*adWhirlView;
-@property (nonatomic, strong, readonly) EKEventStore							*eventStore;
+@property (nonatomic, strong) UIWindow *window; //Rename禁止
+@property (nonatomic, strong) UITabBarController *ppTabBarController;
+@property (nonatomic, strong, readonly) EKEventStore		*ppEventStore;
 
 // app_ Global paramaters
-//@property (nonatomic, assign) BOOL			app_is_sponsor;
-@property (nonatomic, assign) BOOL			app_is_unlock;				// In App Purchese = 広告なし ＆ 制限解除
-@property (nonatomic, assign) NSInteger	app_e2record_count;		// Trial制限に使用。　 コメント投稿情報に表示。
-//@property (nonatomic, assign) BOOL			app_is_AdShow;				// YES=現在広告可能なViewである
-
-@property (nonatomic, assign, readonly) BOOL	app_is_iPad;	// YES=iPad
+@property (nonatomic, assign) BOOL			ppApp_is_unlock;				// In App Purchese = 広告なし ＆ 制限解除
+@property (nonatomic, assign) NSInteger	ppApp_e2record_count;		// Trial制限に使用。　 コメント投稿情報に表示。
+@property (nonatomic, assign, readonly) BOOL	ppApp_is_iPad;	// YES=iPad
 
 
 - (void)alertProgressOn:(NSString*)zTitle;

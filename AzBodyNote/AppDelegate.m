@@ -16,16 +16,21 @@
 //#import "DropboxVC.h"
 
 
-#define CoreData_iCloud_SYNC		NO		// YES or NO
+#define CoreData_iCloud_SYNC				NO		// YES or NO
 
 
 @implementation AppDelegate
-@synthesize window = __window;
-@synthesize tabBarController = __tabBarController;
-@synthesize app_is_unlock = __app_is_unlock;
-@synthesize app_e2record_count = __app_e2record_count;
-@synthesize app_is_iPad = __app_is_iPad;
-@synthesize eventStore = __eventStore;
+
+@synthesize window = __Window;
+@synthesize ppTabBarController = __TabBarController;
+@synthesize ppApp_is_unlock = __App_is_unlock;
+@synthesize ppApp_e2record_count = __App_e2record_count;
+@synthesize ppApp_is_iPad = __App_is_iPad;	//readonlyを更新するため
+@synthesize ppEventStore = __EventStore;
+
+//考察// self.ppEventStore: set,getが使用される
+//考察// __EventStore: 直接アクセス
+
 
 
 #pragma mark - alertProgressOn/Off
@@ -133,30 +138,30 @@
 	
 	[kvs synchronize];
 	
-	if (__app_is_unlock==NO) {
-		__app_is_unlock = [kvs boolForKey:STORE_PRODUCTID_UNLOCK];
+	if (__App_is_unlock==NO) {
+		__App_is_unlock = [kvs boolForKey:STORE_PRODUCTID_UNLOCK];
 		//[0.8]以前に対応するため
-		if (__app_is_unlock==NO) {
-			__app_is_unlock = [kvs boolForKey:@"GUD_bPaid"];  //[0.8]以前の定義
-			if (__app_is_unlock==NO) {
-				__app_is_unlock = [kvs boolForKey:@"GUD_bUnlock"];  //[0.8]以前の定義
-				if (__app_is_unlock==NO) {
+		if (__App_is_unlock==NO) {
+			__App_is_unlock = [kvs boolForKey:@"GUD_bPaid"];  //[0.8]以前の定義
+			if (__App_is_unlock==NO) {
+				__App_is_unlock = [kvs boolForKey:@"GUD_bUnlock"];  //[0.8]以前の定義
+				if (__App_is_unlock==NO) {
 					NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-					if (__app_is_unlock==NO) {
-						__app_is_unlock = [userDefaults boolForKey:@"GUD_bPaid"];  //[0.8]以前の定義
-						if (__app_is_unlock==NO) {
-							__app_is_unlock = [userDefaults boolForKey:@"GUD_bUnlock"];  //[0.8]以前の定義
+					if (__App_is_unlock==NO) {
+						__App_is_unlock = [userDefaults boolForKey:@"GUD_bPaid"];  //[0.8]以前の定義
+						if (__App_is_unlock==NO) {
+							__App_is_unlock = [userDefaults boolForKey:@"GUD_bUnlock"];  //[0.8]以前の定義
 						}
 					}
 				}
 			}
 		}
 #ifdef DEBUG
-		__app_is_unlock = NO;
-		[kvs setBool:__app_is_unlock forKey:STORE_PRODUCTID_UNLOCK];
+		__App_is_unlock = NO;
+		[kvs setBool:__App_is_unlock forKey:STORE_PRODUCTID_UNLOCK];
 		[kvs synchronize]; // plistへ書き出す
 #endif
-		if (__app_is_unlock) {	//登録
+		if (__App_is_unlock) {	//登録
 			[kvs setBool:YES forKey:STORE_PRODUCTID_UNLOCK];
 			[kvs synchronize]; // plistへ書き出す
 		}
@@ -182,16 +187,18 @@
 		azAlertBox(@"! STOP !", @"Need more iOS 5.0", nil);
 		exit(0);
 	}
-	__app_is_iPad = [[[UIDevice currentDevice] model] hasPrefix:@"iPad"];	// iPad
+	//self.ppApp_is_iPad = これはreadonly属性により更新できない。
+	__App_is_iPad = [[[UIDevice currentDevice] model] hasPrefix:@"iPad"];	// iPad
 
 
 	//-------------------------------------------------カレンダー
-	if (__eventStore==nil) {
-		__eventStore = [[EKEventStore alloc] init];
-		//NSLog(@"[__eventStore calendars]={%@}", [__eventStore calendars]);
+	if (__EventStore==nil) {
+		//self.ppEventStore = これはreadonly属性により更新できない。
+		__EventStore = [[EKEventStore alloc] init];
+		//NSLog(@"[__EventStore calendars]={%@}", [__EventStore calendars]);
 	}
-	if (__eventStore==nil) {
-		GA_TRACK_ERROR(@"__eventStore==nil");
+	if (__EventStore==nil) {
+		GA_TRACK_ERROR(@"__EventStore==nil");
 	}
 	
 	
@@ -205,7 +212,7 @@
 #endif
 
 #ifdef xxxxxxxxxxxxNoAddxxxxxxxxxxxx
-	if (__app_is_unlock==NO) {
+	if (__App_is_unlock==NO) {
 		@try {
 			//--------------------------------------------------------------------------------------------------------- AdMob
 			//iPhone//320x50//extern GADAdSize const kGADAdSizeBanner;
@@ -218,14 +225,14 @@
 					RoAdMobView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeBanner];		//320x50
 					RoAdMobView.adUnitID = @"a14ece23da85f5e";	//iPhone//体調メモ
 				}
-				RoAdMobView.rootViewController = self.window.rootViewController;
+				RoAdMobView.rootViewController = __Window.rootViewController;
 				//rc.origin.x = (rc.size.width - RoAdMobView.frame.size.width) / 2.0;
 				//RoAdMobView.frame = rc;
 				RoAdMobView.alpha = 0;
 				GADRequest *request = [GADRequest request];
 				//[request setTesting:YES];
 				[RoAdMobView loadRequest:request];	
-				[self.window.rootViewController.view addSubview:RoAdMobView];
+				[__Window.rootViewController.view addSubview:RoAdMobView];
 			}
 			//--------------------------------------------------------------------------------------------------------- iAd
 			//iPhone//320x50//480x32//
@@ -241,7 +248,7 @@
 			//rc.origin.x = 0;
 			//RiAdBanner.frame = rc;
 			RiAdBanner.alpha = 0;
-			[self.window.rootViewController.view addSubview:RiAdBanner];
+			[_Window.rootViewController.view addSubview:RiAdBanner];
 			bADbannerIsVisible = NO;
 			mAdShow = 0;
 		}
@@ -334,7 +341,7 @@
 
 - (void)dealloc
 {
-	__eventStore = nil;
+	__EventStore = nil;
 	//[self adUnload];
 }
 
@@ -550,7 +557,7 @@
 				// 同期がおかしくなったときには、[設定]-[iCloud]-[ストレージとバックアップ]-[ストレージを管理]-[健康日記]-[編集]-[すべて削除] する。
 				//[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy]; // 変更した方を優先(Default)
 				//[moc setMergePolicy:NSOverwriteMergePolicy]; // 上書き
-				[moc setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy]; // ストアを優先　＜＜＜ＯＫ
+				//[moc setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy]; // ストアを優先　＜＜＜ＯＫ
 				
 				[[NSNotificationCenter defaultCenter]addObserver:self 
 														selector:@selector(mergeChangesFrom_iCloud:) 
@@ -616,7 +623,7 @@
 
 - (void)adRefresh
 {
-	if (__app_is_unlock  OR  (RoAdMobView==nil  &&  RiAdBanner==nil)) {
+	if (__App_is_unlock  OR  (RoAdMobView==nil  &&  RiAdBanner==nil)) {
 		return;  //Adなし
 	}
 	//NSLog(@"=== adRefresh ===");

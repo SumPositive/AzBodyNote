@@ -9,6 +9,10 @@
 #import <UIKit/UIKit.h>
 
 @interface PatternImageView : UIView
+{
+@private
+    UIImage		*mImage;
+}
 
 - (id)initWithFrame:(CGRect)frame  patternImage:(UIImage*)image;
 

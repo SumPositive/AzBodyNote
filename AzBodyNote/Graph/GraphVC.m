@@ -571,7 +571,7 @@ NSInteger afterPageChange = 0;
 		mSliderOneWidth.value = iVal;
 	}
 	
-	if (mAppDelegate.app_is_unlock==NO) {
+	if (mAppDelegate.ppApp_is_unlock==NO) {
 		CGRect rc = ibScrollView.frame;	//繰り返し通っても大丈夫なようにすること。
 		if (iS_iPAD) {
 			rc.size.height = self.view.frame.size.height - rc.origin.y - (66+3);
@@ -692,7 +692,7 @@ NSInteger afterPageChange = 0;
 	//	  scrollView.contentOffset.x, scrollView.contentOffset.y, scrollView.frame.size.height);
 	if (scrollView.contentOffset.x < -70) {
 		// PREV（過去）ページへ
-		if (mAppDelegate.app_is_unlock==NO) {
+		if (mAppDelegate.ppApp_is_unlock==NO) {
 			azAlertBox(NSLocalizedString(@"FreeLock",nil), 
 							NSLocalizedString(@"FreeLock GraphLimit",nil), @"OK");
 			return;

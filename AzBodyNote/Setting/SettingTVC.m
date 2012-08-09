@@ -173,7 +173,7 @@
 				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
 			}
 			cell.textLabel.text = NSLocalizedString(@"SettTweet",nil);
-			if (mAppDelegate.app_is_unlock) {
+			if (mAppDelegate.ppApp_is_unlock) {
 				cell.detailTextLabel.text = NSLocalizedString(@"SettTweet detail",nil);
 			} else {
 				cell.detailTextLabel.text = NSLocalizedString(@"SettTweet detail FREE",nil);
@@ -427,7 +427,7 @@
 {	//既に呼び出し元にて、[userDefaults setBool:YES  forKey:productID]　登録済み
 	GA_TRACK_EVENT(@"AZStore", @"azStorePurchesed", productID,1);
 	if ([productID isEqualToString:STORE_PRODUCTID_UNLOCK]) {
-		mAppDelegate.app_is_unlock = YES; //購入済み
+		mAppDelegate.ppApp_is_unlock = YES; //購入済み
 		//Ad非表示
 		//[mAppDelegate adShow:-1]; //-1=破棄
 	}
@@ -511,7 +511,7 @@
 	// コミット
 	[[MocFunctions sharedMocFunctions] commit];
 	// E2 件数
-	mAppDelegate.app_e2record_count = [[MocFunctions sharedMocFunctions] e2record_count];
+	mAppDelegate.ppApp_e2record_count = [[MocFunctions sharedMocFunctions] e2record_count];
 	// E2listなどへ再フェッチ要求
 	[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFETCH_ALL_DATA
 														object:self userInfo:nil];

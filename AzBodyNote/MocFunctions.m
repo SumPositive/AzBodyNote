@@ -46,55 +46,55 @@ static NSDate *dateGoal_ = nil;
 	if (self==nil) return nil; // ERROR
 	
 	assert(moc);
-	moc_ = moc;
+	mContext = moc;
 	return self;
 }*/
 
 - (void)setMoc:(NSManagedObjectContext *)moc
 {
 	assert(moc);
-	moc_ = moc;
+	mContext = moc;
 }	
 
 - (NSManagedObjectContext*)getMoc
 {
-	return moc_;
+	return mContext;
 }
 
 - (id)insertAutoEntity:(NSString *)zEntityName	// autorelease
 {
-	assert(moc_);
+	assert(mContext);
 	// Newが含まれているが、自動解放インスタンスが生成される。
 	// 即commitされる。つまり、rollbackやcommitの対象外である。 ＜＜そんなことは無い！ roolback可能 save必要
-	return [NSEntityDescription insertNewObjectForEntityForName:zEntityName inManagedObjectContext:moc_];
+	return [NSEntityDescription insertNewObjectForEntityForName:zEntityName inManagedObjectContext:mContext];
 	// ここで生成されたEntityは、rollBack では削除されない。　Cancel時には、deleteEntityが必要。 ＜＜そんなことは無い！ roolback可能 save必要
 }	
 
 - (void)deleteEntity:(NSManagedObject *)entity
 {
-	@synchronized(moc_)
+	@synchronized(mContext)
 	{
 		if (entity) {
-			[moc_ deleteObject:entity];	// 即commitされる。つまり、rollbackやcommitの対象外である。 ＜＜そんなことは無い！ roolback可能 save必要
+			[mContext deleteObject:entity];	// 即commitされる。つまり、rollbackやcommitの対象外である。 ＜＜そんなことは無い！ roolback可能 save必要
 		}
 	}
 }	
 
 - (BOOL)hasChanges		// YES=commit以後に変更あり
 {
-	return [moc_ hasChanges];
+	return [mContext hasChanges];
 }
 
 - (BOOL)commit
 {
-	assert(moc_);
-	@synchronized(moc_)
+	assert(mContext);
+	@synchronized(mContext)
 	{
 		// SAVE
 		NSError *err = nil;
-		if (![moc_  save:&err]) {
-			NSLog(@"*** MOC commit error ***\n%@\n%@\n***\n", err, [err userInfo]);
-			GA_TRACK_EVENT_ERROR([err localizedDescription],0);
+		if (![mContext  save:&err]) {
+			//NSLog(@"*** MOC commit error ***\n%@\n%@\n***\n", err, [err userInfo]);
+			GA_TRACK_EVENT_ERROR([err description],0);
 			//exit(-1);  // Fail
 			azAlertBox(NSLocalizedString(@"MOC CommitErr",nil),
 					 NSLocalizedString(@"MOC CommitErrMsg",nil),
@@ -108,11 +108,11 @@ static NSDate *dateGoal_ = nil;
 
 - (void)rollBack
 {
-	assert(moc_);
-	@synchronized(moc_)
+	assert(mContext);
+	@synchronized(mContext)
 	{
 		// ROLLBACK
-		[moc_ rollback]; // 前回のSAVE以降を取り消す
+		[mContext rollback]; // 前回のSAVE以降を取り消す
 	}
 }
 
@@ -121,21 +121,21 @@ static NSDate *dateGoal_ = nil;
 
 - (NSUInteger)e2record_count
 {
-	assert(moc_);
+	assert(mContext);
 	NSFetchRequest *req = nil;
 	@try {
 		req = [[NSFetchRequest alloc] init];
 		
 		// select
 		NSEntityDescription *entity = [NSEntityDescription entityForName:E2_ENTITYNAME 
-												  inManagedObjectContext:moc_];
+												  inManagedObjectContext:mContext];
 		[req setEntity:entity];
 		
 		// where
 		[req setPredicate: [NSPredicate predicateWithFormat: E2_nYearMM @" > 200000"]];
 		
 		NSError *error = nil;
-		NSUInteger count = [moc_ countForFetchRequest:req error:&error];
+		NSUInteger count = [mContext countForFetchRequest:req error:&error];
 		if (error) {
 			NSLog(@"count: Error %@, %@", error, [error userInfo]);
 			GA_TRACK_EVENT_ERROR([error localizedDescription],0);
@@ -156,14 +156,14 @@ static NSDate *dateGoal_ = nil;
 			  where:(NSPredicate *)predicate
 			   sort:(NSArray *)arSort 
 {
-	assert(moc_);
+	assert(mContext);
 	NSFetchRequest *req = nil;
 	@try {
 		req = [[NSFetchRequest alloc] init];
 		
 		// select
 		NSEntityDescription *entity = [NSEntityDescription entityForName:zEntity 
-												  inManagedObjectContext:moc_];
+												  inManagedObjectContext:mContext];
 		[req setEntity:entity];
 		
 		// limit	抽出件数制限
@@ -188,7 +188,7 @@ static NSDate *dateGoal_ = nil;
 		}
 
 		NSError *error = nil;
-		NSArray *arFetch = [moc_ executeFetchRequest:req error:&error];
+		NSArray *arFetch = [mContext executeFetchRequest:req error:&error];
 		//[req release], req = nil;
 		if (error) {
 			NSLog(@"select: Error %@, %@", error, [error userInfo]);
@@ -210,9 +210,9 @@ static NSDate *dateGoal_ = nil;
 
 - (void)e2delete:(E2record *)e2node
 {
-	assert(moc_);
+	assert(mContext);
 	if (e2node==nil) return;
-	[moc_ deleteObject:e2node]; // 削除
+	[mContext deleteObject:e2node]; // 削除
 }
 
 
@@ -221,12 +221,12 @@ static NSDate *dateGoal_ = nil;
 {
 	NSUInteger count = 0;
 	
-	for (NSEntityDescription *entity in [[[moc_ persistentStoreCoordinator] managedObjectModel] entities]) 
+	for (NSEntityDescription *entity in [[[mContext persistentStoreCoordinator] managedObjectModel] entities]) 
 	{
 		NSFetchRequest *request = [[NSFetchRequest alloc] init];
-		[request setEntity:[NSEntityDescription entityForName:[entity name] inManagedObjectContext:moc_]];
+		[request setEntity:[NSEntityDescription entityForName:[entity name] inManagedObjectContext:mContext]];
 		
-		NSArray *temp = [moc_ executeFetchRequest:request error:NULL];
+		NSArray *temp = [mContext executeFetchRequest:request error:NULL];
 		
 		if (temp) {
 			count += [temp count];
@@ -235,7 +235,7 @@ static NSDate *dateGoal_ = nil;
 		//[request release];
 		
 		for (NSManagedObject *object in temp) {
-			[moc_ deleteObject:object];
+			[mContext deleteObject:object];
 		}
 	}
 	NSLog(@"deleteAllCoreData: count=%d", count);
@@ -310,7 +310,7 @@ static NSDate *dateGoal_ = nil;
     NSString* class = [dict objectForKey:@"#class"];
 	NSManagedObject* newObject;
 	@try {
-		newObject = [NSEntityDescription insertNewObjectForEntityForName:class inManagedObjectContext:moc_];
+		newObject = [NSEntityDescription insertNewObjectForEntityForName:class inManagedObjectContext:mContext];
 	}
 	@catch (NSException *exception) {
 		NSLog(@"insertNewObjectForDictionary: No class={%@}", class);
@@ -346,7 +346,7 @@ static NSDate *dateGoal_ = nil;
         else if ([value isKindOfClass:[NSDictionary class]]) {
 			/***　関連（リレーション）非対応
             // This is a to-one relationship
-            NSManagedObject* childObject = [MocFunctions insertNewObjectFromDictionary:(NSDictionary*)value  inContext:moc_];
+            NSManagedObject* childObject = [MocFunctions insertNewObjectFromDictionary:(NSDictionary*)value  inContext:mContext];
             [mobj setValue:childObject forKey:key];　***/
         }
         else if ([value isKindOfClass:[NSSet class]]) {
@@ -358,7 +358,7 @@ static NSDate *dateGoal_ = nil;
             NSMutableSet* relatedObjects = [mobj mutableSetValueForKey:key];
 			
             for (NSDictionary* relatedObjectDict in relatedObjectDictionaries) {
-                NSManagedObject* childObject = [MocFunctions insertNewObjectFromDictionary:relatedObjectDict  inContext:moc_];
+                NSManagedObject* childObject = [MocFunctions insertNewObjectFromDictionary:relatedObjectDict  inContext:mContext];
                 [relatedObjects addObject:childObject];
             }***/
         }

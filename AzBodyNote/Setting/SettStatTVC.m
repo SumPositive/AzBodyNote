@@ -117,7 +117,7 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
-	if (section==0 && !mAppDelegate.app_is_unlock) {
+	if (section==0 && !mAppDelegate.ppApp_is_unlock) {
 		return @"\n\n\n"; //広告スペース
 	}
 	return nil;
@@ -286,7 +286,7 @@
 
 - (void)dialDone:(id)sender dial:(NSInteger)dial
 {	// dial変位が停止したとき
-	if (mAppDelegate.app_is_unlock==NO && STAT_DAYS_FREE < dial) {
+	if (mAppDelegate.ppApp_is_unlock==NO && STAT_DAYS_FREE < dial) {
 		[mDialDays setDial:STAT_DAYS_FREE animated:NO];
 		azAlertBox(NSLocalizedString(@"FreeLock",nil), 
 				 NSLocalizedString(@"FreeLock StatLimit",nil), @"OK");

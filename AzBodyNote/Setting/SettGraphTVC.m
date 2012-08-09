@@ -157,7 +157,7 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
-	if (section==1 && !mAppDelegate.app_is_unlock) {
+	if (section==1 && !mAppDelegate.ppApp_is_unlock) {
 		return @"\n\n\n"; //広告スペース
 	}
 	return nil;

@@ -17,7 +17,7 @@
 @interface MocFunctions : NSObject 
 {
 @private
-	NSManagedObjectContext		*moc_;
+	NSManagedObjectContext		*mContext;
 }
 
 // ＋ クラスメソッド
