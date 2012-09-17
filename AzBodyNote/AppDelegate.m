@@ -16,9 +16,6 @@
 //#import "DropboxVC.h"
 
 
-#define CoreData_iCloud_SYNC				NO		// YES or NO
-
-
 @implementation AppDelegate
 
 @synthesize window = __Window;
@@ -78,11 +75,6 @@
 	GA_TRACK_EVENT(@"Device", @"systemVersion", [[UIDevice currentDevice] systemVersion], 0);
 
 	mAzukiUnlock = NO;	// YES=購入意思ありと見なしてUnlockする
-	
-	// Moc初期化	//[1.0]shard化
-	MocFunctions *mf = [MocFunctions sharedMocFunctions];
-	[mf setMoc:[self managedObjectContext]];
-	
 	
 	//  iCloud KVS     [0.9.0]以降、userDefaultsを廃して、kvsへ移行統一
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
@@ -200,6 +192,9 @@
 	if (__EventStore==nil) {
 		GA_TRACK_ERROR(@"__EventStore==nil");
 	}
+	
+	//-------------------------------------------------Moc初期化	//[1.0]shard化
+	[[MocFunctions sharedMocFunctions] initialize];
 	
 	
 #ifdef DEBUGxxxxxxxx
@@ -349,245 +344,6 @@
 {
     //E2listTVC *rootViewController = (E2listTVC *)[self.navigationController topViewController];
     //rootViewController.managedObjectContext = self.managedObjectContext;
-}
-
-
-#pragma mark - iCloud
-
-// iCloud完全クリアする　＜＜＜同期矛盾が生じたときや構造変更時に使用
-- (void)iCloudAllClear
-{
-	// iCloudサーバー上のゴミデータ削除
-	NSURL *icloudURL = [[NSFileManager defaultManager] URLForUbiquityContainerIdentifier:nil];
-	NSError *err;
-	[[NSFileManager defaultManager] removeItemAtURL:icloudURL error:&err];
-	if (err) {
-		GA_TRACK_ERROR([err localizedDescription])
-	} else {
-		NSLog(@"iCloud: Removed %@", icloudURL);
-	}
-}
-
-- (void)mergeiCloudChanges:(NSNotification*)notification forContext:(NSManagedObjectContext*)moc 
-{
-	NSLog(@"mergeiCloudChanges: notification=%@", notification);
-    [moc mergeChangesFromContextDidSaveNotification:notification]; 
-	
-    NSNotification* refreshNotification = [NSNotification notificationWithName:NFM_REFETCH_ALL_DATA
-																		object:self  userInfo:[notification userInfo]];
-    [[NSNotificationCenter defaultCenter] postNotification:refreshNotification];
-}
-
-// NSNotifications are posted synchronously on the caller's thread
-// make sure to vector this back to the thread we want, in this case
-// the main thread for our views & controller
-- (void)mergeChangesFrom_iCloud:(NSNotification *)notification
-{
-	NSManagedObjectContext* moc = [self managedObjectContext];
-	// this only works if you used NSMainQueueConcurrencyType
-	// otherwise use a dispatch_async back to the main thread yourself
-	[moc performBlock:^{
-        [self mergeiCloudChanges:notification forContext:moc];
-    }];
-}
-
-
-#pragma mark - Core Data stack
-
-/**
- Returns the managed object model for the application.
- If the model doesn't already exist, it is created from the application's model.
- */
-- (NSManagedObjectModel *)managedObjectModel
-{
-    if (mMocModel) {
-        return mMocModel;
-    }
-	
-	mMocModel = [NSManagedObjectModel mergedModelFromBundles:nil];
-	
-	return mMocModel;
-}
-
-/**
- Returns the persistent store coordinator for the application.
- If the coordinator doesn't already exist, it is created and the application's store added to it.
- */
-- (NSPersistentStoreCoordinator *)persistentStoreCoordinator
-{
-    if (mMocPsc) {
-        return mMocPsc;
-    }
-    
-/*    NSURL *storeUrl = [[self applicationDocumentsDirectory] 
-					   URLByAppendingPathComponent:@"azbodynote.sqlite"];	//【重要】リリース後変更禁止
-	NSLog(@"storeUrl=%@", storeUrl);*/
-	
-	NSString *storePath = [[self applicationDocumentsDirectory]
-						   stringByAppendingPathComponent:@"AzBodyNote.sqlite"];	//【重要】リリース後変更禁止
-	NSLog(@"storePath=%@", storePath);
-
-	// assign the PSC to our app delegate ivar before adding the persistent store in the background
-	// this leverages a behavior in Core Data where you can create NSManagedObjectContext and fetch requests
-	// even if the PSC has no stores.  Fetch requests return empty arrays until the persistent store is added
-	// so it's possible to bring up the UI and then fill in the results later
-    mMocPsc = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
-	
-	if (CoreData_iCloud_SYNC  && IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
-		// do this asynchronously since if this is the first time this particular device is syncing with preexisting
-		// iCloud content it may take a long long time to download
-		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-			NSFileManager *fileManager = [NSFileManager defaultManager];
-			// Migrate datamodel
-			NSDictionary *options = nil;
-			NSURL *storeUrl = [NSURL fileURLWithPath:storePath];
-			// this needs to match the entitlements and provisioning profile
-			//@"<individual ID>.<project bundle identifier>"	 
-			//@"5C2UYK6F45.com.azukid.*"  ＜＜＜<individual ID>は、<Company ID>と同じ契約固有コード。
-			NSURL *cloudURL = [fileManager URLForUbiquityContainerIdentifier:nil]; //.entitlementsから自動取得されるようになった。
-			NSLog(@"cloudURL=1=%@", cloudURL);
-			NSURL *tlogURL = nil;
-			if (cloudURL) {
-				// アプリ内のコンテンツ名付加：["coredata"]　＜＜＜変わると共有できない。
-				//NSString* coreDataCloudContent = [[cloudURL path] stringByAppendingPathComponent:@"coredata"];
-				//cloudURL = [NSURL fileURLWithPath:coreDataCloudContent];
-				cloudURL = [cloudURL URLByAppendingPathComponent:@"Documents" isDirectory:YES];
-				tlogURL = [cloudURL URLByAppendingPathComponent:@"TLOG" isDirectory:YES];
-				NSLog(@"cloudURL=2=%@", cloudURL);
-				NSLog(@"tlogURL=2=%@", tlogURL);
-
-				BOOL exists, isDir;
-				[fileManager createDirectoryAtURL:cloudURL withIntermediateDirectories:NO attributes:nil error:nil];
-				exists = [fileManager fileExistsAtPath:[cloudURL relativePath] isDirectory:&isDir];
-				if (exists && isDir) {
-					[fileManager createDirectoryAtURL:tlogURL withIntermediateDirectories:NO attributes:nil error:nil];   
-					exists = [fileManager fileExistsAtPath:[tlogURL relativePath] isDirectory:&isDir];
-					//directory exists
-					if (exists && isDir) {
-					} else{
-						tlogURL = nil;
-						GA_TRACK_ERROR(@"tlogURL==nil;")
-					}
-				} else{
-					tlogURL = nil;
-					GA_TRACK_ERROR(@"tlogURL==nil;")
-				}
-			} else{
-				GA_TRACK_ERROR(@"cloudURL==nil;")
-			}
-			
-			if (cloudURL && tlogURL) {
-				options = [NSDictionary dictionaryWithObjectsAndKeys:
-						   [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
-						   [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption,
-						   @"com.azukid.AzBodyNote.sqlog", NSPersistentStoreUbiquitousContentNameKey,		//【重要】リリース後変更禁止
-						   tlogURL, NSPersistentStoreUbiquitousContentURLKey,													//【重要】リリース後変更禁止
-						   nil];
-			} else {
-				// iCloud is not available
-				options = [NSDictionary dictionaryWithObjectsAndKeys:
-						   [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,	// 自動移行
-						   [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption,			// 自動マッピング推論して処理
-						   nil];																									// NO ならば、「マッピングモデル」を使って移行処理される。
-			}			 
-			NSLog(@"options=%@", options);
-			
-			// prep the store path and bundle stuff here since NSBundle isn't totally thread safe
-			NSPersistentStoreCoordinator* psc = mMocPsc;
-			NSError *error = nil;
-			[psc lock];
-			if (![psc addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeUrl options:options error:&error]) 
-			{
-				NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-				GA_TRACK_ERROR([error localizedDescription]);
-				abort();
-			}
-			[psc unlock];
-			
-			// tell the UI on the main thread we finally added the store and then
-			// post a custom notification to make your views do whatever they need to such as tell their
-			// NSFetchedResultsController to -performFetch again now there is a real store
-			dispatch_async(dispatch_get_main_queue(), ^{
-				NSLog(@"asynchronously added persistent store!");
-				[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFETCH_ALL_DATA
-																	object:self userInfo:nil];
-			});
-		});
-	} 
-	else {	// iOS5より前
-		NSURL *storeUrl = [NSURL fileURLWithPath:storePath];
-		NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
-								 [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
-								 [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption,
-								 nil];
-		
-		NSError *error = nil;
-		if (![mMocPsc addPersistentStoreWithType:NSSQLiteStoreType
-														configuration:nil  URL:storeUrl  options:options  error:&error])
-		{
-			NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-			GA_TRACK_EVENT_ERROR([error description],0);
-			abort();
-		}
-	}
-    return mMocPsc;
-}
-
-/**
- Returns the managed object context for the application.
- If the context doesn't already exist, it is created and bound to the persistent store coordinator for the application.
-**/
-- (NSManagedObjectContext *)managedObjectContext
-{
-	if (mMoc) {
-		return mMoc;
-	}
-    
-    NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
-	NSManagedObjectContext* moc = nil;
-
-    if (coordinator != nil) {
-		if (CoreData_iCloud_SYNC  && IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
-			moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
-			
-			[moc performBlockAndWait:^{
-				// even the post initialization needs to be done within the Block
-				[moc setPersistentStoreCoordinator: coordinator];
-				
-				// 同期がおかしくなったときには、[設定]-[iCloud]-[ストレージとバックアップ]-[ストレージを管理]-[健康日記]-[編集]-[すべて削除] する。
-				//[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy]; // 変更した方を優先(Default)
-				//[moc setMergePolicy:NSOverwriteMergePolicy]; // 上書き
-				//[moc setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy]; // ストアを優先　＜＜＜ＯＫ
-				
-				[[NSNotificationCenter defaultCenter]addObserver:self 
-														selector:@selector(mergeChangesFrom_iCloud:) 
-															name:NSPersistentStoreDidImportUbiquitousContentChangesNotification 
-														  object:coordinator];
-			}];
-        }
-		else {	// iOS5より前
-            moc = [[NSManagedObjectContext alloc] init];
-            [moc setPersistentStoreCoordinator:coordinator];
-        }
-    }
-	//
-	mMoc = moc;
-    return	mMoc;
-}
-
-
-
-#pragma mark - Application's Documents directory
-
-/**
- Returns the URL to the application's Documents directory.
-
-- (NSURL *)applicationDocumentsDirectory
-{
-    return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
-}*/
-- (NSString *)applicationDocumentsDirectory {
-	return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
 }
 
 

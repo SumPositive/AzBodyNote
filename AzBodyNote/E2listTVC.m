@@ -770,8 +770,17 @@
 	return @"NG";
 }
 
-- (void)azDropboxDownCompleated {	// 未使用
+- (void)azDropboxDownResult:(NSString *)result {
+	if (result) {
+		GA_TRACK_ERROR(result);
+	}
 }
+- (void)azDropboxUpResult:(NSString *)result {
+	if (result) {
+		GA_TRACK_ERROR(result);
+	}
+}
+
 
 
 @end

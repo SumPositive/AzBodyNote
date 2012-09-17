@@ -32,7 +32,7 @@
 	IBOutlet UILabel				*ibLbSkMuscle;
 	 */
 	// 見出し　　多言語対応のため
-	IBOutlet UIView				*ibViewTitle;	//iPad//中央寄せするため
+	//IBOutlet UIView				*ibViewTitle;	//iPad//中央寄せするため
 	IBOutlet UILabel				*ibLbTitleDay;
 	IBOutlet UILabel				*ibLbTitleTime;
 	IBOutlet UILabel				*ibLbTitleBpHi;

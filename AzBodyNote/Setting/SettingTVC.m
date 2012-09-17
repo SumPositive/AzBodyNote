@@ -349,7 +349,7 @@
 			vc.ppImgIcon = [UIImage imageNamed:@"Icon57"];
 			vc.ppProductTitle = @"Condition";	// 世界共通名称
 			vc.ppProductSubtitle = NSLocalizedString(@"Product Title",nil); // ローカル名称
-			//vc.ppProductYear = @"2011";	// Copyright初年度
+			vc.ppCopyright = COPYRIGHT;
 			vc.ppSupportSite = @"http://condition.azukid.com";
 			//vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
 			//[self.navigationController pushViewController:vc animated:YES];
@@ -518,13 +518,23 @@
 	return nil; //OK
 }
 
-- (void)azDropboxDownCompleated
+- (void)azDropboxDownResult:(NSString *)result
 {	//ここで、Down成功後の再描画など行う
-	// 再読み込み 通知発信---> E1viewController
-	[[NSNotificationCenter defaultCenter] postNotificationName:NFM_REFRESH_ALL_VIEWS
-														object:self userInfo:nil];
-	[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
+	if (result) {
+		GA_TRACK_ERROR(result);
+	} else {
+		// 再読み込み 通知発信---> E1viewController
+		[[NSNotificationCenter defaultCenter] postNotificationName:NFM_REFRESH_ALL_VIEWS
+															object:self userInfo:nil];
+		[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
+	}
 }
+- (void)azDropboxUpResult:(NSString *)result {
+	if (result) {
+		GA_TRACK_ERROR(result);
+	}
+}
+
 
 
 @end

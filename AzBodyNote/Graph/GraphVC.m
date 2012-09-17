@@ -172,6 +172,8 @@
 	CGRect rcGraphFrame = rcgv;
 	rcGraphFrame.origin.y += rcGraphFrame.size.height;
 	CGFloat fHeight = ibScrollView.bounds.size.height - rcGraphFrame.origin.y - 8;  // 日付と下の余白を除く
+	NSLog(@"self.view.frame.size.height=%f  ibScrollView.frame.size.height=%f   fHeight=%f",
+		  self.view.frame.size.height, ibScrollView.frame.size.height, fHeight);
 	NSInteger iPs = [mPanelGraphs count];
 	assert(0<iPs);
 	fHeight /= iPs;	// 1パネルあたりの高さ
@@ -561,7 +563,7 @@ NSInteger afterPageChange = 0;
 		//注意// 回転対応のため、同じものが didRotateFromInterfaceOrientation:にもある
 		mSliderOneWidth.frame =
 					CGRectMake(-14+(self.view.frame.size.width+ONE_WID_MIN*mPadScale)/2.0,
-				   0,
+				   5,
 				   (ONE_WID_MAX-ONE_WID_MIN)*2.0*mPadScale,
 					20);		//幅2倍にして操作しやすくした
 		NSInteger iVal = [[kvs objectForKey:KVS_SettGraphOneWid] integerValue];
@@ -571,7 +573,7 @@ NSInteger afterPageChange = 0;
 		mSliderOneWidth.value = iVal;
 	}
 	
-	if (mAppDelegate.ppApp_is_unlock==NO) {
+/*	if (mAppDelegate.ppApp_is_unlock==NO) {
 		CGRect rc = ibScrollView.frame;	//繰り返し通っても大丈夫なようにすること。
 		if (iS_iPAD) {
 			rc.size.height = self.view.frame.size.height - rc.origin.y - (66+3);
@@ -581,6 +583,9 @@ NSInteger afterPageChange = 0;
 		ibScrollView.frame = rc;
 	}
 	//NSLog(@"*** self.view.frame.size.width=%.2f", self.view.frame.size.width);
+	NSLog(@"*** self.view.frame.size.height=%.2f", self.view.frame.size.height);
+	NSLog(@"*** ibScrollView.frame.size.height=%.2f", ibScrollView.frame.size.height);
+	*/
 	
 	mPageMax = 999; // この時点で最終ページは不明
 	mPage = 0;

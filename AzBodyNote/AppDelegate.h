@@ -22,8 +22,6 @@
 @interface AppDelegate : NSObject <UIApplicationDelegate>
 {
 @private
-	NSManagedObjectModel				*mMocModel;
-	NSPersistentStoreCoordinator		*mMocPsc;
 	NSManagedObjectContext				*mMoc;
 	
 	UIAlertView									*mAlertProgress;
@@ -48,9 +46,6 @@
 
 - (void)alertProgressOn:(NSString*)zTitle;
 - (void)alertProgressOff;
-
-- (void)iCloudAllClear;
-- (NSString *)applicationDocumentsDirectory;
 
 //- (void)adShow:(NSInteger)iShow;
 //- (void)adRefresh;  //回転時に呼び出すため

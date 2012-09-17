@@ -7,54 +7,75 @@
 //
 #import "MocFunctions.h"
 
+#define ManagedObjectModelFileName @"AzBodyNote"	//【重要】リリース後変更禁止
+//iCloud Parameters
+//#define UBIQUITY_CONTAINER_IDENTIFIER @"5C2UYK6F45.com.azukid.AzBodyNote"
+#define UBIQUITY_CONTENT_NAME_KEY @"com.azukid.AzBodyNote.CoreData"
+
 
 @implementation MocFunctions
 
 //static NSManagedObjectContext *scMoc = nil;
 
 #pragma mark - ＋ クラスメソッド
-
 static MocFunctions	*staticMocFunctions= nil;
 + (MocFunctions *)sharedMocFunctions 
 {
-	if (!staticMocFunctions) {
-		staticMocFunctions = [[MocFunctions alloc] init];
-	}  
-	return staticMocFunctions;
+	@synchronized(self)
+	{	//シングルトン：selfに対する処理が、この間は別のスレッドから行えないようになる。
+		if (staticMocFunctions==nil) {
+			staticMocFunctions = [[MocFunctions alloc] init];
+		}
+		return staticMocFunctions;
+	}
+	return nil;
 }
 
 static NSDate *dateGoal_ = nil;
 + (NSDate*)dateGoal
 {	// .dateTime のための 固有日付(dateGoal)を求める
-	if (dateGoal_==nil) {
-		NSDateFormatter *df = [[NSDateFormatter alloc] init];
-		//[df setTimeStyle:NSDateFormatterFullStyle];
-		[df setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss ZZZZ"];
-		dateGoal_ = [df dateFromString: E2_dateTime_GOAL];
+	@synchronized(self)
+	{	//シングルトン：selfに対する処理が、この間は別のスレッドから行えないようになる。
+		if (dateGoal_==nil) {
+			NSDateFormatter *df = [[NSDateFormatter alloc] init];
+			//[df setTimeStyle:NSDateFormatterFullStyle];
+			[df setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss ZZZZ"];
+			dateGoal_ = [df dateFromString: E2_dateTime_GOAL];
+		}
+		NSLog(@"MocFunction: dateGoal_=%@", dateGoal_);
+		assert(dateGoal_);
+		return dateGoal_;
 	}
-	NSLog(@"MocFunction: dateGoal_=%@", dateGoal_);
-	assert(dateGoal_);
-	return dateGoal_;
+	return nil;
 }
 
 
 #pragma mark - ー インスタンスメソッド
-/*sharedMocFunctions:
-- (id)initWithMoc:(NSManagedObjectContext*)moc
+/*- (void)setMoc:(NSManagedObjectContext *)moc
 {
-	self = [super init];
-	if (self==nil) return nil; // ERROR
-	
 	assert(moc);
 	mContext = moc;
-	return self;
 }*/
-
-- (void)setMoc:(NSManagedObjectContext *)moc
+- (void)initialize
 {
-	assert(moc);
-	mContext = moc;
-}	
+	//Test for iCloud availability
+	if (CoreData_iCloud_SYNC) {
+		[[NSBundle mainBundle] bundleIdentifier];
+		NSFileManager *fileManager = [NSFileManager defaultManager];
+		//miCloudContentURL= [fileManager URLForUbiquityContainerIdentifier:UBIQUITY_CONTAINER_IDENTIFIER];
+		miCloudContentURL = [fileManager URLForUbiquityContainerIdentifier:nil]; //=nilで自動取得されるようになった。
+		if (miCloudContentURL==nil) {
+			GA_TRACK_ERROR(@"miCloudContentURL==nil");
+		}
+	} else {
+		miCloudContentURL = nil;
+	}
+
+	mContext = [self managedObjectContext];
+	if (mContext==nil) {
+		GA_TRACK_ERROR(@"mContext==nil");
+	}
+}
 
 - (NSManagedObjectContext*)getMoc
 {
@@ -72,13 +93,10 @@ static NSDate *dateGoal_ = nil;
 
 - (void)deleteEntity:(NSManagedObject *)entity
 {
-	@synchronized(mContext)
-	{
-		if (entity) {
-			[mContext deleteObject:entity];	// 即commitされる。つまり、rollbackやcommitの対象外である。 ＜＜そんなことは無い！ roolback可能 save必要
-		}
+	if (entity) {
+		[mContext deleteObject:entity];	// 即commitされる。つまり、rollbackやcommitの対象外である。 ＜＜そんなことは無い！ roolback可能 save必要
 	}
-}	
+}
 
 - (BOOL)hasChanges		// YES=commit以後に変更あり
 {
@@ -88,32 +106,34 @@ static NSDate *dateGoal_ = nil;
 - (BOOL)commit
 {
 	assert(mContext);
-	@synchronized(mContext)
+	// SAVE
+	NSError *err = nil;
+	if ([mContext hasChanges] && ![mContext  save:&err])
 	{
-		// SAVE
-		NSError *err = nil;
-		if (![mContext  save:&err]) {
-			//NSLog(@"*** MOC commit error ***\n%@\n%@\n***\n", err, [err userInfo]);
-			GA_TRACK_EVENT_ERROR([err description],0);
-			//exit(-1);  // Fail
-			azAlertBox(NSLocalizedString(@"MOC CommitErr",nil),
-					 NSLocalizedString(@"MOC CommitErrMsg",nil),
-					 NSLocalizedString(@"Roger",nil));
-			return NO;
-		}
+		GA_TRACK_EVENT_ERROR([err description],0);
+		//exit(-1);  // Fail
+		azAlertBox(NSLocalizedString(@"MOC CommitErr",nil),
+				   NSLocalizedString(@"MOC CommitErrMsg",nil),
+				   NSLocalizedString(@"Roger",nil));
+		return NO;
 	}
 	return YES;
 }
 
 
-- (void)rollBack
-{
-	assert(mContext);
-	@synchronized(mContext)
-	{
-		// ROLLBACK
-		[mContext rollback]; // 前回のSAVE以降を取り消す
-	}
+#pragma mark - Undo/Redo Operations
+- (void)undo{
+    [mContext undo];
+	
+}
+- (void)redo{
+    [mContext redo];
+}
+- (void)rollBack{
+    [mContext rollback];
+}
+- (void)reset{
+    [mContext reset];
 }
 
 
@@ -373,6 +393,196 @@ static NSDate *dateGoal_ = nil;
     }
 	return newObject;
 }
+
+
+
+
+#pragma mark - iCloud
+
+// iCloud完全クリアする　＜＜＜同期矛盾が生じたときや構造変更時に使用
+- (void)iCloudAllClear
+{
+	// iCloudサーバー上のゴミデータ削除
+	NSURL *icloudURL = [[NSFileManager defaultManager] URLForUbiquityContainerIdentifier:nil];
+	NSError *err;
+	[[NSFileManager defaultManager] removeItemAtURL:icloudURL error:&err];
+	if (err) {
+		GA_TRACK_ERROR([err localizedDescription])
+	} else {
+		NSLog(@"iCloud: Removed %@", icloudURL);
+	}
+}
+
+// NSNotifications are posted synchronously on the caller's thread
+// make sure to vector this back to the thread we want, in this case
+// the main thread for our views & controller
+- (void)mergeChangesFrom_iCloud:(NSNotification *)notification
+{
+	NSManagedObjectContext* moc = [self managedObjectContext];
+	// this only works if you used NSMainQueueConcurrencyType
+	// otherwise use a dispatch_async back to the main thread yourself
+	//[moc performBlock:^{
+	[moc performBlockAndWait:^(void){
+		[moc mergeChangesFromContextDidSaveNotification:notification]; //CoreData更新
+		
+		NSNotification* refreshNotification = [NSNotification notificationWithName:NFM_REFETCH_ALL_DATA
+																			object:self  userInfo:[notification userInfo]];
+		[[NSNotificationCenter defaultCenter] postNotification:refreshNotification];
+    }];
+}
+
+
+#pragma mark - Core Data stack
+
+/**
+ Returns the managed object model for the application.
+ If the model doesn't already exist, it is created from the application's model.
+ */
+- (NSManagedObjectModel *)managedObjectModel
+{
+    if (mMocModel) {
+        return mMocModel;
+    }
+	
+	//mMocModel = [NSManagedObjectModel mergedModelFromBundles:nil];
+
+	NSURL *modelURL = [[NSBundle mainBundle] URLForResource:ManagedObjectModelFileName withExtension:@"momd"];
+    mMocModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
+	
+	return mMocModel;
+}
+
+/**
+ Returns the persistent store coordinator for the application.
+ If the coordinator doesn't already exist, it is created and the application's store added to it.
+ */
+- (NSPersistentStoreCoordinator *)persistentStoreCoordinator
+{
+    if (mMocPsc) {
+        return mMocPsc;
+    }
+    
+    //NSURL *storeUrl = [[self applicationDocumentsDirectory]
+	//				   URLByAppendingPathComponent:@"AzBodyNote.sqlite"];	//【重要】リリース後変更禁止
+    NSURL *storeUrl = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:
+					   [NSString stringWithFormat:@"%@.sqlite",ManagedObjectModelFileName]];
+	NSLog(@"storeUrl=%@", storeUrl);
+	
+    mMocPsc = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:
+			   [self managedObjectModel]];
+	
+	if (CoreData_iCloud_SYNC  && miCloudContentURL) {
+		// do this asynchronously since if this is the first time this particular device is syncing with preexisting
+		// iCloud content it may take a long long time to download
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+			//[[NSBundle mainBundle] bundleIdentifier];
+			//NSFileManager *fileManager = [NSFileManager defaultManager];
+
+			//NSURL *contentURL = [fileManager URLForUbiquityContainerIdentifier:UBIQUITY_CONTAINER_IDENTIFIER];
+			//=nil : .entitlementsから自動取得されるようになった。
+			//NSURL *contentURL = [fileManager URLForUbiquityContainerIdentifier:nil];
+			NSLog(@"miCloudContentURL=1=%@", miCloudContentURL);
+			
+			NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
+					   [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
+					   [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption,
+					   UBIQUITY_CONTENT_NAME_KEY, NSPersistentStoreUbiquitousContentNameKey,	//【重要】リリース後変更禁止
+					   miCloudContentURL, NSPersistentStoreUbiquitousContentURLKey,								//【重要】リリース後変更禁止
+					   nil];
+			NSLog(@"options=%@", options);
+			
+			// prep the store path and bundle stuff here since NSBundle isn't totally thread safe
+			NSPersistentStoreCoordinator* psc = mMocPsc;
+			NSError *error = nil;
+			[psc lock];
+			if (![psc addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeUrl options:options error:&error])
+			{
+				NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+				GA_TRACK_ERROR([error description]);
+				abort();
+			}
+			[psc unlock];
+			
+			// tell the UI on the main thread we finally added the store and then
+			// post a custom notification to make your views do whatever they need to such as tell their
+			// NSFetchedResultsController to -performFetch again now there is a real store
+			dispatch_async(dispatch_get_main_queue(), ^{
+				NSLog(@"asynchronously added persistent store!");
+				[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFETCH_ALL_DATA
+																	object:self userInfo:nil];
+			});
+		});
+	}
+	else {	//iCloudなし　　iOS5より前
+		NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
+								 [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
+								 [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption,
+								 nil];
+		NSError *error = nil;
+		if (![mMocPsc addPersistentStoreWithType:NSSQLiteStoreType
+								   configuration:nil  URL:storeUrl  options:options  error:&error])
+		{
+			NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+			GA_TRACK_EVENT_ERROR([error description],0);
+			abort();
+		}
+	}
+    return mMocPsc;
+}
+
+/**
+ Returns the managed object context for the application.
+ If the context doesn't already exist, it is created and bound to the persistent store coordinator for the application.
+ **/
+- (NSManagedObjectContext *)managedObjectContext
+{
+	if (mContext) {
+		return mContext;
+	}
+    
+    NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
+	NSManagedObjectContext* moc = nil;
+	
+    if (coordinator != nil) {
+		if (CoreData_iCloud_SYNC  && IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")) {
+			moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+			
+			[moc performBlockAndWait:^(void){
+				// Set up an undo manager, not included by default
+				NSUndoManager *undoManager = [[NSUndoManager alloc] init];
+				[undoManager setGroupsByEvent:NO];
+				[moc setUndoManager:undoManager];
+				
+				
+				// Set persistent store
+				[moc setPersistentStoreCoordinator:coordinator];
+				
+				// 同期がおかしくなったときには、[設定]-[iCloud]-[ストレージとバックアップ]-[ストレージを管理]-[健康日記]-[編集]-[すべて削除] する。
+				//[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy]; // 変更した方を優先(Default)
+				//[moc setMergePolicy:NSOverwriteMergePolicy]; // 上書き
+				//[moc setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy]; // ストアを優先　＜＜＜ＯＫ
+				
+				[[NSNotificationCenter defaultCenter]addObserver:self
+														selector:@selector(mergeChangesFrom_iCloud:)
+															name:NSPersistentStoreDidImportUbiquitousContentChangesNotification
+														  object:coordinator];
+			}];
+        }
+		else {	// iOS5より前
+            moc = [[NSManagedObjectContext alloc] init];
+            [moc setPersistentStoreCoordinator:coordinator];
+        }
+    }
+	//
+    return	moc;
+}
+
+- (NSURL *)applicationDocumentsDirectory
+{
+    return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
+												   inDomains:NSUserDomainMask] lastObject];
+}
+
 
 
 @end

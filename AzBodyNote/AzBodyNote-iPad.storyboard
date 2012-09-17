@@ -673,7 +673,7 @@
                     </subviews>
                 </view>
             </objects>
-            <point key="canvasLocation" x="1354" y="-57"/>
+            <point key="canvasLocation" x="1281" y="-89"/>
         </scene>
         <!--Navigation Controller - List-->
         <scene sceneID="61g-rB-uuX">
@@ -899,7 +899,6 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                 <relationship kind="outlet" name="ibLbTitleTemp" candidateClass="UILabel"/>
                 <relationship kind="outlet" name="ibLbTitleTime" candidateClass="UILabel"/>
                 <relationship kind="outlet" name="ibLbTitleWeight" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibViewTitle" candidateClass="UIView"/>
             </relationships>
         </class>
         <class className="EditDateVC" superclassName="UIViewController">

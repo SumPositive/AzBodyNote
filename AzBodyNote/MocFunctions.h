@@ -13,12 +13,18 @@
 #import "Global.h"
 #import "MocEntity.h"
 
+#define CoreData_iCloud_SYNC				YES		// YES or NO
+
 
 @interface MocFunctions : NSObject 
 {
 @private
-	NSManagedObjectContext		*mContext;
+	NSManagedObjectContext			*mContext;
+	NSManagedObjectModel			*mMocModel;
+	NSPersistentStoreCoordinator	*mMocPsc;
+	NSURL											*miCloudContentURL;
 }
+
 
 // ＋ クラスメソッド
 + (MocFunctions *)sharedMocFunctions;
@@ -26,7 +32,8 @@
 
 // − インスタンスメソッド
 //- (id)initWithMoc:(NSManagedObjectContext*)moc;
-- (void)setMoc:(NSManagedObjectContext *)moc;
+//- (void)setMoc:(NSManagedObjectContext *)moc;
+- (void)initialize;
 - (NSManagedObjectContext*)getMoc;
 - (id)insertAutoEntity:(NSString *)zEntityName;
 - (void)deleteEntity:(NSManagedObject *)entity;
@@ -47,5 +54,8 @@
 
 - (NSDictionary*)dictionaryObject:(NSManagedObject*)mobj;
 - (NSManagedObject*)insertNewObjectForDictionary:(NSDictionary*)dict;
+
+- (void)iCloudAllClear;
+//- (NSString *)applicationDocumentsDirectory;
 
 @end

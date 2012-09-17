@@ -1,49 +1,49 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="2182" systemVersion="11E53" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="gSo-hg-p0Z">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="2840" systemVersion="11E53" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="gSo-hg-p0Z">
     <dependencies>
-        <deployment defaultVersion="1296" identifier="iOS"/>
-        <development version="4300" defaultVersion="4200" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="1181"/>
+        <deployment defaultVersion="1536" identifier="iOS"/>
+        <development version="4300" identifier="xcode"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="1926"/>
     </dependencies>
     <scenes>
         <!--View Controller - GraphVC-->
         <scene sceneID="qaR-l3-Cgj">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="zzZ-UW-wVY" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController title="Graph" modalTransitionStyle="crossDissolve" id="pJ2-eu-18r" userLabel="View Controller - GraphVC" customClass="GraphVC" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Mes-uB-0Hv">
-                        <rect key="frame" x="0.0" y="20" width="320" height="411"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <rect key="frame" x="0.0" y="20" width="320" height="340"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" contentMode="scaleToFill" directionalLockEnabled="YES" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" id="WwL-HN-1Ng">
-                                <rect key="frame" x="0.0" y="10" width="320" height="390"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <rect key="frame" x="0.0" y="10" width="320" height="320"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             </scrollView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="GraphRoll-320x50.png" id="HSy-0I-XRk">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="410"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="340"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             </imageView>
                             <view userInteractionEnabled="NO" alpha="0.20000000000000015" contentMode="scaleToFill" id="JCq-go-u0F" userLabel="View - Record Width">
-                                <rect key="frame" x="140" y="10" width="40" height="390"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <rect key="frame" x="140" y="10" width="40" height="320"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" red="0.20000000000000001" green="0.80000000000000004" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
                     <tabBarItem key="tabBarItem" title="Graph" image="Tab32-Graph.png" id="LCl-bO-Aa5"/>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <connections>
                         <outlet property="ibScrollView" destination="WwL-HN-1Ng" id="ZGL-wP-0cG"/>
                         <outlet property="ibViewRecord" destination="JCq-go-u0F" id="cbc-9E-aev"/>
                     </connections>
                 </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="zzZ-UW-wVY" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1" y="574"/>
         </scene>
         <!--View Controller - StatisticsVC-->
         <scene sceneID="wzE-5A-WaR">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="rDS-3g-KiX" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController title="Statistics" modalTransitionStyle="crossDissolve" id="DPa-5P-xBn" userLabel="View Controller - StatisticsVC" customClass="StatisticsVC" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Cwo-OY-S1z">
                         <rect key="frame" x="0.0" y="20" width="320" height="411"/>
@@ -73,12 +73,13 @@
                             </label>
                             <stepper opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="7" minimumValue="1" maximumValue="50" id="0oK-hR-HbN">
                                 <rect key="frame" x="161" y="49" width="94" height="27"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </stepper>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <tabBarItem key="tabBarItem" title="Statistics" image="Tab32-Stat.png" id="gMC-S8-gyf"/>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <connections>
                         <outlet property="ibLbDays" destination="1Wd-Ax-kKp" id="KuK-et-cY8"/>
                         <outlet property="ibScrollView" destination="5fm-PA-odh" id="bjw-OD-oia"/>
@@ -86,13 +87,13 @@
                         <outlet property="ibSpDays" destination="0oK-hR-HbN" id="mMB-7G-Ram"/>
                     </connections>
                 </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rDS-3g-KiX" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1" y="1178"/>
         </scene>
         <!--SettingTVC - Settings-->
         <scene sceneID="EtZ-nn-ruz">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="oyp-D7-zLW" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <tableViewController id="QFt-XJ-CL0" customClass="SettingTVC" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="singleLineEtched" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="Rqb-7F-zVL">
                         <rect key="frame" x="0.0" y="64" width="320" height="367"/>
@@ -171,13 +172,13 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Settings" id="lDo-cr-lSC"/>
                 </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="oyp-D7-zLW" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="500" y="1879"/>
         </scene>
         <!--Navigation Controller - Settings-->
         <scene sceneID="cDg-AD-sm0">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="0vz-4N-h6K" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController definesPresentationContext="YES" id="MqS-Ic-m4v" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Settings" image="Icon32-Setting.png" id="SKL-9n-apW"/>
                     <navigationBar key="navigationBar" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="fgj-6N-75h">
@@ -187,13 +188,13 @@
                         <segue destination="QFt-XJ-CL0" kind="relationship" relationship="rootViewController" id="VpT-gf-05O"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="0vz-4N-h6K" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1" y="1788"/>
         </scene>
         <!--Navigation Controller - List-->
         <scene sceneID="f7r-rG-arv">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="hob-kh-rKo" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController title="List" definesPresentationContext="YES" modalTransitionStyle="crossDissolve" id="a96-47-bvo" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="List" image="Tab32-List.png" id="M8A-xp-xZL"/>
                     <navigationBar key="navigationBar" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="ee0-I5-CrU">
@@ -203,13 +204,13 @@
                         <segue destination="BBT-Jw-Cgz" kind="relationship" relationship="rootViewController" id="Qgb-gV-31t"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="hob-kh-rKo" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1" y="1"/>
         </scene>
         <!--E2listTVC - List-->
         <scene sceneID="Z9B-62-yUp">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="8UH-ee-1Qs" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <tableViewController storyboardIdentifier="E2listTVC" title="List" id="BBT-Jw-Cgz" userLabel="E2listTVC - List" customClass="E2listTVC" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="tWK-KK-KBJ">
                         <rect key="frame" x="0.0" y="64" width="320" height="367"/>
@@ -449,13 +450,13 @@
                         <outlet property="ibLbTitleWeight" destination="Cs4-fg-BPI" id="2s2-Nd-d8W"/>
                     </connections>
                 </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="8UH-ee-1Qs" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="500" y="1"/>
         </scene>
         <!--E2editTVC - Add-->
         <scene sceneID="kBl-Qy-0cL">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="vlA-T8-dA5" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <tableViewController storyboardIdentifier="E2editTVC" title="Add" modalTransitionStyle="crossDissolve" id="g6r-81-43n" userLabel="E2editTVC - Add" customClass="E2editTVC" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="80" sectionHeaderHeight="22" sectionFooterHeight="22" id="7De-Za-a9P">
                         <rect key="frame" x="0.0" y="64" width="320" height="367"/>
@@ -624,7 +625,7 @@
                                     <outlet property="ibLbValue" destination="AAf-dS-wPz" id="c7H-54-T9F"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" shouldIndentWhileEditing="NO" reuseIdentifier="E2editCellNote" rowHeight="88" id="4j0-QO-TFj" userLabel="Cell - E2editCellCondition" customClass="E2editCellNote">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" shouldIndentWhileEditing="NO" reuseIdentifier="E2editCellNote2" rowHeight="88" id="4j0-QO-TFj" userLabel="Cell - E2editCellCondition" customClass="E2editCellNote">
                                 <rect key="frame" x="0.0" y="286" width="320" height="88"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
@@ -719,13 +720,13 @@
                         <barButtonItem key="backBarButtonItem" title="Back" id="vUe-Jd-6cY"/>
                     </navigationItem>
                 </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="vlA-T8-dA5" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1064" y="-579"/>
         </scene>
         <!--Edit DateVC-->
         <scene sceneID="bo2-qi-yiM">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Lqj-Ke-lAF" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController id="ae1-NJ-t9I" customClass="EditDateVC" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8Xx-Dk-nM0">
                         <rect key="frame" x="0.0" y="64" width="320" height="367"/>
@@ -786,13 +787,13 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                         <outlet property="ibDatePicker" destination="hi3-5k-BVe" id="qYo-7D-rCS"/>
                     </connections>
                 </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Lqj-Ke-lAF" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1546" y="-579"/>
         </scene>
         <!--Navigation Controller - Add-->
         <scene sceneID="oNU-oE-srg">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="NMd-UZ-Ilp" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController title="Add" definesPresentationContext="YES" modalTransitionStyle="flipHorizontal" id="GAi-aS-64n" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Add" image="Tab32-Add.png" id="KP8-uq-wlD"/>
                     <navigationBar key="navigationBar" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="zi7-k3-hfl">
@@ -802,13 +803,13 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                         <segue destination="g6r-81-43n" kind="relationship" relationship="rootViewController" id="nDM-Jt-DLq"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="NMd-UZ-Ilp" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1" y="-576"/>
         </scene>
         <!--Tab Bar Controller - Main-->
         <scene sceneID="iwE-Gc-8wi">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="x7y-mU-XEZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <tabBarController title="Main" definesPresentationContext="YES" id="gSo-hg-p0Z" sceneMemberID="viewController">
                     <nil key="simulatedBottomBarMetrics"/>
                     <tabBar key="tabBar" contentMode="scaleToFill" id="PK9-8h-A9S">
@@ -824,6 +825,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                         <segue destination="MqS-Ic-m4v" kind="relationship" relationship="viewControllers" id="he3-rX-L03"/>
                     </connections>
                 </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="x7y-mU-XEZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-643" y="249"/>
         </scene>

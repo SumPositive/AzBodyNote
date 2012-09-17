@@ -129,7 +129,7 @@
 	ibSpDays.value = iDays;
 	ibLbDays.text = [NSString stringWithFormat:NSLocalizedString(@"Stat Last %ld days",nil), iDays];
 
-	if (mAppDelegate.ppApp_is_unlock==NO) {
+/*	if (mAppDelegate.ppApp_is_unlock==NO) {
 		CGRect rc = ibScrollView.frame;	//繰り返し通っても大丈夫なようにすること。
 		if (iS_iPAD) {
 			rc.size.height = self.view.frame.size.height - rc.origin.y - (66+3);
@@ -137,7 +137,7 @@
 			rc.size.height = self.view.frame.size.height - rc.origin.y - (50+3);
 		}
 		ibScrollView.frame = rc;
-	}
+	}*/
 }
 
 - (void)viewDidAppear:(BOOL)animated
