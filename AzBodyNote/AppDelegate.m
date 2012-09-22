@@ -149,7 +149,7 @@
 			}
 		}
 #ifdef DEBUG
-		__App_is_unlock = NO;
+		__App_is_unlock = YES;
 		[kvs setBool:__App_is_unlock forKey:STORE_PRODUCTID_UNLOCK];
 		[kvs synchronize]; // plistへ書き出す
 #endif

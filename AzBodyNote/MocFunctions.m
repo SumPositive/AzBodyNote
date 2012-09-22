@@ -7,7 +7,7 @@
 //
 #import "MocFunctions.h"
 
-#define ManagedObjectModelFileName @"AzBodyNote"	//【重要】リリース後変更禁止
+#define ManagedObjectModelFileName @"AzBodyNote"	//AzBodyNote.xcdatamodeld//【重要】リリース後変更禁止
 //iCloud Parameters
 //#define UBIQUITY_CONTAINER_IDENTIFIER @"5C2UYK6F45.com.azukid.AzBodyNote"
 #define UBIQUITY_CONTENT_NAME_KEY @"com.azukid.AzBodyNote.CoreData"

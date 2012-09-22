@@ -13,7 +13,7 @@
 #import "Global.h"
 #import "MocEntity.h"
 
-#define CoreData_iCloud_SYNC				YES		// YES or NO
+#define CoreData_iCloud_SYNC				NO		// YES or NO
 
 
 @interface MocFunctions : NSObject 
