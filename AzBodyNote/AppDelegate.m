@@ -187,7 +187,11 @@
 	if (__EventStore==nil) {
 		//self.ppEventStore = これはreadonly属性により更新できない。
 		__EventStore = [[EKEventStore alloc] init];
-		//NSLog(@"[__EventStore calendars]={%@}", [__EventStore calendars]);
+		if ([[[UIDevice currentDevice] systemVersion] compare:@"6.0"]==NSOrderedAscending) { // ＜ "6.0"
+			NSLog(@"[__EventStore calendars]={%@}", [__EventStore calendars]);
+		} else {
+			NSLog(@"[__EventStore calendarsForEntityType:EKEntityTypeEvent]={%@}", [__EventStore calendarsForEntityType:EKEntityTypeEvent]);
+		}
 	}
 	if (__EventStore==nil) {
 		GA_TRACK_ERROR(@"__EventStore==nil");

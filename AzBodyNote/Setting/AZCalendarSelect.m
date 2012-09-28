@@ -32,21 +32,45 @@
     [super viewDidLoad];
 	self.title = NSLocalizedString(@"AZCalendarSelect",nil);
 
-	mEventStore = [[EKEventStore alloc] init];
-	
-	mCalendars = [NSMutableArray new];
-	for (EKCalendar *cal in [mEventStore calendars]) {
-		if (cal.allowsContentModifications) {
-			// 追加変更が可能なカレンダーだけを抽出する
-			[mCalendars addObject:cal];
-		}
-	}
-	NSLog(@"mCalendars={%@}", mCalendars);
-	
-	//NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	//mCalendarID = [kvs objectForKey:KVS_CalendarID];
 	NSUserDefaults *udef = [NSUserDefaults standardUserDefaults];
 	mCalendarID = [udef objectForKey:UDEF_CalendarID];
+
+	mEventStore = [[EKEventStore alloc] init];
+	mCalendars = [NSMutableArray new];
+
+	if ([[[UIDevice currentDevice] systemVersion] compare:@"6.0"]==NSOrderedAscending) { // ＜ "6.0"
+		for (EKCalendar *cal in [mEventStore calendars]) {		// <<< Deprecated in iOS 6.0
+			if (cal.allowsContentModifications) {
+				// 追加変更が可能なカレンダーだけを抽出する
+				[mCalendars addObject:cal];
+			}
+		}
+		NSLog(@"mCalendars={%@}", mCalendars);
+	}
+	else {
+		//iOS6//カレンダー利用にはユーザの許可が必要になった。
+		[mEventStore requestAccessToEntityType:EKEntityTypeEvent
+									completion:^(BOOL granted, NSError *error) {
+			if (granted) {
+				//許可あり
+				NSArray *cals = [mEventStore calendarsForEntityType:EKEntityTypeEvent];	//iOS6以降
+				for (EKCalendar *cal in cals) {
+					if (cal.allowsContentModifications) {
+						// 追加変更が可能なカレンダーだけを抽出する
+						[mCalendars addObject:cal];
+					}
+				}
+				NSLog(@"mCalendars={%@}", mCalendars);
+				[self.tableView reloadData];
+			}
+			else {
+				if (error) {
+					GA_TRACK_ERROR([error description]);
+				}
+				mCalendarID = nil; //なし　使用禁止
+			}
+		}];
+	}
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -78,6 +102,18 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     return [mCalendars count] + 1;  //+1:「なし」
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
+{
+	if ([mCalendars count] < 1) {
+		if ([[[UIDevice currentDevice] systemVersion] compare:@"6.0"]==NSOrderedAscending) { // ＜ "6.0"
+			return	NSLocalizedString(@"AZCalendarSelect NoCalender",nil);
+		} else {
+			return	NSLocalizedString(@"AZCalendarSelect Sett-Privacy",nil);
+		}
+	}
+	return	nil;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
