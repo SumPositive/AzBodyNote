@@ -142,6 +142,7 @@
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
 	appDelegate_.ppApp_is_unlock = [kvs boolForKey:STORE_PRODUCTID_UNLOCK];
 
+    /**[1.0.6.0]**この方法では、まれに新規追加後、一覧表示されない不具合が発生するため没。
 	// 表示行調整
 	if (indexPathEdit_) { // E2editTVC:から戻ったとき、
 		@try {	// 範囲オーバーで落ちる可能性があるため。　＜＜最終行を削除したとき。
@@ -179,6 +180,39 @@
 			[self.tableView reloadData]; //1.0.1//List表示が消える現象の回避策
 		}
 	}
+     **/
+
+    //[1.0.6.0] 常時、リロードして位置合わせする方式に改めた。
+    // 再読み込み
+    [self reloadFetchedResults:nil];
+    // 適切な行へ移動
+    @try {	// 範囲オーバーで落ちる可能性があるため。
+        if (indexPathEdit_) { // E2editTVC:から戻ったとき、
+            // 修正行へ
+			NSLog(@"viewWillAppear: indexPathEdit_=%@", indexPathEdit_);
+            [self.tableView scrollToRowAtIndexPath: indexPathEdit_
+                                  atScrollPosition:UITableViewScrollPositionMiddle animated:NO];  // 実機検証結果:NO
+        }
+        else {
+            // 最終行へ
+            NSIndexPath* ipGoal = [NSIndexPath indexPathForRow:0 inSection: [[__fetchedRc sections] count]];
+            // GOAL! 行へ
+            [self.tableView scrollToRowAtIndexPath: ipGoal
+                                  atScrollPosition:UITableViewScrollPositionMiddle animated:NO];  // 実機検証結果:NO
+            // GOAL! リフレッシュ
+            NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+            [kvs synchronize]; // iCloud最新同期（取得）
+            NSArray *aPaths = [NSArray arrayWithObject: ipGoal];
+            [self.tableView reloadRowsAtIndexPaths: aPaths withRowAnimation:UITableViewRowAnimationFade];
+        }
+    }
+    @catch (NSException *exception) {
+        GA_TRACK_ERROR(@"LOGIC ERROR - Bottom line --> reloadData")
+        [self.tableView reloadData]; //1.0.1//List表示が消える現象の回避策
+    }
+    @finally {
+        indexPathEdit_ = nil; // Editモード解除
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated

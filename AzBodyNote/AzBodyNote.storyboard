@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="2843" systemVersion="11G63" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="gSo-hg-p0Z">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="11G63" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="gSo-hg-p0Z">
     <dependencies>
-        <deployment defaultVersion="1536" identifier="iOS"/>
         <development version="4300" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="1929"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="2083"/>
     </dependencies>
     <scenes>
         <!--View Controller - GraphVC-->
@@ -838,91 +837,6 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         <image name="Tab32-List.png" width="32" height="32"/>
         <image name="Tab32-Stat.png" width="32" height="32"/>
     </resources>
-    <classes>
-        <class className="E2editCellDateOpt" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2editCellDateOpt.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibSegment" candidateClass="UISegmentedControl"/>
-            </relationships>
-        </class>
-        <class className="E2editCellDial" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2editCellDial.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibLbDetail" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbName" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbUnit" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbValue" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibViewBase" candidateClass="UIView"/>
-            </relationships>
-        </class>
-        <class className="E2editCellNote" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2editCellNote.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibTfNote1" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="ibTfNote2" candidateClass="UITextField"/>
-            </relationships>
-        </class>
-        <class className="E2editTVC" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2editTVC.h"/>
-        </class>
-        <class className="E2listCell" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2listCell.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibIvDateOpt" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="ibLbBodyFat" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbBpHi" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbBpLo" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbDate" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbNote1" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbPedo" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbPuls" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbSkMuscle" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbTemp" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbWeight" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-        <class className="E2listTVC" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/E2listTVC.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibLbTitleBodyFat" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbTitleBpHi" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbTitleBpLo" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbTitleDay" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbTitlePedo" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbTitlePuls" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbTitleSkMuscle" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbTitleTemp" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbTitleTime" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibLbTitleWeight" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-        <class className="EditDateVC" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/EditDateVC.h"/>
-            <relationships>
-                <relationship kind="action" name="ibBuToday:" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="ibDatePicker" candidateClass="UIDatePicker"/>
-            </relationships>
-        </class>
-        <class className="GraphVC" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/GraphVC.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibScrollView" candidateClass="UIScrollView"/>
-                <relationship kind="outlet" name="ibViewRecord" candidateClass="UIView"/>
-            </relationships>
-        </class>
-        <class className="SettingTVC" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/SettingTVC.h"/>
-        </class>
-        <class className="StatisticsVC" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/StatisticsVC.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ibLbDays" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="ibScrollView" candidateClass="UIScrollView"/>
-                <relationship kind="outlet" name="ibSegment" candidateClass="UISegmentedControl"/>
-                <relationship kind="outlet" name="ibSpDays" candidateClass="UIStepper"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

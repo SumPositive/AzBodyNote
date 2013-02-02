@@ -409,7 +409,7 @@
 	}
 }
 
-- (void)actionSave
+- (void)actionSave      //[保存]ボタン
 {
 	GA_TRACK_METHOD
 	//self.navigationItem.rightBarButtonItem.enabled = NO; // 変更あればYESにする
@@ -477,7 +477,7 @@
 }
 
 
-- (void)actionCancel
+- (void)actionCancel    //[キャンセル]ボタン
 {	// Edit mode ONLY
 	assert(editMode_ !=0);
 	if (kvsGoal_) {
