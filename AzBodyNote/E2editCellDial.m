@@ -27,13 +27,13 @@
 	NSInteger  val = mValue;
 	if (val < 0) {
 		val = valuePrev_;
-		ibLbValue.textColor = [UIColor brownColor];
+		ibLbValue.textColor = COLOR_AZBK;
 	} else {
-		ibLbValue.textColor = [UIColor blackColor];
+		ibLbValue.textColor = COLOR_AZWH;
 	}
 
 	if (valueDec_<=0) {
-		ibLbValue.text = [NSString stringWithFormat:@"%d", val];
+		ibLbValue.text = [NSString stringWithFormat:@"%zd", val];
 	} else {
 		NSInteger iPow = (NSInteger)pow(10, valueDec_); //= 10 ^ valueDec_;
 		NSInteger iInt = val / iPow;
@@ -41,12 +41,12 @@
 		if (iDec<=0) {
 			//ibLbValue.text = [NSString stringWithFormat:@"%ld", iInt];
 			switch (valueDec_) {
-				case 1: ibLbValue.text =  [NSString stringWithFormat:@"%d.0", iInt]; break;
-				case 2: ibLbValue.text =  [NSString stringWithFormat:@"%d.00", iInt]; break;
-				default: ibLbValue.text =  [NSString stringWithFormat:@"%d", iInt]; break;
+				case 1: ibLbValue.text =  [NSString stringWithFormat:@"%zd.0", iInt]; break;
+				case 2: ibLbValue.text =  [NSString stringWithFormat:@"%zd.00", iInt]; break;
+				default: ibLbValue.text =  [NSString stringWithFormat:@"%zd", iInt]; break;
 			}
 		} else {
-			ibLbValue.text = [NSString stringWithFormat:@"%d.%d", iInt, iDec];
+			ibLbValue.text = [NSString stringWithFormat:@"%zd.%zd", iInt, iDec];
 		}
 	}
 }

@@ -93,8 +93,8 @@
 	// TableView
 	//self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone; // セル区切り線なし
 	//self.tableView.separatorColor = [UIColor blackColor];
-	UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
-	self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
+//	UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
+//	self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 	
 	//
 	if (lbPagePrev_==nil) {
@@ -322,45 +322,82 @@
 		return [sectionInfo numberOfObjects];
 	}
 	// GOALセクション
-	if (appDelegate_.ppApp_is_unlock) {
-		return 2;
-	} else {
-		return 3; // Goal + Dropbox + Ad
-	}
+    return 1;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{	// セクション ヘッダ
-	if (section < [[__fetchedRc sections] count])
-	{ // 明細セクション
-		NSInteger iYearMM = [[[[__fetchedRc sections] objectAtIndex:section] name] integerValue];
-		NSInteger iYear = iYearMM / 100;
-		
-		if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) 
-		{ // 「書式」で変わる。　「言語」でない
-			return [NSString stringWithFormat:@"%d年 %d月", iYear, iYearMM - (iYear * 100)]; 
-		}
-		else {
-			static const char *mon[] = { "???", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };			
-			int iMon = iYearMM - (iYear * 100);
-			if (iMon<1 OR 12<iMon ) iMon = 0;
-			return [NSString stringWithFormat:@"%s, %d", mon[ iMon ], iYear]; 
-		}
-	}
-	// GOALセクション
-	NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
-	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
-	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-	[fmt setCalendar:calendar];
-	if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) 
-	{ // 「書式」で変わる。　「言語」でない
-		[fmt setDateFormat:@"yyyy年 M月 d日 EE"];
-	}
-	else {
-		[fmt setDateFormat:@"EE, MMM d, yyyy"];
-	}
-	return [NSString stringWithFormat:@"%@  %@", NSLocalizedString(@"Latest",nil), [fmt stringFromDate:[NSDate date]]];
+//- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+//{	// セクション ヘッダ
+//	if (section < [[__fetchedRc sections] count])
+//	{ // 明細セクション
+//		NSInteger iYearMM = [[[[__fetchedRc sections] objectAtIndex:section] name] integerValue];
+//		NSInteger iYear = iYearMM / 100;
+//		
+//		if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) 
+//		{ // 「書式」で変わる。　「言語」でない
+//			return [NSString stringWithFormat:@"%zd年 %zd月", iYear, iYearMM - (iYear * 100)];
+//		}
+//		else {
+//			static const char *mon[] = { "???", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };			
+//			NSInteger iMon = iYearMM - (iYear * 100);
+//			if (iMon<1 OR 12<iMon ) iMon = 0;
+//			return [NSString stringWithFormat:@"%s, %zd", mon[ iMon ], iYear];
+//		}
+//	}
+//	// GOALセクション
+//	NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
+//	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
+//	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+//	[fmt setCalendar:calendar];
+//	if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) 
+//	{ // 「書式」で変わる。　「言語」でない
+//		[fmt setDateFormat:@"yyyy年 M月 d日 EE"];
+//	}
+//	else {
+//		[fmt setDateFormat:@"EE, MMM d, yyyy"];
+//	}
+//	return [NSString stringWithFormat:@"%@  %@", NSLocalizedString(@"Latest",nil), [fmt stringFromDate:[NSDate date]]];
+//}
+- (UIView*)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    UILabel* label = UILabel.new;
+    label.backgroundColor = COLOR_AZUKI;
+    label.textColor = COLOR_AZWH;
+    label.textAlignment = NSTextAlignmentCenter;
+    
+    if (section < [[__fetchedRc sections] count])
+    { // 明細セクション
+        NSInteger iYearMM = [[[[__fetchedRc sections] objectAtIndex:section] name] integerValue];
+        NSInteger iYear = iYearMM / 100;
+        
+        if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"])
+        { // 「書式」で変わる。　「言語」でない
+            label.text = [NSString stringWithFormat:@"%zd年%zd月", iYear, iYearMM - (iYear * 100)];
+            return label;
+        }
+        else {
+            static const char *mon[] = { "???", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+            NSInteger iMon = iYearMM - (iYear * 100);
+            if (iMon<1 OR 12<iMon ) iMon = 0;
+            label.text = [NSString stringWithFormat:@"%s, %zd", mon[ iMon ], iYear];
+            return label;
+        }
+    }
+    // GOALセクション
+    NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
+    // システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
+    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    [fmt setCalendar:calendar];
+    if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"])
+    { // 「書式」で変わる。　「言語」でない
+        [fmt setDateFormat:@"yyyy年M月d日(EE)"];
+    }
+    else {
+        [fmt setDateFormat:@"EE, MMM d, yyyy"];
+    }
+    label.text = [NSString stringWithFormat:@"%@  %@", NSLocalizedString(@"Latest",nil), [fmt stringFromDate:[NSDate date]]];
+    return label;
 }
+
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -396,44 +433,44 @@
 				return cell;
 			}	break;
 
-			case 1: {	// Dropbox  "esuslogo101409"
-				static NSString *Cid = @"E2listBasic";  //== Class名
-				UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
-				if (cell == nil) {
-					UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
-					[nib instantiateWithOwner:self options:nil];
-				}
-				cell.imageView.image = [UIImage imageNamed:@"AZDropbox-32"];
-				cell.textLabel.text = NSLocalizedString(@"Dropbox Upload",nil);
-				cell.detailTextLabel.text = NSLocalizedString(@"Dropbox Upload detail",nil);
-				cell.userInteractionEnabled = YES;
-				cell.selectionStyle = UITableViewCellSelectionStyleBlue;
-				if (iS_iPAD) {
-					cell.accessoryType = UITableViewCellAccessoryNone;
-				} else {
-					cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-				}
-				return cell;
-			}	break;
-				
-			case 2: {	// Ad余白
-				static NSString *Cid = @"E2listBasic";  //== Class名
-				UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
-				if (cell == nil) {
-					UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
-					[nib instantiateWithOwner:self options:nil];
-					//cell.accessoryType = UITableViewCellAccessoryNone;
-					//cell.showsReorderControl = NO; // Move禁止
-					//cell.selectionStyle = UITableViewCellSelectionStyleNone; // 選択時ハイライトなし
-				}
-				cell.imageView.image = nil;
-				cell.textLabel.text = @"";
-				cell.detailTextLabel.text = @"";
-				cell.userInteractionEnabled = NO;
-				cell.selectionStyle = UITableViewCellSelectionStyleNone;
-				cell.accessoryType = UITableViewCellAccessoryNone;
-				return cell;
-			}	break;
+//			case 1: {	// Dropbox  "esuslogo101409"
+//				static NSString *Cid = @"E2listBasic";  //== Class名
+//				UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
+//				if (cell == nil) {
+//					UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
+//					[nib instantiateWithOwner:self options:nil];
+//				}
+//				cell.imageView.image = [UIImage imageNamed:@"AZDropbox-32"];
+//				cell.textLabel.text = NSLocalizedString(@"Dropbox Upload",nil);
+//				cell.detailTextLabel.text = NSLocalizedString(@"Dropbox Upload detail",nil);
+//				cell.userInteractionEnabled = YES;
+//				cell.selectionStyle = UITableViewCellSelectionStyleBlue;
+//				if (iS_iPAD) {
+//					cell.accessoryType = UITableViewCellAccessoryNone;
+//				} else {
+//					cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+//				}
+//				return cell;
+//			}	break;
+//				
+//			case 2: {	// Ad余白
+//				static NSString *Cid = @"E2listBasic";  //== Class名
+//				UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cid];
+//				if (cell == nil) {
+//					UINib *nib = [UINib nibWithNibName:Cid   bundle:nil];
+//					[nib instantiateWithOwner:self options:nil];
+//					//cell.accessoryType = UITableViewCellAccessoryNone;
+//					//cell.showsReorderControl = NO; // Move禁止
+//					//cell.selectionStyle = UITableViewCellSelectionStyleNone; // 選択時ハイライトなし
+//				}
+//				cell.imageView.image = nil;
+//				cell.textLabel.text = @"";
+//				cell.detailTextLabel.text = @"";
+//				cell.userInteractionEnabled = NO;
+//				cell.selectionStyle = UITableViewCellSelectionStyleNone;
+//				cell.accessoryType = UITableViewCellAccessoryNone;
+//				return cell;
+//			}	break;
 		}
 	}
     return nil;

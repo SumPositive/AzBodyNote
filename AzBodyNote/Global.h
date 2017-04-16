@@ -22,6 +22,11 @@
 #define NFM_REFETCH_ALL_DATA			@"RefetchAllDatabaseData"		//リロード更新要求
 #define NFM_AppDidBecomeActive			@"AppDidBecomeActive"			//バックグランドから戻った
 
+// Base Color
+#define COLOR_AZUKI     [UIColor colorWithRed:151.0/255.0 green: 80.0/255.0 blue: 77.0/255.0 alpha:1.0]
+#define COLOR_AZBK      [UIColor colorWithRed: 70.0/255.0 green: 70.0/255.0 blue: 70.0/255.0 alpha:1.0]
+#define COLOR_AZWH      [UIColor colorWithRed:250.0/255.0 green:250.0/255.0 blue:250.0/255.0 alpha:1.0]
+
 
 // typedef
 enum {

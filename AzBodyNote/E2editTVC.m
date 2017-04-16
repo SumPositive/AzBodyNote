@@ -3,8 +3,8 @@
 //  E2editTVC.m
 //  AzBodyNote
 //
-//  Created by 松山 和正 on 11/10/02.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Created by 松山 正和 on 11/10/02.
+//  Copyright 2011 Azukid. All rights reserved.
 //
 #import "E2editTVC.h"
 
@@ -554,9 +554,9 @@
 		case 0: //-------------------------------------------------------------------- AddNew
 		{
 			self.title = NSLocalizedString(@"TabAdd",nil);
-			// TableView 背景
-			UIImage *imgTile = [UIImage imageNamed: @"Tx-Back1"];   //@"Tx-Back1"
-			self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
+//			// TableView 背景
+//			UIImage *imgTile = [UIImage imageNamed: @"Tx-Back1"];   //@"Tx-Back1"
+//			self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 			assert(moE2edit_==nil);
 			// moE2edit_ は、viewWillAppear:にて生成する。
 			// [Clear]ボタンを左側に追加する
@@ -569,9 +569,9 @@
 		case 1: //-------------------------------------------------------------------- Edit
 		{
 			self.title = NSLocalizedString(@"Modify",nil);
-			// TableView 背景
-			UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
-			self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
+//			// TableView 背景
+//			UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
+//			self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 			assert(moE2edit_); // 必須
 			
 			// [<Back]ボタン表示: 修正あるのにBackしたときはアラート表示してからRollback処理する。
@@ -585,9 +585,9 @@
 		case 2: //-------------------------------------------------------------------- Goal Edit
 		{
 			self.title = NSLocalizedString(@"Modify",nil);
-			// TableView 背景
-			UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
-			self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
+//			// TableView 背景
+//			UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
+//			self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 			assert(moE2edit_==nil);
 			kvsGoal_ = [NSUbiquitousKeyValueStore defaultStore];
 			//moE2edit_ = [[E2record alloc] init]; // MOCで無い！ 一時エンティティ
