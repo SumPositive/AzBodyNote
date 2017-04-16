@@ -6,7 +6,7 @@
 //  Copyright 2011 Sum Positive. All rights reserved.
 //
 
-#define AZClass_GoogleAnalytics
+//#define AZClass_GoogleAnalytics
 #import "AZClass.h"
 
 #define COPYRIGHT		@"©2012 Azukid"
@@ -21,12 +21,6 @@
 #define NFM_REFRESH_ALL_VIEWS			@"RefreshAllViews"					//表示のみ更新要求
 #define NFM_REFETCH_ALL_DATA			@"RefetchAllDatabaseData"		//リロード更新要求
 #define NFM_AppDidBecomeActive			@"AppDidBecomeActive"			//バックグランドから戻った
-
-// Dropbox
-#define DBOX_KEY										@"qq4oke7nx6f8ivj"
-#define DBOX_SECRET								@"dq48qqerkqz9sen"
-#define GD_EXTENSION								@"condition"
-#define FILE_HEADER_PREFIX					@"Condition(C)Azukid"
 
 
 // typedef

@@ -70,9 +70,9 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {	// Override point for customization after application launch.
-	GA_INIT_TRACKER(@"UA-30305032-4", 10, nil);	//-4:Condition
-	GA_TRACK_EVENT(@"Device", @"model", [[UIDevice currentDevice] model], 0);
-	GA_TRACK_EVENT(@"Device", @"systemVersion", [[UIDevice currentDevice] systemVersion], 0);
+//	GA_INIT_TRACKER(@"UA-30305032-4", 10, nil);	//-4:Condition
+//	GA_TRACK_EVENT(@"Device", @"model", [[UIDevice currentDevice] model], 0);
+//	GA_TRACK_EVENT(@"Device", @"systemVersion", [[UIDevice currentDevice] systemVersion], 0);
 
 	mAzukiUnlock = NO;	// YES=購入意思ありと見なしてUnlockする
 	
@@ -173,12 +173,12 @@
 
 	
 	//-------------------------------------------------デバイス、ＯＳ確認
-	if ([[[UIDevice currentDevice] systemVersion] compare:@"5.0"]==NSOrderedAscending) { // ＜ "5.0"
-		// iOS5.0より前
-		GA_TRACK_EVENT_ERROR(@"Need more iOS 5.0",0);
-		azAlertBox(@"! STOP !", @"Need more iOS 5.0", nil);
-		exit(0);
-	}
+//	if ([[[UIDevice currentDevice] systemVersion] compare:@"5.0"]==NSOrderedAscending) { // ＜ "5.0"
+//		// iOS5.0より前
+//		GA_TRACK_EVENT_ERROR(@"Need more iOS 5.0",0);
+//		azAlertBox(@"! STOP !", @"Need more iOS 5.0", nil);
+//		exit(0);
+//	}
 	//self.ppApp_is_iPad = これはreadonly属性により更新できない。
 	__App_is_iPad = [[[UIDevice currentDevice] model] hasPrefix:@"iPad"];	// iPad
 
@@ -279,16 +279,6 @@
                                           otherButtonTitles:nil, nil];
     [alert show];*/
 	
-	// Dropbox OAuth 認証キーを取得する
-	if ([[DBSession sharedSession] handleOpenURL:url]) { //OAuth結果：urlに認証キーが含まれる
-	/*	if ([[DBSession sharedSession] isLinked]) 
-		{	// Dropbox 認証成功
-            NSLog(@"App linked successfully!");
-			// DropboxTVC を開ける
-			[self dropboxView];
-        }*/
-        return YES;
-    }
     // Add whatever other url handling code your app requires here
     return NO;
 }

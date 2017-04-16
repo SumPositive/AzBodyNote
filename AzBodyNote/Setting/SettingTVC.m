@@ -392,32 +392,32 @@
 		}	break;
 
 	
-		case 300: {	// Dropbox - Download
-			// Dropbox を開ける
-			AZDropboxVC *vc = [[AZDropboxVC alloc] initWithAppKey: DBOX_KEY
-														appSecret: DBOX_SECRET
-															 root: kDBRootAppFolder	//kDBRootAppFolder or kDBRootDropbox
-														 rootPath: @"/"
-															 mode: AZDropboxDownload
-														extension: GD_EXTENSION 
-														 delegate: self];
-			//vc.title = NSLocalizedString(@"Dropbox Download",nil);
-			[vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
-			//表示開始
-			//[self.navigationController pushViewController:vc animated:YES];
-			if (iS_iPAD) {
-				UINavigationController* nc = [[UINavigationController alloc] initWithRootViewController:vc];
-				nc.modalPresentationStyle = UIModalPresentationFormSheet; // iPad画面1/4サイズ
-				nc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-				[self presentModalViewController:nc animated:YES];
-			} else {
-				//[mAppDelegate adShow:2];	//(2)Ad下端へ
-				[vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
-				[self.navigationController pushViewController:vc animated:YES];
-			}
-			//表示開始後にsetする
-			[vc setCryptHidden:YES	 Enabled:NO];////表示後にセットすること
-		}	break;
+//		case 300: {	// Dropbox - Download
+//			// Dropbox を開ける
+//			AZDropboxVC *vc = [[AZDropboxVC alloc] initWithAppKey: DBOX_KEY
+//														appSecret: DBOX_SECRET
+//															 root: kDBRootAppFolder	//kDBRootAppFolder or kDBRootDropbox
+//														 rootPath: @"/"
+//															 mode: AZDropboxDownload
+//														extension: GD_EXTENSION 
+//														 delegate: self];
+//			//vc.title = NSLocalizedString(@"Dropbox Download",nil);
+//			[vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
+//			//表示開始
+//			//[self.navigationController pushViewController:vc animated:YES];
+//			if (iS_iPAD) {
+//				UINavigationController* nc = [[UINavigationController alloc] initWithRootViewController:vc];
+//				nc.modalPresentationStyle = UIModalPresentationFormSheet; // iPad画面1/4サイズ
+//				nc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+//				[self presentModalViewController:nc animated:YES];
+//			} else {
+//				//[mAppDelegate adShow:2];	//(2)Ad下端へ
+//				[vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
+//				[self.navigationController pushViewController:vc animated:YES];
+//			}
+//			//表示開始後にsetする
+//			[vc setCryptHidden:YES	 Enabled:NO];////表示後にセットすること
+//		}	break;
 	}
 }
 
@@ -439,101 +439,101 @@
 }
 
 
-#pragma mark - <AZDropboxDelegate>
-- (NSString*)azDropboxBeforeUpFilePath:(NSString*)filePath crypt:(BOOL)crypt {	// 未使用
-	return @"NG";
-}
-
-- (NSString*)azDropboxDownAfterFilePath:(NSString*)filePath
-{	//Down後処理＜DOWNしたファイルを読み込むなど＞
-	// filePath から NSManagedObject を読み込む
-	NSError *err = nil;
-	// 読み込む
-	NSString *zJson = [NSString stringWithContentsOfFile:filePath
-												encoding:NSUTF8StringEncoding error:&err];
-	if (err OR zJson==nil) {
-		NSLog(@"tmpFileLoad: stringWithContentsOfFile: (err=%@)", [err description]);
-		GA_TRACK_EVENT_ERROR([err description],0);
-		return [err description];
-	}
-	NSLog(@"tmpFileLoad: zJson=%@", zJson);
-	// JSON --> NSArray
-	DBJSON	*js = [DBJSON new];
-	NSArray *ary = [js objectWithString:zJson error:&err];
-	if (err) {
-		NSLog(@"tmpFileLoad: SBJSON: objectWithString: (err=%@) zJson=%@", [err description], zJson);
-		GA_TRACK_EVENT_ERROR([err description],0);
-		return [err description];
-	}
-	NSLog(@"tmpFileLoad: ary=%@", ary);
-	//
-	NSDictionary *dict = [ary objectAtIndex:0]; // Header
-	if (![[dict objectForKey:@"#class"] isEqualToString:@"Header"]) {
-		NSLog(@"tmpFileLoad: #class ERR: %@", dict);
-		return @"NG #class";
-	}
-	if (![[dict objectForKey:@"#header"] isEqualToString:FILE_HEADER_PREFIX]) {
-		NSLog(@"tmpFileLoad: #header ERR: %@", dict);
-		return @"NG #header";
-	}
-	//----------------------------------------------------------------------------------  iCloud-KVS
-	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	[kvs setObject: azNSNull([dict objectForKey:Goal_nBpHi_mmHg])		forKey:Goal_nBpHi_mmHg];
-	[kvs setObject: azNSNull([dict objectForKey:Goal_nBpLo_mmHg])		forKey:Goal_nBpLo_mmHg];
-	[kvs setObject: azNSNull([dict objectForKey:Goal_nPulse_bpm])			forKey:Goal_nPulse_bpm];
-	[kvs setObject: azNSNull([dict objectForKey:Goal_nTemp_10c])			forKey:Goal_nTemp_10c];
-	[kvs setObject: azNSNull([dict objectForKey:Goal_nWeight_10Kg])	forKey:Goal_nWeight_10Kg];
-	[kvs setObject: azNSNull([dict objectForKey:Goal_sEquipment])			forKey:Goal_sEquipment];
-	[kvs setObject: azNSNull([dict objectForKey:Goal_sNote1])					forKey:Goal_sNote1];
-	[kvs setObject: azNSNull([dict objectForKey:Goal_sNote2])					forKey:Goal_sNote2];
-	//----------[0.9]以下追加
-	[kvs setObject: azNSNull([dict objectForKey:Goal_nPedometer])			forKey:Goal_nPedometer];
-	[kvs setObject: azNSNull([dict objectForKey:Goal_nBodyFat_10p])		forKey:Goal_nBodyFat_10p];
-	[kvs setObject: azNSNull([dict objectForKey:Goal_nSkMuscle_10p])	forKey:Goal_nSkMuscle_10p];
-	[kvs synchronize]; // iCloud最新同期（取得）
-	//---------------------------------------------------------------------------------- 
-	
-	// E2record 全クリア
-	//[mAppDelegate.mocBase deleteAllCoreData];
-	[[MocFunctions sharedMocFunctions] deleteAllCoreData];
-	// E2record 生成
-	for (NSDictionary *dict in ary)
-	{
-		NSString *zClass = [dict objectForKey:@"#class"];
-		
-		if ([zClass isEqualToString:E2_ENTITYNAME]) {
-			[[MocFunctions sharedMocFunctions] insertNewObjectForDictionary:dict];
-		}
-		//else if ([zClass isEqualToString:@"E1body"]) {
-		//	[mocBase insertNewObjectForDictionary:dict];
-		//}
-	}
-	// コミット
-	[[MocFunctions sharedMocFunctions] commit];
-	// E2 件数
-	mAppDelegate.ppApp_e2record_count = [[MocFunctions sharedMocFunctions] e2record_count];
-	// E2listなどへ再フェッチ要求
-	[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFETCH_ALL_DATA
-														object:self userInfo:nil];
-	return nil; //OK
-}
-
-- (void)azDropboxDownResult:(NSString *)result
-{	//ここで、Down成功後の再描画など行う
-	if (result) {
-		GA_TRACK_ERROR(result);
-	} else {
-		// 再読み込み 通知発信---> E1viewController
-		[[NSNotificationCenter defaultCenter] postNotificationName:NFM_REFRESH_ALL_VIEWS
-															object:self userInfo:nil];
-		[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
-	}
-}
-- (void)azDropboxUpResult:(NSString *)result {
-	if (result) {
-		GA_TRACK_ERROR(result);
-	}
-}
+//#pragma mark - <AZDropboxDelegate>
+//- (NSString*)azDropboxBeforeUpFilePath:(NSString*)filePath crypt:(BOOL)crypt {	// 未使用
+//	return @"NG";
+//}
+//
+//- (NSString*)azDropboxDownAfterFilePath:(NSString*)filePath
+//{	//Down後処理＜DOWNしたファイルを読み込むなど＞
+//	// filePath から NSManagedObject を読み込む
+//	NSError *err = nil;
+//	// 読み込む
+//	NSString *zJson = [NSString stringWithContentsOfFile:filePath
+//												encoding:NSUTF8StringEncoding error:&err];
+//	if (err OR zJson==nil) {
+//		NSLog(@"tmpFileLoad: stringWithContentsOfFile: (err=%@)", [err description]);
+//		GA_TRACK_EVENT_ERROR([err description],0);
+//		return [err description];
+//	}
+//	NSLog(@"tmpFileLoad: zJson=%@", zJson);
+//	// JSON --> NSArray
+//	DBJSON	*js = [DBJSON new];
+//	NSArray *ary = [js objectWithString:zJson error:&err];
+//	if (err) {
+//		NSLog(@"tmpFileLoad: SBJSON: objectWithString: (err=%@) zJson=%@", [err description], zJson);
+//		GA_TRACK_EVENT_ERROR([err description],0);
+//		return [err description];
+//	}
+//	NSLog(@"tmpFileLoad: ary=%@", ary);
+//	//
+//	NSDictionary *dict = [ary objectAtIndex:0]; // Header
+//	if (![[dict objectForKey:@"#class"] isEqualToString:@"Header"]) {
+//		NSLog(@"tmpFileLoad: #class ERR: %@", dict);
+//		return @"NG #class";
+//	}
+//	if (![[dict objectForKey:@"#header"] isEqualToString:FILE_HEADER_PREFIX]) {
+//		NSLog(@"tmpFileLoad: #header ERR: %@", dict);
+//		return @"NG #header";
+//	}
+//	//----------------------------------------------------------------------------------  iCloud-KVS
+//	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+//	[kvs setObject: azNSNull([dict objectForKey:Goal_nBpHi_mmHg])		forKey:Goal_nBpHi_mmHg];
+//	[kvs setObject: azNSNull([dict objectForKey:Goal_nBpLo_mmHg])		forKey:Goal_nBpLo_mmHg];
+//	[kvs setObject: azNSNull([dict objectForKey:Goal_nPulse_bpm])			forKey:Goal_nPulse_bpm];
+//	[kvs setObject: azNSNull([dict objectForKey:Goal_nTemp_10c])			forKey:Goal_nTemp_10c];
+//	[kvs setObject: azNSNull([dict objectForKey:Goal_nWeight_10Kg])	forKey:Goal_nWeight_10Kg];
+//	[kvs setObject: azNSNull([dict objectForKey:Goal_sEquipment])			forKey:Goal_sEquipment];
+//	[kvs setObject: azNSNull([dict objectForKey:Goal_sNote1])					forKey:Goal_sNote1];
+//	[kvs setObject: azNSNull([dict objectForKey:Goal_sNote2])					forKey:Goal_sNote2];
+//	//----------[0.9]以下追加
+//	[kvs setObject: azNSNull([dict objectForKey:Goal_nPedometer])			forKey:Goal_nPedometer];
+//	[kvs setObject: azNSNull([dict objectForKey:Goal_nBodyFat_10p])		forKey:Goal_nBodyFat_10p];
+//	[kvs setObject: azNSNull([dict objectForKey:Goal_nSkMuscle_10p])	forKey:Goal_nSkMuscle_10p];
+//	[kvs synchronize]; // iCloud最新同期（取得）
+//	//---------------------------------------------------------------------------------- 
+//	
+//	// E2record 全クリア
+//	//[mAppDelegate.mocBase deleteAllCoreData];
+//	[[MocFunctions sharedMocFunctions] deleteAllCoreData];
+//	// E2record 生成
+//	for (NSDictionary *dict in ary)
+//	{
+//		NSString *zClass = [dict objectForKey:@"#class"];
+//		
+//		if ([zClass isEqualToString:E2_ENTITYNAME]) {
+//			[[MocFunctions sharedMocFunctions] insertNewObjectForDictionary:dict];
+//		}
+//		//else if ([zClass isEqualToString:@"E1body"]) {
+//		//	[mocBase insertNewObjectForDictionary:dict];
+//		//}
+//	}
+//	// コミット
+//	[[MocFunctions sharedMocFunctions] commit];
+//	// E2 件数
+//	mAppDelegate.ppApp_e2record_count = [[MocFunctions sharedMocFunctions] e2record_count];
+//	// E2listなどへ再フェッチ要求
+//	[[NSNotificationCenter defaultCenter] postNotificationName: NFM_REFETCH_ALL_DATA
+//														object:self userInfo:nil];
+//	return nil; //OK
+//}
+//
+//- (void)azDropboxDownResult:(NSString *)result
+//{	//ここで、Down成功後の再描画など行う
+//	if (result) {
+//		GA_TRACK_ERROR(result);
+//	} else {
+//		// 再読み込み 通知発信---> E1viewController
+//		[[NSNotificationCenter defaultCenter] postNotificationName:NFM_REFRESH_ALL_VIEWS
+//															object:self userInfo:nil];
+//		[self.navigationController popViewControllerAnimated:YES];	// < 前のViewへ戻る
+//	}
+//}
+//- (void)azDropboxUpResult:(NSString *)result {
+//	if (result) {
+//		GA_TRACK_ERROR(result);
+//	}
+//}
 
 
 

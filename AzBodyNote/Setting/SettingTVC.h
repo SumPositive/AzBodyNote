@@ -9,7 +9,6 @@
 #import <UIKit/UIKit.h>
 #import "AZAboutVC.h"
 #import "AZStoreTVC.h"	//<AZStoreDelegate>
-#import "AZDropboxVC.h"	//<AZDropboxDelegate>
 
 #import "Global.h"
 #import "AppDelegate.h"
@@ -18,7 +17,7 @@
 #import "SettStatTVC.h"
 
 
-@interface SettingTVC : UITableViewController <AZStoreDelegate, AZDropboxDelegate>
+@interface SettingTVC : UITableViewController <AZStoreDelegate>
 {
 @private
 	AppDelegate					*mAppDelegate;

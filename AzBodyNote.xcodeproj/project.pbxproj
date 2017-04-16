@@ -467,7 +467,7 @@
 			children = (
 				44EF3BB21546235000925F12 /* OpenCode */,
 				4412FD05153002BC00545B12 /* AZClass */,
-				4435385F143746F900F5F309 /* AzBodyNote */,
+				4435385F143746F900F5F309 /* Code */,
 				44C1B8F2143B429200C03449 /* Design */,
 				44353860143746F900F5F309 /* Supporting Files */,
 				44353885143746FA00F5F309 /* AzBodyNoteTests */,
@@ -515,7 +515,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		4435385F143746F900F5F309 /* AzBodyNote */ = {
+		4435385F143746F900F5F309 /* Code */ = {
 			isa = PBXGroup;
 			children = (
 				44AB5DFD14380A2900F6EDE8 /* Global.h */,
@@ -537,6 +537,7 @@
 				4412FCEA152FC75600545B12 /* Setting */,
 				44A255041EA36CAA00FE4760 /* Images.xcassets */,
 			);
+			name = Code;
 			path = AzBodyNote;
 			sourceTree = "<group>";
 		};

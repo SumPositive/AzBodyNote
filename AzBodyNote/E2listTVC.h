@@ -12,11 +12,10 @@
 #import "AppDelegate.h"
 #import "E2listCell.h"
 #import "E2editTVC.h"
-#import "AZDropboxVC.h"	//<AZDropboxDelegate>
 
 
 
-@interface E2listTVC : UITableViewController <UITableViewDelegate, UITableViewDataSource, NSFetchedResultsControllerDelegate, AZDropboxDelegate>
+@interface E2listTVC : UITableViewController <UITableViewDelegate, UITableViewDataSource, NSFetchedResultsControllerDelegate>
 {
 	/* E3listCell.h へ
 	IBOutlet UILabel				*ibLbDate;
