@@ -1,0 +1,35 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "78B0850B1D8D204C79DEFA75BED768DA2698F732" : 9223372036854775807,
+    "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "8652B9BD-2B28-4E8C-9DA7-89856667368F",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "78B0850B1D8D204C79DEFA75BED768DA2698F732" : "AZClass\/",
+    "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23" : "..\/AzukiSoft\/AzBodyNote\/AzBodyNote"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "AzBodyNote",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "AzBodyNote.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/bitbucket.org\/azukid\/azbodynote.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/bitbucket.org\/azukid\/azbodynote.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/bitbucket.org\/azukid\/azclass.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "78B0850B1D8D204C79DEFA75BED768DA2698F732"
+    }
+  ]
+}
