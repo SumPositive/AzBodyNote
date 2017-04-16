@@ -451,7 +451,7 @@
         <scene sceneID="kBl-Qy-0cL">
             <objects>
                 <tableViewController storyboardIdentifier="E2editTVC" title="Add" modalTransitionStyle="crossDissolve" id="g6r-81-43n" userLabel="E2editTVC - Add" customClass="E2editTVC" sceneMemberID="viewController">
-                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="80" sectionHeaderHeight="22" sectionFooterHeight="22" id="7De-Za-a9P">
+                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="80" sectionHeaderHeight="22" sectionFooterHeight="22" id="7De-Za-a9P">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -530,6 +530,7 @@
                                     </subviews>
                                 </tableViewCellContentView>
                                 <connections>
+                                    <outlet property="_panelImageView" destination="ZoR-uY-5cg" id="PLS-i1-qMS"/>
                                     <outlet property="ibTfNote1" destination="Pq1-iG-tto" id="peK-WO-Nur"/>
                                     <outlet property="ibTfNote2" destination="yx1-s0-WCa" id="iDg-ir-76h"/>
                                 </connections>
@@ -606,6 +607,7 @@
                                     </subviews>
                                 </tableViewCellContentView>
                                 <connections>
+                                    <outlet property="_panelImageView" destination="FAB-2D-P1s" id="twn-7H-pzD"/>
                                     <outlet property="ibLbDetail" destination="Vp2-Ee-CLL" id="bpb-kC-xkn"/>
                                     <outlet property="ibLbName" destination="4qs-aG-OBU" id="bjb-u8-tWc"/>
                                     <outlet property="ibLbUnit" destination="epH-Xr-nzY" id="oPz-PO-jEE"/>
@@ -738,7 +740,6 @@
                                 </connections>
                             </button>
                         </subviews>
-                        <color key="backgroundColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
                     </view>
                     <navigationItem key="navigationItem" id="bVr-dO-pdJ"/>
                     <connections>

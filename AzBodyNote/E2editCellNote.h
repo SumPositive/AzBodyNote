@@ -10,11 +10,7 @@
 #import "AppDelegate.h"
 #import "E2editTVC.h"	// delegateEditChange 更新通知のため
 
-@interface E2editCellNote : UITableViewCell <UITextFieldDelegate>
-{
-	IBOutlet UITextField		*ibTfNote1;
-	IBOutlet UITextField		*ibTfNote2;
-}
+@interface E2editCellNote : UITableViewCell
 
 @property (nonatomic, unsafe_unretained) id		delegate;	// delegateEditChange 更新通知のため
 @property (nonatomic, retain) E2record				*Re2record;		// 結果を戻すため

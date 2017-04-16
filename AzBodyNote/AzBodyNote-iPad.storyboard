@@ -160,7 +160,7 @@
         <scene sceneID="6Dd-uu-Xx0">
             <objects>
                 <tableViewController storyboardIdentifier="E2editTVC" title="Add" id="OLi-Ry-mMo" userLabel="E2editTVC - Add" customClass="E2editTVC" sceneMemberID="viewController">
-                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="e4V-4X-4Oz">
+                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="e4V-4X-4Oz">
                         <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES"/>
                         <prototypes>
@@ -241,6 +241,7 @@
                                 </tableViewCellContentView>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
+                                    <outlet property="_panelImageView" destination="MGu-K3-gjN" id="U8W-U8-noI"/>
                                     <outlet property="ibTfNote1" destination="Vop-zs-C49" id="RfJ-xL-xth"/>
                                     <outlet property="ibTfNote2" destination="H2h-3u-ewA" id="6o9-3o-04S"/>
                                 </connections>
@@ -325,6 +326,7 @@
                                 </tableViewCellContentView>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
+                                    <outlet property="_panelImageView" destination="YHI-aL-Vfg" id="0oM-th-ACR"/>
                                     <outlet property="ibLbDetail" destination="zUr-f4-owK" id="eqm-30-av5"/>
                                     <outlet property="ibLbName" destination="FiS-WH-ca9" id="Rjg-V7-ajF"/>
                                     <outlet property="ibLbUnit" destination="gDK-3g-ePP" id="usg-ug-yM3"/>

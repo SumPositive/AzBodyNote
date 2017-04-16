@@ -13,20 +13,7 @@
 #import "E2editTVC.h"
 #import "CalcView.h"
 
-@interface E2editCellDial : UITableViewCell <AZDialDelegate>
-{
-	IBOutlet UIView			*ibViewBase;	//iPad//ヨコでセンタリングするため
-	IBOutlet UILabel			*ibLbName;
-	IBOutlet UILabel			*ibLbDetail;
-	IBOutlet UILabel			*ibLbUnit;
-	IBOutlet UILabel			*ibLbValue;
-
-@private
-	//NSInteger		mSliderBase;
-	NSInteger		mValue;
-	AZDial				*mDial;
-	UIPopoverController	*mPopover;
-}
+@interface E2editCellDial : UITableViewCell
 
 @property (nonatomic, unsafe_unretained) id			delegate;	// delegateEditChange 更新通知のため
 @property (nonatomic, unsafe_unretained) UIView				*viewParent;

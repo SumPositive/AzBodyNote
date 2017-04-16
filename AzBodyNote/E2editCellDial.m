@@ -8,8 +8,26 @@
 #import "E2editCellDial.h"
 
 
+@interface E2editCellDial () <AZDialDelegate>
+{
+    __weak IBOutlet UIView             *ibViewBase;	//iPad//ヨコでセンタリングするため
+    __weak IBOutlet UILabel			*ibLbName;
+    __weak IBOutlet UILabel			*ibLbDetail;
+    __weak IBOutlet UILabel			*ibLbUnit;
+    __weak IBOutlet UILabel			*ibLbValue;
+    __weak IBOutlet UIImageView*       _panelImageView;
+    
+    
+    //NSInteger		mSliderBase;
+    NSInteger		mValue;
+    AZDial				*mDial;
+    UIPopoverController	*mPopover;
+}
+@end
+
+
 @implementation E2editCellDial
-@synthesize ibLbName, ibLbDetail, ibLbUnit;  // ibLbValue
+//@synthesize ibLbName, ibLbDetail, ibLbUnit;  // ibLbValue
 @synthesize delegate = delegate_;
 @synthesize viewParent = viewParent_;
 @synthesize Re2record = Re2record_;
@@ -193,6 +211,10 @@
 		mDial.backgroundColor = [UIColor clearColor]; //self.backgroundColor;
 	}
 	
+    // 背景パネル角丸
+    _panelImageView.layer.cornerRadius = 4.0;
+    _panelImageView.layer.masksToBounds = YES;
+    
 	[self refreshValue];
 }
 

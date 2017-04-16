@@ -8,6 +8,16 @@
 #import "E2editCellNote.h"
 
 
+@interface E2editCellNote () <UITextFieldDelegate>
+{
+    __weak IBOutlet UITextField		*ibTfNote1;
+    __weak IBOutlet UITextField		*ibTfNote2;
+    __weak IBOutlet UIImageView*       _panelImageView;
+}
+@end
+
+
+
 @implementation E2editCellNote
 @synthesize delegate = delegate_;
 @synthesize Re2record = e2record_;
@@ -25,6 +35,11 @@
 	ibTfNote2.delegate = self;
 	ibTfNote2.text = e2record_.sNote2;
 	ibTfNote2.placeholder = NSLocalizedString(@"PH_Note2",nil); //@"Medicine,  memo";
+    
+    // 背景パネル角丸
+    _panelImageView.layer.cornerRadius = 4.0;
+    _panelImageView.layer.masksToBounds = YES;
+
 }
 
 
