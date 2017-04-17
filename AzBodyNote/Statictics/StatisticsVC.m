@@ -31,8 +31,8 @@
 	
 	self.title = NSLocalizedString(@"TabStatistics",nil);
 	// View 背景
-	UIImage *imgTile = [UIImage imageNamed:@"Tx-Back1"];
-	self.view.backgroundColor = [UIColor colorWithPatternImage:imgTile];
+//	UIImage *imgTile = [UIImage imageNamed:@"Tx-Back1"];
+//	self.view.backgroundColor = [UIColor colorWithPatternImage:imgTile];
 	
 	mAppDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
 	assert(mAppDelegate);

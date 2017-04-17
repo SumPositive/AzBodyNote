@@ -507,29 +507,31 @@ NSInteger afterPageChange = 0;
 		[ibScrollView addSubview:mActIndicator];
 	}
 
-	if (mSliderOneWidth==nil) {
-		mSliderOneWidth = [[UISlider alloc] init];
-		mSliderOneWidth.minimumValue = ONE_WID_MIN;
-		mSliderOneWidth.maximumValue = ONE_WID_MAX;
-		mSliderOneWidth.continuous = NO; //移動が終わったときだけ通知
-		[mSliderOneWidth addTarget:self action:@selector(sliderOneWidth:) 
-				  forControlEvents:UIControlEventValueChanged];
-		[self.view addSubview:mSliderOneWidth];
-	}
+    // 1レコード幅可変スライダー
+//	if (mSliderOneWidth==nil) {
+//		mSliderOneWidth = [[UISlider alloc] init];
+//		mSliderOneWidth.minimumValue = ONE_WID_MIN;
+//		mSliderOneWidth.maximumValue = ONE_WID_MAX;
+//		mSliderOneWidth.continuous = NO; //移動が終わったときだけ通知
+//		[mSliderOneWidth addTarget:self action:@selector(sliderOneWidth:) 
+//				  forControlEvents:UIControlEventValueChanged];
+//		[self.view addSubview:mSliderOneWidth];
+//	}
 }
 
-- (void)sliderOneWidth:(UISlider*)sender
-{
-	CGRect rc = ibViewRecord.frame;
-	rc.size.width = sender.value * mPadScale;
-	rc.origin.x = (self.view.frame.size.width - rc.size.width) / 2.0;
-	ibViewRecord.frame = rc;
-	// 再描画
-	[self graphViewPageChange:0  animated:YES];
-	//
-	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
-	[kvs setObject:[NSNumber numberWithInteger:(NSInteger)sender.value] forKey:KVS_SettGraphOneWid];
-}
+// 1レコード幅可変スライダー
+//- (void)sliderOneWidth:(UISlider*)sender
+//{
+//	CGRect rc = ibViewRecord.frame;
+//	rc.size.width = sender.value * mPadScale;
+//	rc.origin.x = (self.view.frame.size.width - rc.size.width) / 2.0;
+//	ibViewRecord.frame = rc;
+//	// 再描画
+//	[self graphViewPageChange:0  animated:YES];
+//	//
+//	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
+//	[kvs setObject:[NSNumber numberWithInteger:(NSInteger)sender.value] forKey:KVS_SettGraphOneWid];
+//}
 
 - (void)viewWillAppear:(BOOL)animated 
 {
