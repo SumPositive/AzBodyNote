@@ -99,15 +99,15 @@
     [super viewDidUnload];
 }
 */
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
-
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{	// 回転した後に呼び出される
-	//[mAppDelegate adRefresh];
-}
+//- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+//{
+//    return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait);
+//}
+//
+//- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+//{	// 回転した後に呼び出される
+//	//[mAppDelegate adRefresh];
+//}
 
 
 #pragma mark - Table view data source

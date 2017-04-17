@@ -761,19 +761,19 @@
 #endif
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{   // Return YES for supported orientations
-	return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait); // タテ正面のみ
-}
-- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation 
+//- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+//{   // Return YES for supported orientations
+//	return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait); // タテ正面のみ
+//}
+- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
 								duration:(NSTimeInterval)duration
 {	// 回転前
 	[[CalcView sharedCalcView] hide];	//回転すれば電卓消す
 }
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{	// 回転後
-	//[appDelegate_ adRefresh];
-}
+//- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+//{	// 回転後
+//	//[appDelegate_ adRefresh];
+//}
 
 - (void)viewWillDisappear:(BOOL)animated
 {	// 非表示になる前に呼び出される

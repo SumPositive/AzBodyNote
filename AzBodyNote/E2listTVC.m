@@ -243,21 +243,21 @@
 }
 */
 
-// Override to allow orientations other than the default portrait orientation.
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-	// Return YES for supported orientations.
-	return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
-
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{	// 回転した後に呼び出される
-	//[appDelegate_ adRefresh];
-/*	if (iS_iPAD) {
-		CGRect rc = ibViewTitle.frame;
-		rc.origin.x = (self.navigationController.navigationBar.bounds.size.width - rc.size.width) / 2.0;
-		ibViewTitle.frame = rc;
-	}*/
-}
+//// Override to allow orientations other than the default portrait orientation.
+//- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+//	// Return YES for supported orientations.
+//	return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait);
+//}
+//
+//- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+//{	// 回転した後に呼び出される
+//	//[appDelegate_ adRefresh];
+///*	if (iS_iPAD) {
+//		CGRect rc = ibViewTitle.frame;
+//		rc.origin.x = (self.navigationController.navigationBar.bounds.size.width - rc.size.width) / 2.0;
+//		ibViewTitle.frame = rc;
+//	}*/
+//}
 
 
 - (void)didReceiveMemoryWarning
@@ -401,7 +401,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return 60;
+    return 66;
 }
 
 // Customize the appearance of table view cells.
