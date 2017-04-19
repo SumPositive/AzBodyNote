@@ -38,6 +38,7 @@
 		4435388E143746FA00F5F309 /* AzBodyNoteTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4435388D143746FA00F5F309 /* AzBodyNoteTests.m */; };
 		443538A51437557D00F5F309 /* MocEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = 443538A41437557C00F5F309 /* MocEntity.m */; };
 		443538A814375B2300F5F309 /* E2listCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 443538A714375B2300F5F309 /* E2listCell.m */; };
+		443DF1CD1EA6510900191A36 /* SFHFKeychainUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 443DF1CC1EA6510900191A36 /* SFHFKeychainUtils.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		44424F29154F933200A0E832 /* SViewBp.m in Sources */ = {isa = PBXBuildFile; fileRef = 44424F27154F933200A0E832 /* SViewBp.m */; };
 		44424F2C155003D300A0E832 /* Icon32-Sett_Right.png in Resources */ = {isa = PBXBuildFile; fileRef = 44424F2A155003D300A0E832 /* Icon32-Sett_Right.png */; };
 		44424F2D155003D300A0E832 /* Icon32-Sett_Right@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 44424F2B155003D300A0E832 /* Icon32-Sett_Right@2x.png */; };
@@ -119,8 +120,7 @@
 		44A255661EA36D7000FE4760 /* Icon57-PackList@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 44A2554D1EA36D7000FE4760 /* Icon57-PackList@2x.png */; };
 		44A255671EA36D7000FE4760 /* Icon57-PayNote.png in Resources */ = {isa = PBXBuildFile; fileRef = 44A2554E1EA36D7000FE4760 /* Icon57-PayNote.png */; };
 		44A255681EA36D7000FE4760 /* Icon57-PayNote@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 44A2554F1EA36D7000FE4760 /* Icon57-PayNote@2x.png */; };
-		44A255691EA36D7000FE4760 /* Icon57-SplitPay.png in Resources */ = {isa = PBXBuildFile; fileRef = 44A255501EA36D7000FE4760 /* Icon57-SplitPay.png */; };
-		44A2556A1EA36D7000FE4760 /* Icon57-SplitPay@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 44A255511EA36D7000FE4760 /* Icon57-SplitPay@2x.png */; };
+		44A2556A1EA36D7000FE4760 /* Icon57-SplitPay.png in Resources */ = {isa = PBXBuildFile; fileRef = 44A255511EA36D7000FE4760 /* Icon57-SplitPay.png */; };
 		44A2556B1EA36D7000FE4760 /* NSDataBase64.m in Sources */ = {isa = PBXBuildFile; fileRef = 44A255531EA36D7000FE4760 /* NSDataBase64.m */; };
 		44A2556C1EA36D7000FE4760 /* VerificationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 44A255551EA36D7000FE4760 /* VerificationController.m */; };
 		44A255741EA36D8000FE4760 /* AZWeb-Back-16.png in Resources */ = {isa = PBXBuildFile; fileRef = 44A2556E1EA36D8000FE4760 /* AZWeb-Back-16.png */; };
@@ -224,6 +224,8 @@
 		443538A41437557C00F5F309 /* MocEntity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MocEntity.m; sourceTree = "<group>"; };
 		443538A614375B2300F5F309 /* E2listCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = E2listCell.h; sourceTree = "<group>"; };
 		443538A714375B2300F5F309 /* E2listCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = E2listCell.m; sourceTree = "<group>"; };
+		443DF1CB1EA6510900191A36 /* SFHFKeychainUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFHFKeychainUtils.h; sourceTree = "<group>"; };
+		443DF1CC1EA6510900191A36 /* SFHFKeychainUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFHFKeychainUtils.m; sourceTree = "<group>"; };
 		44424F27154F933200A0E832 /* SViewBp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SViewBp.m; path = Statictics/SViewBp.m; sourceTree = "<group>"; };
 		44424F28154F933200A0E832 /* SViewBp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SViewBp.h; path = Statictics/SViewBp.h; sourceTree = "<group>"; };
 		44424F2A155003D300A0E832 /* Icon32-Sett_Right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon32-Sett_Right.png"; path = "AzBodyNote/Design/Icon32-Sett_Right.png"; sourceTree = "<group>"; };
@@ -326,8 +328,7 @@
 		44A2554D1EA36D7000FE4760 /* Icon57-PackList@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon57-PackList@2x.png"; sourceTree = "<group>"; };
 		44A2554E1EA36D7000FE4760 /* Icon57-PayNote.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon57-PayNote.png"; sourceTree = "<group>"; };
 		44A2554F1EA36D7000FE4760 /* Icon57-PayNote@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon57-PayNote@2x.png"; sourceTree = "<group>"; };
-		44A255501EA36D7000FE4760 /* Icon57-SplitPay.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon57-SplitPay.png"; sourceTree = "<group>"; };
-		44A255511EA36D7000FE4760 /* Icon57-SplitPay@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon57-SplitPay@2x.png"; sourceTree = "<group>"; };
+		44A255511EA36D7000FE4760 /* Icon57-SplitPay.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon57-SplitPay.png"; sourceTree = "<group>"; };
 		44A255521EA36D7000FE4760 /* NSDataBase64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSDataBase64.h; sourceTree = "<group>"; };
 		44A255531EA36D7000FE4760 /* NSDataBase64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSDataBase64.m; sourceTree = "<group>"; };
 		44A255541EA36D7000FE4760 /* VerificationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VerificationController.h; sourceTree = "<group>"; };
@@ -589,6 +590,16 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		443DF1CA1EA6510900191A36 /* SFHFKeychainUtils.release */ = {
+			isa = PBXGroup;
+			children = (
+				443DF1CB1EA6510900191A36 /* SFHFKeychainUtils.h */,
+				443DF1CC1EA6510900191A36 /* SFHFKeychainUtils.m */,
+			);
+			name = SFHFKeychainUtils.release;
+			path = ../OpenCode/SFHFKeychainUtils/SFHFKeychainUtils.release;
+			sourceTree = "<group>";
+		};
 		4453CD341548C11900181BF0 /* Statistics */ = {
 			isa = PBXGroup;
 			children = (
@@ -644,14 +655,6 @@
 				4453CD4015498C1F00181BF0 /* GViewLine.m */,
 			);
 			name = Graph;
-			sourceTree = "<group>";
-		};
-		44A254FF1EA36C7500FE4760 /* SFHFKeychainUtils.release */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = SFHFKeychainUtils.release;
-			path = ../OpenCode/SFHFKeychainUtils/SFHFKeychainUtils.release;
 			sourceTree = "<group>";
 		};
 		44A255001EA36C8000FE4760 /* UIDevice-Hardware.release */ = {
@@ -736,8 +739,7 @@
 				44A2554D1EA36D7000FE4760 /* Icon57-PackList@2x.png */,
 				44A2554E1EA36D7000FE4760 /* Icon57-PayNote.png */,
 				44A2554F1EA36D7000FE4760 /* Icon57-PayNote@2x.png */,
-				44A255501EA36D7000FE4760 /* Icon57-SplitPay.png */,
-				44A255511EA36D7000FE4760 /* Icon57-SplitPay@2x.png */,
+				44A255511EA36D7000FE4760 /* Icon57-SplitPay.png */,
 				44A255521EA36D7000FE4760 /* NSDataBase64.h */,
 				44A255531EA36D7000FE4760 /* NSDataBase64.m */,
 				44A255541EA36D7000FE4760 /* VerificationController.h */,
@@ -819,8 +821,8 @@
 		44EF3BB21546235000925F12 /* OpenCode */ = {
 			isa = PBXGroup;
 			children = (
+				443DF1CA1EA6510900191A36 /* SFHFKeychainUtils.release */,
 				44A255001EA36C8000FE4760 /* UIDevice-Hardware.release */,
-				44A254FF1EA36C7500FE4760 /* SFHFKeychainUtils.release */,
 			);
 			name = OpenCode;
 			sourceTree = "<group>";
@@ -870,7 +872,7 @@
 		4435384A143746F900F5F309 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0460;
+				LastUpgradeCheck = 0830;
 				TargetAttributes = {
 					44353852143746F900F5F309 = {
 						DevelopmentTeam = 5C2UYK6F45;
@@ -956,7 +958,7 @@
 				44EE0271154EDC22004A8ADB /* Icon20-Goal@2x.png in Resources */,
 				44A255761EA36D8000FE4760 /* AZWeb-Forward-16.png in Resources */,
 				44A255341EA36D6200FE4760 /* AZDialStepperPlus.png in Resources */,
-				44A2556A1EA36D7000FE4760 /* Icon57-SplitPay@2x.png in Resources */,
+				44A2556A1EA36D7000FE4760 /* Icon57-SplitPay.png in Resources */,
 				44EE0272154EDC22004A8ADB /* Icon20-Goal.png in Resources */,
 				44EE027B154EEBCD004A8ADB /* bird_32_blue.png in Resources */,
 				44EE027D154EEC1D004A8ADB /* bird_32_gray.png in Resources */,
@@ -970,7 +972,6 @@
 				44A2555C1EA36D7000FE4760 /* AZStore-Stop-32.png in Resources */,
 				448BF7C1155FFB5C005C76C3 /* Icon32-Calender-ON.png in Resources */,
 				448BF7C2155FFB5C005C76C3 /* Icon32-Calender-ON@2x.png in Resources */,
-				44A255691EA36D7000FE4760 /* Icon57-SplitPay.png in Resources */,
 				44A2552E1EA36D6200FE4760 /* AZDialBack.png in Resources */,
 				44A255561EA36D7000FE4760 /* AZStore-32.png in Resources */,
 				44A255621EA36D7000FE4760 /* Icon57-CalcRoll@2x.png in Resources */,
@@ -1051,6 +1052,7 @@
 				44A2556C1EA36D7000FE4760 /* VerificationController.m in Sources */,
 				44353866143746F900F5F309 /* main.m in Sources */,
 				44A2550C1EA36D4300FE4760 /* AZClass.m in Sources */,
+				443DF1CD1EA6510900191A36 /* SFHFKeychainUtils.m in Sources */,
 				44A255781EA36D8000FE4760 /* AZWebView.m in Sources */,
 				4435386A143746F900F5F309 /* AppDelegate.m in Sources */,
 				4435386D143746F900F5F309 /* AzBodyNote.xcdatamodeld in Sources */,
@@ -1156,16 +1158,25 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Masakazu Matsuyama (RL5WRC28AG)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -1173,14 +1184,19 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "92C8B195-489D-4959-9A36-D0058D40D948";
+				ONLY_ACTIVE_ARCH = NO;
+				PROVISIONING_PROFILE = "889e2e7c-2c5b-4075-a49f-9c2b59954e1e";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "889e2e7c-2c5b-4075-a49f-9c2b59954e1e";
 				SDKROOT = iphoneos;
-				VALID_ARCHS = armv7;
+				VALID_ARCHS = "armv7s arm64";
 			};
 			name = Debug;
 		};
@@ -1188,26 +1204,39 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Masakazu Matsuyama (RL5WRC28AG)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "92C8B195-489D-4959-9A36-D0058D40D948";
+				PROVISIONING_PROFILE = "889e2e7c-2c5b-4075-a49f-9c2b59954e1e";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "889e2e7c-2c5b-4075-a49f-9c2b59954e1e";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
-				VALID_ARCHS = armv7;
+				VALID_ARCHS = "armv7s arm64";
 			};
 			name = Release;
 		};
@@ -1215,31 +1244,28 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = AzBodyNote/AzBodyNote.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = 5C2UYK6F45;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../AZClass/AZDropbox/AZDropbox.relese\"",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AzBodyNote/AzBodyNote-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
 				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = "AzBodyNote-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../OpenCode/GoogleAnalytics/GoogleAnalytics.release\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				MACH_O_TYPE = mh_execute;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-all_load",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.azukid.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1252,31 +1278,27 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = AzBodyNote/AzBodyNote.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = 5C2UYK6F45;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../AZClass/AZDropbox/AZDropbox.relese\"",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AzBodyNote/AzBodyNote-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
 				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = "AzBodyNote-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../OpenCode/GoogleAnalytics/GoogleAnalytics.release\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				MACH_O_TYPE = mh_execute;
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-all_load",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.azukid.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1296,6 +1318,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AzBodyNote/AzBodyNote-Prefix.pch";
 				INFOPLIST_FILE = "AzBodyNoteTests/AzBodyNoteTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.azukid.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = octest;
@@ -1313,6 +1336,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AzBodyNote/AzBodyNote-Prefix.pch";
 				INFOPLIST_FILE = "AzBodyNoteTests/AzBodyNoteTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.azukid.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = octest;

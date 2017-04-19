@@ -98,7 +98,7 @@
 	CGContextSetRGBFillColor (cgc, 151.0/295, 80.0/295, 77.0/295, 1.0);//Azukid色の薄め
 
 	//システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
-	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 	NSDateComponents* comp;
 	const char *cc;
 
@@ -130,14 +130,14 @@
 					| NSHourCalendarUnit | NSMinuteCalendarUnit   fromDate:e2.dateTime];
 			
 			// 月/日
-			cc = [[NSString stringWithFormat:@"%d/%d", comp.month, comp.day] UTF8String];
+			cc = [[NSString stringWithFormat:@"%ld/%ld", (long)comp.month, (long)comp.day] UTF8String];
 			if (4 < strlen(cc)) {
 				CGContextShowTextAtPoint (cgc, po.x-15*mPadScale, po.y+22+12*mPadScale, cc, strlen(cc));
 			} else {
 				CGContextShowTextAtPoint (cgc, po.x-10*mPadScale, po.y+22+12*mPadScale, cc, strlen(cc));
 			}
 			// 時:分
-			cc = [[NSString stringWithFormat:@"%d:%d", comp.hour, comp.minute] UTF8String];
+			cc = [[NSString stringWithFormat:@"%ld:%ld", (long)comp.hour, (long)comp.minute] UTF8String];
 			if (4 < strlen(cc)) {
 				CGContextShowTextAtPoint (cgc, po.x-15*mPadScale, po.y+22, cc, strlen(cc));
 			} else {

@@ -594,7 +594,7 @@
 //			[vc setCryptHidden:YES	 Enabled:NO];////表示後にセットすること
 //			NSDateFormatter *fm = [[NSDateFormatter alloc] init];
 //			// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
-//			NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+//			NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 //			[fm setCalendar:calendar];
 //			[fm setDateFormat:@"yyyy-MM"];	//年-月
 //			[vc setUpFileName: [fm stringFromDate:[NSDate date]]];

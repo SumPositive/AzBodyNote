@@ -168,7 +168,7 @@
 - (EnumConditions)integerDateOpt:(NSDate *)date
 {	// 保存時に自動学習(記録更新)する
 	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
-	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 	NSDateComponents* comp = [calendar components: NSHourCalendarUnit  fromDate:date]; // Hourのみ
 	
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
@@ -391,7 +391,7 @@
 		} else {
 			// 修正
 			// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
-			NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+			NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 			NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
 			[fmt setCalendar:calendar];
 			if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) 
@@ -438,7 +438,7 @@
 		assert(moE2edit_.dateTime);
 		// データ整合処理
 		// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
-		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 		NSDateComponents* comp = [calendar components:NSYearCalendarUnit | NSMonthCalendarUnit | NSHourCalendarUnit
 											 fromDate:moE2edit_.dateTime];
 		moE2edit_.nYearMM = [NSNumber numberWithInteger:([comp year] * 100 + [comp month])];
@@ -734,7 +734,7 @@
 		if (dt==nil) {
 			dt =[NSDate date];
 		}
-		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 		static int iTotal = 1;
 		for (int i=1; i<=100; i++, iTotal++) {
 			E2record *e2 = [mocFunc_ insertAutoEntity:E2_ENTITYNAME];
@@ -947,7 +947,7 @@
 		
 		NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
 		// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
-		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 		[fmt setCalendar:calendar];
 		if ([[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] isEqualToString:@"ja"]) 
 		{ // 「書式」で変わる。　「言語」でない
