@@ -26,7 +26,7 @@
 #define COLOR_AZUKI     [UIColor colorWithRed:151.0/255.0 green: 80.0/255.0 blue: 77.0/255.0 alpha:1.0]
 #define COLOR_AZBK      [UIColor colorWithRed: 70.0/255.0 green: 70.0/255.0 blue: 70.0/255.0 alpha:1.0]
 #define COLOR_AZWH      [UIColor colorWithRed:250.0/255.0 green:250.0/255.0 blue:250.0/255.0 alpha:1.0]
-#define COLOR_BACK      [UIColor colorWithRed:255.0/255.0 green:255.0/255.0 blue:240.0/255.0 alpha:1.0]  // 背景 明るい黄色
+#define COLOR_BACK      [UIColor colorWithRed:240.0/255.0 green:240.0/255.0 blue:240.0/255.0 alpha:1.0]  // 背景 薄い白
 
 
 // typedef
