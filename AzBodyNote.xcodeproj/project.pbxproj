@@ -120,7 +120,6 @@
 		44A255671EA36D7000FE4760 /* Icon57-PayNote.png in Resources */ = {isa = PBXBuildFile; fileRef = 44A2554E1EA36D7000FE4760 /* Icon57-PayNote.png */; };
 		44A255681EA36D7000FE4760 /* Icon57-PayNote@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 44A2554F1EA36D7000FE4760 /* Icon57-PayNote@2x.png */; };
 		44A255691EA36D7000FE4760 /* Icon57-SplitPay.png in Resources */ = {isa = PBXBuildFile; fileRef = 44A255501EA36D7000FE4760 /* Icon57-SplitPay.png */; };
-		44A2556A1EA36D7000FE4760 /* Icon57-SplitPay@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 44A255511EA36D7000FE4760 /* Icon57-SplitPay@2x.png */; };
 		44A2556B1EA36D7000FE4760 /* NSDataBase64.m in Sources */ = {isa = PBXBuildFile; fileRef = 44A255531EA36D7000FE4760 /* NSDataBase64.m */; };
 		44A2556C1EA36D7000FE4760 /* VerificationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 44A255551EA36D7000FE4760 /* VerificationController.m */; };
 		44A255741EA36D8000FE4760 /* AZWeb-Back-16.png in Resources */ = {isa = PBXBuildFile; fileRef = 44A2556E1EA36D8000FE4760 /* AZWeb-Back-16.png */; };
@@ -327,7 +326,6 @@
 		44A2554E1EA36D7000FE4760 /* Icon57-PayNote.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon57-PayNote.png"; sourceTree = "<group>"; };
 		44A2554F1EA36D7000FE4760 /* Icon57-PayNote@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon57-PayNote@2x.png"; sourceTree = "<group>"; };
 		44A255501EA36D7000FE4760 /* Icon57-SplitPay.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon57-SplitPay.png"; sourceTree = "<group>"; };
-		44A255511EA36D7000FE4760 /* Icon57-SplitPay@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon57-SplitPay@2x.png"; sourceTree = "<group>"; };
 		44A255521EA36D7000FE4760 /* NSDataBase64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSDataBase64.h; sourceTree = "<group>"; };
 		44A255531EA36D7000FE4760 /* NSDataBase64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSDataBase64.m; sourceTree = "<group>"; };
 		44A255541EA36D7000FE4760 /* VerificationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VerificationController.h; sourceTree = "<group>"; };
@@ -737,7 +735,6 @@
 				44A2554E1EA36D7000FE4760 /* Icon57-PayNote.png */,
 				44A2554F1EA36D7000FE4760 /* Icon57-PayNote@2x.png */,
 				44A255501EA36D7000FE4760 /* Icon57-SplitPay.png */,
-				44A255511EA36D7000FE4760 /* Icon57-SplitPay@2x.png */,
 				44A255521EA36D7000FE4760 /* NSDataBase64.h */,
 				44A255531EA36D7000FE4760 /* NSDataBase64.m */,
 				44A255541EA36D7000FE4760 /* VerificationController.h */,
@@ -956,7 +953,6 @@
 				44EE0271154EDC22004A8ADB /* Icon20-Goal@2x.png in Resources */,
 				44A255761EA36D8000FE4760 /* AZWeb-Forward-16.png in Resources */,
 				44A255341EA36D6200FE4760 /* AZDialStepperPlus.png in Resources */,
-				44A2556A1EA36D7000FE4760 /* Icon57-SplitPay@2x.png in Resources */,
 				44EE0272154EDC22004A8ADB /* Icon20-Goal.png in Resources */,
 				44EE027B154EEBCD004A8ADB /* bird_32_blue.png in Resources */,
 				44EE027D154EEC1D004A8ADB /* bird_32_gray.png in Resources */,
@@ -1221,20 +1217,14 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = 5C2UYK6F45;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../AZClass/AZDropbox/AZDropbox.relese\"",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AzBodyNote/AzBodyNote-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
 				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = "AzBodyNote-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../OpenCode/GoogleAnalytics/GoogleAnalytics.release\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-all_load",
@@ -1258,20 +1248,14 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = 5C2UYK6F45;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../AZClass/AZDropbox/AZDropbox.relese\"",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AzBodyNote/AzBodyNote-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
 				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = "AzBodyNote-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../OpenCode/GoogleAnalytics/GoogleAnalytics.release\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-all_load",
