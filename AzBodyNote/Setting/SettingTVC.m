@@ -114,7 +114,7 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {	// Return the number of sections.
-    return 3;
+    return 4;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -123,7 +123,7 @@
 		case 0:	return 2;			break;
 		case 1:	return 2;			break;
 		case 2:	return 2;			break;
-//		case 3:	return 1;			break;
+		case 3:	return 1;			break;
 	}
 	return 0;
 }
@@ -136,15 +136,15 @@
 
 /* 背景画像を生かす為に非表示にした。表示すると背景が分断される*/
 // TableView セクションタイトルを応答
-//- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section 
-//{
-//	switch (section) {
-//		case 3:
-//			return	NSLocalizedString(@"All data will be removed", nil);
-//			break;
-//	}
-//	return nil;
-//}
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section 
+{
+	switch (section) {
+		case 3:
+			return	NSLocalizedString(@"All data will be removed", nil);
+			break;
+	}
+	return nil;
+}
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
@@ -267,21 +267,21 @@
 		}	break;
 			
 		
-//		case 300: {	// Dropbox - Download
-//			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
-//			if (cell == nil) {
-//				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
-//			}
-//			cell.imageView.image = [UIImage imageNamed:@"AZDropbox-32"];
-//			cell.textLabel.text = NSLocalizedString(@"Dropbox Download",nil);
-//			cell.detailTextLabel.text = nil;
-//			if (iS_iPAD) {
-//				cell.accessoryType = UITableViewCellAccessoryNone;
-//			} else {
-//				cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-//			}
-//			return cell;
-//		}	break;
+		case 300: {	// Dropbox - Download
+			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
+			if (cell == nil) {
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
+			}
+			cell.imageView.image = [UIImage imageNamed:@"AZDropbox-32"];
+			cell.textLabel.text = NSLocalizedString(@"Dropbox Download",nil);
+			cell.detailTextLabel.text = nil;
+			if (iS_iPAD) {
+				cell.accessoryType = UITableViewCellAccessoryNone;
+			} else {
+				cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+			}
+			return cell;
+		}	break;
 	}
     return nil;
 }
@@ -357,8 +357,7 @@
 				UINavigationController* nc = [[UINavigationController alloc] initWithRootViewController:vc];
 				nc.modalPresentationStyle = UIModalPresentationFormSheet; // iPad画面1/4サイズ
 				nc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-				//[self presentModalViewController:nc animated:YES];
-                [self presentViewController:nc animated:YES completion:nil];
+				[self presentModalViewController:nc animated:YES];
 			} else {
 				//[mAppDelegate adShow:2];	//(2)Ad下端へ
 				[vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする

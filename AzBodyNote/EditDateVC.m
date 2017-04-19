@@ -52,9 +52,9 @@
     [super loadView];
 
 	if (iS_iPAD) {
-        self.view.backgroundColor = COLOR_BACK;  //[UIColor lightGrayColor];
+        self.view.backgroundColor = COLOR_AZGR;  //[UIColor lightGrayColor];
 	} else {
-        self.view.backgroundColor = COLOR_BACK;  //[UIColor groupTableViewBackgroundColor];
+        self.view.backgroundColor = COLOR_AZGR;  //[UIColor groupTableViewBackgroundColor];
 		[self.navigationController setToolbarHidden:YES animated:NO]; // ツールバー消す
 	}
 

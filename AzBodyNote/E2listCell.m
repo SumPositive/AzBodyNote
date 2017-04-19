@@ -42,7 +42,7 @@
 	{
 		NSDateFormatter *fm = [[NSDateFormatter alloc] init];
 		// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
-		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 		[fm setCalendar:calendar];
 		[fm setDateFormat:@"dd  HH:mm"];
 		ibLbDate.text = [fm stringFromDate:moE2node_.dateTime];

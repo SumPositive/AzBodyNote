@@ -161,7 +161,7 @@ NSInteger	pStatCount = 0;
 	pValMax[bpLo] = E2_nBpLo_MIN;
 	
 	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
-	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 	NSDateComponents* comp;
 	NSInteger  iYear=0, iMM=0, iDD=0;
 

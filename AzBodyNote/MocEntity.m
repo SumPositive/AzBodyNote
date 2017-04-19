@@ -44,7 +44,7 @@
 - (NSInteger)dateYearMM
 {	// セクション表示のため「年月」を取得する
 	// システム設定で「和暦」にされたとき年表示がおかしくなるため、西暦（グレゴリア）に固定
-	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 	NSDateComponents* dateComponents =
 	[calendar components:NSYearCalendarUnit | NSMonthCalendarUnit  fromDate:self.dateTime];
 	return [dateComponents year] * 100 + [dateComponents month];
@@ -63,7 +63,7 @@ NSDate *dateFromUTC( NSString *zUTC )
 	NSDateFormatter *dfmt = [[NSDateFormatter alloc] init];
 	[dfmt setTimeZone:[NSTimeZone timeZoneWithName:@"UTC"]]; // 協定世界時(+0000)
 	// カレンダーの設定 ＜＜システム設定が「和暦」になると、2012-->平成2012年-->西暦4000年になるのを避けるため、西暦（グレゴリア）に固定
-	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 	[dfmt setCalendar:calendar];
 	[dfmt setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss"];
 	NSDate *dTZ = [dfmt dateFromString:zUTC];	
@@ -76,7 +76,7 @@ NSString *utcFromDate( NSDate *dTZ )
 	NSDateFormatter *dfmt = [[NSDateFormatter alloc] init];
 	[dfmt setTimeZone:[NSTimeZone timeZoneWithName:@"UTC"]]; // 協定世界時(+0000)
 	// カレンダーの設定 ＜＜システム設定が「和暦」になると、2012-->平成2012年-->西暦4000年になるのを避けるため、西暦（グレゴリア）に固定
-	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 	[dfmt setCalendar:calendar];
 	[dfmt setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss"];
 	NSString *zUTC = [dfmt stringFromDate:dTZ];
