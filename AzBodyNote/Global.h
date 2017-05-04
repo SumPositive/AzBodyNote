@@ -23,10 +23,13 @@
 #define NFM_AppDidBecomeActive			@"AppDidBecomeActive"			//バックグランドから戻った
 
 // Base Color
-#define COLOR_AZUKI     [UIColor colorWithRed:151.0/255.0 green: 80.0/255.0 blue: 77.0/255.0 alpha:1.0]
-#define COLOR_AZBK      [UIColor colorWithRed: 70.0/255.0 green: 70.0/255.0 blue: 70.0/255.0 alpha:1.0]
-#define COLOR_AZWH      [UIColor colorWithRed:250.0/255.0 green:250.0/255.0 blue:250.0/255.0 alpha:1.0]
-#define COLOR_BACK      [UIColor colorWithRed:240.0/255.0 green:240.0/255.0 blue:240.0/255.0 alpha:1.0]  // 背景 薄い白
+#define COLOR_AZUKI         [UIColor colorWithRed:151.0/255.0 green: 80.0/255.0 blue: 77.0/255.0 alpha:1.0]
+#define COLOR_AZBK          [UIColor colorWithRed: 70.0/255.0 green: 70.0/255.0 blue: 70.0/255.0 alpha:1.0]
+#define COLOR_AZWH          [UIColor colorWithRed:250.0/255.0 green:250.0/255.0 blue:250.0/255.0 alpha:1.0]
+//#define COLOR_BACK      [UIColor colorWithRed:240.0/255.0 green:240.0/255.0 blue:240.0/255.0 alpha:1.0]  // 背景 薄い白
+#define COLOR_BACK          [UIColor colorWithRed:220.0/255.0 green:220.0/255.0 blue:220.0/255.0 alpha:1.0]  // 背景
+#define COLOR_BACK_EDIT     [UIColor colorWithRed:210.0/255.0 green:220.0/255.0 blue:210.0/255.0 alpha:1.0]  // 背景 修正
+#define COLOR_BACK_GOAL     [UIColor colorWithRed:210.0/255.0 green:210.0/255.0 blue:220.0/255.0 alpha:1.0]  // 背景 GOAL
 
 
 // typedef

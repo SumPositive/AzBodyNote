@@ -210,10 +210,10 @@
 		}
 		mDial.backgroundColor = [UIColor clearColor]; //self.backgroundColor;
 	}
-	
+    
     // 背景パネル角丸
-    _panelImageView.layer.cornerRadius = 4.0;
-    _panelImageView.layer.masksToBounds = YES;
+    ibViewBase.layer.masksToBounds = true;
+    ibViewBase.layer.cornerRadius = 6.0;
     
 	[self refreshValue];
 }

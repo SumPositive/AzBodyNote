@@ -523,7 +523,7 @@
 		mocFunc_ = [MocFunctions sharedMocFunctions]; //appDelegate_.mocBase; // Read Only
 	}
 	assert(mocFunc_);
-	
+    
 	// Set up NEXT Left [Back] buttons.
 	self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
 											 initWithTitle: NSLocalizedString(@"Back", nil)
@@ -554,9 +554,7 @@
 		case 0: //-------------------------------------------------------------------- AddNew
 		{
 			self.title = NSLocalizedString(@"TabAdd",nil);
-//			// TableView 背景
-//			UIImage *imgTile = [UIImage imageNamed: @"Tx-Back1"];   //@"Tx-Back1"
-//			self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
+            [self.tableView setBackgroundColor:COLOR_BACK];
 			assert(moE2edit_==nil);
 			// moE2edit_ は、viewWillAppear:にて生成する。
 			// [Clear]ボタンを左側に追加する
@@ -569,11 +567,9 @@
 		case 1: //-------------------------------------------------------------------- Edit
 		{
 			self.title = NSLocalizedString(@"Modify",nil);
-//			// TableView 背景
-//			UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
-//			self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
+            //self.tableView.backgroundView.backgroundColor = COLOR_BACK_EDIT;
+            [self.tableView setBackgroundColor:COLOR_BACK_EDIT];
 			assert(moE2edit_); // 必須
-			
 			// [<Back]ボタン表示: 修正あるのにBackしたときはアラート表示してからRollback処理する。
 			// [Cancel]ボタンを左側に追加する
 			self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
@@ -585,9 +581,7 @@
 		case 2: //-------------------------------------------------------------------- Goal Edit
 		{
 			self.title = NSLocalizedString(@"Modify",nil);
-//			// TableView 背景
-//			UIImage *imgTile = [UIImage imageNamed:@"Tx-WdWhite320"];
-//			self.tableView.backgroundColor = [UIColor colorWithPatternImage:imgTile];
+            [self.tableView setBackgroundColor:COLOR_BACK_GOAL];
 			assert(moE2edit_==nil);
 			kvsGoal_ = [NSUbiquitousKeyValueStore defaultStore];
 			//moE2edit_ = [[E2record alloc] init]; // MOCで無い！ 一時エンティティ
@@ -910,6 +904,11 @@
 		return nil;
 	}
 }*/
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    cell.backgroundColor = [UIColor clearColor];
+}
 
 - (UITableViewCell *)cellDate:(UITableView *)tableView
 {

@@ -37,8 +37,8 @@
 	ibTfNote2.placeholder = NSLocalizedString(@"PH_Note2",nil); //@"Medicine,  memo";
     
     // 背景パネル角丸
-    _panelImageView.layer.cornerRadius = 4.0;
-    _panelImageView.layer.masksToBounds = YES;
+    _panelImageView.layer.cornerRadius = 6.0;
+    _panelImageView.layer.masksToBounds = true;
 
 }
 

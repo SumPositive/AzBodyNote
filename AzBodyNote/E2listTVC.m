@@ -417,6 +417,7 @@
 		}
 		// Configure the cell.
 		[self configureCell:cell atIndexPath:indexPath];
+        cell.backgroundColor = COLOR_BACK_EDIT;
 		return cell;
 	}
 	else { // GOALセクション
@@ -430,6 +431,7 @@
 				}
 				// Configure the cell.
 				[self configureCell:cell atIndexPath:nil]; // GOAL!
+                cell.backgroundColor = COLOR_BACK_GOAL;
 				return cell;
 			}	break;
 
