@@ -383,6 +383,8 @@
 		44EE2D11157E03F600236557 /* Icon72@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon72@2x.png"; path = "../Icon72@2x.png"; sourceTree = "<group>"; };
 		44EE2D15157E070F00236557 /* Tx-Back1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Tx-Back1.png"; path = "AzBodyNote/Design/Tx-Back1.png"; sourceTree = "<group>"; };
 		44EE2D16157E070F00236557 /* Tx-Back1@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Tx-Back1@2x.png"; path = "AzBodyNote/Design/Tx-Back1@2x.png"; sourceTree = "<group>"; };
+		44F195771EBC2ED900F5FF93 /* History.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = History.h; path = AzBodyNote/History.h; sourceTree = "<group>"; };
+		44F195781EBC2ED900F5FF93 /* Readme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Readme.h; path = AzBodyNote/Readme.h; sourceTree = "<group>"; };
 		44F577AA15428AFF0003FFD4 /* Icon20-Sleep.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon20-Sleep.png"; path = "AzBodyNote/Design/Icon20-Sleep.png"; sourceTree = "<group>"; };
 		44F577AB15428AFF0003FFD4 /* Icon20-Wake.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon20-Wake.png"; path = "AzBodyNote/Design/Icon20-Wake.png"; sourceTree = "<group>"; };
 		44F577B0154292950003FFD4 /* Icon20-Sleep@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon20-Sleep@2x.png"; path = "AzBodyNote/Design/Icon20-Sleep@2x.png"; sourceTree = "<group>"; };
@@ -465,6 +467,8 @@
 		44353848143746F900F5F309 = {
 			isa = PBXGroup;
 			children = (
+				44F195781EBC2ED900F5FF93 /* Readme.h */,
+				44F195771EBC2ED900F5FF93 /* History.h */,
 				44EF3BB21546235000925F12 /* OpenCode */,
 				4412FD05153002BC00545B12 /* AZClass */,
 				4435385F143746F900F5F309 /* Code */,
