@@ -89,7 +89,7 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown);
 }
 
 #pragma mark - Table view data source

@@ -38,6 +38,11 @@
 
 - (void)draw
 {
+    
+    CGRect rc = ibCenterView.frame;
+    rc.origin.x = (self.contentView.frame.size.width - rc.size.width) / 2.0;
+    ibCenterView.frame = rc;
+    
 	if (moE2node_) 
 	{
 		NSDateFormatter *fm = [[NSDateFormatter alloc] init];

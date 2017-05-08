@@ -101,7 +101,7 @@
 */
 //- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 //{
-//    return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait);
+//    return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown);
 //}
 //
 //- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation

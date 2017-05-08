@@ -612,7 +612,7 @@ NSInteger afterPageChange = 0;
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-    return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown);
 	//return YES; //[0.9]ヨコにすると「血圧の日変動分布」グラフ表示する
 }
 

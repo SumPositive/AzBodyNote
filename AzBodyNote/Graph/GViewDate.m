@@ -19,7 +19,7 @@
     if (self) {
         // Initialization code
 		if (iS_iPAD) {
-			mPadScale = 1.5;
+			mPadScale = 1.3;
 		} else {
 			mPadScale = 1.0;
 		}
@@ -104,9 +104,13 @@
 
 	CGPoint po;
 	po.x = self.bounds.size.width - self.ppRecordWidth/2.0;
-	po.y = 2.0;	//Base Line
+    if (iS_iPAD) {
+        po.y = -3.0;	//Base Line
+    } else {
+        po.y = +4.0;	//Base Line
+    }
 	
-	if (self.ppPage==0) { 
+	if (self.ppPage==0) {
 		//Goal
 		if (bGoal) {
 			cc = [@"Goal" UTF8String];

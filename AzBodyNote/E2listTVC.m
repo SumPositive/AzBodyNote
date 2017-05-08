@@ -243,22 +243,19 @@
 }
 */
 
-//// Override to allow orientations other than the default portrait orientation.
-//- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-//	// Return YES for supported orientations.
-//	return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait);
-//}
-//
-//- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-//{	// 回転した後に呼び出される
-//	//[appDelegate_ adRefresh];
-///*	if (iS_iPAD) {
-//		CGRect rc = ibViewTitle.frame;
-//		rc.origin.x = (self.navigationController.navigationBar.bounds.size.width - rc.size.width) / 2.0;
-//		ibViewTitle.frame = rc;
-//	}*/
-//}
-
+// Override to allow orientations other than the default portrait orientation.
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+	// Return YES for supported orientations.
+    return iS_iPAD OR (interfaceOrientation == UIInterfaceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown); // タテ正面のみ
+}
+- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
+                                duration:(NSTimeInterval)duration
+{	// 回転前
+}
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{	// 回転した後に呼び出される
+    [self.tableView reloadData];
+}
 
 - (void)didReceiveMemoryWarning
 {

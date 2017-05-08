@@ -1,16 +1,20 @@
 {
-  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23",
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23+++EF68A06",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
 
   },
   "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
-    "78B0850B1D8D204C79DEFA75BED768DA2698F732" : 9223372036854775807,
-    "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23" : 9223372036854775807
+    "78B0850B1D8D204C79DEFA75BED768DA2698F732+++224100D" : 9223372036854775807,
+    "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23+++EF68A06" : 9223372036854775807,
+    "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23+++1FC9339" : 9223372036854775807,
+    "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23+++92F15EF" : 9223372036854775807
   },
   "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "8652B9BD-2B28-4E8C-9DA7-89856667368F",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
-    "78B0850B1D8D204C79DEFA75BED768DA2698F732" : "AZClass\/",
-    "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23" : "..\/AzukiSoft\/AzBodyNote\/AzBodyNote"
+    "78B0850B1D8D204C79DEFA75BED768DA2698F732+++224100D" : "AZClass\/",
+    "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23+++EF68A06" : "AzBodyNote\/",
+    "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23+++1FC9339" : "..\/AzukiSoft\/AzBodyNote\/AzBodyNote",
+    "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23+++92F15EF" : "..\/AzukiSoft\/AzBodyNote\/AzBodyNote"
   },
   "DVTSourceControlWorkspaceBlueprintNameKey" : "AzBodyNote",
   "DVTSourceControlWorkspaceBlueprintVersion" : 204,
@@ -19,17 +23,22 @@
     {
       "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/bitbucket.org\/azukid\/azbodynote.git",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
-      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23"
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23+++1FC9339"
     },
     {
       "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/bitbucket.org\/azukid\/azbodynote.git",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
-      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23"
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23+++92F15EF"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/bitbucket.org\/azukid\/condition.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "3BA531E76F3A9C443808E27DDF82BDCE3C35BC23+++EF68A06"
     },
     {
       "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/bitbucket.org\/azukid\/azclass.git",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
-      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "78B0850B1D8D204C79DEFA75BED768DA2698F732"
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "78B0850B1D8D204C79DEFA75BED768DA2698F732+++224100D"
     }
   ]
 }

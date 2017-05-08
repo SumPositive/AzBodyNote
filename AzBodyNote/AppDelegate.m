@@ -210,53 +210,53 @@
 	[kvs synchronize];
 #endif
 
-#ifdef xxxxxxxxxxxxNoAddxxxxxxxxxxxx
-	if (__App_is_unlock==NO) {
-		@try {
-			//--------------------------------------------------------------------------------------------------------- AdMob
-			//iPhone//320x50//extern GADAdSize const kGADAdSizeBanner;
-			//iPad//468x60//extern GADAdSize const kGADAdSizeFullBanner;
-			if (RoAdMobView==nil) {
-				if (iS_iPAD) {
-					RoAdMobView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeFullBanner];	//468x60
-					RoAdMobView.adUnitID = @"0dc4518b212344a8";	//iPad//体調メモ iPad
-				} else {
-					RoAdMobView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeBanner];		//320x50
-					RoAdMobView.adUnitID = @"a14ece23da85f5e";	//iPhone//体調メモ
-				}
-				RoAdMobView.rootViewController = __Window.rootViewController;
-				//rc.origin.x = (rc.size.width - RoAdMobView.frame.size.width) / 2.0;
-				//RoAdMobView.frame = rc;
-				RoAdMobView.alpha = 0;
-				GADRequest *request = [GADRequest request];
-				//[request setTesting:YES];
-				[RoAdMobView loadRequest:request];	
-				[__Window.rootViewController.view addSubview:RoAdMobView];
-			}
-			//--------------------------------------------------------------------------------------------------------- iAd
-			//iPhone//320x50//480x32//
-			//iPad//768x66//1024x66//
-			// iOS5.0以降のみ
-			assert(NSClassFromString(@"ADBannerView"));
-			RiAdBanner = [[ADBannerView alloc] initWithFrame:CGRectZero];
-			RiAdBanner.delegate = self;
-			RiAdBanner.requiredContentSizeIdentifiers = [NSSet setWithObjects:
-														 ADBannerContentSizeIdentifierPortrait,
-														 ADBannerContentSizeIdentifierLandscape, nil];
-			RiAdBanner.currentContentSizeIdentifier = ADBannerContentSizeIdentifierPortrait;
-			//rc.origin.x = 0;
-			//RiAdBanner.frame = rc;
-			RiAdBanner.alpha = 0;
-			[_Window.rootViewController.view addSubview:RiAdBanner];
-			bADbannerIsVisible = NO;
-			mAdShow = 0;
-		}
-		@catch (NSException *exception) {
-			NSLog(@"Ad Exception: %@: %@", [exception name], [exception reason]);
-			GA_TRACK_EVENT_ERROR([exception description],0);
-		}
-	}
-#endif
+//#ifdef xxxxxxxxxxxxNoAddxxxxxxxxxxxx
+//	if (__App_is_unlock==NO) {
+//		@try {
+//			//--------------------------------------------------------------------------------------------------------- AdMob
+//			//iPhone//320x50//extern GADAdSize const kGADAdSizeBanner;
+//			//iPad//468x60//extern GADAdSize const kGADAdSizeFullBanner;
+//			if (RoAdMobView==nil) {
+//				if (iS_iPAD) {
+//					RoAdMobView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeFullBanner];	//468x60
+//					RoAdMobView.adUnitID = @"0dc4518b212344a8";	//iPad//体調メモ iPad
+//				} else {
+//					RoAdMobView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeBanner];		//320x50
+//					RoAdMobView.adUnitID = @"a14ece23da85f5e";	//iPhone//体調メモ
+//				}
+//				RoAdMobView.rootViewController = __Window.rootViewController;
+//				//rc.origin.x = (rc.size.width - RoAdMobView.frame.size.width) / 2.0;
+//				//RoAdMobView.frame = rc;
+//				RoAdMobView.alpha = 0;
+//				GADRequest *request = [GADRequest request];
+//				//[request setTesting:YES];
+//				[RoAdMobView loadRequest:request];	
+//				[__Window.rootViewController.view addSubview:RoAdMobView];
+//			}
+//			//--------------------------------------------------------------------------------------------------------- iAd
+//			//iPhone//320x50//480x32//
+//			//iPad//768x66//1024x66//
+//			// iOS5.0以降のみ
+//			assert(NSClassFromString(@"ADBannerView"));
+//			RiAdBanner = [[ADBannerView alloc] initWithFrame:CGRectZero];
+//			RiAdBanner.delegate = self;
+//			RiAdBanner.requiredContentSizeIdentifiers = [NSSet setWithObjects:
+//														 ADBannerContentSizeIdentifierPortrait,
+//														 ADBannerContentSizeIdentifierLandscape, nil];
+//			RiAdBanner.currentContentSizeIdentifier = ADBannerContentSizeIdentifierPortrait;
+//			//rc.origin.x = 0;
+//			//RiAdBanner.frame = rc;
+//			RiAdBanner.alpha = 0;
+//			[_Window.rootViewController.view addSubview:RiAdBanner];
+//			bADbannerIsVisible = NO;
+//			mAdShow = 0;
+//		}
+//		@catch (NSException *exception) {
+//			NSLog(@"Ad Exception: %@: %@", [exception name], [exception reason]);
+//			GA_TRACK_EVENT_ERROR([exception description],0);
+//		}
+//	}
+//#endif
 
     return YES;
 }
