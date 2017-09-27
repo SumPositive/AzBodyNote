@@ -122,7 +122,7 @@
 	switch (section) {
 		case 0:	return 2;			break;
 		case 1:	return 2;			break;
-		case 2:	return 2;			break;
+		case 2:	return 1;			break;
 //		case 3:	return 1;			break;
 	}
 	return 0;
@@ -250,21 +250,21 @@
 			return cell;
 		}	break;
 
-		case 201: {	// あずき商店
-			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
-			if (cell == nil) {
-				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
-			}
-			cell.imageView.image = [UIImage imageNamed:@"AZStore-32"];
-			cell.textLabel.text = AZLocalizedString(@"AZStore",nil);
-			cell.detailTextLabel.text = AZLocalizedString(@"AZStore detail",nil);
-			if (iS_iPAD) {
-				cell.accessoryType = UITableViewCellAccessoryNone;
-			} else {
-				cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-			}
-			return cell;
-		}	break;
+//        case 201: {    // あずき商店
+//            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sysCellSubtitle];
+//            if (cell == nil) {
+//                cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:sysCellSubtitle];
+//            }
+//            cell.imageView.image = [UIImage imageNamed:@"AZStore-32"];
+//            cell.textLabel.text = AZLocalizedString(@"AZStore",nil);
+//            cell.detailTextLabel.text = AZLocalizedString(@"AZStore detail",nil);
+//            if (iS_iPAD) {
+//                cell.accessoryType = UITableViewCellAccessoryNone;
+//            } else {
+//                cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+//            }
+//            return cell;
+//        }    break;
 			
 		
 //		case 300: {	// Dropbox - Download
@@ -366,31 +366,31 @@
 			}
 		}	break;
 			
-		case 201: {	// あずき商店
-			AZStoreTVC *vc = [[AZStoreTVC alloc] init];
-			vc.delegate = self; //<AZStoreDelegate> azStorePurchesed:呼び出すため
-
-			// Important note about In-App Purchase Receipt Validation on iOS
-			// クラッキング対策：非消費型でもレシートチェックが必要になった。
-			// [Manage In-App Purchase]-[View or generate a shared secret]-[Generate]から取得した文字列をセットする
-			vc.ppSharedSecret = @"062e76976c5a468a82bda70683326208";	//Condition
-			
-			// 商品IDリスト
-			NSSet *pids = [NSSet setWithObjects:STORE_PRODUCTID_UNLOCK, nil]; // 商品が複数ある場合は列記
-			[vc setProductIDs:pids];
-			//vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
-			//[self.navigationController pushViewController:vc animated:YES];
-			if (iS_iPAD) {
-				UINavigationController* nc = [[UINavigationController alloc] initWithRootViewController:vc];
-				nc.modalPresentationStyle = UIModalPresentationFormSheet; // iPad画面1/4サイズ
-				nc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-				[self presentModalViewController:nc animated:YES];
-			} else {
-				//[mAppDelegate adShow:2];	//(2)Ad下端へ
-				[vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
-				[self.navigationController pushViewController:vc animated:YES];
-			}
-		}	break;
+//        case 201: {    // あずき商店
+//            AZStoreTVC *vc = [[AZStoreTVC alloc] init];
+//            vc.delegate = self; //<AZStoreDelegate> azStorePurchesed:呼び出すため
+//
+//            // Important note about In-App Purchase Receipt Validation on iOS
+//            // クラッキング対策：非消費型でもレシートチェックが必要になった。
+//            // [Manage In-App Purchase]-[View or generate a shared secret]-[Generate]から取得した文字列をセットする
+//            vc.ppSharedSecret = @"062e76976c5a468a82bda70683326208";    //Condition
+//
+//            // 商品IDリスト
+//            NSSet *pids = [NSSet setWithObjects:STORE_PRODUCTID_UNLOCK, nil]; // 商品が複数ある場合は列記
+//            [vc setProductIDs:pids];
+//            //vc.hidesBottomBarWhenPushed = YES; //以降のタブバーを消す
+//            //[self.navigationController pushViewController:vc animated:YES];
+//            if (iS_iPAD) {
+//                UINavigationController* nc = [[UINavigationController alloc] initWithRootViewController:vc];
+//                nc.modalPresentationStyle = UIModalPresentationFormSheet; // iPad画面1/4サイズ
+//                nc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+//                [self presentModalViewController:nc animated:YES];
+//            } else {
+//                //[mAppDelegate adShow:2];    //(2)Ad下端へ
+//                [vc setHidesBottomBarWhenPushed:YES]; // 現在のToolBar状態をPushした上で、次画面では非表示にする
+//                [self.navigationController pushViewController:vc animated:YES];
+//            }
+//        }    break;
 
 	
 //		case 300: {	// Dropbox - Download
@@ -423,21 +423,21 @@
 }
 
 
-#pragma mark - <AZStoreDelegate>
-- (void)azStorePurchesed:(NSString*)productID
-{	//既に呼び出し元にて、[userDefaults setBool:YES  forKey:productID]　登録済み
-	GA_TRACK_EVENT(@"AZStore", @"azStorePurchesed", productID,1);
-	if ([productID isEqualToString:STORE_PRODUCTID_UNLOCK]) {
-		mAppDelegate.ppApp_is_unlock = YES; //購入済み
-		//Ad非表示
-		//[mAppDelegate adShow:-1]; //-1=破棄
-	}
-	
-	// NFM_REFRESH_ALL_VIEWS 通知
-	NSNotification* refreshNotification = [NSNotification notificationWithName:NFM_REFRESH_ALL_VIEWS
-																		object:self  userInfo:nil];
-	[[NSNotificationCenter defaultCenter] postNotification:refreshNotification];
-}
+//#pragma mark - <AZStoreDelegate>
+//- (void)azStorePurchesed:(NSString*)productID
+//{    //既に呼び出し元にて、[userDefaults setBool:YES  forKey:productID]　登録済み
+//    GA_TRACK_EVENT(@"AZStore", @"azStorePurchesed", productID,1);
+//    if ([productID isEqualToString:STORE_PRODUCTID_UNLOCK]) {
+//        mAppDelegate.ppApp_is_unlock = YES; //購入済み
+//        //Ad非表示
+//        //[mAppDelegate adShow:-1]; //-1=破棄
+//    }
+//
+//    // NFM_REFRESH_ALL_VIEWS 通知
+//    NSNotification* refreshNotification = [NSNotification notificationWithName:NFM_REFRESH_ALL_VIEWS
+//                                                                        object:self  userInfo:nil];
+//    [[NSNotificationCenter defaultCenter] postNotification:refreshNotification];
+//}
 
 
 //#pragma mark - <AZDropboxDelegate>

@@ -46,7 +46,7 @@
 			// 設定中は、BpLoを取り除き、BpHiだけにする ＞＞ 保存時にBpHiの次にBpLoを挿入する
 			for (int iRow=0; iRow<[mPanels count]; iRow++) {
 				NSInteger item = [[mPanels objectAtIndex:iRow] integerValue];
-				if (abs(item)==EnumConditionBpLo) {
+                if (labs(item)==EnumConditionBpLo) {
 					[mPanels removeObjectAtIndex:iRow];	//BpLo削除
 					break;
 				}
@@ -93,7 +93,7 @@
 	// 設定中は、BpLoを取り除き、BpHiだけ ＞＞ 保存時にBpHiの次にBpLoを挿入する
 	for (int iRow=0; iRow<[mPanels count]; iRow++) {
 		NSInteger item = [[mPanels objectAtIndex:iRow] integerValue];
-		if (abs(item)==EnumConditionBpHi) {
+        if (labs(item)==EnumConditionBpHi) {
 			if (item < 0) {
 				item = EnumConditionBpLo * (-1); //Lo ON
 			} else {

@@ -50,7 +50,7 @@
 									   sort:sortDesc]; // 日付降順の先頭から1件抽出
 		if ([arFetch count]==1) {
 			e2prev = [arFetch objectAtIndex:0];
-			NSLog(@"Re2prev.nBpHi_mmHg=%d", [e2prev.nBpHi_mmHg integerValue]);
+            NSLog(@"Re2prev.nBpHi_mmHg=%ld", (long)[e2prev.nBpHi_mmHg integerValue]);
 			iPrevBpHi_ = [e2prev.nBpHi_mmHg integerValue];
 		} else {
 			iPrevBpHi_ = E2_nBpHi_INIT;

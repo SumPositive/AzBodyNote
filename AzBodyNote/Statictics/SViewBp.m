@@ -420,7 +420,7 @@ NSInteger	pStatCount = 0;
 		} else {
 			dAvgLo = 0.0;
 		}
-		NSLog(@"Average: iCntHi=%d, iCntLo=%d", iCntHi, iCntLo);
+        NSLog(@"Average: iCntHi=%ld, iCntLo=%ld", (long)iCntHi, (long)iCntLo);
 		NSLog(@"Average: dAvgHi=%0.4lf, dAvgLo=%0.4lf", dAvgHi, dAvgLo);
 		
 		//--------------------------------------------------------------------------標準偏 Standard deviations

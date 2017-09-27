@@ -74,7 +74,7 @@
 //	GA_TRACK_EVENT(@"Device", @"model", [[UIDevice currentDevice] model], 0);
 //	GA_TRACK_EVENT(@"Device", @"systemVersion", [[UIDevice currentDevice] systemVersion], 0);
 
-	mAzukiUnlock = NO;	// YES=購入意思ありと見なしてUnlockする
+	//mAzukiUnlock = NO;	// YES=購入意思ありと見なしてUnlockする
 	
 	//  iCloud KVS     [0.9.0]以降、userDefaultsを廃して、kvsへ移行統一
 	NSUbiquitousKeyValueStore *kvs = [NSUbiquitousKeyValueStore defaultStore];
@@ -130,34 +130,39 @@
 	
 	[kvs synchronize];
 	
-	if (__App_is_unlock==NO) {
-		__App_is_unlock = [kvs boolForKey:STORE_PRODUCTID_UNLOCK];
-		//[0.8]以前に対応するため
-		if (__App_is_unlock==NO) {
-			__App_is_unlock = [kvs boolForKey:@"GUD_bPaid"];  //[0.8]以前の定義
-			if (__App_is_unlock==NO) {
-				__App_is_unlock = [kvs boolForKey:@"GUD_bUnlock"];  //[0.8]以前の定義
-				if (__App_is_unlock==NO) {
-					NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-					if (__App_is_unlock==NO) {
-						__App_is_unlock = [userDefaults boolForKey:@"GUD_bPaid"];  //[0.8]以前の定義
-						if (__App_is_unlock==NO) {
-							__App_is_unlock = [userDefaults boolForKey:@"GUD_bUnlock"];  //[0.8]以前の定義
-						}
-					}
-				}
-			}
-		}
-#ifdef DEBUG
-		__App_is_unlock = YES;
-		[kvs setBool:__App_is_unlock forKey:STORE_PRODUCTID_UNLOCK];
-		[kvs synchronize]; // plistへ書き出す
-#endif
+
+    if (__App_is_unlock==NO) {
+        
+//        __App_is_unlock = [kvs boolForKey:STORE_PRODUCTID_UNLOCK];
+//        //[0.8]以前に対応するため
+//        if (__App_is_unlock==NO) {
+//            __App_is_unlock = [kvs boolForKey:@"GUD_bPaid"];  //[0.8]以前の定義
+//            if (__App_is_unlock==NO) {
+//                __App_is_unlock = [kvs boolForKey:@"GUD_bUnlock"];  //[0.8]以前の定義
+//                if (__App_is_unlock==NO) {
+//                    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+//                    if (__App_is_unlock==NO) {
+//                        __App_is_unlock = [userDefaults boolForKey:@"GUD_bPaid"];  //[0.8]以前の定義
+//                        if (__App_is_unlock==NO) {
+//                            __App_is_unlock = [userDefaults boolForKey:@"GUD_bUnlock"];  //[0.8]以前の定義
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//#ifdef DEBUG
+//        __App_is_unlock = YES;
+//        [kvs setBool:__App_is_unlock forKey:STORE_PRODUCTID_UNLOCK];
+//        [kvs synchronize]; // plistへ書き出す
+//#endif
+
+        __App_is_unlock = YES;  //1.1.2// 基本無料配布（今後、内部課金予定）
+        
 		if (__App_is_unlock) {	//登録
 			[kvs setBool:YES forKey:STORE_PRODUCTID_UNLOCK];
 			[kvs synchronize]; // plistへ書き出す
 		}
-	}
+    }
 	
 	// NSUserDefaults
 	NSUserDefaults *udef = [NSUserDefaults standardUserDefaults];

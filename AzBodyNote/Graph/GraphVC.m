@@ -706,7 +706,7 @@ NSInteger afterPageChange = 0;
 		}
 		NSLog(@"mPage=%ld < mPageMax=%ld", (long)mPage, (long)mPageMax);
 		if (mPage < mPageMax) {
-			NSLog(@"scrollViewDidEndDragging: PREV mPage=%d + 1", mPage);
+            NSLog(@"scrollViewDidEndDragging: PREV mPage=%lu + 1", (unsigned long)mPage);
 			[self graphViewPageChange:+1  animated:YES];
 			return;
 		}
@@ -714,7 +714,7 @@ NSInteger afterPageChange = 0;
 	else if (scrollView.contentSize.width - ibScrollView.bounds.size.width + 70 < scrollView.contentOffset.x) {
 		// NEXT（未来）ページへ
 		if (0 < mPage) {
-			NSLog(@"scrollViewDidEndDragging: NEXT mPage=%d - 1", mPage);
+            NSLog(@"scrollViewDidEndDragging: NEXT mPage=%lu - 1", (unsigned long)mPage);
 			[self graphViewPageChange:-1  animated:YES];
 			return;
 		} 

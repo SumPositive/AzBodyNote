@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "AZAboutVC.h"
-#import "AZStoreTVC.h"	//<AZStoreDelegate>
+//#import "AZStoreTVC.h"	//<AZStoreDelegate>
 
 #import "Global.h"
 #import "AppDelegate.h"
@@ -17,7 +17,7 @@
 #import "SettStatTVC.h"
 
 
-@interface SettingTVC : UITableViewController <AZStoreDelegate>
+@interface SettingTVC : UITableViewController //<AZStoreDelegate>
 {
 @private
 	AppDelegate					*mAppDelegate;

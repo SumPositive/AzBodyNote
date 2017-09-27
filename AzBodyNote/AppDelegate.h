@@ -26,7 +26,7 @@
 	
 	UIAlertView									*mAlertProgress;
 	UIActivityIndicatorView				*mAlertIndicator;
-	BOOL											mAzukiUnlock;	// YES=購入意思ありと見なしてUnlockする
+	//BOOL											mAzukiUnlock;	// YES=購入意思ありと見なしてUnlockする
 	
 	//ADBannerView						*RiAdBanner;
 	//GADBannerView						*RoAdMobView;

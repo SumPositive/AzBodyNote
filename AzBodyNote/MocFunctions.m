@@ -258,7 +258,7 @@ static NSDate *dateGoal_ = nil;
 			[mContext deleteObject:object];
 		}
 	}
-	NSLog(@"deleteAllCoreData: count=%d", count);
+    NSLog(@"deleteAllCoreData: count=%lu", (unsigned long)count);
 	[self commit];
 }
 
