@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 48;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -62,6 +62,13 @@
 		448BF7C1155FFB5C005C76C3 /* Icon32-Calender-ON.png in Resources */ = {isa = PBXBuildFile; fileRef = 448BF7BF155FFB5C005C76C3 /* Icon32-Calender-ON.png */; };
 		448BF7C2155FFB5C005C76C3 /* Icon32-Calender-ON@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 448BF7C0155FFB5C005C76C3 /* Icon32-Calender-ON@2x.png */; };
 		448DD2761490FFEA005FD889 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44F90CDA1490C7F900BA5020 /* Security.framework */; };
+		4490A9ED1F7BF233006A572D /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4490A9E61F7BF232006A572D /* Default@2x.png */; };
+		4490A9EE1F7BF233006A572D /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 4490A9E71F7BF232006A572D /* Default.png */; };
+		4490A9EF1F7BF233006A572D /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4490A9E81F7BF232006A572D /* Default-568h@2x.png */; };
+		4490A9F01F7BF233006A572D /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 4490A9E91F7BF232006A572D /* Default-Landscape~ipad.png */; };
+		4490A9F11F7BF233006A572D /* Default-Landscape@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 4490A9EA1F7BF233006A572D /* Default-Landscape@2x~ipad.png */; };
+		4490A9F21F7BF233006A572D /* Default-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 4490A9EB1F7BF233006A572D /* Default-Portrait@2x~ipad.png */; };
+		4490A9F31F7BF233006A572D /* Default-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 4490A9EC1F7BF233006A572D /* Default-Portrait~ipad.png */; };
 		449BED59147E96E40084E8EA /* Tab32-Graph@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 449BED55147E96E40084E8EA /* Tab32-Graph@2x.png */; };
 		449BED5A147E96E40084E8EA /* Tab32-Graph.png in Resources */ = {isa = PBXBuildFile; fileRef = 449BED56147E96E40084E8EA /* Tab32-Graph.png */; };
 		449BED5B147E96E40084E8EA /* Tab32-List.png in Resources */ = {isa = PBXBuildFile; fileRef = 449BED57147E96E40084E8EA /* Tab32-List.png */; };
@@ -232,6 +239,13 @@
 		4486745414385E0C00B6EE2F /* E2editCellDial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = E2editCellDial.m; sourceTree = "<group>"; };
 		448BF7BF155FFB5C005C76C3 /* Icon32-Calender-ON.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon32-Calender-ON.png"; path = "AzBodyNote/Design/Icon32-Calender-ON.png"; sourceTree = "<group>"; };
 		448BF7C0155FFB5C005C76C3 /* Icon32-Calender-ON@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon32-Calender-ON@2x.png"; path = "AzBodyNote/Design/Icon32-Calender-ON@2x.png"; sourceTree = "<group>"; };
+		4490A9E61F7BF232006A572D /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default@2x.png"; path = "Design/Default@2x.png"; sourceTree = SOURCE_ROOT; };
+		4490A9E71F7BF232006A572D /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = Design/Default.png; sourceTree = SOURCE_ROOT; };
+		4490A9E81F7BF232006A572D /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "Design/Default-568h@2x.png"; sourceTree = SOURCE_ROOT; };
+		4490A9E91F7BF232006A572D /* Default-Landscape~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Landscape~ipad.png"; path = "Design/Default-Landscape~ipad.png"; sourceTree = SOURCE_ROOT; };
+		4490A9EA1F7BF233006A572D /* Default-Landscape@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Landscape@2x~ipad.png"; path = "Design/Default-Landscape@2x~ipad.png"; sourceTree = SOURCE_ROOT; };
+		4490A9EB1F7BF233006A572D /* Default-Portrait@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Portrait@2x~ipad.png"; path = "Design/Default-Portrait@2x~ipad.png"; sourceTree = SOURCE_ROOT; };
+		4490A9EC1F7BF233006A572D /* Default-Portrait~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Portrait~ipad.png"; path = "Design/Default-Portrait~ipad.png"; sourceTree = SOURCE_ROOT; };
 		449BED55147E96E40084E8EA /* Tab32-Graph@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Tab32-Graph@2x.png"; path = "AzBodyNote/Design/Tab32-Graph@2x.png"; sourceTree = "<group>"; };
 		449BED56147E96E40084E8EA /* Tab32-Graph.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Tab32-Graph.png"; path = "AzBodyNote/Design/Tab32-Graph.png"; sourceTree = "<group>"; };
 		449BED57147E96E40084E8EA /* Tab32-List.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Tab32-List.png"; path = "AzBodyNote/Design/Tab32-List.png"; sourceTree = "<group>"; };
@@ -497,6 +511,13 @@
 				44EE2D0F157E03E700236557 /* Icon72.png */,
 				44CFED6D147E8EE100A22F49 /* Icon57@2x.png */,
 				44CFED6B147E8EDB00A22F49 /* Icon57.png */,
+				4490A9E81F7BF232006A572D /* Default-568h@2x.png */,
+				4490A9EA1F7BF233006A572D /* Default-Landscape@2x~ipad.png */,
+				4490A9E91F7BF232006A572D /* Default-Landscape~ipad.png */,
+				4490A9EB1F7BF233006A572D /* Default-Portrait@2x~ipad.png */,
+				4490A9EC1F7BF233006A572D /* Default-Portrait~ipad.png */,
+				4490A9E71F7BF232006A572D /* Default.png */,
+				4490A9E61F7BF232006A572D /* Default@2x.png */,
 			);
 			name = "Supporting Files";
 			path = AzBodyNote;
@@ -781,7 +802,7 @@
 				};
 			};
 			buildConfigurationList = 4435384D143746F900F5F309 /* Build configuration list for PBXProject "AzBodyNote" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -816,6 +837,7 @@
 				44A2551A1EA36D5300FE4760 /* AZAbout-iPad.xib in Resources */,
 				44B60138143DAED00048E099 /* Icon32-Information.png in Resources */,
 				44B60139143DAED00048E099 /* Icon32-Information@2x.png in Resources */,
+				4490A9EF1F7BF233006A572D /* Default-568h@2x.png in Resources */,
 				44B6013A143DAED00048E099 /* Icon32-Setting.png in Resources */,
 				44B6013B143DAED00048E099 /* Icon32-Setting@2x.png in Resources */,
 				44F90CF01490D73B00BA5020 /* AzBodyNote.storyboard in Resources */,
@@ -823,6 +845,7 @@
 				445B50D2144B127A00E5311D /* Tx-WdWhite320@2x.png in Resources */,
 				44CFED65147E84A100A22F49 /* Tab32-Add@2x.png in Resources */,
 				44CFED66147E84A100A22F49 /* Tab32-Add.png in Resources */,
+				4490A9F11F7BF233006A572D /* Default-Landscape@2x~ipad.png in Resources */,
 				44A255181EA36D5300FE4760 /* AZAbout-32.png in Resources */,
 				44CFED6C147E8EDC00A22F49 /* Icon57.png in Resources */,
 				44CFED6E147E8EE100A22F49 /* Icon57@2x.png in Resources */,
@@ -832,6 +855,7 @@
 				449BED5B147E96E40084E8EA /* Tab32-List.png in Resources */,
 				449BED5C147E96E40084E8EA /* Tab32-List@2x.png in Resources */,
 				44F577AD15428AFF0003FFD4 /* Icon20-Sleep.png in Resources */,
+				4490A9F21F7BF233006A572D /* Default-Portrait@2x~ipad.png in Resources */,
 				44F577AE15428AFF0003FFD4 /* Icon20-Wake.png in Resources */,
 				44F577B3154292950003FFD4 /* Icon20-Sleep@2x.png in Resources */,
 				44A2550D1EA36D4300FE4760 /* AZLocalizable.strings in Resources */,
@@ -845,11 +869,13 @@
 				44EE0271154EDC22004A8ADB /* Icon20-Goal@2x.png in Resources */,
 				44A255761EA36D8000FE4760 /* AZWeb-Forward-16.png in Resources */,
 				44A255341EA36D6200FE4760 /* AZDialStepperPlus.png in Resources */,
+				4490A9F01F7BF233006A572D /* Default-Landscape~ipad.png in Resources */,
 				44EE0272154EDC22004A8ADB /* Icon20-Goal.png in Resources */,
 				44EE027B154EEBCD004A8ADB /* bird_32_blue.png in Resources */,
 				44EE027D154EEC1D004A8ADB /* bird_32_gray.png in Resources */,
 				44424F2C155003D300A0E832 /* Icon32-Sett_Right.png in Resources */,
 				44424F2D155003D300A0E832 /* Icon32-Sett_Right@2x.png in Resources */,
+				4490A9F31F7BF233006A572D /* Default-Portrait~ipad.png in Resources */,
 				44FE103015536A3E0021CDCC /* Icon32-Calender.png in Resources */,
 				44FE103115536A3E0021CDCC /* Icon32-Calender@2x.png in Resources */,
 				44FE103515536D740021CDCC /* Icon32@2x.png in Resources */,
@@ -857,10 +883,12 @@
 				448BF7C1155FFB5C005C76C3 /* Icon32-Calender-ON.png in Resources */,
 				448BF7C2155FFB5C005C76C3 /* Icon32-Calender-ON@2x.png in Resources */,
 				44A2552E1EA36D6200FE4760 /* AZDialBack.png in Resources */,
+				4490A9EE1F7BF233006A572D /* Default.png in Resources */,
 				44A255301EA36D6200FE4760 /* AZDialStepperMinus.png in Resources */,
 				44A255371EA36D6200FE4760 /* AZDialStepperPlusDown@2X.png in Resources */,
 				44A255191EA36D5300FE4760 /* AZAbout-32@2x.png in Resources */,
 				44A255361EA36D6200FE4760 /* AZDialStepperPlusDown.png in Resources */,
+				4490A9ED1F7BF233006A572D /* Default@2x.png in Resources */,
 				44A255321EA36D6200FE4760 /* AZDialStepperMinusDown.png in Resources */,
 				44A255051EA36CAA00FE4760 /* Images.xcassets in Resources */,
 				4430BD5F157B039E00917714 /* AzBodyNote-iPad.storyboard in Resources */,
