@@ -17,6 +17,8 @@
 		4412FD54153086B700545B12 /* SettingTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 4412FD53153086B700545B12 /* SettingTVC.m */; };
 		44187BF3159BFEF80095230C /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4486741A14383B5C00B6EE2F /* MessageUI.framework */; };
 		442530E51449870800F9B4C1 /* E2editCellNote.m in Sources */ = {isa = PBXBuildFile; fileRef = 442530E31449870800F9B4C1 /* E2editCellNote.m */; };
+		442DABE71F8281F000295F3F /* AzBodyNote-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4405F22914A0CEFD00D4FD62 /* AzBodyNote-Info.plist */; };
+		442DABE81F8281F400295F3F /* AzBodyNote.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 442DCD36149DFAE70012328B /* AzBodyNote.entitlements */; };
 		4430BD5F157B039E00917714 /* AzBodyNote-iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4430BD5E157B039E00917714 /* AzBodyNote-iPad.storyboard */; };
 		44343431153A9A88009CCB51 /* AZCalendarSelect.m in Sources */ = {isa = PBXBuildFile; fileRef = 44343430153A9A88009CCB51 /* AZCalendarSelect.m */; };
 		44353858143746F900F5F309 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44353857143746F900F5F309 /* UIKit.framework */; };
@@ -794,8 +796,14 @@
 						DevelopmentTeam = 5C2UYK6F45;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
-							com.apple.iCloud = {
+							com.apple.Keychain = {
 								enabled = 0;
+							};
+							com.apple.Push = {
+								enabled = 0;
+							};
+							com.apple.iCloud = {
+								enabled = 1;
 							};
 						};
 					};
@@ -845,6 +853,7 @@
 				445B50D2144B127A00E5311D /* Tx-WdWhite320@2x.png in Resources */,
 				44CFED65147E84A100A22F49 /* Tab32-Add@2x.png in Resources */,
 				44CFED66147E84A100A22F49 /* Tab32-Add.png in Resources */,
+				442DABE81F8281F400295F3F /* AzBodyNote.entitlements in Resources */,
 				4490A9F11F7BF233006A572D /* Default-Landscape@2x~ipad.png in Resources */,
 				44A255181EA36D5300FE4760 /* AZAbout-32.png in Resources */,
 				44CFED6C147E8EDC00A22F49 /* Icon57.png in Resources */,
@@ -872,6 +881,7 @@
 				4490A9F01F7BF233006A572D /* Default-Landscape~ipad.png in Resources */,
 				44EE0272154EDC22004A8ADB /* Icon20-Goal.png in Resources */,
 				44EE027B154EEBCD004A8ADB /* bird_32_blue.png in Resources */,
+				442DABE71F8281F000295F3F /* AzBodyNote-Info.plist in Resources */,
 				44EE027D154EEC1D004A8ADB /* bird_32_gray.png in Resources */,
 				44424F2C155003D300A0E832 /* Icon32-Sett_Right.png in Resources */,
 				44424F2D155003D300A0E832 /* Icon32-Sett_Right@2x.png in Resources */,
@@ -1051,7 +1061,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
@@ -1075,7 +1085,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "92C8B195-489D-4959-9A36-D0058D40D948";
 				SDKROOT = iphoneos;
-				VALID_ARCHS = armv7;
+				VALID_ARCHS = arm64;
 			};
 			name = Debug;
 		};
@@ -1083,7 +1093,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
@@ -1102,7 +1112,7 @@
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "92C8B195-489D-4959-9A36-D0058D40D948";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
-				VALID_ARCHS = armv7;
+				VALID_ARCHS = arm64;
 			};
 			name = Release;
 		};
@@ -1132,7 +1142,7 @@
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALID_ARCHS = "arm64 armv7s armv7";
+				VALID_ARCHS = arm64;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1163,7 +1173,7 @@
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALID_ARCHS = "arm64 armv7s armv7";
+				VALID_ARCHS = arm64;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
