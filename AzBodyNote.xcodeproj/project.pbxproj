@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		44000BA61F89324D003C9A47 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44000BA51F89324D003C9A47 /* DataManager.swift */; };
 		44082704152863F500DD596A /* E2editCellDateOpt.m in Sources */ = {isa = PBXBuildFile; fileRef = 44082702152863F400DD596A /* E2editCellDateOpt.m */; };
 		4410C83E154C22B8008E4DA5 /* Icon20-Down.png in Resources */ = {isa = PBXBuildFile; fileRef = 4410C83A154C22B8008E4DA5 /* Icon20-Down.png */; };
 		4410C83F154C22B8008E4DA5 /* Icon20-Down@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4410C83B154C22B8008E4DA5 /* Icon20-Down@2x.png */; };
@@ -163,6 +164,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		44000BA41F89324C003C9A47 /* AzBodyNote-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AzBodyNote-Bridging-Header.h"; sourceTree = "<group>"; };
+		44000BA51F89324D003C9A47 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
 		4405F22914A0CEFD00D4FD62 /* AzBodyNote-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "AzBodyNote-Info.plist"; sourceTree = SOURCE_ROOT; };
 		44082702152863F400DD596A /* E2editCellDateOpt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = E2editCellDateOpt.m; sourceTree = "<group>"; };
 		44082703152863F500DD596A /* E2editCellDateOpt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = E2editCellDateOpt.h; sourceTree = "<group>"; };
@@ -475,6 +478,8 @@
 		4435385F143746F900F5F309 /* Code */ = {
 			isa = PBXGroup;
 			children = (
+				44000BA51F89324D003C9A47 /* DataManager.swift */,
+				44000BA41F89324C003C9A47 /* AzBodyNote-Bridging-Header.h */,
 				44AB5DFD14380A2900F6EDE8 /* Global.h */,
 				4486741814383AB800B6EE2F /* Global.m */,
 				443538A31437557C00F5F309 /* MocEntity.h */,
@@ -794,6 +799,7 @@
 				TargetAttributes = {
 					44353852143746F900F5F309 = {
 						DevelopmentTeam = 5C2UYK6F45;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.Keychain = {
@@ -958,6 +964,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				44353866143746F900F5F309 /* main.m in Sources */,
+				44000BA61F89324D003C9A47 /* DataManager.swift in Sources */,
 				44A2550C1EA36D4300FE4760 /* AZClass.m in Sources */,
 				44A255781EA36D8000FE4760 /* AZWebView.m in Sources */,
 				4435386A143746F900F5F309 /* AppDelegate.m in Sources */,
@@ -1122,6 +1129,7 @@
 				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = AzBodyNote/AzBodyNote.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -1133,6 +1141,7 @@
 				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = "AzBodyNote-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -1141,6 +1150,9 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "AzBodyNote/AzBodyNote-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = arm64;
 				WRAPPER_EXTENSION = app;
@@ -1153,6 +1165,7 @@
 				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = AzBodyNote/AzBodyNote.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -1164,6 +1177,7 @@
 				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = "AzBodyNote-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -1172,6 +1186,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "AzBodyNote/AzBodyNote-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = arm64;
 				WRAPPER_EXTENSION = app;
